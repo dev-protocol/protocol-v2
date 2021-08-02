@@ -1,6 +1,6 @@
 pragma solidity 0.5.17;
 
-import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
+import {UsingRegistry} from "contracts/src/common/registry/UsingRegistry.sol";
 import {IAllocator} from "contracts/interface/IAllocator.sol";
 import {IWithdraw} from "contracts/interface/IWithdraw.sol";
 import {IPolicy} from "contracts/interface/IPolicy.sol";
@@ -12,22 +12,22 @@ import {IMetricsGroup} from "contracts/interface/IMetricsGroup.sol";
  * A contract that determines the total number of mint.
  * Lockup contract and Withdraw contract mint new DEV tokens based on the total number of new mint determined by this contract.
  */
-contract Allocator is UsingConfig, IAllocator {
+contract Allocator is UsingRegistry, IAllocator {
 	/**
 	 * @dev Initialize the passed address as AddressConfig address.
 	 * @param _config AddressConfig address.
 	 */
-	constructor(address _config) public UsingConfig(_config) {}
+	constructor(address _config) public UsingRegistry(_config) {}
 
 	/**
 	 * @dev Returns the maximum number of mints per block.
 	 * @return Maximum number of mints per block.
 	 */
 	function calculateMaxRewardsPerBlock() external view returns (uint256) {
-		uint256 totalAssets = IMetricsGroup(config().metricsGroup())
+		uint256 totalAssets = IMetricsGroup(registry().registries("MetricsGroup"))
 			.totalIssuedMetrics();
-		uint256 totalLockedUps = ILockup(config().lockup()).getAllValue();
-		return IPolicy(config().policy()).rewards(totalLockedUps, totalAssets);
+		uint256 totalLockedUps = ILockup(registry().registries("Lockup")).getAllValue();
+		return IPolicy(registry().registries("Policy")).rewards(totalLockedUps, totalAssets);
 	}
 
 	/**
@@ -42,11 +42,11 @@ contract Allocator is UsingConfig, IAllocator {
 		address _to
 	) external {
 		require(
-			IPropertyGroup(config().propertyGroup()).isGroup(msg.sender),
+			IPropertyGroup(registry().registries("PropertyGroup")).isGroup(msg.sender),
 			"this is illegal address"
 		);
 
-		IWithdraw(config().withdraw()).beforeBalanceChange(
+		IWithdraw(registry().registries("Withdraw")).beforeBalanceChange(
 			_property,
 			_from,
 			_to
