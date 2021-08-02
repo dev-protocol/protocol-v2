@@ -24,10 +24,16 @@ contract Allocator is UsingRegistry, IAllocator {
 	 * @return Maximum number of mints per block.
 	 */
 	function calculateMaxRewardsPerBlock() external view returns (uint256) {
-		uint256 totalAssets = IMetricsGroup(registry().registries("MetricsGroup"))
-			.totalIssuedMetrics();
-		uint256 totalLockedUps = ILockup(registry().registries("Lockup")).getAllValue();
-		return IPolicy(registry().registries("Policy")).rewards(totalLockedUps, totalAssets);
+		uint256 totalAssets = IMetricsGroup(
+			registry().registries("MetricsGroup")
+		).totalIssuedMetrics();
+		uint256 totalLockedUps = ILockup(registry().registries("Lockup"))
+			.getAllValue();
+		return
+			IPolicy(registry().registries("Policy")).rewards(
+				totalLockedUps,
+				totalAssets
+			);
 	}
 
 	/**
@@ -42,7 +48,9 @@ contract Allocator is UsingRegistry, IAllocator {
 		address _to
 	) external {
 		require(
-			IPropertyGroup(registry().registries("PropertyGroup")).isGroup(msg.sender),
+			IPropertyGroup(registry().registries("PropertyGroup")).isGroup(
+				msg.sender
+			),
 			"this is illegal address"
 		);
 
