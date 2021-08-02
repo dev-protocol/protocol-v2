@@ -1,0 +1,34 @@
+{
+	"parser": "@typescript-eslint/parser",
+	"parserOptions": {
+		"project": "./tsconfig.json",
+		"tsconfigRootDir": "."
+	},
+	"env": { "mocha": true },
+	"plugins": ["@typescript-eslint"],
+	"extends": ["xo", "xo-typescript", "prettier"],
+	"rules": {
+		"@typescript-eslint/prefer-readonly-parameter-types": "off",
+		"@typescript-eslint/no-unsafe-member-access": "off",
+		"@typescript-eslint/no-unsafe-call": "off",
+		"@typescript-eslint/no-unsafe-return": "off",
+		"@typescript-eslint/no-base-to-string": "off"
+	},
+	"overrides": [
+		{
+			"files": ["test/**/*.ts"],
+			"globals": {
+				"artifacts": "readonly",
+				"contract": "readonly",
+				"web3": "readonly"
+			}
+		},
+		{
+			"files": ["migrations/**/*", "test/**/*"],
+			"globals": {
+				"artifacts": "readonly",
+				"Truffle": "readonly"
+			}
+		}
+	]
+}
