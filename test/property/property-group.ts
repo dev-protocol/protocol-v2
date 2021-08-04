@@ -16,9 +16,9 @@ contract(
 		const dev = new DevProtocolInstance(deployer)
 		describe('PrpertyGroup; addGroup, isGroup', () => {
 			before(async () => {
-				await dev.generateAddressConfig()
+				await dev.generateAddressRegistry()
 				await dev.generatePropertyGroup()
-				await dev.addressConfig.setPropertyFactory(propertyFactory, {
+				await dev.addressRegistry.setRegistry('PropertyFactory', propertyFactory, {
 					from: deployer,
 				})
 				await dev.propertyGroup.addGroup(property, { from: propertyFactory })

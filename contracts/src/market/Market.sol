@@ -1,7 +1,7 @@
 pragma solidity 0.5.17;
 
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
-import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
+import {UsingRegistry} from "contracts/src/common/registry/UsingRegistry.sol";
 import {IProperty} from "contracts/interface/IProperty.sol";
 import {IMarket} from "contracts/interface/IMarket.sol";
 import {IMarketBehavior} from "contracts/interface/IMarketBehavior.sol";
@@ -16,7 +16,7 @@ import {IDev} from "contracts/interface/IDev.sol";
  * A user-proposable contract for authenticating and associating assets with Property.
  * A user deploys a contract that inherits IMarketBehavior and creates this Market contract with the MarketFactory contract.
  */
-contract Market is UsingConfig, IMarket {
+contract Market is UsingRegistry, IMarket {
 	using SafeMath for uint256;
 	bool public enabled;
 	address public behavior;
@@ -26,17 +26,17 @@ contract Market is UsingConfig, IMarket {
 	mapping(address => bytes32) private idHashMetricsMap;
 
 	/**
-	 * Initialize the passed address as AddressConfig address and user-proposed contract.
+	 * Initialize the passed address as AddressRegistry address and user-proposed contract.
 	 */
-	constructor(address _config, address _behavior)
+	constructor(address _registry, address _behavior)
 		public
-		UsingConfig(_config)
+		UsingRegistry(_registry)
 	{
 		/**
 		 * Validates the sender is MarketFactory contract.
 		 */
 		require(
-			msg.sender == config().marketFactory(),
+			msg.sender == registry().registries("MarketFactory"),
 			"this is illegal address"
 		);
 
@@ -54,7 +54,7 @@ contract Market is UsingConfig, IMarket {
 		 * Sets the period during which voting by voters can be accepted.
 		 * This period is determined by `Policy.marketVotingBlocks`.
 		 */
-		uint256 marketVotingBlocks = IPolicy(config().policy())
+		uint256 marketVotingBlocks = IPolicy(registry().registries("Policy"))
 			.marketVotingBlocks();
 		votingEndBlockNumber = block.number.add(marketVotingBlocks);
 	}
@@ -93,7 +93,7 @@ contract Market is UsingConfig, IMarket {
 	 */
 	function toEnable() external {
 		require(
-			msg.sender == config().marketFactory(),
+			msg.sender == registry().registries("MarketFactory"),
 			"this is illegal address"
 		);
 		require(isDuringVotingPeriod(), "deadline is over");
@@ -139,7 +139,7 @@ contract Market is UsingConfig, IMarket {
 		 * Validates the sender is PropertyFactory.
 		 */
 		require(
-			msg.sender == config().propertyFactory(),
+			msg.sender == registry().registries("PropertyFactory"),
 			"this is illegal address"
 		);
 
@@ -198,11 +198,11 @@ contract Market is UsingConfig, IMarket {
 		view
 		returns (uint256)
 	{
-		uint256 tokenValue = ILockup(config().lockup()).getPropertyValue(
+		uint256 tokenValue = ILockup(registry().registries("Lockup")).getPropertyValue(
 			_property
 		);
-		IPolicy policy = IPolicy(config().policy());
-		IMetricsGroup metricsGroup = IMetricsGroup(config().metricsGroup());
+		IPolicy policy = IPolicy(registry().registries("Policy"));
+		IMetricsGroup metricsGroup = IMetricsGroup(registry().registries("MetricsGroup"));
 		return
 			policy.authenticationFee(
 				metricsGroup.totalIssuedMetrics(),
@@ -239,7 +239,7 @@ contract Market is UsingConfig, IMarket {
 		 * Publishes a new Metrics contract and associate the Property with the asset.
 		 */
 		IMetricsFactory metricsFactory = IMetricsFactory(
-			config().metricsFactory()
+			registry().registries("MetricsFactory")
 		);
 		address metrics = metricsFactory.create(_property);
 		idHashMetricsMap[metrics] = _idHash;
@@ -249,7 +249,7 @@ contract Market is UsingConfig, IMarket {
 		 */
 		uint256 authenticationFee = getAuthenticationFee(_property);
 		require(
-			IDev(config().token()).fee(sender, authenticationFee),
+			IDev(registry().registries("Dev")).fee(sender, authenticationFee),
 			"dev fee failed"
 		);
 
@@ -283,7 +283,7 @@ contract Market is UsingConfig, IMarket {
 		 * Removes the passed Metrics contract from the Metrics address set.
 		 */
 		IMetricsFactory metricsFactory = IMetricsFactory(
-			config().metricsFactory()
+			registry().registries("MetricsFactory")
 		);
 		metricsFactory.destroy(_metrics);
 

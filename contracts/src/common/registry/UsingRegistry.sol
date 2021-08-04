@@ -3,23 +3,23 @@ pragma solidity 0.5.17;
 import {IAddressRegistry} from "contracts/interface/IAddressRegistry.sol";
 
 /**
- * Module for using AddressConfig contracts.
+ * Module for using AddressRegistry contracts.
  */
 contract UsingRegistry {
 	address private _registry;
 
 	/**
-	 * Initialize the argument as AddressConfig address.
+	 * Initialize the argument as AddressRegistry address.
 	 */
 	constructor(address _addressRegistry) public {
 		_registry = _addressRegistry;
 	}
 
 	/**
-	 * Returns the latest AddressConfig instance.
+	 * Returns the latest AddressRegistry instance.
 	 */
 	function registry() internal view returns (IAddressRegistry) {
-		return IAddressRegistry(_config);
+		return IAddressRegistry(_registry);
 	}
 
 	/**

@@ -7,14 +7,14 @@ import {TreasuryFee} from "contracts/src/policy/TreasuryFee.sol";
 contract Patch780 is TreasuryFee {
 	uint256 private constant mint_per_block_and_aseet = 132000000000000;
 
-	constructor(address _config) public TreasuryFee(_config) {}
+	constructor(address _registry) public TreasuryFee(_registry) {}
 
 	function rewards(uint256 _lockups, uint256 _assets)
 		external
 		view
 		returns (uint256)
 	{
-		uint256 totalSupply = IERC20(config().token()).totalSupply();
+		uint256 totalSupply = IERC20(registry().registries("Dev")).totalSupply();
 		return
 			curveRewards(
 				_lockups,

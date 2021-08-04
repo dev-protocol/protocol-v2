@@ -17,9 +17,9 @@ contract(
 		const dev = new DevProtocolInstance(deployer)
 		describe('MarketGroup addGroup, isGroup', () => {
 			beforeEach(async () => {
-				await dev.generateAddressConfig()
+				await dev.generateAddressRegistry()
 				await dev.generateMarketGroup()
-				await dev.addressConfig.setMarketFactory(marketFactory, {
+				await dev.addressRegistry.setRegistry('MarketFactory',marketFactory, {
 					from: deployer,
 				})
 				await dev.marketGroup.addGroup(market1, { from: marketFactory })

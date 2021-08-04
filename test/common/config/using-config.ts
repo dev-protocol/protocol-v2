@@ -1,33 +1,33 @@
 import { DevProtocolInstance } from '../../test-lib/instance'
 
-contract('UsingConfigTest', ([deployer]) => {
-	const usingConfigContract = artifacts.require('UsingConfigTest')
+contract('UsingRegistryTest', ([deployer]) => {
+	const usingRegistryContract = artifacts.require('UsingRegistryTest')
 	const dev = new DevProtocolInstance(deployer)
 	before(async () => {
-		await dev.generateAddressConfig()
+		await dev.generateAddressRegistry()
 		await dev.generateDev()
 		await dev.generateDevMinter()
 	})
-	describe('UsingConfig; config', () => {
-		it('You can get the address of config by setting it in the constructor.', async () => {
-			const usingConfigTest = await usingConfigContract.new(
-				dev.addressConfig.address,
+	describe('UsingRegistry; registry', () => {
+		it('You can get the address of registry by setting it in the constructor.', async () => {
+			const usingRegistryTest = await usingRegistryContract.new(
+				dev.addressRegistry.address,
 				{ from: deployer }
 			)
-			const tokenAddress = await usingConfigTest.getToken()
+			const tokenAddress = await usingRegistryTest.getToken()
 
-			expect(tokenAddress).to.be.equal(await dev.addressConfig.token())
+			expect(tokenAddress).to.be.equal(await dev.addressRegistry.registries('Dev'))
 		})
 	})
-	describe('UsingConfig; configAddress', () => {
-		it('You can get the address of config .', async () => {
-			const usingConfigTest = await usingConfigContract.new(
-				dev.addressConfig.address,
+	describe('UsingRegistry; registryAddress', () => {
+		it('You can get the address of registry.', async () => {
+			const usingRegistryTest = await usingRegistryContract.new(
+				dev.addressRegistry.address,
 				{ from: deployer }
 			)
-			const configAddress = await usingConfigTest.configAddress()
+			const registryAddress = await usingRegistryTest.registryAddress()
 
-			expect(configAddress).to.be.equal(dev.addressConfig.address)
+			expect(registryAddress).to.be.equal(dev.addressRegistry.address)
 		})
 	})
 })

@@ -14,14 +14,14 @@ contract('TreasuryFee', ([deployer, treasury, uesr]) => {
 
 	before(async () => {
 		dev = new DevProtocolInstance(deployer)
-		await dev.generateAddressConfig()
+		await dev.generateAddressRegistry()
 		await dev.generateDev()
 		await dev.generateDevMinter()
 		await dev.dev.mint(deployer, new BigNumber(1e18).times(10000000))
-		dip7 = await artifacts.require('DIP7').new(dev.addressConfig.address)
+		dip7 = await artifacts.require('DIP7').new(dev.addressRegistry.address)
 		treasuryFee = await artifacts
 			.require('TreasuryFee')
-			.new(dev.addressConfig.address)
+			.new(dev.addressRegistry.address)
 	})
 
 	describe('TreasuryFee; rewards', () => {
@@ -149,7 +149,7 @@ contract('TreasuryFee', ([deployer, treasury, uesr]) => {
 		it('the default value is 0 address.', async () => {
 			const treasuryFeeTmp = await artifacts
 				.require('TreasuryFee')
-				.new(dev.addressConfig.address)
+				.new(dev.addressRegistry.address)
 			const result = await treasuryFeeTmp.treasury()
 			expect(result).to.be.equal(DEFAULT_ADDRESS)
 		})

@@ -10,7 +10,7 @@ async function getWithdrawAmount(
 	const cal = await dev.allocator
 		.calculateMaxRewardsPerBlock()
 		.then(toBigNumber)
-	const policyAddress = await dev.addressConfig.policy()
+	const policyAddress = await dev.addressRegistry.registries('Policy')
 	// eslint-disable-next-line @typescript-eslint/await-thenable
 	const policyInstance = await artifacts.require('IPolicy').at(policyAddress)
 	const value = await dev.lockup.getPropertyValue(propertyAddress)

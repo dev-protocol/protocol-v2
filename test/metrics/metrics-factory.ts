@@ -20,13 +20,13 @@ contract(
 		describe('MetircsFactory; create', () => {
 			const dev = new DevProtocolInstance(deployer)
 			before(async () => {
-				await dev.generateAddressConfig()
+				await dev.generateAddressRegistry()
 				await Promise.all([
 					dev.generateMarketGroup(),
 					dev.generateMetricsFactory(),
 					dev.generateMetricsGroup(),
 				])
-				await dev.addressConfig.setMarketFactory(marketFactory)
+				await dev.addressRegistry.setRegistry('MarketFactory', marketFactory)
 				await dev.marketGroup.addGroup(market, { from: marketFactory })
 			})
 
@@ -62,13 +62,13 @@ contract(
 			let metricsAddress1: string
 			let metricsAddress2: string
 			before(async () => {
-				await dev.generateAddressConfig()
+				await dev.generateAddressRegistry()
 				await Promise.all([
 					dev.generateMarketGroup(),
 					dev.generateMetricsFactory(),
 					dev.generateMetricsGroup(),
 				])
-				await dev.addressConfig.setMarketFactory(marketFactory)
+				await dev.addressRegistry.setRegistry('MarketFactory', marketFactory)
 				await dev.marketGroup.addGroup(market, { from: marketFactory })
 				const metricsFactoryResult1 = await dev.metricsFactory.create(
 					property1,

@@ -14,10 +14,10 @@ import {IMetricsGroup} from "contracts/interface/IMetricsGroup.sol";
  */
 contract Allocator is UsingRegistry, IAllocator {
 	/**
-	 * @dev Initialize the passed address as AddressConfig address.
-	 * @param _config AddressConfig address.
+	 * @dev Initialize the passed address as AddressRegistry address.
+	 * @param _registry AddressRegistry address.
 	 */
-	constructor(address _config) public UsingRegistry(_config) {}
+	constructor(address _registry) public UsingRegistry(_registry) {}
 
 	/**
 	 * @dev Returns the maximum number of mints per block.

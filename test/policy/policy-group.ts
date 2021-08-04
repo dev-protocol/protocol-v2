@@ -10,14 +10,14 @@ contract(
 	([deployer, policyFactory, dummyPolicyFactory, dummyPolicy]) => {
 		const init = async (): Promise<DevProtocolInstance> => {
 			const dev = new DevProtocolInstance(deployer)
-			await dev.generateAddressConfig()
+			await dev.generateAddressRegistry()
 			await dev.generatePolicyGroup()
 			await dev.generatePolicyFactory()
 			const policy = await dev.getPolicy('PolicyTestForPolicyFactory', deployer)
 			await dev.policyFactory.create(policy.address, {
 				from: deployer,
 			})
-			await dev.addressConfig.setPolicyFactory(policyFactory, {
+			await dev.addressRegistry.setRegistry('PolicyFactory', policyFactory, {
 				from: deployer,
 			})
 			return dev
@@ -26,7 +26,7 @@ contract(
 		describe('PolicyGroup; addGroup, isGroup', () => {
 			it('When a policy address is specified', async () => {
 				const dev = await init()
-				const currentPolicy = await dev.addressConfig.policy()
+				const currentPolicy = await dev.addressRegistry.registries('Policy')
 
 				const result = await dev.policyGroup.isGroup(currentPolicy)
 				expect(result).to.be.equal(true)
@@ -64,7 +64,7 @@ contract(
 			})
 			it('Existing policy cannot be added', async () => {
 				const dev = await init()
-				const currentPolicy = await dev.addressConfig.policy()
+				const currentPolicy = await dev.addressRegistry.registries('Policy')
 				const result = await dev.policyGroup
 					.addGroup(currentPolicy, {
 						from: policyFactory,

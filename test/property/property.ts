@@ -7,7 +7,7 @@ import {
 } from '../test-lib/utils/error'
 import { DEFAULT_ADDRESS } from '../test-lib/const'
 import { toBigNumber, splitValue } from '../test-lib/utils/common'
-import { getEventValue, waitForEvent } from '../test-lib/utils/event'
+import { getEventValue } from '../test-lib/utils/event'
 
 contract(
 	'PropertyTest',
@@ -16,7 +16,7 @@ contract(
 		describe('Property; constructor', () => {
 			const dev = new DevProtocolInstance(deployer)
 			before(async () => {
-				await dev.generateAddressConfig()
+				await dev.generateAddressRegistry()
 				await dev.generateDev()
 				await dev.generateDevMinter()
 				await dev.generateAllocator()
@@ -28,16 +28,16 @@ contract(
 			})
 			it('Cannot be created from other than factory', async () => {
 				const result = await propertyContract
-					.new(dev.addressConfig.address, author, 'sample', 'SAMPLE', {
+					.new(dev.addressRegistry.address, author, 'sample', 'SAMPLE', {
 						from: deployer,
 					})
 					.catch((err: Error) => err)
 				validateAddressErrorMessage(result)
 			})
 			it('The author, decimal places, and number of issues are fixed values', async () => {
-				await dev.addressConfig.setPropertyFactory(propertyFactory)
+				await dev.addressRegistry.setRegistry('PropertyFactory', propertyFactory)
 				const propertyInstance = await propertyContract.new(
-					dev.addressConfig.address,
+					dev.addressRegistry.address,
 					author,
 					'sample',
 					'SAMPLE',
@@ -70,7 +70,7 @@ contract(
 		describe('Property; changeAuthor', () => {
 			const dev = new DevProtocolInstance(deployer)
 			before(async () => {
-				await dev.generateAddressConfig()
+				await dev.generateAddressRegistry()
 				await dev.generateDev()
 				await dev.generateDevMinter()
 				await dev.generateAllocator()
@@ -81,9 +81,9 @@ contract(
 				await dev.generatePolicy()
 			})
 			it('Executing a changeAuthor function with a non-Author.', async () => {
-				await dev.addressConfig.setPropertyFactory(propertyFactory)
+				await dev.addressRegistry.setRegistry('PropertyFactory', propertyFactory)
 				const propertyInstance = await propertyContract.new(
-					dev.addressConfig.address,
+					dev.addressRegistry.address,
 					author,
 					'sample',
 					'SAMPLE',
@@ -137,7 +137,7 @@ contract(
 		describe('Property; changeName', () => {
 			const dev = new DevProtocolInstance(deployer)
 			before(async () => {
-				await dev.generateAddressConfig()
+				await dev.generateAddressRegistry()
 				await dev.generateDev()
 				await dev.generateDevMinter()
 				await dev.generateLockup()
@@ -148,9 +148,9 @@ contract(
 				await dev.generatePolicy()
 			})
 			it('Should fail to call when the sender is not author', async () => {
-				await dev.addressConfig.setPropertyFactory(propertyFactory)
+				await dev.addressRegistry.setRegistry('PropertyFactory', propertyFactory)
 				const propertyInstance = await propertyContract.new(
-					dev.addressConfig.address,
+					dev.addressRegistry.address,
 					author,
 					'sample',
 					'SAMPLE',
@@ -204,7 +204,7 @@ contract(
 		describe('Property; changeSymbol', () => {
 			const dev = new DevProtocolInstance(deployer)
 			before(async () => {
-				await dev.generateAddressConfig()
+				await dev.generateAddressRegistry()
 				await dev.generateDev()
 				await dev.generateDevMinter()
 				await dev.generateLockup()
@@ -215,9 +215,9 @@ contract(
 				await dev.generatePolicy()
 			})
 			it('Should fail to call when the sender is not author', async () => {
-				await dev.addressConfig.setPropertyFactory(propertyFactory)
+				await dev.addressRegistry.setRegistry('PropertyFactory', propertyFactory)
 				const propertyInstance = await propertyContract.new(
-					dev.addressConfig.address,
+					dev.addressRegistry.address,
 					author,
 					'sample',
 					'SAMPLE',
@@ -272,7 +272,7 @@ contract(
 			const dev = new DevProtocolInstance(deployer)
 			let propertyAddress: string
 			beforeEach(async () => {
-				await dev.generateAddressConfig()
+				await dev.generateAddressRegistry()
 				await dev.generateDev()
 				await dev.generateDevMinter()
 				await Promise.all([
@@ -303,7 +303,7 @@ contract(
 				validateAddressErrorMessage(result)
 			})
 			it('Dev token balance does not exist in property contract', async () => {
-				await dev.addressConfig.setLockup(lockup)
+				await dev.addressRegistry.setRegistry('Lockup', lockup)
 				const property = await propertyContract.at(propertyAddress)
 				const result = await property
 					.withdraw(user, 10, { from: lockup })
@@ -311,7 +311,7 @@ contract(
 				validateErrorMessage(result, 'ERC20: transfer amount exceeds balance')
 			})
 			it('Dev token balance does not exist in property contract', async () => {
-				await dev.addressConfig.setLockup(lockup)
+				await dev.addressRegistry.setRegistry('Lockup', lockup)
 				await dev.dev.mint(propertyAddress, 10)
 				const property = await propertyContract.at(propertyAddress)
 				await property.withdraw(user, 10, { from: lockup })
@@ -321,7 +321,7 @@ contract(
 			const dev = new DevProtocolInstance(deployer)
 			let propertyAddress: string
 			beforeEach(async () => {
-				await dev.generateAddressConfig()
+				await dev.generateAddressRegistry()
 				await dev.generateDev()
 				await dev.generateDevMinter()
 				await Promise.all([
@@ -370,7 +370,7 @@ contract(
 			const dev = new DevProtocolInstance(deployer)
 			let propertyAddress: string
 			beforeEach(async () => {
-				await dev.generateAddressConfig()
+				await dev.generateAddressRegistry()
 				await dev.generateDev()
 				await dev.generateDevMinter()
 				await Promise.all([

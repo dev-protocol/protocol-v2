@@ -1,5 +1,5 @@
 import {
-	AddressConfigInstance,
+	AddressRegistryInstance,
 	AllocatorInstance,
 	PropertyGroupInstance,
 	DevInstance,
@@ -21,14 +21,13 @@ import {
 	LockupTestInstance,
 	DevMinterInstance,
 } from '../../types/truffle-contracts'
-import { getBlock } from './utils/common'
 
 const contract = artifacts.require
 
 export class DevProtocolInstance {
 	private readonly _deployer: string
 
-	private _addressConfig!: AddressConfigInstance
+	private _addressRegistry!: AddressRegistryInstance
 	private _allocator!: AllocatorInstance
 	private _dev!: DevInstance
 	private _lockup!: LockupInstance
@@ -55,8 +54,8 @@ export class DevProtocolInstance {
 		return { from: this._deployer }
 	}
 
-	public get addressConfig(): AddressConfigInstance {
-		return this._addressConfig
+	public get addressRegistry(): AddressRegistryInstance {
+		return this._addressRegistry
 	}
 
 	public get devMinter(): DevMinterInstance {
@@ -131,14 +130,14 @@ export class DevProtocolInstance {
 		return this._withdraw
 	}
 
-	public async generateAddressConfig(): Promise<void> {
-		const instance = contract('AddressConfig')
-		this._addressConfig = await instance.new(this.fromDeployer)
+	public async generateAddressRegistry(): Promise<void> {
+		const instance = contract('AddressRegistry')
+		this._addressRegistry = await instance.new(this.fromDeployer)
 	}
 
 	public async generateDevMinter(): Promise<void> {
 		this._devMinter = await contract('DevMinter').new(
-			this.addressConfig.address,
+			this.addressRegistry.address,
 			this.fromDeployer
 		)
 		await this._dev.addMinter(this._devMinter.address)
@@ -146,18 +145,19 @@ export class DevProtocolInstance {
 
 	public async generateDev(): Promise<void> {
 		this._dev = await contract('Dev').new(
-			this.addressConfig.address,
+			this.addressRegistry.address,
 			this.fromDeployer
 		)
-		await this._addressConfig.setToken(this._dev.address, this.fromDeployer)
+		await this.addressRegistry.setRegistry("Dev", this._dev.address, this.fromDeployer)
 	}
 
 	public async generateAllocator(): Promise<void> {
 		this._allocator = await contract('Allocator').new(
-			this.addressConfig.address,
+			this.addressRegistry.address,
 			this.fromDeployer
 		)
-		await this._addressConfig.setAllocator(
+		await this.addressRegistry.setRegistry(
+			"Allocator",
 			this._allocator.address,
 			this.fromDeployer
 		)
@@ -165,21 +165,21 @@ export class DevProtocolInstance {
 
 	public async generateLockup(): Promise<void> {
 		this._lockup = await contract('Lockup').new(
-			this.addressConfig.address,
+			this.addressRegistry.address,
 			this.devMinter.address,
 			this.fromDeployer
 		)
-		const block = await getBlock()
-		await this._addressConfig.setLockup(this._lockup.address, this.fromDeployer)
+		await this.addressRegistry.setRegistry('Lockup', this._lockup.address, this.fromDeployer)
 		await this._lockup.createStorage()
 	}
 
 	public async generatePropertyFactory(): Promise<void> {
 		this._propertyFactory = await contract('PropertyFactory').new(
-			this.addressConfig.address,
+			this.addressRegistry.address,
 			this.fromDeployer
 		)
-		await this._addressConfig.setPropertyFactory(
+		await this.addressRegistry.setRegistry(
+			'PropertyFactory',
 			this._propertyFactory.address,
 			this.fromDeployer
 		)
@@ -187,11 +187,12 @@ export class DevProtocolInstance {
 
 	public async generatePropertyGroup(): Promise<void> {
 		this._propertyGroup = await contract('PropertyGroup').new(
-			this.addressConfig.address,
+			this.addressRegistry.address,
 			this.fromDeployer
 		)
 		await this._propertyGroup.createStorage({ from: this._deployer })
-		await this._addressConfig.setPropertyGroup(
+		await this.addressRegistry.setRegistry(
+			'PropertyGroup',
 			this._propertyGroup.address,
 			this.fromDeployer
 		)
@@ -199,10 +200,11 @@ export class DevProtocolInstance {
 
 	public async generatePolicyFactory(): Promise<void> {
 		this._policyFactory = await contract('PolicyFactory').new(
-			this.addressConfig.address,
+			this.addressRegistry.address,
 			this.fromDeployer
 		)
-		await this._addressConfig.setPolicyFactory(
+		await this.addressRegistry.setRegistry(
+			'PolicyFactory',
 			this._policyFactory.address,
 			this.fromDeployer
 		)
@@ -210,11 +212,12 @@ export class DevProtocolInstance {
 
 	public async generatePolicyGroup(): Promise<void> {
 		this._policyGroup = await contract('PolicyGroup').new(
-			this.addressConfig.address,
+			this.addressRegistry.address,
 			this.fromDeployer
 		)
 		await this._policyGroup.createStorage({ from: this._deployer })
-		await this._addressConfig.setPolicyGroup(
+		await this.addressRegistry.setRegistry(
+			'PolicyGroup',
 			this._policyGroup.address,
 			this.fromDeployer
 		)
@@ -222,10 +225,11 @@ export class DevProtocolInstance {
 
 	public async generateMarketFactory(): Promise<void> {
 		this._marketFactory = await contract('MarketFactory').new(
-			this.addressConfig.address,
+			this.addressRegistry.address,
 			this.fromDeployer
 		)
-		await this._addressConfig.setMarketFactory(
+		await this.addressRegistry.setRegistry(
+			'MarketFactory',
 			this._marketFactory.address,
 			this.fromDeployer
 		)
@@ -233,10 +237,11 @@ export class DevProtocolInstance {
 
 	public async generateMarketGroup(): Promise<void> {
 		this._marketGroup = await contract('MarketGroup').new(
-			this.addressConfig.address,
+			this.addressRegistry.address,
 			this.fromDeployer
 		)
-		await this._addressConfig.setMarketGroup(
+		await this.addressRegistry.setRegistry(
+			'MarketGroup',
 			this._marketGroup.address,
 			this.fromDeployer
 		)
@@ -245,10 +250,11 @@ export class DevProtocolInstance {
 
 	public async generateMetricsFactory(): Promise<void> {
 		this._metricsFactory = await contract('MetricsFactory').new(
-			this.addressConfig.address,
+			this.addressRegistry.address,
 			this.fromDeployer
 		)
-		await this._addressConfig.setMetricsFactory(
+		await this.addressRegistry.setRegistry(
+			'MetricsFactory',
 			this._metricsFactory.address,
 			this.fromDeployer
 		)
@@ -256,10 +262,11 @@ export class DevProtocolInstance {
 
 	public async generateMetricsGroup(): Promise<void> {
 		this._metricsGroup = await contract('MetricsGroupTest').new(
-			this.addressConfig.address,
+			this.addressRegistry.address,
 			this.fromDeployer
 		)
-		await this._addressConfig.setMetricsGroup(
+		await this.addressRegistry.setRegistry(
+			'MetricsGroupTest',
 			this._metricsGroup.address,
 			this.fromDeployer
 		)
@@ -268,11 +275,12 @@ export class DevProtocolInstance {
 
 	public async generateWithdraw(): Promise<void> {
 		this._withdraw = await contract('Withdraw').new(
-			this.addressConfig.address,
+			this.addressRegistry.address,
 			this.devMinter.address,
 			this.fromDeployer
 		)
-		await this._addressConfig.setWithdraw(
+		await this.addressRegistry.setRegistry(
+			'Withdraw',
 			this._withdraw.address,
 			this.fromDeployer
 		)
@@ -281,11 +289,12 @@ export class DevProtocolInstance {
 
 	public async generateWithdrawTest(): Promise<void> {
 		this._withdrawTest = await contract('WithdrawTest').new(
-			this.addressConfig.address,
+			this.addressRegistry.address,
 			this.devMinter.address,
 			this.fromDeployer
 		)
-		await this._addressConfig.setWithdraw(
+		await this.addressRegistry.setRegistry(
+			'WithdrawTest',
 			this._withdrawTest.address,
 			this.fromDeployer
 		)
@@ -294,11 +303,12 @@ export class DevProtocolInstance {
 
 	public async generateLockupTest(): Promise<void> {
 		this._lockupTest = await contract('LockupTest').new(
-			this.addressConfig.address,
+			this.addressRegistry.address,
 			this.devMinter.address,
 			this.fromDeployer
 		)
-		await this._addressConfig.setLockup(
+		await this.addressRegistry.setRegistry(
+			'LockupTest',
 			this._lockupTest.address,
 			this.fromDeployer
 		)
@@ -310,7 +320,7 @@ export class DevProtocolInstance {
 	): Promise<string> {
 		const policy = await contract(policyContractName).new()
 		this._treasury = await contract('TreasuryTest').new(
-			this.addressConfig.address
+			this.addressRegistry.address
 		)
 		await policy.setTreasury(this._treasury.address)
 		await this._policyFactory.create(policy.address)
@@ -332,7 +342,7 @@ export class DevProtocolInstance {
 		contractName: string,
 		user: string
 	): Promise<IMarketInstance> {
-		const tmp = await contract(contractName).new(this.addressConfig.address, {
+		const tmp = await contract(contractName).new(this.addressRegistry.address, {
 			from: user,
 		})
 		return tmp
