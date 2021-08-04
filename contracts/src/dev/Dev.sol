@@ -18,7 +18,13 @@ import {IMarketGroup} from "contracts/interface/IMarketGroup.sol";
  * Also, mint will be performed based on the Allocator contract.
  * When authenticated a new asset by the Market contracts, DEV token is burned as fees.
  */
-contract Dev is ERC20Detailed, ERC20Mintable, ERC20Burnable, UsingRegistry, IDev {
+contract Dev is
+	ERC20Detailed,
+	ERC20Mintable,
+	ERC20Burnable,
+	UsingRegistry,
+	IDev
+{
 	/**
 	 * Initialize the passed address as AddressRegistry address.
 	 * The token name is `Dev`, the token symbol is `DEV`, and the decimals is 18.
@@ -61,7 +67,9 @@ contract Dev is ERC20Detailed, ERC20Mintable, ERC20Burnable, UsingRegistry, IDev
 	 */
 	function fee(address _from, uint256 _amount) external returns (bool) {
 		require(
-			IMarketGroup(registry().registries("MarketGroup")).isGroup(msg.sender),
+			IMarketGroup(registry().registries("MarketGroup")).isGroup(
+				msg.sender
+			),
 			"this is illegal address"
 		);
 		_burn(_from, _amount);

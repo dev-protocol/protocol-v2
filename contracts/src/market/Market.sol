@@ -198,11 +198,12 @@ contract Market is UsingRegistry, IMarket {
 		view
 		returns (uint256)
 	{
-		uint256 tokenValue = ILockup(registry().registries("Lockup")).getPropertyValue(
-			_property
-		);
+		uint256 tokenValue = ILockup(registry().registries("Lockup"))
+			.getPropertyValue(_property);
 		IPolicy policy = IPolicy(registry().registries("Policy"));
-		IMetricsGroup metricsGroup = IMetricsGroup(registry().registries("MetricsGroup"));
+		IMetricsGroup metricsGroup = IMetricsGroup(
+			registry().registries("MetricsGroup")
+		);
 		return
 			policy.authenticationFee(
 				metricsGroup.totalIssuedMetrics(),

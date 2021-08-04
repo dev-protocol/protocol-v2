@@ -12,7 +12,10 @@ contract AddressRegistry is Ownable, IAddressRegistry {
 	mapping(string => address) private reg;
 
 	function setRegistry(string calldata _key, address _addr) external {
-		if (keccak256(abi.encodePacked(_key)) == keccak256(abi.encodePacked("Policy"))) {
+		if (
+			keccak256(abi.encodePacked(_key)) ==
+			keccak256(abi.encodePacked("Policy"))
+		) {
 			address policyFactory = reg["PolicyFactory"];
 			require(msg.sender == policyFactory, "this is illegal address");
 		} else {

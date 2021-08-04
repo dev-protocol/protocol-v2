@@ -27,7 +27,9 @@ contract MetricsFactory is UsingRegistry, IMetricsFactory {
 		 * Validates the sender is included in the Market address set.
 		 */
 		require(
-			IMarketGroup(registry().registries("MarketGroup")).isGroup(msg.sender),
+			IMarketGroup(registry().registries("MarketGroup")).isGroup(
+				msg.sender
+			),
 			"this is illegal address"
 		);
 
@@ -39,7 +41,9 @@ contract MetricsFactory is UsingRegistry, IMetricsFactory {
 		/**
 		 *  Adds the new Metrics contract to the Metrics address set.
 		 */
-		IMetricsGroup metricsGroup = IMetricsGroup(registry().registries("MetricsGroup"));
+		IMetricsGroup metricsGroup = IMetricsGroup(
+			registry().registries("MetricsGroup")
+		);
 		address metricsAddress = address(metrics);
 		metricsGroup.addGroup(metricsAddress);
 
@@ -54,14 +58,18 @@ contract MetricsFactory is UsingRegistry, IMetricsFactory {
 		/**
 		 * Validates the passed address is included in the Metrics address set.
 		 */
-		IMetricsGroup metricsGroup = IMetricsGroup(registry().registries("MetricsGroup"));
+		IMetricsGroup metricsGroup = IMetricsGroup(
+			registry().registries("MetricsGroup")
+		);
 		require(metricsGroup.isGroup(_metrics), "address is not metrics");
 
 		/**
 		 * Validates the sender is included in the Market address set.
 		 */
 		require(
-			IMarketGroup(registry().registries("MarketGroup")).isGroup(msg.sender),
+			IMarketGroup(registry().registries("MarketGroup")).isGroup(
+				msg.sender
+			),
 			"this is illegal address"
 		);
 
@@ -74,7 +82,9 @@ contract MetricsFactory is UsingRegistry, IMetricsFactory {
 		/**
 		 * Logical deletions a Metrics contract.
 		 */
-		IMetricsGroup(registry().registries("MetricsGroup")).removeGroup(_metrics);
+		IMetricsGroup(registry().registries("MetricsGroup")).removeGroup(
+			_metrics
+		);
 		emit Destroy(msg.sender, _metrics);
 	}
 }

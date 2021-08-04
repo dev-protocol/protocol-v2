@@ -40,7 +40,9 @@ contract Withdraw is IWithdraw, UsingRegistry, WithdrawStorage {
 		 * the passed Property address is included the Property address set.
 		 */
 		require(
-			IPropertyGroup(registry().registries("PropertyGroup")).isGroup(_property),
+			IPropertyGroup(registry().registries("PropertyGroup")).isGroup(
+				_property
+			),
 			"this is illegal address"
 		);
 
@@ -109,7 +111,10 @@ contract Withdraw is IWithdraw, UsingRegistry, WithdrawStorage {
 		/**
 		 * Validates the sender is Allocator contract.
 		 */
-		require(msg.sender == registry().registries("Allocator"), "this is illegal address");
+		require(
+			msg.sender == registry().registries("Allocator"),
+			"this is illegal address"
+		);
 
 		/**
 		 * Gets the cumulative sum of the transfer source's "before transfer" withdrawable reward amount and the cumulative sum of the maximum mint amount.
@@ -259,7 +264,9 @@ contract Withdraw is IWithdraw, UsingRegistry, WithdrawStorage {
 		 * If the passed Property has not authenticated, returns always 0.
 		 */
 		if (
-			IMetricsGroup(registry().registries("MetricsGroup")).hasAssets(_property) == false
+			IMetricsGroup(registry().registries("MetricsGroup")).hasAssets(
+				_property
+			) == false
 		) {
 			return (0, price, cap, 0);
 		}

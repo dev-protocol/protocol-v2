@@ -19,7 +19,8 @@ contract DevMinter is UsingRegistry, Ownable, IDevMinter {
 	function mint(address account, uint256 amount) external returns (bool) {
 		IAddressRegistry reg = registry();
 		require(
-			msg.sender == reg.registries("Lockup") || msg.sender == reg.registries("Withdraw"),
+			msg.sender == reg.registries("Lockup") ||
+				msg.sender == reg.registries("Withdraw"),
 			"illegal access"
 		);
 		return ERC20Mintable(reg.registries("Dev")).mint(account, amount);

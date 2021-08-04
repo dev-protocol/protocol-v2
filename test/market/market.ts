@@ -53,9 +53,13 @@ contract(
 				await dev.addressRegistry.setRegistry('MarketFactory', marketFactory)
 				const iPolicyInstance = await dev.getPolicy('PolicyTest1', user)
 				await dev.policyFactory.create(iPolicyInstance.address)
-				market = await marketContract.new(dev.addressRegistry.address, behavuor, {
-					from: marketFactory,
-				})
+				market = await marketContract.new(
+					dev.addressRegistry.address,
+					behavuor,
+					{
+						from: marketFactory,
+					}
+				)
 			})
 			it('Cannot be enabled from other than market factory', async () => {
 				const result = await market.toEnable().catch((err: Error) => err)
@@ -358,7 +362,10 @@ contract(
 				propertyAddress = getPropertyAddress(createPropertyResult)
 				await dev.metricsGroup.__setMetricsCountPerProperty(propertyAddress, 1)
 				await dev.dev.mint(propertyAuther, 10000000000, { from: deployer })
-				await dev.addressRegistry.setRegistry('PropertyFactory',propertyFactory)
+				await dev.addressRegistry.setRegistry(
+					'PropertyFactory',
+					propertyFactory
+				)
 			})
 			it('Proxy to mapped Behavior Contract.', async () => {
 				await dev.dev.deposit(propertyAddress, 100000, { from: propertyAuther })

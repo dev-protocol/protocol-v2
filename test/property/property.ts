@@ -35,7 +35,10 @@ contract(
 				validateAddressErrorMessage(result)
 			})
 			it('The author, decimal places, and number of issues are fixed values', async () => {
-				await dev.addressRegistry.setRegistry('PropertyFactory', propertyFactory)
+				await dev.addressRegistry.setRegistry(
+					'PropertyFactory',
+					propertyFactory
+				)
 				const propertyInstance = await propertyContract.new(
 					dev.addressRegistry.address,
 					author,
@@ -81,7 +84,10 @@ contract(
 				await dev.generatePolicy()
 			})
 			it('Executing a changeAuthor function with a non-Author.', async () => {
-				await dev.addressRegistry.setRegistry('PropertyFactory', propertyFactory)
+				await dev.addressRegistry.setRegistry(
+					'PropertyFactory',
+					propertyFactory
+				)
 				const propertyInstance = await propertyContract.new(
 					dev.addressRegistry.address,
 					author,
@@ -148,7 +154,10 @@ contract(
 				await dev.generatePolicy()
 			})
 			it('Should fail to call when the sender is not author', async () => {
-				await dev.addressRegistry.setRegistry('PropertyFactory', propertyFactory)
+				await dev.addressRegistry.setRegistry(
+					'PropertyFactory',
+					propertyFactory
+				)
 				const propertyInstance = await propertyContract.new(
 					dev.addressRegistry.address,
 					author,
@@ -215,7 +224,10 @@ contract(
 				await dev.generatePolicy()
 			})
 			it('Should fail to call when the sender is not author', async () => {
-				await dev.addressRegistry.setRegistry('PropertyFactory', propertyFactory)
+				await dev.addressRegistry.setRegistry(
+					'PropertyFactory',
+					propertyFactory
+				)
 				const propertyInstance = await propertyContract.new(
 					dev.addressRegistry.address,
 					author,

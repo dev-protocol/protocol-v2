@@ -75,7 +75,10 @@ contract(
 				const dev = new DevProtocolInstance(deployer)
 				await dev.generateAddressRegistry()
 				await dev.generatePropertyGroup()
-				await dev.addressRegistry.setRegistry('PropertyFactory', dummyProperFactory)
+				await dev.addressRegistry.setRegistry(
+					'PropertyFactory',
+					dummyProperFactory
+				)
 				await dev.propertyGroup.addGroup(dummyProperty, {
 					from: dummyProperFactory,
 				})
@@ -110,7 +113,10 @@ contract(
 				const dev = new DevProtocolInstance(deployer)
 				await dev.generateAddressRegistry()
 				await dev.generatePropertyGroup()
-				await dev.addressRegistry.setRegistry('PropertyFactory', dummyProperFactory)
+				await dev.addressRegistry.setRegistry(
+					'PropertyFactory',
+					dummyProperFactory
+				)
 				await dev.propertyGroup.addGroup(dummyProperty, {
 					from: dummyProperFactory,
 				})
@@ -145,7 +151,10 @@ contract(
 				const dev = new DevProtocolInstance(deployer)
 				await dev.generateAddressRegistry()
 				await dev.generatePropertyGroup()
-				await dev.addressRegistry.setRegistry('PropertyFactory',dummyProperFactory)
+				await dev.addressRegistry.setRegistry(
+					'PropertyFactory',
+					dummyProperFactory
+				)
 				await dev.propertyGroup.addGroup(dummyProperty, {
 					from: dummyProperFactory,
 				})

@@ -16,7 +16,9 @@ contract('UsingRegistryTest', ([deployer]) => {
 			)
 			const tokenAddress = await usingRegistryTest.getToken()
 
-			expect(tokenAddress).to.be.equal(await dev.addressRegistry.registries('Dev'))
+			expect(tokenAddress).to.be.equal(
+				await dev.addressRegistry.registries('Dev')
+			)
 		})
 	})
 	describe('UsingRegistry; registryAddress', () => {

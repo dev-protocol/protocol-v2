@@ -14,7 +14,8 @@ contract Patch780 is TreasuryFee {
 		view
 		returns (uint256)
 	{
-		uint256 totalSupply = IERC20(registry().registries("Dev")).totalSupply();
+		uint256 totalSupply = IERC20(registry().registries("Dev"))
+			.totalSupply();
 		return
 			curveRewards(
 				_lockups,

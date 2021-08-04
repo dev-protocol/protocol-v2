@@ -122,10 +122,8 @@ contract Property is ERC20, UsingRegistry, IProperty {
 		/**
 		 * save author information
 		 */
-		IPropertyFactory(registry().registries("PropertyFactory")).createChangeAuthorEvent(
-			__author,
-			_nextAuthor
-		);
+		IPropertyFactory(registry().registries("PropertyFactory"))
+			.createChangeAuthorEvent(__author, _nextAuthor);
 
 		/**
 		 * Changes the author.
@@ -138,10 +136,8 @@ contract Property is ERC20, UsingRegistry, IProperty {
 	 * @param _name The new name.
 	 */
 	function changeName(string calldata _name) external onlyAuthor {
-		IPropertyFactory(registry().registries("PropertyFactory")).createChangeNameEvent(
-			__name,
-			_name
-		);
+		IPropertyFactory(registry().registries("PropertyFactory"))
+			.createChangeNameEvent(__name, _name);
 
 		__name = _name;
 	}
@@ -151,10 +147,8 @@ contract Property is ERC20, UsingRegistry, IProperty {
 	 * @param _symbol The new symbol.
 	 */
 	function changeSymbol(string calldata _symbol) external onlyAuthor {
-		IPropertyFactory(registry().registries("PropertyFactory")).createChangeSymbolEvent(
-			__symbol,
-			_symbol
-		);
+		IPropertyFactory(registry().registries("PropertyFactory"))
+			.createChangeSymbolEvent(__symbol, _symbol);
 
 		__symbol = _symbol;
 	}
@@ -245,7 +239,10 @@ contract Property is ERC20, UsingRegistry, IProperty {
 		/**
 		 * Validates the sender is Lockup contract.
 		 */
-		require(msg.sender == registry().registries("Lockup"), "this is illegal address");
+		require(
+			msg.sender == registry().registries("Lockup"),
+			"this is illegal address"
+		);
 
 		/**
 		 * Transfers the passed amount to the original owner.

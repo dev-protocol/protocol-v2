@@ -42,7 +42,8 @@ contract PolicyGroup is UsingRegistry, UsingStorage, IPolicyGroup {
 			"this is illegal address"
 		);
 		bytes32 key = getVotingEndBlockNumberKey(_policy);
-		uint256 tmp = IPolicy(registry().registries("Policy")).policyVotingBlocks();
+		uint256 tmp = IPolicy(registry().registries("Policy"))
+			.policyVotingBlocks();
 		uint256 votingEndBlockNumber = block.number.add(tmp);
 		eternalStorage().setUint(key, votingEndBlockNumber);
 	}

@@ -30,7 +30,9 @@ contract PolicyFactory is UsingRegistry, IPolicyFactory, Ownable {
 		/**
 		 * In the case of the first Policy, it will be activated immediately.
 		 */
-		IPolicyGroup policyGroup = IPolicyGroup(registry().registries("PolicyGroup"));
+		IPolicyGroup policyGroup = IPolicyGroup(
+			registry().registries("PolicyGroup")
+		);
 		if (registry().registries("Policy") == address(0)) {
 			registry().setRegistry("Policy", _newPolicyAddress);
 		}
@@ -55,7 +57,9 @@ contract PolicyFactory is UsingRegistry, IPolicyFactory, Ownable {
 		/**
 		 * Validates the voting deadline has not passed.
 		 */
-		IPolicyGroup policyGroup = IPolicyGroup(registry().registries("PolicyGroup"));
+		IPolicyGroup policyGroup = IPolicyGroup(
+			registry().registries("PolicyGroup")
+		);
 		require(policyGroup.isDuringVotingPeriod(_policy), "deadline is over");
 
 		/**

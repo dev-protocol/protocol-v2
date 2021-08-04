@@ -19,7 +19,7 @@ contract(
 			beforeEach(async () => {
 				await dev.generateAddressRegistry()
 				await dev.generateMarketGroup()
-				await dev.addressRegistry.setRegistry('MarketFactory',marketFactory, {
+				await dev.addressRegistry.setRegistry('MarketFactory', marketFactory, {
 					from: deployer,
 				})
 				await dev.marketGroup.addGroup(market1, { from: marketFactory })

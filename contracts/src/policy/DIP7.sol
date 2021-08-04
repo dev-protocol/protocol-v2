@@ -18,7 +18,8 @@ contract DIP7 is DIP1, Curve {
 		view
 		returns (uint256)
 	{
-		uint256 totalSupply = IERC20(registry().registries("Dev")).totalSupply();
+		uint256 totalSupply = IERC20(registry().registries("Dev"))
+			.totalSupply();
 		return
 			curveRewards(
 				_lockups,

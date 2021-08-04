@@ -36,7 +36,9 @@ contract MarketFactory is Ownable, IMarketFactory, UsingRegistry {
 		 * Adds the created Market contract to the Market address set.
 		 */
 		address marketAddr = address(market);
-		IMarketGroup marketGroup = IMarketGroup(registry().registries("MarketGroup"));
+		IMarketGroup marketGroup = IMarketGroup(
+			registry().registries("MarketGroup")
+		);
 		marketGroup.addGroup(marketAddr);
 
 		/**
@@ -58,7 +60,9 @@ contract MarketFactory is Ownable, IMarketFactory, UsingRegistry {
 		/**
 		 * Validates the passed address is not 0 address.
 		 */
-		IMarketGroup marketGroup = IMarketGroup(registry().registries("MarketGroup"));
+		IMarketGroup marketGroup = IMarketGroup(
+			registry().registries("MarketGroup")
+		);
 		require(marketGroup.isGroup(_addr), "this is illegal address");
 
 		/**

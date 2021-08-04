@@ -148,7 +148,11 @@ export class DevProtocolInstance {
 			this.addressRegistry.address,
 			this.fromDeployer
 		)
-		await this.addressRegistry.setRegistry("Dev", this._dev.address, this.fromDeployer)
+		await this.addressRegistry.setRegistry(
+			'Dev',
+			this._dev.address,
+			this.fromDeployer
+		)
 	}
 
 	public async generateAllocator(): Promise<void> {
@@ -157,7 +161,7 @@ export class DevProtocolInstance {
 			this.fromDeployer
 		)
 		await this.addressRegistry.setRegistry(
-			"Allocator",
+			'Allocator',
 			this._allocator.address,
 			this.fromDeployer
 		)
@@ -169,7 +173,11 @@ export class DevProtocolInstance {
 			this.devMinter.address,
 			this.fromDeployer
 		)
-		await this.addressRegistry.setRegistry('Lockup', this._lockup.address, this.fromDeployer)
+		await this.addressRegistry.setRegistry(
+			'Lockup',
+			this._lockup.address,
+			this.fromDeployer
+		)
 		await this._lockup.createStorage()
 	}
 

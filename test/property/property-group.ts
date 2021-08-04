@@ -18,9 +18,13 @@ contract(
 			before(async () => {
 				await dev.generateAddressRegistry()
 				await dev.generatePropertyGroup()
-				await dev.addressRegistry.setRegistry('PropertyFactory', propertyFactory, {
-					from: deployer,
-				})
+				await dev.addressRegistry.setRegistry(
+					'PropertyFactory',
+					propertyFactory,
+					{
+						from: deployer,
+					}
+				)
 				await dev.propertyGroup.addGroup(property, { from: propertyFactory })
 			})
 

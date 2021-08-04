@@ -75,7 +75,10 @@ contract Lockup is ILockup, UsingRegistry, LockupStorage {
 		/**
 		 * Validates the sender is Dev contract.
 		 */
-		require(msg.sender == registry().registries("Dev"), "this is illegal address");
+		require(
+			msg.sender == registry().registries("Dev"),
+			"this is illegal address"
+		);
 
 		/**
 		 * Validates _value is not 0.
@@ -86,7 +89,9 @@ contract Lockup is ILockup, UsingRegistry, LockupStorage {
 		 * Validates the passed Property has greater than 1 asset.
 		 */
 		require(
-			IMetricsGroup(registry().registries("MetricsGroup")).hasAssets(_property),
+			IMetricsGroup(registry().registries("MetricsGroup")).hasAssets(
+				_property
+			),
 			"unable to stake to unauthenticated property"
 		);
 
@@ -271,10 +276,8 @@ contract Lockup is ILockup, UsingRegistry, LockupStorage {
 		/**
 		 * Calculates the holders reward out of the total reward amount.
 		 */
-		uint256 holdersShare = IPolicy(registry().registries("Policy")).holdersShare(
-			price,
-			allStakes
-		);
+		uint256 holdersShare = IPolicy(registry().registries("Policy"))
+			.holdersShare(price, allStakes);
 
 		/**
 		 * Calculates and returns each reward.
@@ -497,7 +500,9 @@ contract Lockup is ILockup, UsingRegistry, LockupStorage {
 		 * If the passed Property has not authenticated, returns always 0.
 		 */
 		if (
-			IMetricsGroup(registry().registries("MetricsGroup")).hasAssets(_property) == false
+			IMetricsGroup(registry().registries("MetricsGroup")).hasAssets(
+				_property
+			) == false
 		) {
 			return (0, RewardPrices(0, 0, 0, 0));
 		}

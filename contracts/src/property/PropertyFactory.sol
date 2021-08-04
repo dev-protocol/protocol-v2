@@ -30,7 +30,9 @@ contract PropertyFactory is UsingRegistry, IPropertyFactory {
 	 */
 	modifier onlyProperty() {
 		require(
-			IPropertyGroup(registry().registries("PropertyGroup")).isGroup(msg.sender),
+			IPropertyGroup(registry().registries("PropertyGroup")).isGroup(
+				msg.sender
+			),
 			"illegal address"
 		);
 		_;
@@ -107,7 +109,9 @@ contract PropertyFactory is UsingRegistry, IPropertyFactory {
 		/**
 		 * Adds the new Property contract to the Property address set.
 		 */
-		IPropertyGroup(registry().registries("PropertyGroup")).addGroup(address(property));
+		IPropertyGroup(registry().registries("PropertyGroup")).addGroup(
+			address(property)
+		);
 
 		emit Create(msg.sender, address(property));
 		return address(property);
