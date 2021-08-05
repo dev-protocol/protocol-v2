@@ -15,3 +15,5 @@ export function validateAddressErrorMessage(result: any, reason = true): void {
 export function validateNotOwnerErrorMessage(result: any, reason = true): void {
 	validateErrorMessage(result, 'Ownable: caller is not the owner.', reason)
 }
+
+export const errorCatch = (err: Error) => err

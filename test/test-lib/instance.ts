@@ -274,7 +274,7 @@ export class DevProtocolInstance {
 			this.fromDeployer
 		)
 		await this.addressRegistry.setRegistry(
-			'MetricsGroupTest',
+			'MetricsGroup',
 			this._metricsGroup.address,
 			this.fromDeployer
 		)
@@ -334,7 +334,6 @@ export class DevProtocolInstance {
 		await this._policyFactory.create(policy.address)
 		await policy.setCapSetter(this._deployer)
 		await this.updateCap()
-
 		return policy.address
 	}
 
