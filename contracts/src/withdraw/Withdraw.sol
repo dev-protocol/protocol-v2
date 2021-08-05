@@ -23,9 +23,7 @@ contract Withdraw is IWithdraw, UsingRegistry, WithdrawStorage {
 	/**
 	 * Initialize the passed address as AddressRegistry address.
 	 */
-	constructor(address _registry)
-		public
-		UsingRegistry(_registry) {}
+	constructor(address _registry) public UsingRegistry(_registry) {}
 
 	/**
 	 * Withdraws rewards.
@@ -78,7 +76,10 @@ contract Withdraw is IWithdraw, UsingRegistry, WithdrawStorage {
 		 * Mints the holder reward.
 		 */
 		require(
-			IDevMinter(registry().registries("DevMinter")).mint(msg.sender, value),
+			IDevMinter(registry().registries("DevMinter")).mint(
+				msg.sender,
+				value
+			),
 			"dev mint failed"
 		);
 

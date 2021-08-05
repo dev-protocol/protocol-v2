@@ -55,9 +55,7 @@ contract Lockup is ILockup, UsingRegistry, LockupStorage {
 	/**
 	 * Initialize the passed address as AddressRegistry address.
 	 */
-	constructor(address _registry)
-		public
-		UsingRegistry(_registry) {}
+	constructor(address _registry) public UsingRegistry(_registry) {}
 
 	/**
 	 * Adds staking.
@@ -577,7 +575,10 @@ contract Lockup is ILockup, UsingRegistry, LockupStorage {
 		 * Mints the reward.
 		 */
 		require(
-			IDevMinter(registry().registries("DevMinter")).mint(msg.sender, value),
+			IDevMinter(registry().registries("DevMinter")).mint(
+				msg.sender,
+				value
+			),
 			"dev mint failed"
 		);
 
