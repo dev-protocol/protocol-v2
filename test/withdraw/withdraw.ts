@@ -1467,7 +1467,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 				})
 			})
 		})
-		describe('scenario: fallback legacy rewards', () => {
+		describe.only('scenario: fallback legacy rewards', () => {
 			let dev: DevProtocolInstance
 			let property: PropertyInstance
 			let property2: PropertyInstance

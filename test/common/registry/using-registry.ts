@@ -1,7 +1,7 @@
 import { DevProtocolInstance } from '../../test-lib/instance'
 
 contract('UsingRegistryTest', ([deployer]) => {
-	const usingRegistryContract = artifacts.require('Using≈Test')
+	const usingRegistryContract = artifacts.require('UsingRegistryTest')
 	const dev = new DevProtocolInstance(deployer)
 	before(async () => {
 		await dev.generateAddressRegistry()

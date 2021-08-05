@@ -302,7 +302,7 @@ export class DevProtocolInstance {
 			this.fromDeployer
 		)
 		await this.addressRegistry.setRegistry(
-			'WithdrawTest',
+			'Withdraw',
 			this._withdrawTest.address,
 			this.fromDeployer
 		)

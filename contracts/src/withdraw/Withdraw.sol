@@ -45,7 +45,6 @@ contract Withdraw is IWithdraw, UsingRegistry, WithdrawStorage {
 			),
 			"this is illegal address"
 		);
-
 		/**
 		 * Gets the withdrawable rewards amount and the latest cumulative sum of the maximum mint amount.
 		 */
@@ -55,29 +54,24 @@ contract Withdraw is IWithdraw, UsingRegistry, WithdrawStorage {
 			uint256 lastPriceCap,
 
 		) = _calculateWithdrawableAmount(_property, msg.sender);
-
 		/**
 		 * Validates the result is not 0.
 		 */
 		require(value != 0, "withdraw value is 0");
-
 		/**
 		 * Saves the latest cumulative sum of the holder reward price.
 		 * By subtracting this value when calculating the next rewards, always withdrawal the difference from the previous time.
 		 */
 		setStorageLastWithdrawnReward(_property, msg.sender, lastPrice);
 		setStorageLastWithdrawnRewardCap(_property, msg.sender, lastPriceCap);
-
 		/**
 		 * Sets the number of unwithdrawn rewards to 0.
 		 */
 		setPendingWithdrawal(_property, msg.sender, 0);
-
 		/**
 		 * Updates the withdrawal status to avoid double withdrawal for before DIP4.
 		 */
 		__updateLegacyWithdrawableAmount(_property, msg.sender);
-
 		/**
 		 * Mints the holder reward.
 		 */
@@ -85,13 +79,11 @@ contract Withdraw is IWithdraw, UsingRegistry, WithdrawStorage {
 			IDevMinter(devMinter).mint(msg.sender, value),
 			"dev mint failed"
 		);
-
 		/**
 		 * Since the total supply of tokens has changed, updates the latest maximum mint amount.
 		 */
 		ILockup lockup = ILockup(registry().registries("Lockup"));
 		lockup.update();
-
 		/**
 		 * Adds the reward amount already withdrawn in the passed Property.
 		 */
