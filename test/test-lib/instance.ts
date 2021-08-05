@@ -316,7 +316,7 @@ export class DevProtocolInstance {
 			this.fromDeployer
 		)
 		await this.addressRegistry.setRegistry(
-			'LockupTest',
+			'Lockup',
 			this._lockupTest.address,
 			this.fromDeployer
 		)
