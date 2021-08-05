@@ -141,6 +141,11 @@ export class DevProtocolInstance {
 			this.fromDeployer
 		)
 		await this._dev.addMinter(this._devMinter.address)
+		await this.addressRegistry.setRegistry(
+			'DevMinter',
+			this._devMinter.address,
+			this.fromDeployer
+		)
 	}
 
 	public async generateDev(): Promise<void> {
@@ -170,7 +175,6 @@ export class DevProtocolInstance {
 	public async generateLockup(): Promise<void> {
 		this._lockup = await contract('Lockup').new(
 			this.addressRegistry.address,
-			this.devMinter.address,
 			this.fromDeployer
 		)
 		await this.addressRegistry.setRegistry(
@@ -284,7 +288,6 @@ export class DevProtocolInstance {
 	public async generateWithdraw(): Promise<void> {
 		this._withdraw = await contract('Withdraw').new(
 			this.addressRegistry.address,
-			this.devMinter.address,
 			this.fromDeployer
 		)
 		await this.addressRegistry.setRegistry(
@@ -298,7 +301,6 @@ export class DevProtocolInstance {
 	public async generateWithdrawTest(): Promise<void> {
 		this._withdrawTest = await contract('WithdrawTest').new(
 			this.addressRegistry.address,
-			this.devMinter.address,
 			this.fromDeployer
 		)
 		await this.addressRegistry.setRegistry(
@@ -312,7 +314,6 @@ export class DevProtocolInstance {
 	public async generateLockupTest(): Promise<void> {
 		this._lockupTest = await contract('LockupTest').new(
 			this.addressRegistry.address,
-			this.devMinter.address,
 			this.fromDeployer
 		)
 		await this.addressRegistry.setRegistry(

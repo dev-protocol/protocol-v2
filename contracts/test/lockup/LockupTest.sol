@@ -4,8 +4,8 @@ import {Lockup} from "contracts/src/lockup/Lockup.sol";
 import {LockupStorageTest} from "contracts/test/lockup/LockupStorageTest.sol";
 
 contract LockupTest is LockupStorageTest, Lockup {
-	constructor(address _registry, address _devMinter)
+	constructor(address _registry)
 		public
-		Lockup(_registry, _devMinter)
+		Lockup(_registry)
 	{}
 }

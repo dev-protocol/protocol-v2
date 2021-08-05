@@ -43,7 +43,6 @@ import {IMetricsGroup} from "contracts/interface/IMetricsGroup.sol";
 contract Lockup is ILockup, UsingRegistry, LockupStorage {
 	using SafeMath for uint256;
 	using Decimals for uint256;
-	address public devMinter;
 	struct RewardPrices {
 		uint256 reward;
 		uint256 holders;
@@ -54,14 +53,11 @@ contract Lockup is ILockup, UsingRegistry, LockupStorage {
 	event UpdateCap(uint256 _cap);
 
 	/**
-	 * Initialize the passed address as AddressRegistry address and Devminter.
+	 * Initialize the passed address as AddressRegistry address.
 	 */
-	constructor(address _registry, address _devMinter)
+	constructor(address _registry)
 		public
-		UsingRegistry(_registry)
-	{
-		devMinter = _devMinter;
-	}
+		UsingRegistry(_registry) {}
 
 	/**
 	 * Adds staking.
@@ -581,7 +577,7 @@ contract Lockup is ILockup, UsingRegistry, LockupStorage {
 		 * Mints the reward.
 		 */
 		require(
-			IDevMinter(devMinter).mint(msg.sender, value),
+			IDevMinter(registry().registries("DevMinter")).mint(msg.sender, value),
 			"dev mint failed"
 		);
 
