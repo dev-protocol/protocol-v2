@@ -12,8 +12,8 @@ contract PolicyTestBase is IPolicy {
 	// solhint-disable-next-line no-unused-vars
 	function rewards(uint256 _lockups, uint256 _assets)
 		external
-		override
 		view
+		override
 		returns (uint256)
 	{
 		return 100000000000000000000;
@@ -21,8 +21,8 @@ contract PolicyTestBase is IPolicy {
 
 	function holdersShare(uint256 _amount, uint256 _lockups)
 		external
-		override
 		view
+		override
 		returns (uint256)
 	{
 		return _lockups > 0 ? (_amount * 90) / 100 : _amount;
@@ -30,22 +30,27 @@ contract PolicyTestBase is IPolicy {
 
 	function authenticationFee(uint256 _assets, uint256 _propertyLockups)
 		external
-		override
 		view
+		override
 		returns (uint256)
 	{
 		return _assets + _propertyLockups + 1;
 	}
 
-	function marketVotingBlocks() external override view returns (uint256) {
+	function marketVotingBlocks() external view override returns (uint256) {
 		return 10;
 	}
 
-	function policyVotingBlocks() external override view returns (uint256) {
+	function policyVotingBlocks() external view override returns (uint256) {
 		return 20;
 	}
 
-	function shareOfTreasury(uint256 _supply) external override view returns (uint256) {
+	function shareOfTreasury(uint256 _supply)
+		external
+		view
+		override
+		returns (uint256)
+	{
 		return _supply.div(100).mul(5);
 	}
 

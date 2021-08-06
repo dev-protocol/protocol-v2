@@ -24,10 +24,7 @@ contract DevMinter is UsingRegistry, Ownable, IDevMinter {
 				msg.sender == reg.registries("Withdraw"),
 			"illegal access"
 		);
-		ERC20PresetMinterPauser(reg.registries("Dev")).mint(
-			account,
-			amount
-		);
+		ERC20PresetMinterPauser(reg.registries("Dev")).mint(account, amount);
 		return true;
 	}
 
