@@ -1,4 +1,5 @@
-pragma solidity 0.5.17;
+// SPDX-License-Identifier: MPL-2.0
+pragma solidity = 0.8.6;
 
 import {UsingRegistry} from "contracts/src/common/registry/UsingRegistry.sol";
 import {Property} from "contracts/src/property/Property.sol";

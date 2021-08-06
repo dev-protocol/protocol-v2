@@ -1,8 +1,9 @@
 /* solhint-disable const-name-snakecase */
 /* solhint-disable var-name-mixedcase */
-pragma solidity 0.5.17;
+// SPDX-License-Identifier: MPL-2.0
+pragma solidity = 0.8.6;
 
-import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
+import {SafeMath} from "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {UsingRegistry} from "contracts/src/common/registry/UsingRegistry.sol";
 import {IPolicy} from "contracts/interface/IPolicy.sol";

@@ -1,5 +1,6 @@
 /* solhint-disable const-name-snakecase */
-pragma solidity 0.5.17;
+// SPDX-License-Identifier: MPL-2.0
+pragma solidity = 0.8.6;
 
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {TreasuryFee} from "contracts/src/policy/TreasuryFee.sol";

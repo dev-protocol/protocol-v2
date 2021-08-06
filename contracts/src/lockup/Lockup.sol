@@ -1,7 +1,8 @@
-pragma solidity 0.5.17;
+// SPDX-License-Identifier: MPL-2.0
+pragma solidity = 0.8.6;
 
 // prettier-ignore
-import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
+import {SafeMath} from "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import {Decimals} from "contracts/src/common/libs/Decimals.sol";
 import {UsingRegistry} from "contracts/src/common/registry/UsingRegistry.sol";
 import {LockupStorage} from "contracts/src/lockup/LockupStorage.sol";

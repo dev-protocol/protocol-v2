@@ -1,4 +1,5 @@
-pragma solidity 0.5.17;
+// SPDX-License-Identifier: MPL-2.0
+pragma solidity = 0.8.6;
 
 import {WithdrawStorage} from "contracts/src/withdraw/WithdrawStorage.sol";
 

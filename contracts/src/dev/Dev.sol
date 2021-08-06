@@ -1,11 +1,8 @@
-pragma solidity 0.5.17;
+// SPDX-License-Identifier: MPL-2.0
+pragma solidity = 0.8.6;
 
 // prettier-ignore
-import {ERC20Detailed} from "@openzeppelin/contracts/token/ERC20/ERC20Detailed.sol";
-// prettier-ignore
-import {ERC20Mintable} from "@openzeppelin/contracts/token/ERC20/ERC20Mintable.sol";
-// prettier-ignore
-import {ERC20Burnable} from "@openzeppelin/contracts/token/ERC20/ERC20Burnable.sol";
+import {ERC20PresetMinterPauser} from "@openzeppelin/contracts/token/ERC20/presets/ERC20PresetMinterPauser.sol";
 import {UsingRegistry} from "contracts/src/common/registry/UsingRegistry.sol";
 import {ILockup} from "contracts/interface/ILockup.sol";
 import {IDev} from "contracts/interface/IDev.sol";
@@ -19,9 +16,7 @@ import {IMarketGroup} from "contracts/interface/IMarketGroup.sol";
  * When authenticated a new asset by the Market contracts, DEV token is burned as fees.
  */
 contract Dev is
-	ERC20Detailed,
-	ERC20Mintable,
-	ERC20Burnable,
+	ERC20PresetMinterPauser,
 	UsingRegistry,
 	IDev
 {
@@ -31,7 +26,7 @@ contract Dev is
 	 */
 	constructor(address _registry)
 		public
-		ERC20Detailed("Dev", "DEV", 18)
+		ERC20PresetMinterPauser("Dev", "DEV", 18)
 		UsingRegistry(_registry)
 	{}
 

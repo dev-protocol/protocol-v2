@@ -1,6 +1,7 @@
-pragma solidity 0.5.17;
+// SPDX-License-Identifier: MPL-2.0
+pragma solidity = 0.8.6;
 
-import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
+import {SafeMath} from "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import {UsingRegistry} from "contracts/src/common/registry/UsingRegistry.sol";
 import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
 import {IMetrics} from "contracts/interface/IMetrics.sol";

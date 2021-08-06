@@ -1,7 +1,7 @@
-/* solhint-disable const-name-snakecase */
-pragma solidity 0.5.17;
+// SPDX-License-Identifier: MPL-2.0
+pragma solidity = 0.8.6;
 
-import {Ownable} from "@openzeppelin/contracts/ownership/Ownable.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {DIP7} from "contracts/src/policy/DIP7.sol";
 
 /**

@@ -1,4 +1,5 @@
-pragma solidity 0.5.17;
+// SPDX-License-Identifier: MPL-2.0
+pragma solidity = 0.8.6;
 
 import {PolicyTestBase} from "contracts/test/policy/PolicyTestBase.sol";
 import {Decimals} from "contracts/src/common/libs/Decimals.sol";

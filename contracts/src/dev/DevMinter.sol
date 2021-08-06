@@ -1,8 +1,9 @@
-pragma solidity 0.5.17;
+// SPDX-License-Identifier: MPL-2.0
+pragma solidity = 0.8.6;
 
 // prettier-ignore
-import {ERC20Mintable} from "@openzeppelin/contracts/token/ERC20/ERC20Mintable.sol";
-import {Ownable} from "@openzeppelin/contracts/ownership/Ownable.sol";
+import {ERC20PresetMinterPauser} from "@openzeppelin/contracts/token/ERC20/presets/ERC20PresetMinterPauser.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {UsingRegistry} from "contracts/src/common/registry/UsingRegistry.sol";
 import {IAddressRegistry} from "contracts/interface/IAddressRegistry.sol";
 import {IDevMinter} from "contracts/interface/IDevMinter.sol";
@@ -23,7 +24,7 @@ contract DevMinter is UsingRegistry, Ownable, IDevMinter {
 				msg.sender == reg.registries("Withdraw"),
 			"illegal access"
 		);
-		return ERC20Mintable(reg.registries("Dev")).mint(account, amount);
+		return ERC20PresetMinterPauser(reg.registries("Dev")).mint(account, amount);
 	}
 
 	/**
@@ -31,6 +32,6 @@ contract DevMinter is UsingRegistry, Ownable, IDevMinter {
 	 */
 	function renounceMinter() external onlyOwner {
 		address token = registry().registries("Dev");
-		ERC20Mintable(token).renounceMinter();
+		ERC20PresetMinterPauser(token).renounceMinter();
 	}
 }
