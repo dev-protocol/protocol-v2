@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MPL-2.0
-pragma solidity = 0.8.6;
+pragma solidity =0.8.6;
 
 import {IUsingStorage} from "contracts/interface/IUsingStorage.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";

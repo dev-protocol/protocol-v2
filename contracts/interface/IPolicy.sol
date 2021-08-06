@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MPL-2.0
-pragma solidity = 0.8.6;
+pragma solidity =0.8.6;
 
 interface IPolicy {
 	function rewards(uint256 _lockups, uint256 _assets)

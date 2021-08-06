@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MPL-2.0
-pragma solidity = 0.8.6;
+pragma solidity =0.8.6;
 
 // prettier-ignore
 import {ERC20PresetMinterPauser} from "@openzeppelin/contracts/token/ERC20/presets/ERC20PresetMinterPauser.sol";
@@ -24,7 +24,11 @@ contract DevMinter is UsingRegistry, Ownable, IDevMinter {
 				msg.sender == reg.registries("Withdraw"),
 			"illegal access"
 		);
-		return ERC20PresetMinterPauser(reg.registries("Dev")).mint(account, amount);
+		return
+			ERC20PresetMinterPauser(reg.registries("Dev")).mint(
+				account,
+				amount
+			);
 	}
 
 	/**

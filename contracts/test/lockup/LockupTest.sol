@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MPL-2.0
-pragma solidity = 0.8.6;
+pragma solidity =0.8.6;
 
 import {Lockup} from "contracts/src/lockup/Lockup.sol";
 import {LockupStorageTest} from "contracts/test/lockup/LockupStorageTest.sol";

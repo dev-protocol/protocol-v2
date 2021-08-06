@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MPL-2.0
-pragma solidity = 0.8.6;
+pragma solidity =0.8.6;
 
 interface IProperty {
 	function author() external view returns (address);

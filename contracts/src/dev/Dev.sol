@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MPL-2.0
-pragma solidity = 0.8.6;
+pragma solidity =0.8.6;
 
 // prettier-ignore
 import {ERC20PresetMinterPauser} from "@openzeppelin/contracts/token/ERC20/presets/ERC20PresetMinterPauser.sol";
@@ -15,11 +15,7 @@ import {IMarketGroup} from "contracts/interface/IMarketGroup.sol";
  * Also, mint will be performed based on the Allocator contract.
  * When authenticated a new asset by the Market contracts, DEV token is burned as fees.
  */
-contract Dev is
-	ERC20PresetMinterPauser,
-	UsingRegistry,
-	IDev
-{
+contract Dev is ERC20PresetMinterPauser, UsingRegistry, IDev {
 	/**
 	 * Initialize the passed address as AddressRegistry address.
 	 * The token name is `Dev`, the token symbol is `DEV`, and the decimals is 18.
