@@ -56,6 +56,4 @@ interface ILockup {
 	function cap() external view returns (uint256);
 
 	function updateCap(uint256 _cap) external;
-
-	function devMinter() external view returns (address);
 }
