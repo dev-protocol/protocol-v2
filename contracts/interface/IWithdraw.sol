@@ -33,6 +33,4 @@ interface IWithdraw {
 			uint256 _cap,
 			uint256 _allReward
 		);
-
-	function devMinter() external view returns (address);
 }
