@@ -9,6 +9,7 @@ contract PolicyTest1 is PolicyTestBase {
 
 	function rewards(uint256 _lockups, uint256 _assets)
 		external
+		override
 		view
 		returns (uint256)
 	{
@@ -17,6 +18,7 @@ contract PolicyTest1 is PolicyTestBase {
 
 	function holdersShare(uint256 _amount, uint256 _lockups)
 		external
+		override
 		view
 		returns (uint256)
 	{
@@ -27,6 +29,7 @@ contract PolicyTest1 is PolicyTestBase {
 
 	function authenticationFee(uint256 _assets, uint256 _propertyLockups)
 		external
+		override
 		view
 		returns (uint256)
 	{

@@ -6,6 +6,7 @@ import {PolicyTestBase} from "contracts/test/policy/PolicyTestBase.sol";
 contract PolicyTestForAllocator is PolicyTestBase {
 	function rewards(uint256 _lockups, uint256 _assets)
 		external
+		override
 		view
 		returns (uint256)
 	{

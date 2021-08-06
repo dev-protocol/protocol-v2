@@ -24,11 +24,11 @@ contract DevMinter is UsingRegistry, Ownable, IDevMinter {
 				msg.sender == reg.registries("Withdraw"),
 			"illegal access"
 		);
-		return
-			ERC20PresetMinterPauser(reg.registries("Dev")).mint(
-				account,
-				amount
-			);
+		ERC20PresetMinterPauser(reg.registries("Dev")).mint(
+			account,
+			amount
+		);
+		return true;
 	}
 
 	/**
@@ -36,6 +36,7 @@ contract DevMinter is UsingRegistry, Ownable, IDevMinter {
 	 */
 	function renounceMinter() external onlyOwner {
 		address token = registry().registries("Dev");
-		ERC20PresetMinterPauser(token).renounceMinter();
+		ERC20PresetMinterPauser dev = ERC20PresetMinterPauser(token);
+		dev.renounceRole(dev.MINTER_ROLE(), address(this));
 	}
 }

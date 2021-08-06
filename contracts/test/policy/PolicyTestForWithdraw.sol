@@ -7,6 +7,7 @@ contract PolicyTestForWithdraw is PolicyTestBase {
 	// solhint-disable-next-line no-unused-vars
 	function rewards(uint256 _lockups, uint256 _assets)
 		external
+		override
 		view
 		returns (uint256)
 	{

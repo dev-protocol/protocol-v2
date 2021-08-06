@@ -22,7 +22,7 @@ contract Dev is ERC20PresetMinterPauser, UsingRegistry, IDev {
 	 */
 	constructor(address _registry)
 		public
-		ERC20PresetMinterPauser("Dev", "DEV", 18)
+		ERC20PresetMinterPauser("Dev", "DEV")
 		UsingRegistry(_registry)
 	{}
 
