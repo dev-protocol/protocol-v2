@@ -353,22 +353,7 @@ contract Lockup is ILockup, UsingRegistry, LockupStorage {
 	}
 
 	function _getInitialCap(address _property) private view returns (uint256) {
-		uint256 initialCap = getStorageInitialCumulativeHoldersRewardCap(
-			_property
-		);
-		if (initialCap > 0) {
-			return initialCap;
-		}
-
-		// Fallback when there is a data past staked.
-		if (
-			getStorageLastCumulativeHoldersRewardPricePerProperty(_property) >
-			0 ||
-			getStoragePropertyValue(_property) > 0
-		) {
-			return getStorageFallbackInitialCumulativeHoldersRewardCap();
-		}
-		return 0;
+		return getStorageInitialCumulativeHoldersRewardCap(_property);
 	}
 
 	/**
@@ -511,11 +496,6 @@ contract Lockup is ILockup, UsingRegistry, LockupStorage {
 		uint256 pending = getStoragePendingInterestWithdrawal(_property, _user);
 
 		/**
-		 * Gets the reward amount of before DIP4.
-		 */
-		uint256 legacy = __legacyWithdrawableInterestAmount(_property, _user);
-
-		/**
 		 * Gets the latest withdrawal reward amount.
 		 */
 		(
@@ -527,7 +507,7 @@ contract Lockup is ILockup, UsingRegistry, LockupStorage {
 		/**
 		 * Returns the sum of all values.
 		 */
-		uint256 withdrawableAmount = amount.add(pending).add(legacy);
+		uint256 withdrawableAmount = amount.add(pending);
 		return (withdrawableAmount, prices);
 	}
 
@@ -573,7 +553,6 @@ contract Lockup is ILockup, UsingRegistry, LockupStorage {
 			msg.sender,
 			prices.interest
 		);
-		__updateLegacyWithdrawableInterestAmount(_property, msg.sender);
 
 		/**
 		 * Mints the reward.
@@ -779,48 +758,6 @@ contract Lockup is ILockup, UsingRegistry, LockupStorage {
 			withdrawableAmount
 		);
 
-		/**
-		 * Updates the reward amount of before DIP4 to prevent further addition it.
-		 */
-		__updateLegacyWithdrawableInterestAmount(_property, _user);
-
 		return prices;
-	}
-
-	/**
-	 * Returns the reward amount of the calculation model before DIP4.
-	 * It can be calculated by subtracting "the last cumulative sum of reward unit price" from
-	 * "the current cumulative sum of reward unit price," and multiplying by the staking amount.
-	 */
-	function __legacyWithdrawableInterestAmount(
-		address _property,
-		address _user
-	) private view returns (uint256) {
-		uint256 _last = getStorageLastInterestPrice(_property, _user);
-		uint256 price = getStorageInterestPrice(_property);
-		uint256 priceGap = price.sub(_last);
-		uint256 lockedUpValue = getStorageValue(_property, _user);
-		uint256 value = priceGap.mul(lockedUpValue);
-		return value.divBasis();
-	}
-
-	/**
-	 * Updates and treats the reward of before DIP4 as already received.
-	 */
-	function __updateLegacyWithdrawableInterestAmount(
-		address _property,
-		address _user
-	) private {
-		uint256 interestPrice = getStorageInterestPrice(_property);
-		if (getStorageLastInterestPrice(_property, _user) != interestPrice) {
-			setStorageLastInterestPrice(_property, _user, interestPrice);
-		}
-	}
-
-	function ___setFallbackInitialCumulativeHoldersRewardCap(uint256 _value)
-		external
-		onlyOwner
-	{
-		setStorageFallbackInitialCumulativeHoldersRewardCap(_value);
 	}
 }
