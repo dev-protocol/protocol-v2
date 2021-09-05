@@ -54,20 +54,23 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 			expect((await dev.totalSupply()).toNumber()).to.equal(0)
 			expect((await dev.balanceOf(deployer)).toNumber()).to.equal(0)
 		})
-		it('if the sender is minter, can add a new minter by addMinter', async () => {
+		it('if the sender has role of granting roles, can add a new minter', async () => {
 			const dev = await createDev()
-			await dev.addMinter(user1)
-			expect(await dev.isMinter(user1)).to.equal(true)
+			const role = web3.utils.keccak256('MINTER_ROLE')
+			await dev.grantRole(role, user1)
+			expect(await dev.hasRole(role, user1)).to.equal(true)
+			await dev.grantRole('0x00', user1) // '0x00' is the value of DEFAULT_ADMIN_ROLE defined by the AccessControl
 
-			await dev.addMinter(user2, { from: user1 })
-			expect(await dev.isMinter(user2)).to.equal(true)
+			await dev.grantRole(role, user2, { from: user1 })
+			expect(await dev.hasRole(role, user2)).to.equal(true)
 		})
-		it('renounce minter by running renounceMinter', async () => {
+		it('renounce minter by running renounceRole', async () => {
 			const dev = await createDev()
-			await dev.addMinter(user1)
-			expect(await dev.isMinter(user1)).to.equal(true)
-			await dev.renounceMinter({ from: user1 })
-			expect(await dev.isMinter(user1)).to.equal(false)
+			const role = web3.utils.keccak256('MINTER_ROLE')
+			await dev.grantRole(role, user1)
+			expect(await dev.hasRole(role, user1)).to.equal(true)
+			await dev.renounceRole(role, user1, { from: user1 })
+			expect(await dev.hasRole(role, user1)).to.equal(false)
 		})
 	})
 	describe('Dev; burn', () => {
