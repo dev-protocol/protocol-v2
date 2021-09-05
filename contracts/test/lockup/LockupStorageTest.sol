@@ -16,20 +16,6 @@ contract LockupStorageTest is LockupStorage {
 		setStorageValue(_property, _sender, _value);
 	}
 
-	function setStorageInterestPriceTest(address _property, uint256 _value)
-		external
-	{
-		setStorageInterestPrice(_property, _value);
-	}
-
-	function setStorageLastInterestPriceTest(
-		address _property,
-		address _user,
-		uint256 _value
-	) external {
-		setStorageLastInterestPrice(_property, _user, _value);
-	}
-
 	function setStorageLastSameRewardsAmountAndBlockTest(
 		uint256 _amount,
 		uint256 _block
