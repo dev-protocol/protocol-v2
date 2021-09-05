@@ -29,28 +29,6 @@ contract('LockupStorageTest', ([property, user]) => {
 			expect(result.toNumber()).to.be.equal(30)
 		})
 	})
-	describe('LockupStorage; setInterestPrice, getInterestPrice', () => {
-		it('Initial value is 0.', async () => {
-			const result = await storage.getStorageInterestPrice(property)
-			expect(result.toNumber()).to.be.equal(0)
-		})
-		it('The set value can be taken as it is.', async () => {
-			await storage.setStorageInterestPriceTest(property, 30000)
-			const result = await storage.getStorageInterestPrice(property)
-			expect(result.toNumber()).to.be.equal(30000)
-		})
-	})
-	describe('LockupStorage; setLastInterestPrice, getLastInterestPrice', () => {
-		it('Initial value is 0.', async () => {
-			const result = await storage.getStorageLastInterestPrice(property, user)
-			expect(result.toNumber()).to.be.equal(0)
-		})
-		it('The set value can be taken as it is.', async () => {
-			await storage.setStorageLastInterestPriceTest(property, user, 300000)
-			const result = await storage.getStorageLastInterestPrice(property, user)
-			expect(result.toNumber()).to.be.equal(300000)
-		})
-	})
 	describe('LockupStorage; setPendingInterestWithdrawal, getPendingInterestWithdrawal', () => {
 		it('Initial value is 0.', async () => {
 			const result = await storage.getStoragePendingInterestWithdrawal(

@@ -76,65 +76,6 @@ contract LockupStorage is UsingStorage {
 		return keccak256(abi.encodePacked("_propertyValue", _property));
 	}
 
-	//InterestPrice
-	function setStorageInterestPrice(address _property, uint256 _value)
-		internal
-	{
-		// The previously used function
-		// This function is only used in testing
-		eternalStorage().setUint(getStorageInterestPriceKey(_property), _value);
-	}
-
-	function getStorageInterestPrice(address _property)
-		public
-		view
-		returns (uint256)
-	{
-		return eternalStorage().getUint(getStorageInterestPriceKey(_property));
-	}
-
-	function getStorageInterestPriceKey(address _property)
-		private
-		pure
-		returns (bytes32)
-	{
-		return keccak256(abi.encodePacked("_interestTotals", _property));
-	}
-
-	//LastInterestPrice
-	function setStorageLastInterestPrice(
-		address _property,
-		address _user,
-		uint256 _value
-	) internal {
-		eternalStorage().setUint(
-			getStorageLastInterestPriceKey(_property, _user),
-			_value
-		);
-	}
-
-	function getStorageLastInterestPrice(address _property, address _user)
-		public
-		view
-		returns (uint256)
-	{
-		return
-			eternalStorage().getUint(
-				getStorageLastInterestPriceKey(_property, _user)
-			);
-	}
-
-	function getStorageLastInterestPriceKey(address _property, address _user)
-		private
-		pure
-		returns (bytes32)
-	{
-		return
-			keccak256(
-				abi.encodePacked("_lastLastInterestPrice", _property, _user)
-			);
-	}
-
 	//LastSameRewardsAmountAndBlock
 	function setStorageLastSameRewardsAmountAndBlock(
 		uint256 _amount,
