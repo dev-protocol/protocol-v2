@@ -1,15 +1,15 @@
 pragma solidity 0.5.17;
 
-import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
+import {UsingRegistry} from "contracts/src/common/registry/UsingRegistry.sol";
 import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
 import {IPropertyGroup} from "contracts/interface/IPropertyGroup.sol";
 
-contract PropertyGroup is UsingConfig, UsingStorage, IPropertyGroup {
-	constructor(address _config) public UsingConfig(_config) {}
+contract PropertyGroup is UsingRegistry, UsingStorage, IPropertyGroup {
+	constructor(address _registry) public UsingRegistry(_registry) {}
 
 	function addGroup(address _addr) external {
 		require(
-			msg.sender == config().propertyFactory(),
+			msg.sender == registry().registries("PropertyFactory"),
 			"this is illegal address"
 		);
 

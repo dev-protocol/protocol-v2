@@ -5,11 +5,11 @@ import { validateErrorMessage } from '../test-lib/utils/error'
 contract('DevMinter', ([deployer, user1, lockup, withdraw]) => {
 	const createDevInstance = async (): Promise<DevProtocolInstance> => {
 		const dev = new DevProtocolInstance(deployer)
-		await dev.generateAddressConfig()
+		await dev.generateAddressRegistry()
 		await dev.generateDev()
 		await dev.generateDevMinter()
-		await dev.addressConfig.setLockup(lockup)
-		await dev.addressConfig.setWithdraw(withdraw)
+		await dev.addressRegistry.setRegistry('Lockup', lockup)
+		await dev.addressRegistry.setRegistry('Withdraw', withdraw)
 		return dev
 	}
 
@@ -17,22 +17,25 @@ contract('DevMinter', ([deployer, user1, lockup, withdraw]) => {
 		async (): Promise<DevMinterInstance> => {
 			const contract = artifacts.require
 
-			const addressConfig = await contract('AddressConfig').new({
+			const addressRegistry = await contract('AddressRegistry').new({
 				from: deployer,
 			})
-			const dev = await contract('Dev').new(addressConfig.address, {
+			const dev = await contract('Dev').new(addressRegistry.address, {
 				from: deployer,
 			})
-			await addressConfig.setToken(dev.address, {
+			await addressRegistry.setRegistry('Dev', dev.address, {
 				from: deployer,
 			})
-			const devMinter = await contract('DevMinter').new(addressConfig.address, {
+			const devMinter = await contract('DevMinter').new(
+				addressRegistry.address,
+				{
+					from: deployer,
+				}
+			)
+			await addressRegistry.setRegistry('Lockup', lockup, {
 				from: deployer,
 			})
-			await addressConfig.setLockup(lockup, {
-				from: deployer,
-			})
-			await addressConfig.setWithdraw(withdraw, {
+			await addressRegistry.setRegistry('Withdraw', withdraw, {
 				from: deployer,
 			})
 			return devMinter

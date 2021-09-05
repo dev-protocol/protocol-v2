@@ -1,6 +1,6 @@
 pragma solidity 0.5.17;
 
-import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
+import {UsingRegistry} from "contracts/src/common/registry/UsingRegistry.sol";
 import {Property} from "contracts/src/property/Property.sol";
 import {IPropertyGroup} from "contracts/interface/IPropertyGroup.sol";
 import {IPropertyFactory} from "contracts/interface/IPropertyFactory.sol";
@@ -9,7 +9,7 @@ import {IMarket} from "contracts/interface/IMarket.sol";
 /**
  * A factory contract that creates a new Property contract.
  */
-contract PropertyFactory is UsingConfig, IPropertyFactory {
+contract PropertyFactory is UsingRegistry, IPropertyFactory {
 	event Create(address indexed _from, address _property);
 	event ChangeAuthor(
 		address indexed _property,
@@ -20,17 +20,19 @@ contract PropertyFactory is UsingConfig, IPropertyFactory {
 	event ChangeSymbol(address indexed _property, string _old, string _new);
 
 	/**
-	 * @dev Initialize the passed address as AddressConfig address.
-	 * @param _config AddressConfig address.
+	 * @dev Initialize the passed address as AddressRegistry address.
+	 * @param _registry AddressRegistry address.
 	 */
-	constructor(address _config) public UsingConfig(_config) {}
+	constructor(address _registry) public UsingRegistry(_registry) {}
 
 	/**
 	 * @dev Throws if called by any account other than Properties.
 	 */
 	modifier onlyProperty() {
 		require(
-			IPropertyGroup(config().propertyGroup()).isGroup(msg.sender),
+			IPropertyGroup(registry().registries("PropertyGroup")).isGroup(
+				msg.sender
+			),
 			"illegal address"
 		);
 		_;
@@ -98,7 +100,7 @@ contract PropertyFactory is UsingConfig, IPropertyFactory {
 		 * Creates a new Property contract.
 		 */
 		Property property = new Property(
-			address(config()),
+			address(registry()),
 			_author,
 			_name,
 			_symbol
@@ -107,7 +109,9 @@ contract PropertyFactory is UsingConfig, IPropertyFactory {
 		/**
 		 * Adds the new Property contract to the Property address set.
 		 */
-		IPropertyGroup(config().propertyGroup()).addGroup(address(property));
+		IPropertyGroup(registry().registries("PropertyGroup")).addGroup(
+			address(property)
+		);
 
 		emit Create(msg.sender, address(property));
 		return address(property);

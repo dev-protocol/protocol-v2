@@ -10,7 +10,7 @@ contract Metrics is IMetrics {
 	address public property;
 
 	constructor(address _market, address _property) public {
-		//Do not validate because there is no AddressConfig
+		//Do not validate because there is no AddressRegistry
 		market = _market;
 		property = _property;
 	}

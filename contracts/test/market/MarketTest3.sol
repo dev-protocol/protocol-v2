@@ -1,18 +1,18 @@
 pragma solidity 0.5.17;
 
 import {Ownable} from "@openzeppelin/contracts/ownership/Ownable.sol";
-import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
+import {UsingRegistry} from "contracts/src/common/registry/UsingRegistry.sol";
 import {IMarketBehavior} from "contracts/interface/IMarketBehavior.sol";
 import {IMarket} from "contracts/interface/IMarket.sol";
 
-contract MarketTest3 is Ownable, IMarketBehavior, UsingConfig {
+contract MarketTest3 is Ownable, IMarketBehavior, UsingRegistry {
 	string public schema = "[]";
 	address private associatedMarket;
 	mapping(address => string) internal keys;
 	mapping(string => address) private addresses;
 	address public currentAuthinticateAccount;
 
-	constructor(address _config) public UsingConfig(_config) {}
+	constructor(address _registry) public UsingRegistry(_registry) {}
 
 	function authenticate(
 		address _prop,

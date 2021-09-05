@@ -13,7 +13,7 @@ contract('PolicyFactory', ([deployer, dummyPolicy, user1, ...accounts]) => {
 	})
 	const init = async (): Promise<[DevProtocolInstance, IPolicyInstance]> => {
 		const dev = new DevProtocolInstance(deployer)
-		await dev.generateAddressConfig()
+		await dev.generateAddressRegistry()
 		await Promise.all([
 			dev.generatePolicyGroup(),
 			dev.generatePolicyFactory(),
@@ -30,7 +30,7 @@ contract('PolicyFactory', ([deployer, dummyPolicy, user1, ...accounts]) => {
 			await dev.policyFactory.create(policy.address, {
 				from: user1,
 			})
-			const curentPolicyAddress = await dev.addressConfig.policy()
+			const curentPolicyAddress = await dev.addressRegistry.registries('Policy')
 			expect(curentPolicyAddress).to.be.equal(policy.address)
 		})
 
@@ -67,7 +67,7 @@ contract('PolicyFactory', ([deployer, dummyPolicy, user1, ...accounts]) => {
 			await dev.policyFactory.create(secoundPolicy.address, {
 				from: user1,
 			})
-			const curentPolicyAddress = await dev.addressConfig.policy()
+			const curentPolicyAddress = await dev.addressRegistry.registries('Policy')
 			expect(curentPolicyAddress).to.be.equal(policy.address)
 			const after = await dev.policyGroup.isGroup(secoundPolicy.address)
 			expect(after).to.be.equal(true)
@@ -101,14 +101,14 @@ contract('PolicyFactory', ([deployer, dummyPolicy, user1, ...accounts]) => {
 				await dev.policyFactory.create(secoundPolicy.address, {
 					from: user1,
 				})
-				let curentPolicyAddress = await dev.addressConfig.policy()
+				let curentPolicyAddress = await dev.addressRegistry.registries('Policy')
 				expect(curentPolicyAddress).to.be.equal(policy.address)
 				await mine(10)
 				const result = await dev.policyFactory
 					.forceAttach(secoundPolicy.address)
 					.catch((err: Error) => err)
 				validateErrorMessage(result, 'deadline is over')
-				curentPolicyAddress = await dev.addressConfig.policy()
+				curentPolicyAddress = await dev.addressRegistry.registries('Policy')
 				expect(curentPolicyAddress).to.be.equal(policy.address)
 			})
 		})
@@ -125,12 +125,12 @@ contract('PolicyFactory', ([deployer, dummyPolicy, user1, ...accounts]) => {
 				await dev.policyFactory.create(secoundPolicy.address, {
 					from: user1,
 				})
-				let curentPolicyAddress = await dev.addressConfig.policy()
+				let curentPolicyAddress = await dev.addressRegistry.registries('Policy')
 				expect(curentPolicyAddress).to.be.equal(policy.address)
 
 				await dev.policyFactory.forceAttach(secoundPolicy.address)
 
-				curentPolicyAddress = await dev.addressConfig.policy()
+				curentPolicyAddress = await dev.addressRegistry.registries('Policy')
 				expect(curentPolicyAddress).to.be.equal(secoundPolicy.address)
 			})
 		})

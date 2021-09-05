@@ -22,7 +22,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 		[DevProtocolInstance, PropertyInstance, PolicyTestBaseInstance]
 	> => {
 		const dev = new DevProtocolInstance(deployer)
-		await dev.generateAddressConfig()
+		await dev.generateAddressRegistry()
 		await dev.generateDev()
 		await dev.generateDevMinter()
 		await Promise.all([
@@ -51,7 +51,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 			artifacts.require('Property').at(propertyAddress),
 		])
 
-		await dev.addressConfig.setMetricsFactory(deployer)
+		await dev.addressRegistry.setRegistry('MetricsFactory', deployer)
 		await dev.metricsGroup.addGroup(
 			(
 				await dev.createMetrics(deployer, property.address)
@@ -1881,13 +1881,6 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				expect(res[0].toString()).to.be.equal(res[1].toString())
 				expect(cap.toString()).to.not.be.equal('0')
 			})
-		})
-	})
-	describe('Lockup; devMinter', () => {
-		it('get the address of the DevMinter contract.', async () => {
-			const [dev] = await init()
-			const devMinterAddress = await dev.lockup.devMinter()
-			expect(devMinterAddress).to.be.equal(dev.devMinter.address)
 		})
 	})
 })

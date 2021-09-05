@@ -3,7 +3,7 @@ pragma solidity 0.5.17;
 // prettier-ignore
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 import {Decimals} from "contracts/src/common/libs/Decimals.sol";
-import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
+import {UsingRegistry} from "contracts/src/common/registry/UsingRegistry.sol";
 import {LockupStorage} from "contracts/src/lockup/LockupStorage.sol";
 import {IDevMinter} from "contracts/interface/IDevMinter.sol";
 import {IProperty} from "contracts/interface/IProperty.sol";
@@ -40,10 +40,9 @@ import {IMetricsGroup} from "contracts/interface/IMetricsGroup.sol";
  * - After 10 blocks, Carol stakes 40 DEV on Property-A (Alice's staking state on Property-A: `M`=500, `B`=20, `P`=140, `S`=200, `U`=100)
  * - After 10 blocks, Alice withdraws Property-A staking reward. The reward at this time is 5000 DEV (10 blocks * 500 DEV) + 3125 DEV (10 blocks * 62.5% * 500 DEV) + 2500 DEV (10 blocks * 50% * 500 DEV).
  */
-contract Lockup is ILockup, UsingConfig, LockupStorage {
+contract Lockup is ILockup, UsingRegistry, LockupStorage {
 	using SafeMath for uint256;
 	using Decimals for uint256;
-	address public devMinter;
 	struct RewardPrices {
 		uint256 reward;
 		uint256 holders;
@@ -54,14 +53,9 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 	event UpdateCap(uint256 _cap);
 
 	/**
-	 * Initialize the passed address as AddressConfig address and Devminter.
+	 * Initialize the passed address as AddressRegistry address.
 	 */
-	constructor(address _config, address _devMinter)
-		public
-		UsingConfig(_config)
-	{
-		devMinter = _devMinter;
-	}
+	constructor(address _registry) public UsingRegistry(_registry) {}
 
 	/**
 	 * Adds staking.
@@ -75,7 +69,10 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		/**
 		 * Validates the sender is Dev contract.
 		 */
-		require(msg.sender == config().token(), "this is illegal address");
+		require(
+			msg.sender == registry().registries("Dev"),
+			"this is illegal address"
+		);
 
 		/**
 		 * Validates _value is not 0.
@@ -86,7 +83,9 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		 * Validates the passed Property has greater than 1 asset.
 		 */
 		require(
-			IMetricsGroup(config().metricsGroup()).hasAssets(_property),
+			IMetricsGroup(registry().registries("MetricsGroup")).hasAssets(
+				_property
+			),
 			"unable to stake to unauthenticated property"
 		);
 
@@ -149,7 +148,7 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 	 * set cap
 	 */
 	function updateCap(uint256 _cap) external {
-		address setter = IPolicy(config().policy()).capSetter();
+		address setter = IPolicy(registry().registries("Policy")).capSetter();
 		require(setter == msg.sender, "illegal access");
 
 		/**
@@ -271,10 +270,8 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		/**
 		 * Calculates the holders reward out of the total reward amount.
 		 */
-		uint256 holdersShare = IPolicy(config().policy()).holdersShare(
-			price,
-			allStakes
-		);
+		uint256 holdersShare = IPolicy(registry().registries("Policy"))
+			.holdersShare(price, allStakes);
 
 		/**
 		 * Calculates and returns each reward.
@@ -400,7 +397,7 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		/**
 		 * Gets the latest mint amount per block from Allocator contract.
 		 */
-		uint256 rewardsAmount = IAllocator(config().allocator())
+		uint256 rewardsAmount = IAllocator(registry().registries("Allocator"))
 			.calculateMaxRewardsPerBlock();
 
 		/**
@@ -497,7 +494,9 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		 * If the passed Property has not authenticated, returns always 0.
 		 */
 		if (
-			IMetricsGroup(config().metricsGroup()).hasAssets(_property) == false
+			IMetricsGroup(registry().registries("MetricsGroup")).hasAssets(
+				_property
+			) == false
 		) {
 			return (0, RewardPrices(0, 0, 0, 0));
 		}
@@ -576,7 +575,10 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		 * Mints the reward.
 		 */
 		require(
-			IDevMinter(devMinter).mint(msg.sender, value),
+			IDevMinter(registry().registries("DevMinter")).mint(
+				msg.sender,
+				value
+			),
 			"dev mint failed"
 		);
 

@@ -16,17 +16,17 @@ contract('Patch780', ([deployer, treasury, uesr]) => {
 
 	before(async () => {
 		dev = new DevProtocolInstance(deployer)
-		await dev.generateAddressConfig()
+		await dev.generateAddressRegistry()
 		await dev.generateDev()
 		await dev.generateDevMinter()
 		await dev.generateLockupTest()
 		await dev.dev.mint(deployer, new BigNumber(1e18).times(10000000))
 		patch780 = await artifacts
 			.require('Patch780')
-			.new(dev.addressConfig.address)
+			.new(dev.addressRegistry.address)
 		treasuryFee = await artifacts
 			.require('TreasuryFee')
-			.new(dev.addressConfig.address)
+			.new(dev.addressRegistry.address)
 	})
 
 	describe('Patch780; rewards', () => {
@@ -225,7 +225,7 @@ contract('Patch780', ([deployer, treasury, uesr]) => {
 		it('the default value is 0 address.', async () => {
 			const tmp = await artifacts
 				.require('TreasuryFee')
-				.new(dev.addressConfig.address)
+				.new(dev.addressRegistry.address)
 			const result = await tmp.treasury()
 			expect(result).to.be.equal(DEFAULT_ADDRESS)
 		})

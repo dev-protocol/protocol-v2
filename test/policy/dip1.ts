@@ -12,14 +12,14 @@ contract('DIP1', ([deployer]) => {
 
 	before(async () => {
 		const dev = new DevProtocolInstance(deployer)
-		await dev.generateAddressConfig()
+		await dev.generateAddressRegistry()
 		await dev.generateDev()
 		await dev.generateDevMinter()
 		await dev.dev.mint(deployer, new BigNumber(1e18).times(10000000))
-		dip1 = await artifacts.require('DIP1').new(dev.addressConfig.address)
+		dip1 = await artifacts.require('DIP1').new(dev.addressRegistry.address)
 		theFirstPolicy = await artifacts
 			.require('TheFirstPolicy')
-			.new(dev.addressConfig.address)
+			.new(dev.addressRegistry.address)
 	})
 
 	describe('DIP1; rewards', () => {

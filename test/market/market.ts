@@ -15,12 +15,12 @@ contract(
 		describe('Market; constructor', () => {
 			const dev = new DevProtocolInstance(deployer)
 			beforeEach(async () => {
-				await dev.generateAddressConfig()
+				await dev.generateAddressRegistry()
 			})
 			it('Cannot be created from other than market factory', async () => {
-				await dev.addressConfig.setMarketFactory(marketFactory)
+				await dev.addressRegistry.setRegistry('MarketFactory', marketFactory)
 				const result = await marketContract
-					.new(dev.addressConfig.address, behavuor, { from: deployer })
+					.new(dev.addressRegistry.address, behavuor, { from: deployer })
 					.catch((err: Error) => err)
 				validateAddressErrorMessage(result)
 			})
@@ -29,11 +29,11 @@ contract(
 					dev.generatePolicyFactory(),
 					dev.generatePolicyGroup(),
 				])
-				await dev.addressConfig.setMarketFactory(marketFactory)
+				await dev.addressRegistry.setRegistry('MarketFactory', marketFactory)
 				const iPolicyInstance = await dev.getPolicy('PolicyTest1', user)
 				await dev.policyFactory.create(iPolicyInstance.address)
 				const market = await marketContract.new(
-					dev.addressConfig.address,
+					dev.addressRegistry.address,
 					behavuor,
 					{ from: marketFactory }
 				)
@@ -45,17 +45,21 @@ contract(
 			const dev = new DevProtocolInstance(deployer)
 			let market: MarketInstance
 			beforeEach(async () => {
-				await dev.generateAddressConfig()
+				await dev.generateAddressRegistry()
 				await Promise.all([
 					dev.generatePolicyFactory(),
 					dev.generatePolicyGroup(),
 				])
-				await dev.addressConfig.setMarketFactory(marketFactory)
+				await dev.addressRegistry.setRegistry('MarketFactory', marketFactory)
 				const iPolicyInstance = await dev.getPolicy('PolicyTest1', user)
 				await dev.policyFactory.create(iPolicyInstance.address)
-				market = await marketContract.new(dev.addressConfig.address, behavuor, {
-					from: marketFactory,
-				})
+				market = await marketContract.new(
+					dev.addressRegistry.address,
+					behavuor,
+					{
+						from: marketFactory,
+					}
+				)
 			})
 			it('Cannot be enabled from other than market factory', async () => {
 				const result = await market.toEnable().catch((err: Error) => err)
@@ -79,17 +83,17 @@ contract(
 		describe('Market; schema', () => {
 			const dev = new DevProtocolInstance(deployer)
 			it('Get Schema of mapped Behavior Contract', async () => {
-				await dev.generateAddressConfig()
+				await dev.generateAddressRegistry()
 				await Promise.all([
 					dev.generatePolicyFactory(),
 					dev.generatePolicyGroup(),
 				])
-				await dev.addressConfig.setMarketFactory(marketFactory)
+				await dev.addressRegistry.setRegistry('MarketFactory', marketFactory)
 				const iPolicyInstance = await dev.getPolicy('PolicyTest1', user)
 				await dev.policyFactory.create(iPolicyInstance.address)
 				const behavuor = await dev.getMarket('MarketTest1', user)
 				const market = await marketContract.new(
-					dev.addressConfig.address,
+					dev.addressRegistry.address,
 					behavuor.address,
 					{ from: marketFactory }
 				)
@@ -102,7 +106,7 @@ contract(
 			let marketAddress2: string
 			let propertyAddress: string
 			beforeEach(async () => {
-				await dev.generateAddressConfig()
+				await dev.generateAddressRegistry()
 				await dev.generateDev()
 				await dev.generateDevMinter()
 				await Promise.all([
@@ -319,7 +323,7 @@ contract(
 			let propertyAddress: string
 			const propertyFactory = user1
 			beforeEach(async () => {
-				await dev.generateAddressConfig()
+				await dev.generateAddressRegistry()
 				await dev.generateDev()
 				await dev.generateDevMinter()
 				await Promise.all([
@@ -358,7 +362,10 @@ contract(
 				propertyAddress = getPropertyAddress(createPropertyResult)
 				await dev.metricsGroup.__setMetricsCountPerProperty(propertyAddress, 1)
 				await dev.dev.mint(propertyAuther, 10000000000, { from: deployer })
-				await dev.addressConfig.setPropertyFactory(propertyFactory)
+				await dev.addressRegistry.setRegistry(
+					'PropertyFactory',
+					propertyFactory
+				)
 			})
 			it('Proxy to mapped Behavior Contract.', async () => {
 				await dev.dev.deposit(propertyAddress, 100000, { from: propertyAuther })

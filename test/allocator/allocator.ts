@@ -9,7 +9,7 @@ contract('Allocator', ([deployer, user1, propertyAddress, propertyFactory]) => {
 	const marketContract = artifacts.require('Market')
 	const init = async (): Promise<[DevProtocolInstance, PropertyInstance]> => {
 		const dev = new DevProtocolInstance(deployer)
-		await dev.generateAddressConfig()
+		await dev.generateAddressRegistry()
 		await dev.generateDev()
 		await dev.generateDevMinter()
 		await Promise.all([
@@ -25,7 +25,6 @@ contract('Allocator', ([deployer, user1, propertyAddress, propertyFactory]) => {
 			dev.generatePolicyFactory(),
 			dev.generatePolicyGroup(),
 		])
-
 		await dev.dev.mint(deployer, new BigNumber(1e18).times(10000000))
 		await dev.generatePolicy('PolicyTestForAllocator')
 		const propertyAddress = getPropertyAddress(
@@ -101,7 +100,7 @@ contract('Allocator', ([deployer, user1, propertyAddress, propertyFactory]) => {
 			await property.transfer(bob, totalSupply.times(0.2), {
 				from: alice,
 			})
-			await dev.addressConfig.setPropertyFactory(propertyFactory)
+			await dev.addressRegistry.setRegistry('PropertyFactory', propertyFactory)
 			await dev.propertyGroup.addGroup(propertyAddress, {
 				from: propertyFactory,
 			})

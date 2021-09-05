@@ -38,7 +38,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 		]
 	> => {
 		const dev = new DevProtocolInstance(deployer)
-		await dev.generateAddressConfig()
+		await dev.generateAddressRegistry()
 		await dev.generateDev()
 		await dev.generateDevMinter()
 		await Promise.all([
@@ -76,7 +76,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 		await dev.metricsGroup.__setMetricsCountPerProperty(property.address, 1)
 		const marketBehavior = await artifacts
 			.require('MarketTest1')
-			.new(dev.addressConfig.address)
+			.new(dev.addressRegistry.address)
 		const marketAddress = getMarketAddress(
 			await dev.marketFactory.create(marketBehavior.address)
 		)
@@ -1646,14 +1646,12 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 					1
 				)
 				calc = createCalculator(dev)
-				// Await dev.addressConfig.setWithdraw(deployer)
 				await dev.withdrawTest.setCumulativePriceTest(property.address, 10000)
 				await dev.withdrawTest.setLastWithdrawalPriceTest(
 					property.address,
 					alice,
 					7000
 				)
-				// Await dev.addressConfig.setWithdraw(dev.withdrawTest.address)
 				await dev.dev.deposit(property.address, '10000000000000000000000', {
 					from: bob,
 				})
@@ -1953,13 +1951,6 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 			expect(treasuryAmount.times(2).toFixed()).to.be.equal(
 				afterBalance.minus(beforeBalance).toFixed()
 			)
-		})
-	})
-	describe('Withdraw; devMinter', () => {
-		it('get the address of the DevMinter contract.', async () => {
-			const [dev] = await init()
-			const devMinterAddress = await dev.withdraw.devMinter()
-			expect(devMinterAddress).to.be.equal(dev.devMinter.address)
 		})
 	})
 })

@@ -6,7 +6,7 @@ import {ERC20Detailed} from "@openzeppelin/contracts/token/ERC20/ERC20Detailed.s
 import {ERC20Mintable} from "@openzeppelin/contracts/token/ERC20/ERC20Mintable.sol";
 // prettier-ignore
 import {ERC20Burnable} from "@openzeppelin/contracts/token/ERC20/ERC20Burnable.sol";
-import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
+import {UsingRegistry} from "contracts/src/common/registry/UsingRegistry.sol";
 import {ILockup} from "contracts/interface/ILockup.sol";
 import {IDev} from "contracts/interface/IDev.sol";
 import {IMarketGroup} from "contracts/interface/IMarketGroup.sol";
@@ -18,15 +18,21 @@ import {IMarketGroup} from "contracts/interface/IMarketGroup.sol";
  * Also, mint will be performed based on the Allocator contract.
  * When authenticated a new asset by the Market contracts, DEV token is burned as fees.
  */
-contract Dev is ERC20Detailed, ERC20Mintable, ERC20Burnable, UsingConfig, IDev {
+contract Dev is
+	ERC20Detailed,
+	ERC20Mintable,
+	ERC20Burnable,
+	UsingRegistry,
+	IDev
+{
 	/**
-	 * Initialize the passed address as AddressConfig address.
+	 * Initialize the passed address as AddressRegistry address.
 	 * The token name is `Dev`, the token symbol is `DEV`, and the decimals is 18.
 	 */
-	constructor(address _config)
+	constructor(address _registry)
 		public
 		ERC20Detailed("Dev", "DEV", 18)
-		UsingConfig(_config)
+		UsingRegistry(_registry)
 	{}
 
 	/**
@@ -61,7 +67,9 @@ contract Dev is ERC20Detailed, ERC20Mintable, ERC20Burnable, UsingConfig, IDev {
 	 */
 	function fee(address _from, uint256 _amount) external returns (bool) {
 		require(
-			IMarketGroup(config().marketGroup()).isGroup(msg.sender),
+			IMarketGroup(registry().registries("MarketGroup")).isGroup(
+				msg.sender
+			),
 			"this is illegal address"
 		);
 		_burn(_from, _amount);
@@ -76,6 +84,6 @@ contract Dev is ERC20Detailed, ERC20Mintable, ERC20Burnable, UsingConfig, IDev {
 		address _to,
 		uint256 _amount
 	) private {
-		ILockup(config().lockup()).lockup(_from, _to, _amount);
+		ILockup(registry().registries("Lockup")).lockup(_from, _to, _amount);
 	}
 }

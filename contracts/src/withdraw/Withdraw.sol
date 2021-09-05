@@ -4,7 +4,7 @@ import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 // prettier-ignore
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {Decimals} from "contracts/src/common/libs/Decimals.sol";
-import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
+import {UsingRegistry} from "contracts/src/common/registry/UsingRegistry.sol";
 import {WithdrawStorage} from "contracts/src/withdraw/WithdrawStorage.sol";
 import {IDevMinter} from "contracts/interface/IDevMinter.sol";
 import {IWithdraw} from "contracts/interface/IWithdraw.sol";
@@ -15,21 +15,15 @@ import {IPropertyGroup} from "contracts/interface/IPropertyGroup.sol";
 /**
  * A contract that manages the withdrawal of holder rewards for Property holders.
  */
-contract Withdraw is IWithdraw, UsingConfig, WithdrawStorage {
+contract Withdraw is IWithdraw, UsingRegistry, WithdrawStorage {
 	using SafeMath for uint256;
 	using Decimals for uint256;
-	address public devMinter;
 	event PropertyTransfer(address _property, address _from, address _to);
 
 	/**
-	 * Initialize the passed address as AddressConfig address.
+	 * Initialize the passed address as AddressRegistry address.
 	 */
-	constructor(address _config, address _devMinter)
-		public
-		UsingConfig(_config)
-	{
-		devMinter = _devMinter;
-	}
+	constructor(address _registry) public UsingRegistry(_registry) {}
 
 	/**
 	 * Withdraws rewards.
@@ -40,7 +34,9 @@ contract Withdraw is IWithdraw, UsingConfig, WithdrawStorage {
 		 * the passed Property address is included the Property address set.
 		 */
 		require(
-			IPropertyGroup(config().propertyGroup()).isGroup(_property),
+			IPropertyGroup(registry().registries("PropertyGroup")).isGroup(
+				_property
+			),
 			"this is illegal address"
 		);
 
@@ -80,14 +76,17 @@ contract Withdraw is IWithdraw, UsingConfig, WithdrawStorage {
 		 * Mints the holder reward.
 		 */
 		require(
-			IDevMinter(devMinter).mint(msg.sender, value),
+			IDevMinter(registry().registries("DevMinter")).mint(
+				msg.sender,
+				value
+			),
 			"dev mint failed"
 		);
 
 		/**
 		 * Since the total supply of tokens has changed, updates the latest maximum mint amount.
 		 */
-		ILockup lockup = ILockup(config().lockup());
+		ILockup lockup = ILockup(registry().registries("Lockup"));
 		lockup.update();
 
 		/**
@@ -109,7 +108,10 @@ contract Withdraw is IWithdraw, UsingConfig, WithdrawStorage {
 		/**
 		 * Validates the sender is Allocator contract.
 		 */
-		require(msg.sender == config().allocator(), "this is illegal address");
+		require(
+			msg.sender == registry().registries("Allocator"),
+			"this is illegal address"
+		);
 
 		/**
 		 * Gets the cumulative sum of the transfer source's "before transfer" withdrawable reward amount and the cumulative sum of the maximum mint amount.
@@ -167,7 +169,7 @@ contract Withdraw is IWithdraw, UsingConfig, WithdrawStorage {
 			uint256 _allReward
 		)
 	{
-		ILockup lockup = ILockup(config().lockup());
+		ILockup lockup = ILockup(registry().registries("Lockup"));
 		/**
 		 * Gets the latest reward.
 		 */
@@ -259,7 +261,9 @@ contract Withdraw is IWithdraw, UsingConfig, WithdrawStorage {
 		 * If the passed Property has not authenticated, returns always 0.
 		 */
 		if (
-			IMetricsGroup(config().metricsGroup()).hasAssets(_property) == false
+			IMetricsGroup(registry().registries("MetricsGroup")).hasAssets(
+				_property
+			) == false
 		) {
 			return (0, price, cap, 0);
 		}

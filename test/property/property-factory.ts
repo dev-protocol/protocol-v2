@@ -22,7 +22,7 @@ contract(
 			const propertyContract = artifacts.require('Property')
 			let propertyAddress: string
 			before(async () => {
-				await dev.generateAddressConfig()
+				await dev.generateAddressRegistry()
 				await dev.generateDev()
 				await dev.generateDevMinter()
 				await Promise.all([
@@ -35,7 +35,7 @@ contract(
 					dev.generateMetricsGroup(),
 				])
 				await dev.generatePolicy()
-				await dev.addressConfig.setMarketFactory(marketFactory)
+				await dev.addressRegistry.setRegistry('MarketFactory', marketFactory)
 				const result = await dev.propertyFactory.create(
 					'sample',
 					'SAMPLE',
@@ -73,9 +73,12 @@ contract(
 		describe('PropertyFactory; createChangeAuthorEvent', () => {
 			it('an event is created.', async () => {
 				const dev = new DevProtocolInstance(deployer)
-				await dev.generateAddressConfig()
+				await dev.generateAddressRegistry()
 				await dev.generatePropertyGroup()
-				await dev.addressConfig.setPropertyFactory(dummyProperFactory)
+				await dev.addressRegistry.setRegistry(
+					'PropertyFactory',
+					dummyProperFactory
+				)
 				await dev.propertyGroup.addGroup(dummyProperty, {
 					from: dummyProperFactory,
 				})
@@ -96,7 +99,7 @@ contract(
 
 			it('cannot be executed from outside of a property.', async () => {
 				const dev = new DevProtocolInstance(deployer)
-				await dev.generateAddressConfig()
+				await dev.generateAddressRegistry()
 				await dev.generatePropertyGroup()
 				await dev.generatePropertyFactory()
 				const result = await dev.propertyFactory
@@ -108,9 +111,12 @@ contract(
 		describe('PropertyFactory; createChangeNameEvent', () => {
 			it('Emit ChangeName event', async () => {
 				const dev = new DevProtocolInstance(deployer)
-				await dev.generateAddressConfig()
+				await dev.generateAddressRegistry()
 				await dev.generatePropertyGroup()
-				await dev.addressConfig.setPropertyFactory(dummyProperFactory)
+				await dev.addressRegistry.setRegistry(
+					'PropertyFactory',
+					dummyProperFactory
+				)
 				await dev.propertyGroup.addGroup(dummyProperty, {
 					from: dummyProperFactory,
 				})
@@ -131,7 +137,7 @@ contract(
 
 			it('should fail to call when the sender is not Property', async () => {
 				const dev = new DevProtocolInstance(deployer)
-				await dev.generateAddressConfig()
+				await dev.generateAddressRegistry()
 				await dev.generatePropertyGroup()
 				await dev.generatePropertyFactory()
 				const result = await dev.propertyFactory
@@ -143,9 +149,12 @@ contract(
 		describe('PropertyFactory; createChangeSymbolEvent', () => {
 			it('Emit ChangeSymbol event', async () => {
 				const dev = new DevProtocolInstance(deployer)
-				await dev.generateAddressConfig()
+				await dev.generateAddressRegistry()
 				await dev.generatePropertyGroup()
-				await dev.addressConfig.setPropertyFactory(dummyProperFactory)
+				await dev.addressRegistry.setRegistry(
+					'PropertyFactory',
+					dummyProperFactory
+				)
 				await dev.propertyGroup.addGroup(dummyProperty, {
 					from: dummyProperFactory,
 				})
@@ -166,7 +175,7 @@ contract(
 
 			it('should fail to call when the sender is not Property', async () => {
 				const dev = new DevProtocolInstance(deployer)
-				await dev.generateAddressConfig()
+				await dev.generateAddressRegistry()
 				await dev.generatePropertyGroup()
 				await dev.generatePropertyFactory()
 				const result = await dev.propertyFactory
@@ -178,7 +187,7 @@ contract(
 		describe('PropertyFactory; createAndAuthenticate', () => {
 			const dev = new DevProtocolInstance(deployer)
 			before(async () => {
-				await dev.generateAddressConfig()
+				await dev.generateAddressRegistry()
 				await dev.generateDev()
 				await dev.generateDevMinter()
 				await Promise.all([
@@ -204,7 +213,7 @@ contract(
 				const dev = new DevProtocolInstance(deployer)
 				let marketAddress: string
 				before(async () => {
-					await dev.generateAddressConfig()
+					await dev.generateAddressRegistry()
 					await dev.generateDev()
 					await dev.generateDevMinter()
 					await Promise.all([

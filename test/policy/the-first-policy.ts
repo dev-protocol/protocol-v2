@@ -7,13 +7,13 @@ import BigNumber from 'bignumber.js'
 contract('TheFirstPolicy', ([deployer]) => {
 	const create = async (): Promise<TheFirstPolicyInstance> => {
 		const dev = new DevProtocolInstance(deployer)
-		await dev.generateAddressConfig()
+		await dev.generateAddressRegistry()
 		await dev.generateDev()
 		await dev.generateDevMinter()
 		await dev.dev.mint(deployer, new BigNumber(1e18).times(10000000))
 		const theFirstPolicyInstance = await artifacts
 			.require('TheFirstPolicy')
-			.new(dev.addressConfig.address)
+			.new(dev.addressRegistry.address)
 		return theFirstPolicyInstance
 	}
 

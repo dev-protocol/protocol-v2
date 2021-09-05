@@ -12,7 +12,7 @@ contract('MarketFactoryTest', ([deployer, user, dummyMarketAddress]) => {
 		[DevProtocolInstance, string, string, [string, string]]
 	> => {
 		const dev = new DevProtocolInstance(deployer)
-		await dev.generateAddressConfig()
+		await dev.generateAddressRegistry()
 		await Promise.all([
 			dev.generatePolicyGroup(),
 			dev.generatePolicyFactory(),
@@ -92,7 +92,7 @@ contract('MarketFactoryTest', ([deployer, user, dummyMarketAddress]) => {
 		describe('failed', () => {
 			it('Cannot be executed by anyone but the owner.', async () => {
 				const dev = new DevProtocolInstance(deployer)
-				await dev.generateAddressConfig()
+				await dev.generateAddressRegistry()
 				await dev.generateMarketFactory()
 				const res = await dev.marketFactory
 					.enable(DEFAULT_ADDRESS, {
@@ -103,7 +103,7 @@ contract('MarketFactoryTest', ([deployer, user, dummyMarketAddress]) => {
 			})
 			it('Only the market address can be specified.', async () => {
 				const dev = new DevProtocolInstance(deployer)
-				await dev.generateAddressConfig()
+				await dev.generateAddressRegistry()
 				await dev.generateMarketGroup()
 				await dev.generateMarketFactory()
 				const res = await dev.marketFactory
