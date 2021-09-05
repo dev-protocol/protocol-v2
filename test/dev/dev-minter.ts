@@ -68,7 +68,7 @@ contract('DevMinter', ([deployer, user1, lockup, withdraw]) => {
 					.catch((err: Error) => err)
 				validateErrorMessage(
 					result,
-					'MinterRole: caller does not have the Minter role'
+					'ERC20PresetMinterPauser: must have minter role to mint'
 				)
 			})
 			it('Error when minting from other than Lockup and Withdraw contracts', async () => {
@@ -95,7 +95,7 @@ contract('DevMinter', ([deployer, user1, lockup, withdraw]) => {
 					.catch((err: Error) => err)
 				validateErrorMessage(
 					result,
-					'MinterRole: caller does not have the Minter role'
+					'ERC20PresetMinterPauser: must have minter role to mint'
 				)
 			})
 		})
