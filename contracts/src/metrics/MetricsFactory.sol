@@ -1,4 +1,5 @@
-pragma solidity 0.5.17;
+// SPDX-License-Identifier: MPL-2.0
+pragma solidity =0.8.6;
 
 import {UsingRegistry} from "contracts/src/common/registry/UsingRegistry.sol";
 import {Metrics} from "contracts/src/metrics/Metrics.sol";
@@ -17,12 +18,12 @@ contract MetricsFactory is UsingRegistry, IMetricsFactory {
 	/**
 	 * Initialize the passed address as AddressRegistry address.
 	 */
-	constructor(address _registry) public UsingRegistry(_registry) {}
+	constructor(address _registry) UsingRegistry(_registry) {}
 
 	/**
 	 * Creates a new Metrics contract.
 	 */
-	function create(address _property) external returns (address) {
+	function create(address _property) external override returns (address) {
 		/**
 		 * Validates the sender is included in the Market address set.
 		 */
@@ -54,7 +55,7 @@ contract MetricsFactory is UsingRegistry, IMetricsFactory {
 	/**
 	 * Logical deletions a Metrics contract.
 	 */
-	function destroy(address _metrics) external {
+	function destroy(address _metrics) external override {
 		/**
 		 * Validates the passed address is included in the Metrics address set.
 		 */

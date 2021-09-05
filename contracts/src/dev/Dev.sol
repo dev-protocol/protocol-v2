@@ -1,11 +1,8 @@
-pragma solidity 0.5.17;
+// SPDX-License-Identifier: MPL-2.0
+pragma solidity =0.8.6;
 
 // prettier-ignore
-import {ERC20Detailed} from "@openzeppelin/contracts/token/ERC20/ERC20Detailed.sol";
-// prettier-ignore
-import {ERC20Mintable} from "@openzeppelin/contracts/token/ERC20/ERC20Mintable.sol";
-// prettier-ignore
-import {ERC20Burnable} from "@openzeppelin/contracts/token/ERC20/ERC20Burnable.sol";
+import {ERC20PresetMinterPauser} from "@openzeppelin/contracts/token/ERC20/presets/ERC20PresetMinterPauser.sol";
 import {UsingRegistry} from "contracts/src/common/registry/UsingRegistry.sol";
 import {ILockup} from "contracts/interface/ILockup.sol";
 import {IDev} from "contracts/interface/IDev.sol";
@@ -18,20 +15,13 @@ import {IMarketGroup} from "contracts/interface/IMarketGroup.sol";
  * Also, mint will be performed based on the Allocator contract.
  * When authenticated a new asset by the Market contracts, DEV token is burned as fees.
  */
-contract Dev is
-	ERC20Detailed,
-	ERC20Mintable,
-	ERC20Burnable,
-	UsingRegistry,
-	IDev
-{
+contract Dev is ERC20PresetMinterPauser, UsingRegistry, IDev {
 	/**
 	 * Initialize the passed address as AddressRegistry address.
 	 * The token name is `Dev`, the token symbol is `DEV`, and the decimals is 18.
 	 */
 	constructor(address _registry)
-		public
-		ERC20Detailed("Dev", "DEV", 18)
+		ERC20PresetMinterPauser("Dev", "DEV")
 		UsingRegistry(_registry)
 	{}
 
@@ -40,7 +30,11 @@ contract Dev is
 	 * The transfer destination must always be included in the address set for Property tokens.
 	 * This is because if the transfer destination is not a Property token, it is possible that the staked DEV token cannot be withdrawn.
 	 */
-	function deposit(address _to, uint256 _amount) external returns (bool) {
+	function deposit(address _to, uint256 _amount)
+		external
+		override
+		returns (bool)
+	{
 		require(transfer(_to, _amount), "dev transfer failed");
 		lock(msg.sender, _to, _amount);
 		return true;
@@ -55,7 +49,7 @@ contract Dev is
 		address _from,
 		address _to,
 		uint256 _amount
-	) external returns (bool) {
+	) external override returns (bool) {
 		require(transferFrom(_from, _to, _amount), "dev transferFrom failed");
 		lock(_from, _to, _amount);
 		return true;
@@ -65,7 +59,11 @@ contract Dev is
 	 * Burn the DEV tokens as an authentication fee.
 	 * Only Market contracts can execute this function.
 	 */
-	function fee(address _from, uint256 _amount) external returns (bool) {
+	function fee(address _from, uint256 _amount)
+		external
+		override
+		returns (bool)
+	{
 		require(
 			IMarketGroup(registry().registries("MarketGroup")).isGroup(
 				msg.sender

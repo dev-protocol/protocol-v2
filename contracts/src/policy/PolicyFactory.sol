@@ -1,6 +1,7 @@
-pragma solidity 0.5.17;
+// SPDX-License-Identifier: MPL-2.0
+pragma solidity =0.8.6;
 
-import {Ownable} from "@openzeppelin/contracts/ownership/Ownable.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {UsingRegistry} from "contracts/src/common/registry/UsingRegistry.sol";
 import {IPolicyGroup} from "contracts/interface/IPolicyGroup.sol";
 import {IPolicyFactory} from "contracts/interface/IPolicyFactory.sol";
@@ -14,12 +15,12 @@ contract PolicyFactory is UsingRegistry, IPolicyFactory, Ownable {
 	/**
 	 * Initialize the passed address as AddressRegistry address.
 	 */
-	constructor(address _registry) public UsingRegistry(_registry) {}
+	constructor(address _registry) UsingRegistry(_registry) {}
 
 	/**
 	 * Creates a new Policy contract.
 	 */
-	function create(address _newPolicyAddress) external {
+	function create(address _newPolicyAddress) external override {
 		/**
 		 * Validates the passed address is not 0 address.
 		 */
@@ -46,7 +47,7 @@ contract PolicyFactory is UsingRegistry, IPolicyFactory, Ownable {
 	/**
 	 * Set the policy to force a policy without a vote.
 	 */
-	function forceAttach(address _policy) external onlyOwner {
+	function forceAttach(address _policy) external override onlyOwner {
 		/**
 		 * Validates the passed Policy address is included the Policy address set
 		 */

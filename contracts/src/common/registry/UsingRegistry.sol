@@ -1,4 +1,5 @@
-pragma solidity 0.5.17;
+// SPDX-License-Identifier: MPL-2.0
+pragma solidity =0.8.6;
 
 import {IAddressRegistry} from "contracts/interface/IAddressRegistry.sol";
 
@@ -11,7 +12,7 @@ contract UsingRegistry {
 	/**
 	 * Initialize the argument as AddressRegistry address.
 	 */
-	constructor(address _addressRegistry) public {
+	constructor(address _addressRegistry) {
 		_registry = _addressRegistry;
 	}
 

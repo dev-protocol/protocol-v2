@@ -68,7 +68,7 @@ contract('DevMinter', ([deployer, user1, lockup, withdraw]) => {
 					.catch((err: Error) => err)
 				validateErrorMessage(
 					result,
-					'MinterRole: caller does not have the Minter role'
+					'ERC20PresetMinterPauser: must have minter role to mint'
 				)
 			})
 			it('Error when minting from other than Lockup and Withdraw contracts', async () => {
@@ -84,17 +84,18 @@ contract('DevMinter', ([deployer, user1, lockup, withdraw]) => {
 		describe('success', () => {
 			it('we can remove mint privileges.', async () => {
 				const dev = await createDevInstance()
-				const before = await dev.dev.isMinter(dev.devMinter.address)
+				const role = web3.utils.keccak256('MINTER_ROLE')
+				const before = await dev.dev.hasRole(role, dev.devMinter.address)
 				expect(before).to.equal(true)
 				await dev.devMinter.renounceMinter()
-				const after = await dev.dev.isMinter(dev.devMinter.address)
+				const after = await dev.dev.hasRole(role, dev.devMinter.address)
 				expect(after).to.equal(false)
 				const result = await dev.devMinter
 					.mint(user1, 100, { from: withdraw })
 					.catch((err: Error) => err)
 				validateErrorMessage(
 					result,
-					'MinterRole: caller does not have the Minter role'
+					'ERC20PresetMinterPauser: must have minter role to mint'
 				)
 			})
 		})

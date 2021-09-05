@@ -1,7 +1,8 @@
-pragma solidity 0.5.17;
+// SPDX-License-Identifier: MPL-2.0
+pragma solidity =0.8.6;
 
 import {IUsingStorage} from "contracts/interface/IUsingStorage.sol";
-import {Ownable} from "@openzeppelin/contracts/ownership/Ownable.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {EternalStorage} from "contracts/src/common/storage/EternalStorage.sol";
 
 /**
@@ -33,7 +34,13 @@ contract UsingStorage is Ownable, IUsingStorage {
 	/**
 	 * Returns the set EternalStorage address.
 	 */
-	function getStorageAddress() external view hasStorage returns (address) {
+	function getStorageAddress()
+		external
+		view
+		override
+		hasStorage
+		returns (address)
+	{
 		return _storage;
 	}
 
@@ -42,7 +49,7 @@ contract UsingStorage is Ownable, IUsingStorage {
 	 * This function call will fail if the EternalStorage contract is already set.
 	 * Also, only the owner can execute it.
 	 */
-	function createStorage() external onlyOwner {
+	function createStorage() external override onlyOwner {
 		require(_storage == address(0), "storage is set");
 		EternalStorage tmp = new EternalStorage();
 		_storage = address(tmp);
@@ -52,7 +59,7 @@ contract UsingStorage is Ownable, IUsingStorage {
 	 * Assigns the EternalStorage contract that has already been created.
 	 * Only the owner can execute this function.
 	 */
-	function setStorage(address _storageAddress) external onlyOwner {
+	function setStorage(address _storageAddress) external override onlyOwner {
 		_storage = _storageAddress;
 	}
 
@@ -60,7 +67,7 @@ contract UsingStorage is Ownable, IUsingStorage {
 	 * Delegates the owner of the current EternalStorage contract.
 	 * Only the owner can execute this function.
 	 */
-	function changeOwner(address newOwner) external onlyOwner {
+	function changeOwner(address newOwner) external override onlyOwner {
 		EternalStorage(_storage).changeOwner(newOwner);
 	}
 }

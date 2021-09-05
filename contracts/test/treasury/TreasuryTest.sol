@@ -1,6 +1,7 @@
-pragma solidity 0.5.17;
+// SPDX-License-Identifier: MPL-2.0
+pragma solidity =0.8.6;
 
-import {Ownable} from "@openzeppelin/contracts/ownership/Ownable.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IWithdraw} from "contracts/interface/IWithdraw.sol";
 import {IAddressRegistry} from "contracts/interface/IAddressRegistry.sol";
@@ -11,7 +12,7 @@ contract TreasuryTest is Ownable {
 	/**
 	 * Initialize the passed address as AddressRegistry address.
 	 */
-	constructor(address __registry) public {
+	constructor(address __registry) {
 		_registry = IAddressRegistry(__registry);
 	}
 

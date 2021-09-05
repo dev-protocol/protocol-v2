@@ -1,17 +1,18 @@
-pragma solidity 0.5.17;
+// SPDX-License-Identifier: MPL-2.0
+pragma solidity =0.8.6;
 
-import {Ownable} from "@openzeppelin/contracts/ownership/Ownable.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {UsingRegistry} from "contracts/src/common/registry/UsingRegistry.sol";
 import {IMarketBehavior} from "contracts/interface/IMarketBehavior.sol";
 import {IMarket} from "contracts/interface/IMarket.sol";
 
 contract MarketTest2 is Ownable, IMarketBehavior, UsingRegistry {
-	string public schema = "[]";
+	string public override schema = "[]";
 	address private associatedMarket;
 	mapping(address => string) internal keys;
 	mapping(string => address) private addresses;
 
-	constructor(address _registry) public UsingRegistry(_registry) {}
+	constructor(address _registry) UsingRegistry(_registry) {}
 
 	function authenticate(
 		address _prop,
@@ -22,7 +23,7 @@ contract MarketTest2 is Ownable, IMarketBehavior, UsingRegistry {
 		string memory,
 		address market,
 		address
-	) public returns (bool) {
+	) external override returns (bool) {
 		require(msg.sender == associatedMarket, "Invalid sender");
 
 		bytes32 idHash = keccak256(abi.encodePacked(_args1));
@@ -32,11 +33,21 @@ contract MarketTest2 is Ownable, IMarketBehavior, UsingRegistry {
 		return true;
 	}
 
-	function getId(address _metrics) public view returns (string memory) {
+	function getId(address _metrics)
+		external
+		view
+		override
+		returns (string memory)
+	{
 		return keys[_metrics];
 	}
 
-	function getMetrics(string memory _id) public view returns (address) {
+	function getMetrics(string calldata _id)
+		external
+		view
+		override
+		returns (address)
+	{
 		return addresses[_id];
 	}
 

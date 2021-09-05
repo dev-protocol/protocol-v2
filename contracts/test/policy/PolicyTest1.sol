@@ -1,4 +1,5 @@
-pragma solidity 0.5.17;
+// SPDX-License-Identifier: MPL-2.0
+pragma solidity =0.8.6;
 
 import {PolicyTestBase} from "contracts/test/policy/PolicyTestBase.sol";
 import {Decimals} from "contracts/src/common/libs/Decimals.sol";
@@ -8,7 +9,8 @@ contract PolicyTest1 is PolicyTestBase {
 
 	function rewards(uint256 _lockups, uint256 _assets)
 		external
-		view
+		pure
+		override
 		returns (uint256)
 	{
 		return _lockups + _assets;
@@ -16,7 +18,8 @@ contract PolicyTest1 is PolicyTestBase {
 
 	function holdersShare(uint256 _amount, uint256 _lockups)
 		external
-		view
+		pure
+		override
 		returns (uint256)
 	{
 		uint256 sum = _amount + _lockups;
@@ -26,7 +29,8 @@ contract PolicyTest1 is PolicyTestBase {
 
 	function authenticationFee(uint256 _assets, uint256 _propertyLockups)
 		external
-		view
+		pure
+		override
 		returns (uint256)
 	{
 		return _assets + _propertyLockups - 1;

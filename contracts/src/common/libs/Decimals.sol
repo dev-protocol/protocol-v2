@@ -1,6 +1,7 @@
-pragma solidity 0.5.17;
+// SPDX-License-Identifier: MPL-2.0
+pragma solidity =0.8.6;
 
-import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
+import {SafeMath} from "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 /**
  * Library for emulating calculations involving decimals.
@@ -13,7 +14,7 @@ library Decimals {
 	 * @dev Returns the ratio of the first argument to the second argument.
 	 * @param _a Numerator.
 	 * @param _b Fraction.
-	 * @return Calculated ratio.
+	 * @return result Calculated ratio.
 	 */
 	function outOf(uint256 _a, uint256 _b)
 		internal

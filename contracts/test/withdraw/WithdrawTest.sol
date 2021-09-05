@@ -1,9 +1,10 @@
-pragma solidity 0.5.17;
+// SPDX-License-Identifier: MPL-2.0
+pragma solidity =0.8.6;
 
 import {Withdraw} from "contracts/src/withdraw/Withdraw.sol";
 
 contract WithdrawTest is Withdraw {
-	constructor(address _registry) public Withdraw(_registry) {}
+	constructor(address _registry) Withdraw(_registry) {}
 
 	function setCumulativePriceTest(address _property, uint256 _value)
 		external

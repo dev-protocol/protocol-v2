@@ -140,7 +140,10 @@ export class DevProtocolInstance {
 			this.addressRegistry.address,
 			this.fromDeployer
 		)
-		await this._dev.addMinter(this._devMinter.address)
+		await this._dev.grantRole(
+			web3.utils.keccak256('MINTER_ROLE'),
+			this._devMinter.address
+		)
 		await this.addressRegistry.setRegistry(
 			'DevMinter',
 			this._devMinter.address,

@@ -1,4 +1,5 @@
-pragma solidity 0.5.17;
+// SPDX-License-Identifier: MPL-2.0
+pragma solidity =0.8.6;
 
 import {UsingRegistry} from "contracts/src/common/registry/UsingRegistry.sol";
 import {Property} from "contracts/src/property/Property.sol";
@@ -23,7 +24,7 @@ contract PropertyFactory is UsingRegistry, IPropertyFactory {
 	 * @dev Initialize the passed address as AddressRegistry address.
 	 * @param _registry AddressRegistry address.
 	 */
-	constructor(address _registry) public UsingRegistry(_registry) {}
+	constructor(address _registry) UsingRegistry(_registry) {}
 
 	/**
 	 * @dev Throws if called by any account other than Properties.
@@ -49,7 +50,7 @@ contract PropertyFactory is UsingRegistry, IPropertyFactory {
 		string calldata _name,
 		string calldata _symbol,
 		address _author
-	) external returns (address) {
+	) external override returns (address) {
 		return _create(_name, _symbol, _author);
 	}
 
@@ -71,7 +72,7 @@ contract PropertyFactory is UsingRegistry, IPropertyFactory {
 		string calldata _args1,
 		string calldata _args2,
 		string calldata _args3
-	) external returns (bool) {
+	) external override returns (bool) {
 		return
 			IMarket(_market).authenticateFromPropertyFactory(
 				_create(_name, _symbol, msg.sender),
@@ -124,6 +125,7 @@ contract PropertyFactory is UsingRegistry, IPropertyFactory {
 	 */
 	function createChangeAuthorEvent(address _old, address _new)
 		external
+		override
 		onlyProperty
 	{
 		emit ChangeAuthor(msg.sender, _old, _new);
@@ -136,6 +138,7 @@ contract PropertyFactory is UsingRegistry, IPropertyFactory {
 	 */
 	function createChangeNameEvent(string calldata _old, string calldata _new)
 		external
+		override
 		onlyProperty
 	{
 		emit ChangeName(msg.sender, _old, _new);
@@ -148,6 +151,7 @@ contract PropertyFactory is UsingRegistry, IPropertyFactory {
 	 */
 	function createChangeSymbolEvent(string calldata _old, string calldata _new)
 		external
+		override
 		onlyProperty
 	{
 		emit ChangeSymbol(msg.sender, _old, _new);

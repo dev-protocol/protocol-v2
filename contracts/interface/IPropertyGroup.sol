@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MPL-2.0
-pragma solidity >=0.5.17;
+pragma solidity =0.8.6;
 
 interface IPropertyGroup {
 	function addGroup(address _addr) external;

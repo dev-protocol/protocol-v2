@@ -1,6 +1,7 @@
-pragma solidity 0.5.17;
+// SPDX-License-Identifier: MPL-2.0
+pragma solidity =0.8.6;
 
-import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
+import {SafeMath} from "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {UsingRegistry} from "contracts/src/common/registry/UsingRegistry.sol";
 import {IAllocator} from "contracts/interface/IAllocator.sol";
@@ -34,7 +35,7 @@ contract Property is ERC20, UsingRegistry, IProperty {
 		address _own,
 		string memory _name,
 		string memory _symbol
-	) public UsingRegistry(_registry) {
+	) ERC20(_name, _symbol) UsingRegistry(_registry) {
 		/**
 		 * Validates the sender is PropertyFactory contract.
 		 */
@@ -77,7 +78,7 @@ contract Property is ERC20, UsingRegistry, IProperty {
 	 * @dev Returns the name of the author.
 	 * @return The the author address.
 	 */
-	function author() external view returns (address) {
+	function author() external view override returns (address) {
 		return __author;
 	}
 
@@ -85,7 +86,7 @@ contract Property is ERC20, UsingRegistry, IProperty {
 	 * @dev Returns the name of the token.
 	 * @return The name of the token.
 	 */
-	function name() external view returns (string memory) {
+	function name() public view override returns (string memory) {
 		return __name;
 	}
 
@@ -93,7 +94,7 @@ contract Property is ERC20, UsingRegistry, IProperty {
 	 * @dev Returns the symbol of the token, usually a shorter version of the name.
 	 * @return The symbol of the token, usually a shorter version of the name.
 	 */
-	function symbol() external view returns (string memory) {
+	function symbol() public view override returns (string memory) {
 		return __symbol;
 	}
 
@@ -110,7 +111,7 @@ contract Property is ERC20, UsingRegistry, IProperty {
 	 * {IERC20-balanceOf} and {IERC20-transfer}.
 	 * @return The number of decimals used to get its user representation.
 	 */
-	function decimals() external view returns (uint8) {
+	function decimals() public view override returns (uint8) {
 		return __decimals;
 	}
 
@@ -118,7 +119,7 @@ contract Property is ERC20, UsingRegistry, IProperty {
 	 * @dev Changes the author.
 	 * @param _nextAuthor The new author address.
 	 */
-	function changeAuthor(address _nextAuthor) external onlyAuthor {
+	function changeAuthor(address _nextAuthor) external override onlyAuthor {
 		/**
 		 * save author information
 		 */
@@ -135,7 +136,7 @@ contract Property is ERC20, UsingRegistry, IProperty {
 	 * @dev Changes the name.
 	 * @param _name The new name.
 	 */
-	function changeName(string calldata _name) external onlyAuthor {
+	function changeName(string calldata _name) external override onlyAuthor {
 		IPropertyFactory(registry().registries("PropertyFactory"))
 			.createChangeNameEvent(__name, _name);
 
@@ -146,7 +147,11 @@ contract Property is ERC20, UsingRegistry, IProperty {
 	 * @dev Changes the symbol.
 	 * @param _symbol The new symbol.
 	 */
-	function changeSymbol(string calldata _symbol) external onlyAuthor {
+	function changeSymbol(string calldata _symbol)
+		external
+		override
+		onlyAuthor
+	{
 		IPropertyFactory(registry().registries("PropertyFactory"))
 			.createChangeSymbolEvent(__symbol, _symbol);
 
@@ -158,7 +163,11 @@ contract Property is ERC20, UsingRegistry, IProperty {
 	 * @param _to The recipient address.
 	 * @param _value The transfer amount.
 	 */
-	function transfer(address _to, uint256 _value) public returns (bool) {
+	function transfer(address _to, uint256 _value)
+		public
+		override
+		returns (bool)
+	{
 		/**
 		 * Validates the destination is not 0 address.
 		 */
@@ -192,7 +201,7 @@ contract Property is ERC20, UsingRegistry, IProperty {
 		address _from,
 		address _to,
 		uint256 _value
-	) public returns (bool) {
+	) public override returns (bool) {
 		/**
 		 * Validates the source and destination is not 0 address.
 		 */
@@ -235,7 +244,7 @@ contract Property is ERC20, UsingRegistry, IProperty {
 	 * @param _sender The Property Contract address as the source.
 	 * @param _value The transfer amount.
 	 */
-	function withdraw(address _sender, uint256 _value) external {
+	function withdraw(address _sender, uint256 _value) external override {
 		/**
 		 * Validates the sender is Lockup contract.
 		 */

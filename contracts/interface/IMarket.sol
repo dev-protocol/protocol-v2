@@ -1,24 +1,24 @@
 // SPDX-License-Identifier: MPL-2.0
-pragma solidity >=0.5.17;
+pragma solidity =0.8.6;
 
 interface IMarket {
 	function authenticate(
 		address _prop,
-		string calldata _args1,
-		string calldata _args2,
-		string calldata _args3,
-		string calldata _args4,
-		string calldata _args5
+		string memory _args1,
+		string memory _args2,
+		string memory _args3,
+		string memory _args4,
+		string memory _args5
 	) external returns (bool);
 
 	function authenticateFromPropertyFactory(
 		address _prop,
 		address _author,
-		string calldata _args1,
-		string calldata _args2,
-		string calldata _args3,
-		string calldata _args4,
-		string calldata _args5
+		string memory _args1,
+		string memory _args2,
+		string memory _args3,
+		string memory _args4,
+		string memory _args5
 	) external returns (bool);
 
 	function authenticatedCallback(address _property, bytes32 _idHash)

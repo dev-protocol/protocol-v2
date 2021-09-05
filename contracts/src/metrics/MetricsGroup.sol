@@ -1,6 +1,7 @@
-pragma solidity 0.5.17;
+// SPDX-License-Identifier: MPL-2.0
+pragma solidity =0.8.6;
 
-import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
+import {SafeMath} from "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import {UsingRegistry} from "contracts/src/common/registry/UsingRegistry.sol";
 import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
 import {IMetrics} from "contracts/interface/IMetrics.sol";
@@ -9,9 +10,9 @@ import {IMetricsGroup} from "contracts/interface/IMetricsGroup.sol";
 contract MetricsGroup is UsingRegistry, UsingStorage, IMetricsGroup {
 	using SafeMath for uint256;
 
-	constructor(address _registry) public UsingRegistry(_registry) {}
+	constructor(address _registry) UsingRegistry(_registry) {}
 
-	function addGroup(address _addr) external {
+	function addGroup(address _addr) external override {
 		require(
 			msg.sender == registry().registries("MetricsFactory"),
 			"this is illegal address"
@@ -37,7 +38,7 @@ contract MetricsGroup is UsingRegistry, UsingStorage, IMetricsGroup {
 		setMetricsCountPerProperty(property, metricsCountPerProperty);
 	}
 
-	function removeGroup(address _addr) external {
+	function removeGroup(address _addr) external override {
 		require(
 			msg.sender == registry().registries("MetricsFactory"),
 			"this is illegal address"
@@ -63,25 +64,36 @@ contract MetricsGroup is UsingRegistry, UsingStorage, IMetricsGroup {
 		setMetricsCountPerProperty(property, metricsCountPerProperty);
 	}
 
-	function isGroup(address _addr) external view returns (bool) {
+	function isGroup(address _addr) external view override returns (bool) {
 		return eternalStorage().getBool(getGroupKey(_addr));
 	}
 
-	function totalIssuedMetrics() external view returns (uint256) {
+	function totalIssuedMetrics() external view override returns (uint256) {
 		return eternalStorage().getUint(getTotalCountKey());
 	}
 
-	function totalAuthenticatedProperties() external view returns (uint256) {
+	function totalAuthenticatedProperties()
+		external
+		view
+		override
+		returns (uint256)
+	{
 		return eternalStorage().getUint(getTotalAuthenticatedPropertiesKey());
 	}
 
-	function hasAssets(address _property) external view returns (bool) {
+	function hasAssets(address _property)
+		external
+		view
+		override
+		returns (bool)
+	{
 		return getMetricsCountPerProperty(_property) > 0;
 	}
 
 	function getMetricsCountPerProperty(address _property)
 		public
 		view
+		override
 		returns (uint256)
 	{
 		return

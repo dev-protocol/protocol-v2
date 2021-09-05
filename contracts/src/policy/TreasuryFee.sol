@@ -1,7 +1,8 @@
-/* solhint-disable const-name-snakecase */
-pragma solidity 0.5.17;
+// SPDX-License-Identifier: MPL-2.0
+pragma solidity =0.8.6;
 
-import {Ownable} from "@openzeppelin/contracts/ownership/Ownable.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import {SafeMath} from "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import {DIP7} from "contracts/src/policy/DIP7.sol";
 
 /**
@@ -9,14 +10,20 @@ import {DIP7} from "contracts/src/policy/DIP7.sol";
  */
 contract TreasuryFee is DIP7, Ownable {
 	address private treasuryAddress;
+	using SafeMath for uint256;
 
-	constructor(address _registry) public DIP7(_registry) {}
+	constructor(address _registry) DIP7(_registry) {}
 
-	function shareOfTreasury(uint256 _supply) external view returns (uint256) {
+	function shareOfTreasury(uint256 _supply)
+		external
+		pure
+		override
+		returns (uint256)
+	{
 		return _supply.div(100).mul(5);
 	}
 
-	function treasury() external view returns (address) {
+	function treasury() external view override returns (address) {
 		return treasuryAddress;
 	}
 

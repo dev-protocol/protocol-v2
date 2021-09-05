@@ -46,7 +46,11 @@ contract('DecimalsTest', ([deployer]) => {
 			const res = await decimalsTest
 				.mulBasis(toBigNumber(2 ** 255))
 				.catch((err: Error) => err)
-			validateErrorMessage(res, 'SafeMath: multiplication overflow', false)
+			validateErrorMessage(
+				res,
+				'Returned error: VM Exception while processing transaction: revert',
+				false
+			)
 		})
 	})
 	describe('Decimals; divBasis', () => {

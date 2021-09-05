@@ -1,6 +1,6 @@
 {
-	"name": "@devprotocol/protocol",
-	"version": "3.4.0",
+	"name": "@devprotocol/protocol-optimism",
+	"version": "0.0.1",
 	"description": "Securitize for Internet assets",
 	"scripts": {
 		"test": "truffle test",
@@ -53,7 +53,7 @@
 		"web3": "1.5.2"
 	},
 	"dependencies": {
-		"@openzeppelin/contracts": "2.5.1"
+		"@openzeppelin/contracts": "4.2.0"
 	},
 	"directories": {
 		"doc": "docs",

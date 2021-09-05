@@ -1,4 +1,5 @@
-pragma solidity 0.5.17;
+// SPDX-License-Identifier: MPL-2.0
+pragma solidity =0.8.6;
 
 contract Migrations {
 	address public owner;
@@ -8,7 +9,7 @@ contract Migrations {
 		if (msg.sender == owner) _;
 	}
 
-	constructor() public {
+	constructor() {
 		owner = msg.sender;
 	}
 

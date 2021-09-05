@@ -1,4 +1,5 @@
-pragma solidity 0.5.17;
+// SPDX-License-Identifier: MPL-2.0
+pragma solidity =0.8.6;
 
 import {UsingRegistry} from "contracts/src/common/registry/UsingRegistry.sol";
 import {IAllocator} from "contracts/interface/IAllocator.sol";
@@ -17,13 +18,18 @@ contract Allocator is UsingRegistry, IAllocator {
 	 * @dev Initialize the passed address as AddressRegistry address.
 	 * @param _registry AddressRegistry address.
 	 */
-	constructor(address _registry) public UsingRegistry(_registry) {}
+	constructor(address _registry) UsingRegistry(_registry) {}
 
 	/**
 	 * @dev Returns the maximum number of mints per block.
 	 * @return Maximum number of mints per block.
 	 */
-	function calculateMaxRewardsPerBlock() external view returns (uint256) {
+	function calculateMaxRewardsPerBlock()
+		external
+		view
+		override
+		returns (uint256)
+	{
 		uint256 totalAssets = IMetricsGroup(
 			registry().registries("MetricsGroup")
 		).totalIssuedMetrics();
@@ -46,7 +52,7 @@ contract Allocator is UsingRegistry, IAllocator {
 		address _property,
 		address _from,
 		address _to
-	) external {
+	) external override {
 		require(
 			IPropertyGroup(registry().registries("PropertyGroup")).isGroup(
 				msg.sender
