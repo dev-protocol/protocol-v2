@@ -12,7 +12,7 @@ contract TreasuryTest is Ownable {
 	/**
 	 * Initialize the passed address as AddressRegistry address.
 	 */
-	constructor(address __registry) public {
+	constructor(address __registry) {
 		_registry = IAddressRegistry(__registry);
 	}
 

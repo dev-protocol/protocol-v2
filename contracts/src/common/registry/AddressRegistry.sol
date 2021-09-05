@@ -12,20 +12,29 @@ import {IAddressRegistry} from "contracts/interface/IAddressRegistry.sol";
 contract AddressRegistry is Ownable, IAddressRegistry {
 	mapping(string => address) private reg;
 
-	function setRegistry(string calldata _key, address _addr) external {
+	function setRegistry(string calldata _key, address _addr)
+		external
+		override
+	{
+		address sender;
 		if (
 			keccak256(abi.encodePacked(_key)) ==
 			keccak256(abi.encodePacked("Policy"))
 		) {
-			address policyFactory = reg["PolicyFactory"];
-			require(msg.sender == policyFactory, "this is illegal address");
+			sender = reg["PolicyFactory"];
 		} else {
-			require(isOwner(), "this is illegal address");
+			sender = owner();
 		}
+		require(msg.sender == sender, "this is illegal address");
 		reg[_key] = _addr;
 	}
 
-	function registries(string calldata _key) external view returns (address) {
+	function registries(string calldata _key)
+		external
+		view
+		override
+		returns (address)
+	{
 		return reg[_key];
 	}
 }

@@ -24,12 +24,12 @@ contract Withdraw is IWithdraw, UsingRegistry, WithdrawStorage {
 	/**
 	 * Initialize the passed address as AddressRegistry address.
 	 */
-	constructor(address _registry) public UsingRegistry(_registry) {}
+	constructor(address _registry) UsingRegistry(_registry) {}
 
 	/**
 	 * Withdraws rewards.
 	 */
-	function withdraw(address _property) external {
+	function withdraw(address _property) external override {
 		/**
 		 * Validate
 		 * the passed Property address is included the Property address set.
@@ -105,7 +105,7 @@ contract Withdraw is IWithdraw, UsingRegistry, WithdrawStorage {
 		address _property,
 		address _from,
 		address _to
-	) external {
+	) external override {
 		/**
 		 * Validates the sender is Allocator contract.
 		 */
@@ -291,6 +291,7 @@ contract Withdraw is IWithdraw, UsingRegistry, WithdrawStorage {
 	function calculateWithdrawableAmount(address _property, address _user)
 		external
 		view
+		override
 		returns (uint256)
 	{
 		(uint256 value, , , ) = _calculateWithdrawableAmount(_property, _user);
@@ -303,6 +304,7 @@ contract Withdraw is IWithdraw, UsingRegistry, WithdrawStorage {
 	function calculateRewardAmount(address _property, address _user)
 		external
 		view
+		override
 		returns (
 			uint256 _amount,
 			uint256 _price,

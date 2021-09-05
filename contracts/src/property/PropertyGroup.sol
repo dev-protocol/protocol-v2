@@ -6,9 +6,9 @@ import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
 import {IPropertyGroup} from "contracts/interface/IPropertyGroup.sol";
 
 contract PropertyGroup is UsingRegistry, UsingStorage, IPropertyGroup {
-	constructor(address _registry) public UsingRegistry(_registry) {}
+	constructor(address _registry) UsingRegistry(_registry) {}
 
-	function addGroup(address _addr) external {
+	function addGroup(address _addr) external override {
 		require(
 			msg.sender == registry().registries("PropertyFactory"),
 			"this is illegal address"
@@ -21,7 +21,7 @@ contract PropertyGroup is UsingRegistry, UsingStorage, IPropertyGroup {
 		eternalStorage().setBool(getGroupKey(_addr), true);
 	}
 
-	function isGroup(address _addr) external view returns (bool) {
+	function isGroup(address _addr) external view override returns (bool) {
 		return eternalStorage().getBool(getGroupKey(_addr));
 	}
 

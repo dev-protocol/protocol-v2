@@ -14,7 +14,7 @@ library Decimals {
 	 * @dev Returns the ratio of the first argument to the second argument.
 	 * @param _a Numerator.
 	 * @param _b Fraction.
-	 * @return Calculated ratio.
+	 * @return result Calculated ratio.
 	 */
 	function outOf(uint256 _a, uint256 _b)
 		internal

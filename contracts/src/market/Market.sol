@@ -19,20 +19,17 @@ import {IDev} from "contracts/interface/IDev.sol";
  */
 contract Market is UsingRegistry, IMarket {
 	using SafeMath for uint256;
-	bool public enabled;
-	address public behavior;
-	uint256 public votingEndBlockNumber;
-	uint256 public issuedMetrics;
+	bool public override enabled;
+	address public override behavior;
+	uint256 public override votingEndBlockNumber;
+	uint256 public override issuedMetrics;
 	mapping(bytes32 => bool) private idMap;
 	mapping(address => bytes32) private idHashMetricsMap;
 
 	/**
 	 * Initialize the passed address as AddressRegistry address and user-proposed contract.
 	 */
-	constructor(address _registry, address _behavior)
-		public
-		UsingRegistry(_registry)
-	{
+	constructor(address _registry, address _behavior) UsingRegistry(_registry) {
 		/**
 		 * Validates the sender is MarketFactory contract.
 		 */
@@ -92,7 +89,7 @@ contract Market is UsingRegistry, IMarket {
 	 * Activates this Market.
 	 * Called from MarketFactory contract.
 	 */
-	function toEnable() external {
+	function toEnable() external override {
 		require(
 			msg.sender == registry().registries("MarketFactory"),
 			"this is illegal address"
@@ -111,7 +108,7 @@ contract Market is UsingRegistry, IMarket {
 		string memory _args3,
 		string memory _args4,
 		string memory _args5
-	) public onlyPropertyAuthor(_prop) returns (bool) {
+	) public override onlyPropertyAuthor(_prop) returns (bool) {
 		return
 			_authenticate(
 				_prop,
@@ -135,7 +132,7 @@ contract Market is UsingRegistry, IMarket {
 		string calldata _args3,
 		string calldata _args4,
 		string calldata _args5
-	) external returns (bool) {
+	) external override returns (bool) {
 		/**
 		 * Validates the sender is PropertyFactory.
 		 */
@@ -218,6 +215,7 @@ contract Market is UsingRegistry, IMarket {
 	 */
 	function authenticatedCallback(address _property, bytes32 _idHash)
 		external
+		override
 		returns (address)
 	{
 		/**
@@ -267,6 +265,7 @@ contract Market is UsingRegistry, IMarket {
 	 */
 	function deauthenticate(address _metrics)
 		external
+		override
 		onlyLinkedPropertyAuthor(_metrics)
 	{
 		/**
@@ -298,7 +297,7 @@ contract Market is UsingRegistry, IMarket {
 	/**
 	 * Bypass to IMarketBehavior.schema.
 	 */
-	function schema() external view returns (string memory) {
+	function schema() external view override returns (string memory) {
 		return IMarketBehavior(behavior).schema();
 	}
 

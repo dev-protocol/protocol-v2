@@ -12,12 +12,16 @@ contract DevMinter is UsingRegistry, Ownable, IDevMinter {
 	/**
 	 * Initialize the passed address as AddressRegistry address.
 	 */
-	constructor(address _registry) public UsingRegistry(_registry) {}
+	constructor(address _registry) UsingRegistry(_registry) {}
 
 	/**
 	 * Mint Dev token
 	 */
-	function mint(address account, uint256 amount) external returns (bool) {
+	function mint(address account, uint256 amount)
+		external
+		override
+		returns (bool)
+	{
 		IAddressRegistry reg = registry();
 		require(
 			msg.sender == reg.registries("Lockup") ||
@@ -31,7 +35,7 @@ contract DevMinter is UsingRegistry, Ownable, IDevMinter {
 	/**
 	 * Delete mint role
 	 */
-	function renounceMinter() external onlyOwner {
+	function renounceMinter() external override onlyOwner {
 		address token = registry().registries("Dev");
 		ERC20PresetMinterPauser dev = ERC20PresetMinterPauser(token);
 		dev.renounceRole(dev.MINTER_ROLE(), address(this));

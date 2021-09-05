@@ -9,9 +9,9 @@ import {IMarketGroup} from "contracts/interface/IMarketGroup.sol";
 contract MarketGroup is UsingRegistry, UsingStorage, IMarketGroup {
 	using SafeMath for uint256;
 
-	constructor(address _registry) public UsingRegistry(_registry) {}
+	constructor(address _registry) UsingRegistry(_registry) {}
 
-	function addGroup(address _addr) external {
+	function addGroup(address _addr) external override {
 		require(
 			msg.sender == registry().registries("MarketFactory"),
 			"this is illegal address"
@@ -25,7 +25,7 @@ contract MarketGroup is UsingRegistry, UsingStorage, IMarketGroup {
 		addCount();
 	}
 
-	function isGroup(address _addr) external view returns (bool) {
+	function isGroup(address _addr) external view override returns (bool) {
 		return eternalStorage().getBool(getGroupKey(_addr));
 	}
 
@@ -36,7 +36,7 @@ contract MarketGroup is UsingRegistry, UsingStorage, IMarketGroup {
 		eternalStorage().setUint(key, number);
 	}
 
-	function getCount() external view returns (uint256) {
+	function getCount() external view override returns (uint256) {
 		bytes32 key = getCountKey();
 		return eternalStorage().getUint(key);
 	}

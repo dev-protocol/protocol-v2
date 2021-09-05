@@ -6,13 +6,14 @@ import {IPolicy} from "contracts/interface/IPolicy.sol";
 
 contract PolicyTestBase is IPolicy {
 	using SafeMath for uint256;
-	address public treasury;
-	address public capSetter;
+	address public override treasury;
+	address public override capSetter;
 
 	// solhint-disable-next-line no-unused-vars
 	function rewards(uint256 _lockups, uint256 _assets)
 		external
 		view
+		virtual
 		override
 		returns (uint256)
 	{
@@ -22,6 +23,7 @@ contract PolicyTestBase is IPolicy {
 	function holdersShare(uint256 _amount, uint256 _lockups)
 		external
 		view
+		virtual
 		override
 		returns (uint256)
 	{
@@ -31,23 +33,37 @@ contract PolicyTestBase is IPolicy {
 	function authenticationFee(uint256 _assets, uint256 _propertyLockups)
 		external
 		view
+		virtual
 		override
 		returns (uint256)
 	{
 		return _assets + _propertyLockups + 1;
 	}
 
-	function marketVotingBlocks() external view override returns (uint256) {
+	function marketVotingBlocks()
+		external
+		view
+		virtual
+		override
+		returns (uint256)
+	{
 		return 10;
 	}
 
-	function policyVotingBlocks() external view override returns (uint256) {
+	function policyVotingBlocks()
+		external
+		view
+		virtual
+		override
+		returns (uint256)
+	{
 		return 20;
 	}
 
 	function shareOfTreasury(uint256 _supply)
 		external
 		view
+		virtual
 		override
 		returns (uint256)
 	{

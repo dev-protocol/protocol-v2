@@ -17,12 +17,12 @@ contract MarketFactory is Ownable, IMarketFactory, UsingRegistry {
 	/**
 	 * Initialize the passed address as AddressRegistry address.
 	 */
-	constructor(address _registry) public UsingRegistry(_registry) {}
+	constructor(address _registry) UsingRegistry(_registry) {}
 
 	/**
 	 * Creates a new Market contract.
 	 */
-	function create(address _addr) external returns (address) {
+	function create(address _addr) external override returns (address) {
 		/**
 		 * Validates the passed address is not 0 address.
 		 */
@@ -57,7 +57,7 @@ contract MarketFactory is Ownable, IMarketFactory, UsingRegistry {
 	/**
 	 * Creates a new Market contract.
 	 */
-	function enable(address _addr) external onlyOwner {
+	function enable(address _addr) external override onlyOwner {
 		/**
 		 * Validates the passed address is not 0 address.
 		 */

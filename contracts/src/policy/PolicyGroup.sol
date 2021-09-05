@@ -10,9 +10,9 @@ import {IPolicy} from "contracts/interface/IPolicy.sol";
 contract PolicyGroup is UsingRegistry, UsingStorage, IPolicyGroup {
 	using SafeMath for uint256;
 
-	constructor(address _registry) public UsingRegistry(_registry) {}
+	constructor(address _registry) UsingRegistry(_registry) {}
 
-	function addGroup(address _addr) external {
+	function addGroup(address _addr) external override {
 		require(
 			msg.sender == registry().registries("PolicyFactory"),
 			"this is illegal address"
@@ -23,13 +23,14 @@ contract PolicyGroup is UsingRegistry, UsingStorage, IPolicyGroup {
 		setVotingEndBlockNumber(_addr);
 	}
 
-	function isGroup(address _addr) external view returns (bool) {
+	function isGroup(address _addr) external view override returns (bool) {
 		return eternalStorage().getBool(getGroupKey(_addr));
 	}
 
 	function isDuringVotingPeriod(address _policy)
 		external
 		view
+		override
 		returns (bool)
 	{
 		bytes32 key = getVotingEndBlockNumberKey(_policy);

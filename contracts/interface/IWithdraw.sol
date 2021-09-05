@@ -4,10 +4,11 @@ pragma solidity =0.8.6;
 interface IWithdraw {
 	function withdraw(address _property) external;
 
-	function getRewardsAmount(address _property)
-		external
-		view
-		returns (uint256);
+	// Is there a need for a declaration?
+	// function getRewardsAmount(address _property)
+	// 	external
+	// 	view
+	// 	returns (uint256);
 
 	function beforeBalanceChange(
 		address _property,

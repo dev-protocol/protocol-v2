@@ -13,18 +13,20 @@ import {IPolicy} from "contracts/interface/IPolicy.sol";
  */
 contract DIP1 is IPolicy, UsingRegistry {
 	using SafeMath for uint256;
-	uint256 public marketVotingBlocks = 525600;
-	uint256 public policyVotingBlocks = 525600;
+	uint256 public override marketVotingBlocks = 525600;
+	uint256 public override policyVotingBlocks = 525600;
 
 	uint256 private constant basis = 10000000000000000000000000;
 	uint256 private constant power_basis = 10000000000;
 	uint256 private constant mint_per_block_and_aseet = 250000000000000;
 
-	constructor(address _registry) public UsingRegistry(_registry) {}
+	constructor(address _registry) UsingRegistry(_registry) {}
 
 	function rewards(uint256 _lockups, uint256 _assets)
 		external
 		view
+		virtual
+		override
 		returns (uint256)
 	{
 		uint256 max = _assets.mul(mint_per_block_and_aseet);
@@ -55,6 +57,8 @@ contract DIP1 is IPolicy, UsingRegistry {
 	function holdersShare(uint256 _reward, uint256 _lockups)
 		external
 		view
+		virtual
+		override
 		returns (uint256)
 	{
 		return _lockups > 0 ? (_reward.mul(51)).div(100) : _reward;
@@ -63,6 +67,8 @@ contract DIP1 is IPolicy, UsingRegistry {
 	function authenticationFee(uint256 total_assets, uint256 property_lockups)
 		external
 		view
+		virtual
+		override
 		returns (uint256)
 	{
 		uint256 a = total_assets.div(10000);
@@ -73,15 +79,21 @@ contract DIP1 is IPolicy, UsingRegistry {
 		return a.sub(b);
 	}
 
-	function shareOfTreasury(uint256) external view returns (uint256) {
+	function shareOfTreasury(uint256)
+		external
+		view
+		virtual
+		override
+		returns (uint256)
+	{
 		return 0;
 	}
 
-	function treasury() external view returns (address) {
+	function treasury() external view virtual override returns (address) {
 		return address(0);
 	}
 
-	function capSetter() external view returns (address) {
+	function capSetter() external view virtual override returns (address) {
 		return address(0);
 	}
 }

@@ -56,7 +56,7 @@ contract Lockup is ILockup, UsingRegistry, LockupStorage {
 	/**
 	 * Initialize the passed address as AddressRegistry address.
 	 */
-	constructor(address _registry) public UsingRegistry(_registry) {}
+	constructor(address _registry) UsingRegistry(_registry) {}
 
 	/**
 	 * Adds staking.
@@ -66,7 +66,7 @@ contract Lockup is ILockup, UsingRegistry, LockupStorage {
 		address _from,
 		address _property,
 		uint256 _value
-	) external {
+	) external override {
 		/**
 		 * Validates the sender is Dev contract.
 		 */
@@ -111,7 +111,7 @@ contract Lockup is ILockup, UsingRegistry, LockupStorage {
 	 * Withdraw staking.
 	 * Releases staking, withdraw rewards, and transfer the staked and withdraw rewards amount to the sender.
 	 */
-	function withdraw(address _property, uint256 _amount) external {
+	function withdraw(address _property, uint256 _amount) external override {
 		/**
 		 * Validates the sender is staking to the target Property.
 		 */
@@ -141,14 +141,14 @@ contract Lockup is ILockup, UsingRegistry, LockupStorage {
 	/**
 	 * get cap
 	 */
-	function cap() external view returns (uint256) {
+	function cap() external view override returns (uint256) {
 		return getStorageCap();
 	}
 
 	/**
 	 * set cap
 	 */
-	function updateCap(uint256 _cap) external {
+	function updateCap(uint256 _cap) external override {
 		address setter = IPolicy(registry().registries("Policy")).capSetter();
 		require(setter == msg.sender, "illegal access");
 
@@ -242,6 +242,7 @@ contract Lockup is ILockup, UsingRegistry, LockupStorage {
 	function calculateCumulativeRewardPrices()
 		public
 		view
+		override
 		returns (
 			uint256 _reward,
 			uint256 _holders,
@@ -317,6 +318,7 @@ contract Lockup is ILockup, UsingRegistry, LockupStorage {
 	function calculateCumulativeHoldersRewardAmount(address _property)
 		external
 		view
+		override
 		returns (uint256)
 	{
 		(, uint256 holders, , ) = calculateCumulativeRewardPrices();
@@ -329,6 +331,7 @@ contract Lockup is ILockup, UsingRegistry, LockupStorage {
 	function calculateRewardAmount(address _property)
 		external
 		view
+		override
 		returns (uint256, uint256)
 	{
 		(
@@ -374,7 +377,7 @@ contract Lockup is ILockup, UsingRegistry, LockupStorage {
 	 * The cumulative sum of the maximum mint amount is always added.
 	 * By recording that value when the staker last stakes, the difference from the when the staker stakes can be calculated.
 	 */
-	function update() public {
+	function update() public override {
 		/**
 		 * Gets the cumulative sum of the maximum mint amount and the maximum mint number per block.
 		 */
@@ -534,7 +537,7 @@ contract Lockup is ILockup, UsingRegistry, LockupStorage {
 	function calculateWithdrawableInterestAmount(
 		address _property,
 		address _user
-	) public view returns (uint256) {
+	) public view override returns (uint256) {
 		(uint256 amount, ) = _calculateWithdrawableInterestAmount(
 			_property,
 			_user
@@ -650,7 +653,7 @@ contract Lockup is ILockup, UsingRegistry, LockupStorage {
 	/**
 	 * Returns the staking amount of the protocol total.
 	 */
-	function getAllValue() external view returns (uint256) {
+	function getAllValue() external view override returns (uint256) {
 		return getStorageAllValue();
 	}
 
@@ -678,6 +681,7 @@ contract Lockup is ILockup, UsingRegistry, LockupStorage {
 	function getValue(address _property, address _sender)
 		external
 		view
+		override
 		returns (uint256)
 	{
 		return getStorageValue(_property, _sender);
@@ -727,6 +731,7 @@ contract Lockup is ILockup, UsingRegistry, LockupStorage {
 	function getPropertyValue(address _property)
 		external
 		view
+		override
 		returns (uint256)
 	{
 		return getStoragePropertyValue(_property);

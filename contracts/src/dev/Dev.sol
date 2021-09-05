@@ -21,7 +21,6 @@ contract Dev is ERC20PresetMinterPauser, UsingRegistry, IDev {
 	 * The token name is `Dev`, the token symbol is `DEV`, and the decimals is 18.
 	 */
 	constructor(address _registry)
-		public
 		ERC20PresetMinterPauser("Dev", "DEV")
 		UsingRegistry(_registry)
 	{}
@@ -31,7 +30,11 @@ contract Dev is ERC20PresetMinterPauser, UsingRegistry, IDev {
 	 * The transfer destination must always be included in the address set for Property tokens.
 	 * This is because if the transfer destination is not a Property token, it is possible that the staked DEV token cannot be withdrawn.
 	 */
-	function deposit(address _to, uint256 _amount) external returns (bool) {
+	function deposit(address _to, uint256 _amount)
+		external
+		override
+		returns (bool)
+	{
 		require(transfer(_to, _amount), "dev transfer failed");
 		lock(msg.sender, _to, _amount);
 		return true;
@@ -46,7 +49,7 @@ contract Dev is ERC20PresetMinterPauser, UsingRegistry, IDev {
 		address _from,
 		address _to,
 		uint256 _amount
-	) external returns (bool) {
+	) external override returns (bool) {
 		require(transferFrom(_from, _to, _amount), "dev transferFrom failed");
 		lock(_from, _to, _amount);
 		return true;
@@ -56,7 +59,11 @@ contract Dev is ERC20PresetMinterPauser, UsingRegistry, IDev {
 	 * Burn the DEV tokens as an authentication fee.
 	 * Only Market contracts can execute this function.
 	 */
-	function fee(address _from, uint256 _amount) external returns (bool) {
+	function fee(address _from, uint256 _amount)
+		external
+		override
+		returns (bool)
+	{
 		require(
 			IMarketGroup(registry().registries("MarketGroup")).isGroup(
 				msg.sender

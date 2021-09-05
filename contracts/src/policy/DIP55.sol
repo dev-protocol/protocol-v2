@@ -10,13 +10,13 @@ import {Patch780} from "contracts/src/policy/Patch780.sol";
 contract DIP55 is Patch780 {
 	address private capSetterAddress;
 
-	constructor(address _registry) public Patch780(_registry) {}
+	constructor(address _registry) Patch780(_registry) {}
 
 	function setCapSetter(address _setter) external onlyOwner {
 		capSetterAddress = _setter;
 	}
 
-	function capSetter() external view returns (address) {
+	function capSetter() external view virtual override returns (address) {
 		return capSetterAddress;
 	}
 }

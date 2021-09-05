@@ -7,7 +7,7 @@ import {IMarketBehavior} from "contracts/interface/IMarketBehavior.sol";
 import {IMarket} from "contracts/interface/IMarket.sol";
 
 contract MarketTest1 is Ownable, IMarketBehavior, UsingRegistry {
-	string public schema = "[]";
+	string public override schema = "[]";
 	address private associatedMarket;
 	address private metrics;
 	uint256 private lastBlock;
@@ -15,7 +15,7 @@ contract MarketTest1 is Ownable, IMarketBehavior, UsingRegistry {
 	mapping(address => string) private keys;
 	mapping(string => address) private addresses;
 
-	constructor(address _registry) public UsingRegistry(_registry) {}
+	constructor(address _registry) UsingRegistry(_registry) {}
 
 	function authenticate(
 		address _prop,
@@ -26,21 +26,37 @@ contract MarketTest1 is Ownable, IMarketBehavior, UsingRegistry {
 		string memory,
 		address market,
 		address
-	) public returns (bool) {
-		require(msg.sender == associatedMarket, "Invalid sender");
+	) external override returns (bool) {
+		{
+			require(msg.sender == associatedMarket, "Invalid sender");
+		}
 
-		bytes32 idHash = keccak256(abi.encodePacked(_args1));
-		address _metrics = IMarket(market).authenticatedCallback(_prop, idHash);
-		keys[_metrics] = _args1;
-		addresses[_args1] = _metrics;
+		{
+			address _metrics = IMarket(market).authenticatedCallback(
+				_prop,
+				keccak256(abi.encodePacked(_args1))
+			);
+			keys[_metrics] = _args1;
+			addresses[_args1] = _metrics;
+		}
 		return true;
 	}
 
-	function getId(address _metrics) public view returns (string memory) {
+	function getId(address _metrics)
+		external
+		view
+		override
+		returns (string memory)
+	{
 		return keys[_metrics];
 	}
 
-	function getMetrics(string memory _id) public view returns (address) {
+	function getMetrics(string calldata _id)
+		external
+		view
+		override
+		returns (address)
+	{
 		return addresses[_id];
 	}
 
