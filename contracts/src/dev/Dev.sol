@@ -2,7 +2,15 @@
 pragma solidity =0.8.6;
 
 // prettier-ignore
+<<<<<<< HEAD
 import {ERC20PresetMinterPauser} from "@openzeppelin/contracts/token/ERC20/presets/ERC20PresetMinterPauser.sol";
+=======
+import {ERC20Detailed} from "@openzeppelin/contracts/token/ERC20/ERC20Detailed.sol";
+// prettier-ignore
+import {ERC20Mintable} from "@openzeppelin/contracts/token/ERC20/ERC20Mintable.sol";
+// prettier-ignore
+import {ERC20Burnable} from "@openzeppelin/contracts/token/ERC20/ERC20Burnable.sol";
+>>>>>>> origin/main
 import {UsingRegistry} from "contracts/src/common/registry/UsingRegistry.sol";
 import {ILockup} from "contracts/interface/ILockup.sol";
 import {IDev} from "contracts/interface/IDev.sol";
@@ -15,14 +23,28 @@ import {IMarketGroup} from "contracts/interface/IMarketGroup.sol";
  * Also, mint will be performed based on the Allocator contract.
  * When authenticated a new asset by the Market contracts, DEV token is burned as fees.
  */
+<<<<<<< HEAD
 contract Dev is ERC20PresetMinterPauser, UsingRegistry, IDev {
+=======
+contract Dev is
+	ERC20Detailed,
+	ERC20Mintable,
+	ERC20Burnable,
+	UsingRegistry,
+	IDev
+{
+>>>>>>> origin/main
 	/**
 	 * Initialize the passed address as AddressRegistry address.
 	 * The token name is `Dev`, the token symbol is `DEV`, and the decimals is 18.
 	 */
 	constructor(address _registry)
 		public
+<<<<<<< HEAD
 		ERC20PresetMinterPauser("Dev", "DEV")
+=======
+		ERC20Detailed("Dev", "DEV", 18)
+>>>>>>> origin/main
 		UsingRegistry(_registry)
 	{}
 

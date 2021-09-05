@@ -1,5 +1,9 @@
+<<<<<<< HEAD
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity =0.8.6;
+=======
+pragma solidity 0.5.17;
+>>>>>>> origin/main
 
 import {IAddressRegistry} from "contracts/interface/IAddressRegistry.sol";
 
