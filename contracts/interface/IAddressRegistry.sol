@@ -1,9 +1,5 @@
 // SPDX-License-Identifier: MPL-2.0
-<<<<<<< HEAD
 pragma solidity =0.8.6;
-=======
-pragma solidity >=0.5.17;
->>>>>>> origin/main
 
 interface IAddressRegistry {
 	function setRegistry(string calldata _key, address _addr) external;
