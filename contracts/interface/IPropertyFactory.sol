@@ -2,6 +2,8 @@
 pragma solidity =0.8.6;
 
 interface IPropertyFactory {
+	event Create(address indexed _from, address _property);
+
 	function create(
 		string calldata _name,
 		string calldata _symbol,
@@ -16,12 +18,4 @@ interface IPropertyFactory {
 		string calldata _args2,
 		string calldata _args3
 	) external returns (bool);
-
-	function createChangeAuthorEvent(address _old, address _new) external;
-
-	function createChangeNameEvent(string calldata _old, string calldata _new)
-		external;
-
-	function createChangeSymbolEvent(string calldata _old, string calldata _new)
-		external;
 }
