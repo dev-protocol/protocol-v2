@@ -123,8 +123,7 @@ contract Property is ERC20, UsingRegistry, IProperty {
 		/**
 		 * save author information
 		 */
-		IPropertyFactory(registry().registries("PropertyFactory"))
-			.createChangeAuthorEvent(__author, _nextAuthor);
+		emit ChangeAuthor(__author, _nextAuthor);
 
 		/**
 		 * Changes the author.
@@ -137,8 +136,7 @@ contract Property is ERC20, UsingRegistry, IProperty {
 	 * @param _name The new name.
 	 */
 	function changeName(string calldata _name) external override onlyAuthor {
-		IPropertyFactory(registry().registries("PropertyFactory"))
-			.createChangeNameEvent(__name, _name);
+		emit ChangeName(__name, _name);
 
 		__name = _name;
 	}
@@ -152,8 +150,7 @@ contract Property is ERC20, UsingRegistry, IProperty {
 		override
 		onlyAuthor
 	{
-		IPropertyFactory(registry().registries("PropertyFactory"))
-			.createChangeSymbolEvent(__symbol, _symbol);
+		emit ChangeSymbol(__symbol, _symbol);
 
 		__symbol = _symbol;
 	}
