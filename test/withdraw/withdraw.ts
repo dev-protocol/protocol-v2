@@ -334,9 +334,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 							SECOUND_TRANSFER_PERCENTAGE +
 							SHARE_OF_TREASURY
 					)
-					expect(aliceAmount.toFixed()).to.be.equal(
-						totalAmount.integerValue(BigNumber.ROUND_DOWN).toFixed()
-					)
+					expect(aliceAmount.toNumber()).to.be.equal(totalAmount.toNumber())
 				})
 
 				it(`Bob's withdrawable amount is 30% of reward`, async () => {
@@ -366,9 +364,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 							SECOUND_TRANSFER_PERCENTAGE +
 							SHARE_OF_TREASURY
 					)
-					expect(aliceAmount.toFixed()).to.be.equal(
-						totalAmount.integerValue(BigNumber.ROUND_DOWN).toFixed()
-					)
+					expect(aliceAmount.toNumber()).to.be.equal(totalAmount.toNumber())
 				})
 
 				it(`Bob's withdrawable amount is 30% of reward`, async () => {

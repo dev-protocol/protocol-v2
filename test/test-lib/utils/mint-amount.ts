@@ -7,17 +7,23 @@ async function getWithdrawAmount(
 	dev: DevProtocolInstance,
 	propertyAddress: string
 ): Promise<[BigNumber, BigNumber]> {
-	const cal = await dev.allocator
-		.calculateMaxRewardsPerBlock()
+	const totalIssuedMetrics = await dev.metricsGroup
+		.totalIssuedMetrics()
 		.then(toBigNumber)
+	const totalLockedUps = await dev.lockup.getAllValue().then(toBigNumber)
 	const policyAddress = await dev.addressRegistry.registries('Policy')
 	// eslint-disable-next-line @typescript-eslint/await-thenable
 	const policyInstance = await artifacts.require('IPolicy').at(policyAddress)
+	const cal = await policyInstance
+		.rewards(totalLockedUps.toFixed(), totalIssuedMetrics.toFixed())
+		.then(toBigNumber)
+
+	// eslint-disable-next-line @typescript-eslint/await-thenable
 	const value = await dev.lockup.getPropertyValue(propertyAddress)
 	const share = await policyInstance
 		.holdersShare(cal.toFixed(), value.toString())
 		.then(toBigNumber)
-	return [cal, share]
+	return [toBigNumber(cal.toFixed()), share]
 }
 
 export async function getWithdrawHolderAmount(
