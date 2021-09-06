@@ -4,7 +4,7 @@ pragma solidity =0.8.6;
 import {SafeMath} from "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {UsingRegistry} from "contracts/src/common/registry/UsingRegistry.sol";
-import {IAllocator} from "contracts/interface/IAllocator.sol";
+import {IWithdraw} from "contracts/interface/IWithdraw.sol";
 import {IProperty} from "contracts/interface/IProperty.sol";
 import {IPropertyFactory} from "contracts/interface/IPropertyFactory.sol";
 import {IPolicy} from "contracts/interface/IPolicy.sol";
@@ -175,8 +175,7 @@ contract Property is ERC20, UsingRegistry, IProperty {
 		 * Calls Withdraw contract via Allocator contract.
 		 * Passing through the Allocator contract is due to the historical reason for the old Property contract.
 		 */
-		IAllocator(registry().registries("Allocator")).beforeBalanceChange(
-			address(this),
+		IWithdraw(registry().registries("Withdraw")).beforeBalanceChange(
 			msg.sender,
 			_to
 		);
@@ -210,8 +209,7 @@ contract Property is ERC20, UsingRegistry, IProperty {
 		 * Calls Withdraw contract via Allocator contract.
 		 * Passing through the Allocator contract is due to the historical reason for the old Property contract.
 		 */
-		IAllocator(registry().registries("Allocator")).beforeBalanceChange(
-			address(this),
+		IWithdraw(registry().registries("Withdraw")).beforeBalanceChange(
 			_from,
 			_to
 		);

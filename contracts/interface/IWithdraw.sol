@@ -2,6 +2,12 @@
 pragma solidity =0.8.6;
 
 interface IWithdraw {
+	event PropertyTransfer(
+		address indexed _property,
+		address _from,
+		address _to
+	);
+
 	function withdraw(address _property) external;
 
 	// Is there a need for a declaration?
@@ -10,11 +16,7 @@ interface IWithdraw {
 	// 	view
 	// 	returns (uint256);
 
-	function beforeBalanceChange(
-		address _property,
-		address _from,
-		address _to
-	) external;
+	function beforeBalanceChange(address _from, address _to) external;
 
 	/**
 	 * caution!!!this function is deprecated!!!

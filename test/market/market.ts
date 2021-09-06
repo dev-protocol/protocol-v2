@@ -120,7 +120,6 @@ contract(
 					dev.generatePropertyGroup(),
 					dev.generateLockup(),
 					dev.generateWithdraw(),
-					dev.generateAllocator(),
 				])
 				const behavior1 = await dev.getMarket('MarketTest3', user)
 				const behavior2 = await dev.getMarket('MarketTest3', user)
@@ -337,7 +336,6 @@ contract(
 					dev.generatePropertyGroup(),
 					dev.generateLockup(),
 					dev.generateWithdraw(),
-					dev.generateAllocator(),
 				])
 				const behavior1 = await dev.getMarket('MarketTest3', user)
 				const behavior2 = await dev.getMarket('MarketTest3', user)

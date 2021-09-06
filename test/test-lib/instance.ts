@@ -1,6 +1,5 @@
 import {
 	AddressRegistryInstance,
-	AllocatorInstance,
 	PropertyGroupInstance,
 	DevInstance,
 	LockupInstance,
@@ -28,7 +27,6 @@ export class DevProtocolInstance {
 	private readonly _deployer: string
 
 	private _addressRegistry!: AddressRegistryInstance
-	private _allocator!: AllocatorInstance
 	private _dev!: DevInstance
 	private _lockup!: LockupInstance
 	private _propertyFactory!: PropertyFactoryInstance
@@ -60,10 +58,6 @@ export class DevProtocolInstance {
 
 	public get devMinter(): DevMinterInstance {
 		return this._devMinter
-	}
-
-	public get allocator(): AllocatorInstance {
-		return this._allocator
 	}
 
 	public get dev(): DevInstance {
@@ -159,18 +153,6 @@ export class DevProtocolInstance {
 		await this.addressRegistry.setRegistry(
 			'Dev',
 			this._dev.address,
-			this.fromDeployer
-		)
-	}
-
-	public async generateAllocator(): Promise<void> {
-		this._allocator = await contract('Allocator').new(
-			this.addressRegistry.address,
-			this.fromDeployer
-		)
-		await this.addressRegistry.setRegistry(
-			'Allocator',
-			this._allocator.address,
 			this.fromDeployer
 		)
 	}
