@@ -19,12 +19,19 @@ import {
 	IPolicyContract,
 	LockupTestInstance,
 	DevMinterInstance,
+	AdminInstance,
 } from '../../types/truffle-contracts'
+
+type ContractInstance = {
+	at: any
+	new: any
+}
 
 const contract = artifacts.require
 
 export class DevProtocolInstance {
 	private readonly _deployer: string
+	private readonly _proxyAdmin!: AdminInstance
 
 	private _addressRegistry!: AddressRegistryInstance
 	private _dev!: DevInstance
@@ -125,8 +132,9 @@ export class DevProtocolInstance {
 	}
 
 	public async generateAddressRegistry(): Promise<void> {
-		const instance = contract('AddressRegistry')
-		this._addressRegistry = await instance.new(this.fromDeployer)
+		const proxfied = await this.deployProxy(contract('AddressRegistry'))
+		await proxfied.initialize()
+		this._addressRegistry = proxfied
 	}
 
 	public async generateDevMinter(): Promise<void> {
@@ -352,5 +360,22 @@ export class DevProtocolInstance {
 		value = '115792089237316000000000000000000000'
 	): Promise<void> {
 		await this._lockup.updateCap(value)
+	}
+
+	private async deployProxy<L extends ContractInstance>(
+		logic: L
+	): Promise<ReturnType<L['at']>> {
+		const [admin, impl] = await Promise.all([
+			contract('Admin').new(),
+			logic.new(),
+		])
+		const proxy = await contract('Proxy').new(
+			impl.address,
+			admin.address,
+			web3.utils.fromUtf8(''),
+			this.fromDeployer
+		)
+		const [wrap] = await Promise.all([logic.at(proxy.address)])
+		return wrap
 	}
 }

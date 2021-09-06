@@ -3,7 +3,7 @@ pragma solidity =0.8.6;
 
 import {TransparentUpgradeableProxy} from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
 
-contract STokensManagerProxy is TransparentUpgradeableProxy {
+contract Proxy is TransparentUpgradeableProxy {
 	constructor(
 		address _logic,
 		address admin_,
