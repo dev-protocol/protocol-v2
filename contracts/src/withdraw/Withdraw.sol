@@ -19,7 +19,6 @@ import {IPropertyGroup} from "contracts/interface/IPropertyGroup.sol";
 contract Withdraw is IWithdraw, UsingRegistry, WithdrawStorage {
 	using SafeMath for uint256;
 	using Decimals for uint256;
-	event PropertyTransfer(address _property, address _from, address _to);
 
 	/**
 	 * Initialize the passed address as AddressRegistry address.
@@ -101,16 +100,14 @@ contract Withdraw is IWithdraw, UsingRegistry, WithdrawStorage {
 	 * When the ownership ratio of Property changes, the reward that the Property holder can withdraw will change.
 	 * It is necessary to update the status before and after the ownership ratio changes.
 	 */
-	function beforeBalanceChange(
-		address _property,
-		address _from,
-		address _to
-	) external override {
+	function beforeBalanceChange(address _from, address _to) external override {
 		/**
 		 * Validates the sender is Allocator contract.
 		 */
 		require(
-			msg.sender == registry().registries("Allocator"),
+			IPropertyGroup(registry().registries("PropertyGroup")).isGroup(
+				msg.sender
+			),
 			"this is illegal address"
 		);
 
@@ -122,7 +119,7 @@ contract Withdraw is IWithdraw, UsingRegistry, WithdrawStorage {
 			uint256 priceFrom,
 			uint256 priceCapFrom,
 
-		) = _calculateAmount(_property, _from);
+		) = _calculateAmount(msg.sender, _from);
 
 		/**
 		 * Gets the cumulative sum of the transfer destination's "before receive" withdrawable reward amount and the cumulative sum of the maximum mint amount.
@@ -132,29 +129,29 @@ contract Withdraw is IWithdraw, UsingRegistry, WithdrawStorage {
 			uint256 priceTo,
 			uint256 priceCapTo,
 
-		) = _calculateAmount(_property, _to);
+		) = _calculateAmount(msg.sender, _to);
 
 		/**
 		 * Updates the last cumulative sum of the maximum mint amount of the transfer source and destination.
 		 */
-		setStorageLastWithdrawnReward(_property, _from, priceFrom);
-		setStorageLastWithdrawnReward(_property, _to, priceTo);
-		setStorageLastWithdrawnRewardCap(_property, _from, priceCapFrom);
-		setStorageLastWithdrawnRewardCap(_property, _to, priceCapTo);
+		setStorageLastWithdrawnReward(msg.sender, _from, priceFrom);
+		setStorageLastWithdrawnReward(msg.sender, _to, priceTo);
+		setStorageLastWithdrawnRewardCap(msg.sender, _from, priceCapFrom);
+		setStorageLastWithdrawnRewardCap(msg.sender, _to, priceCapTo);
 
 		/**
 		 * Gets the unwithdrawn reward amount of the transfer source and destination.
 		 */
-		uint256 pendFrom = getPendingWithdrawal(_property, _from);
-		uint256 pendTo = getPendingWithdrawal(_property, _to);
+		uint256 pendFrom = getPendingWithdrawal(msg.sender, _from);
+		uint256 pendTo = getPendingWithdrawal(msg.sender, _to);
 
 		/**
 		 * Adds the undrawn reward amount of the transfer source and destination.
 		 */
-		setPendingWithdrawal(_property, _from, pendFrom.add(amountFrom));
-		setPendingWithdrawal(_property, _to, pendTo.add(amountTo));
+		setPendingWithdrawal(msg.sender, _from, pendFrom.add(amountFrom));
+		setPendingWithdrawal(msg.sender, _to, pendTo.add(amountTo));
 
-		emit PropertyTransfer(_property, _from, _to);
+		emit PropertyTransfer(msg.sender, _from, _to);
 	}
 
 	/**

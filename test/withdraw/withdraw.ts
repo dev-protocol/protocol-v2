@@ -403,11 +403,24 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 
 			it('Should fail to call `beforeBalanceChange` when sent from other than Property Contract address', async () => {
 				const res = await dev.withdraw
-					.beforeBalanceChange(property.address, deployer, user1, {
+					.beforeBalanceChange(deployer, user1, {
 						from: deployer,
 					})
 					.catch((err: Error) => err)
 				validateAddressErrorMessage(res)
+			})
+
+			it('Should emit PropertyTransfer event', async () => {
+				void property.transfer(bob, 1, {
+					from: alice,
+				})
+				const watcher = getEventValue(dev.withdraw)
+				const event = await Promise.all([
+					watcher('PropertyTransfer', '_property'),
+					watcher('PropertyTransfer', '_from'),
+					watcher('PropertyTransfer', '_to'),
+				])
+				expect(event).to.deep.equal([property.address, alice, bob])
 			})
 		})
 		describe('Withdraw; Alice has sent 10% tokens to Bob after 20% tokens sent. Bob has increased from 20% tokens to 30% tokens.', () => {

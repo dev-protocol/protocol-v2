@@ -9,7 +9,6 @@ import {LockupStorage} from "contracts/src/lockup/LockupStorage.sol";
 import {IDevMinter} from "contracts/interface/IDevMinter.sol";
 import {IProperty} from "contracts/interface/IProperty.sol";
 import {IPolicy} from "contracts/interface/IPolicy.sol";
-import {IAllocator} from "contracts/interface/IAllocator.sol";
 import {ILockup} from "contracts/interface/ILockup.sol";
 import {IMetricsGroup} from "contracts/interface/IMetricsGroup.sol";
 
@@ -376,6 +375,22 @@ contract Lockup is ILockup, UsingRegistry, LockupStorage {
 	}
 
 	/**
+	 * @dev Returns the maximum number of mints per block.
+	 * @return Maximum number of mints per block.
+	 */
+	function calculateMaxRewardsPerBlock() private view returns (uint256) {
+		uint256 totalAssets = IMetricsGroup(
+			registry().registries("MetricsGroup")
+		).totalIssuedMetrics();
+		uint256 totalLockedUps = getStorageAllValue();
+		return
+			IPolicy(registry().registries("Policy")).rewards(
+				totalLockedUps,
+				totalAssets
+			);
+	}
+
+	/**
 	 * Referring to the values recorded in each storage to returns the latest cumulative sum of the maximum mint amount and the latest maximum mint amount per block.
 	 */
 	function dry()
@@ -386,8 +401,7 @@ contract Lockup is ILockup, UsingRegistry, LockupStorage {
 		/**
 		 * Gets the latest mint amount per block from Allocator contract.
 		 */
-		uint256 rewardsAmount = IAllocator(registry().registries("Allocator"))
-			.calculateMaxRewardsPerBlock();
+		uint256 rewardsAmount = calculateMaxRewardsPerBlock();
 
 		/**
 		 * Gets the maximum mint amount per block, and the last recorded block number from `LastSameRewardsAmountAndBlock` storage.
