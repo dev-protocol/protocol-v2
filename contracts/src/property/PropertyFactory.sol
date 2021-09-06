@@ -11,33 +11,11 @@ import {IMarket} from "contracts/interface/IMarket.sol";
  * A factory contract that creates a new Property contract.
  */
 contract PropertyFactory is UsingRegistry, IPropertyFactory {
-	event Create(address indexed _from, address _property);
-	event ChangeAuthor(
-		address indexed _property,
-		address _beforeAuthor,
-		address _afterAuthor
-	);
-	event ChangeName(address indexed _property, string _old, string _new);
-	event ChangeSymbol(address indexed _property, string _old, string _new);
-
 	/**
 	 * @dev Initialize the passed address as AddressRegistry address.
 	 * @param _registry AddressRegistry address.
 	 */
 	constructor(address _registry) UsingRegistry(_registry) {}
-
-	/**
-	 * @dev Throws if called by any account other than Properties.
-	 */
-	modifier onlyProperty() {
-		require(
-			IPropertyGroup(registry().registries("PropertyGroup")).isGroup(
-				msg.sender
-			),
-			"illegal address"
-		);
-		_;
-	}
 
 	/**
 	 * @dev Creates a new Property contract.
@@ -116,44 +94,5 @@ contract PropertyFactory is UsingRegistry, IPropertyFactory {
 
 		emit Create(msg.sender, address(property));
 		return address(property);
-	}
-
-	/**
-	 * @dev Emit ChangeAuthor event.
-	 * @param _old The old author of the Property.
-	 * @param _new The new author of the Property.
-	 */
-	function createChangeAuthorEvent(address _old, address _new)
-		external
-		override
-		onlyProperty
-	{
-		emit ChangeAuthor(msg.sender, _old, _new);
-	}
-
-	/**
-	 * @dev Emit ChangeName event.
-	 * @param _old The old name of the Property.
-	 * @param _new The new name of the Property.
-	 */
-	function createChangeNameEvent(string calldata _old, string calldata _new)
-		external
-		override
-		onlyProperty
-	{
-		emit ChangeName(msg.sender, _old, _new);
-	}
-
-	/**
-	 * @dev Emit ChangeSymbol event.
-	 * @param _old The symbol name of the Property.
-	 * @param _new The symbol name of the Property.
-	 */
-	function createChangeSymbolEvent(string calldata _old, string calldata _new)
-		external
-		override
-		onlyProperty
-	{
-		emit ChangeSymbol(msg.sender, _old, _new);
 	}
 }

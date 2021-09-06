@@ -116,26 +116,27 @@ contract(
 				})
 				expect(await propertyInstance.author()).to.be.equal(nextAuthor)
 			})
-			it('Should emit ChangeAuthor event from PropertyFactory', async () => {
-				await dev.generatePropertyFactory()
-				await dev.generatePropertyGroup()
-				const transaction = await dev.propertyFactory.create(
+			it('Should emit ChangeAuthor event', async () => {
+				await dev.addressRegistry.setRegistry(
+					'PropertyFactory',
+					propertyFactory
+				)
+				const propertyInstance = await propertyContract.new(
+					dev.addressRegistry.address,
+					author,
 					'sample',
 					'SAMPLE',
-					author
+					{
+						from: propertyFactory,
+					}
 				)
-				const propertyAddress = getPropertyAddress(transaction)
-				const propertyInstance = await propertyContract.at(propertyAddress)
-				void propertyInstance.changeAuthor(nextAuthor, {
+				const result = await propertyInstance.changeAuthor(nextAuthor, {
 					from: author,
 				})
-				const watcher = getEventValue(dev.propertyFactory)
-				const event = await Promise.all([
-					watcher('ChangeAuthor', '_property'),
-					watcher('ChangeAuthor', '_beforeAuthor'),
-					watcher('ChangeAuthor', '_afterAuthor'),
-				])
-				expect(event).to.deep.equal([propertyAddress, author, nextAuthor])
+				const event = result.logs[0].args
+				expect(result.logs[0].event).to.be.equal('ChangeAuthor')
+				expect(event._old).to.be.equal(author)
+				expect(event._new).to.be.equal(nextAuthor)
 			})
 		})
 		describe('Property; changeName', () => {
@@ -185,26 +186,27 @@ contract(
 				})
 				expect(await propertyInstance.name()).to.be.equal('next-name')
 			})
-			it('Should emit ChangeName event from PropertyFactory', async () => {
-				await dev.generatePropertyFactory()
-				await dev.generatePropertyGroup()
-				const transaction = await dev.propertyFactory.create(
+			it('Should emit ChangeName event', async () => {
+				await dev.addressRegistry.setRegistry(
+					'PropertyFactory',
+					propertyFactory
+				)
+				const propertyInstance = await propertyContract.new(
+					dev.addressRegistry.address,
+					author,
 					'sample',
 					'SAMPLE',
-					author
+					{
+						from: propertyFactory,
+					}
 				)
-				const propertyAddress = getPropertyAddress(transaction)
-				const propertyInstance = await propertyContract.at(propertyAddress)
-				void propertyInstance.changeName('next-name', {
+				const result = await propertyInstance.changeName('next', {
 					from: author,
 				})
-				const watcher = getEventValue(dev.propertyFactory)
-				const event = await Promise.all([
-					watcher('ChangeName', '_property'),
-					watcher('ChangeName', '_old'),
-					watcher('ChangeName', '_new'),
-				])
-				expect(event).to.deep.equal([propertyAddress, 'sample', 'next-name'])
+				const event = result.logs[0].args
+				expect(result.logs[0].event).to.be.equal('ChangeName')
+				expect(event._old).to.be.equal('sample')
+				expect(event._new).to.be.equal('next')
 			})
 		})
 		describe('Property; changeSymbol', () => {
@@ -254,26 +256,27 @@ contract(
 				})
 				expect(await propertyInstance.symbol()).to.be.equal('NEXTSYMBOL')
 			})
-			it('Should emit ChangeSymbol event from PropertyFactory', async () => {
-				await dev.generatePropertyFactory()
-				await dev.generatePropertyGroup()
-				const transaction = await dev.propertyFactory.create(
+			it('Should emit ChangeSymbol event', async () => {
+				await dev.addressRegistry.setRegistry(
+					'PropertyFactory',
+					propertyFactory
+				)
+				const propertyInstance = await propertyContract.new(
+					dev.addressRegistry.address,
+					author,
 					'sample',
 					'SAMPLE',
-					author
+					{
+						from: propertyFactory,
+					}
 				)
-				const propertyAddress = getPropertyAddress(transaction)
-				const propertyInstance = await propertyContract.at(propertyAddress)
-				void propertyInstance.changeSymbol('NEXTSYMBOL', {
+				const result = await propertyInstance.changeSymbol('NEXT', {
 					from: author,
 				})
-				const watcher = getEventValue(dev.propertyFactory)
-				const event = await Promise.all([
-					watcher('ChangeSymbol', '_property'),
-					watcher('ChangeSymbol', '_old'),
-					watcher('ChangeSymbol', '_new'),
-				])
-				expect(event).to.deep.equal([propertyAddress, 'SAMPLE', 'NEXTSYMBOL'])
+				const event = result.logs[0].args
+				expect(result.logs[0].event).to.be.equal('ChangeSymbol')
+				expect(event._old).to.be.equal('SAMPLE')
+				expect(event._new).to.be.equal('NEXT')
 			})
 		})
 		describe('Property; withdraw', () => {
