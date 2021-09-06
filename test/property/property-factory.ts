@@ -26,7 +26,6 @@ contract(
 				await dev.generateDev()
 				await dev.generateDevMinter()
 				await Promise.all([
-					dev.generateAllocator(),
 					dev.generatePropertyFactory(),
 					dev.generatePropertyGroup(),
 					dev.generatePolicyFactory(),
@@ -201,7 +200,6 @@ contract(
 					dev.generatePropertyGroup(),
 					dev.generateLockup(),
 					dev.generateWithdraw(),
-					dev.generateAllocator(),
 				])
 				await dev.generatePolicy('PolicyTest1')
 				const market = await dev.getMarket('MarketTest1', user)
@@ -227,7 +225,6 @@ contract(
 						dev.generatePropertyGroup(),
 						dev.generateLockup(),
 						dev.generateWithdraw(),
-						dev.generateAllocator(),
 					])
 					await dev.generatePolicy('PolicyTest1')
 					const market = await dev.getMarket('MarketTest1', user)

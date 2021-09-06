@@ -243,7 +243,6 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 				dev.generateLockup(),
 				dev.generatePropertyFactory(),
 				dev.generatePropertyGroup(),
-				dev.generateAllocator(),
 				dev.generateMetricsGroup(),
 				dev.generateWithdraw(),
 				dev.generatePolicyFactory(),

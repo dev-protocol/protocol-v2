@@ -26,7 +26,6 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 		await dev.generateDev()
 		await dev.generateDevMinter()
 		await Promise.all([
-			dev.generateAllocator(),
 			dev.generateMarketFactory(),
 			dev.generateMarketGroup(),
 			dev.generateMetricsFactory(),

@@ -19,7 +19,6 @@ contract(
 				await dev.generateAddressRegistry()
 				await dev.generateDev()
 				await dev.generateDevMinter()
-				await dev.generateAllocator()
 				await dev.generateMetricsGroup()
 				await dev.generatePolicyFactory()
 				await dev.generatePolicyGroup()
@@ -76,7 +75,6 @@ contract(
 				await dev.generateAddressRegistry()
 				await dev.generateDev()
 				await dev.generateDevMinter()
-				await dev.generateAllocator()
 				await dev.generateMetricsGroup()
 				await dev.generatePolicyFactory()
 				await dev.generatePolicyGroup()
@@ -147,7 +145,6 @@ contract(
 				await dev.generateDev()
 				await dev.generateDevMinter()
 				await dev.generateLockup()
-				await dev.generateAllocator()
 				await dev.generateMetricsGroup()
 				await dev.generatePolicyFactory()
 				await dev.generatePolicyGroup()
@@ -217,7 +214,6 @@ contract(
 				await dev.generateDev()
 				await dev.generateDevMinter()
 				await dev.generateLockup()
-				await dev.generateAllocator()
 				await dev.generateMetricsGroup()
 				await dev.generatePolicyFactory()
 				await dev.generatePolicyGroup()
@@ -288,7 +284,6 @@ contract(
 				await dev.generateDev()
 				await dev.generateDevMinter()
 				await Promise.all([
-					dev.generateAllocator(),
 					dev.generateMetricsGroup(),
 					dev.generatePropertyGroup(),
 					dev.generatePropertyFactory(),
@@ -337,7 +332,6 @@ contract(
 				await dev.generateDev()
 				await dev.generateDevMinter()
 				await Promise.all([
-					dev.generateAllocator(),
 					dev.generateWithdraw(),
 					dev.generatePropertyGroup(),
 					dev.generatePropertyFactory(),
@@ -386,7 +380,6 @@ contract(
 				await dev.generateDev()
 				await dev.generateDevMinter()
 				await Promise.all([
-					dev.generateAllocator(),
 					dev.generateWithdraw(),
 					dev.generatePropertyGroup(),
 					dev.generatePropertyFactory(),
