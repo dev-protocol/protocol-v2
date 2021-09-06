@@ -19,7 +19,6 @@ import {
 	IPolicyContract,
 	LockupTestInstance,
 	DevMinterInstance,
-	AdminInstance,
 } from '../../types/truffle-contracts'
 
 type ContractInstance = {
@@ -31,7 +30,6 @@ const contract = artifacts.require
 
 export class DevProtocolInstance {
 	private readonly _deployer: string
-	private readonly _proxyAdmin!: AdminInstance
 
 	private _addressRegistry!: AddressRegistryInstance
 	private _dev!: DevInstance
