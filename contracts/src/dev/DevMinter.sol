@@ -4,10 +4,15 @@ pragma solidity =0.8.6;
 // prettier-ignore
 import {ERC20PresetMinterPauser} from "@openzeppelin/contracts/token/ERC20/presets/ERC20PresetMinterPauser.sol";
 import {InitializableUsingRegistry} from "contracts/src/common/registry/InitializableUsingRegistry.sol";
+import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {IAddressRegistry} from "contracts/interface/IAddressRegistry.sol";
 import {IDevMinter} from "contracts/interface/IDevMinter.sol";
 
-contract DevMinter is InitializableUsingRegistry, IDevMinter {
+contract DevMinter is
+	InitializableUsingRegistry,
+	OwnableUpgradeable,
+	IDevMinter
+{
 	function initialize(address _registry) external initializer {
 		__Ownable_init();
 		__UsingRegistry_init(_registry);
