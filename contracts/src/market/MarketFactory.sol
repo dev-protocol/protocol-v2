@@ -1,23 +1,36 @@
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity =0.8.6;
 
-import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
-import {UsingRegistry} from "contracts/src/common/registry/UsingRegistry.sol";
+import {InitializableUsingRegistry} from "contracts/src/common/registry/InitializableUsingRegistry.sol";
+import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {Market} from "contracts/src/market/Market.sol";
 import {IMarket} from "contracts/interface/IMarket.sol";
 import {IMarketFactory} from "contracts/interface/IMarketFactory.sol";
-import {IMarketGroup} from "contracts/interface/IMarketGroup.sol";
+import {SafeMath} from "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 /**
  * A factory contract that creates a new Market contract.
  */
-contract MarketFactory is Ownable, IMarketFactory, UsingRegistry {
+contract MarketFactory is
+	InitializableUsingRegistry,
+	OwnableUpgradeable,
+	IMarketFactory
+{
+	using SafeMath for uint256;
+
+	mapping(address => bool) public markets;
+	mapping(address => bool) public potentialMarkets;
+	uint256 public override marketsCount;
+
 	event Create(address indexed _from, address _market);
 
 	/**
 	 * Initialize the passed address as AddressRegistry address.
 	 */
-	constructor(address _registry) UsingRegistry(_registry) {}
+	function initialize(address _registry) external initializer {
+		__Ownable_init();
+		__UsingRegistry_init(_registry);
+	}
 
 	/**
 	 * Creates a new Market contract.
@@ -37,17 +50,14 @@ contract MarketFactory is Ownable, IMarketFactory, UsingRegistry {
 		 * Adds the created Market contract to the Market address set.
 		 */
 		address marketAddr = address(market);
-		IMarketGroup marketGroup = IMarketGroup(
-			registry().registries("MarketGroup")
-		);
-		marketGroup.addGroup(marketAddr);
+		potentialMarkets[marketAddr] = true;
 
 		/**
 		 * For the first Market contract, it will be activated immediately.
 		 * If not, the Market contract will be activated after a vote by the voters.
 		 */
-		if (marketGroup.getCount() == 1) {
-			market.toEnable();
+		if (marketsCount == 0) {
+			_enable(marketAddr);
 		}
 
 		emit Create(msg.sender, marketAddr);
@@ -58,13 +68,20 @@ contract MarketFactory is Ownable, IMarketFactory, UsingRegistry {
 	 * Creates a new Market contract.
 	 */
 	function enable(address _addr) external override onlyOwner {
+		_enable(_addr);
+	}
+
+	function isMarkets(address _addr) external view override returns (bool) {
+		return markets[_addr];
+	}
+
+	function _enable(address _addr) internal {
 		/**
 		 * Validates the passed address is not 0 address.
 		 */
-		IMarketGroup marketGroup = IMarketGroup(
-			registry().registries("MarketGroup")
-		);
-		require(marketGroup.isGroup(_addr), "this is illegal address");
+		require(potentialMarkets[_addr], "this is illegal address");
+
+		_addMarkets(_addr);
 
 		/**
 		 * Market will be enable.
@@ -73,5 +90,14 @@ contract MarketFactory is Ownable, IMarketFactory, UsingRegistry {
 		require(market.enabled() == false, "already enabled");
 
 		market.toEnable();
+	}
+
+	function _addMarkets(address _addr) internal {
+		markets[_addr] = true;
+		_addCount();
+	}
+
+	function _addCount() internal {
+		marketsCount = marketsCount.add(1);
 	}
 }

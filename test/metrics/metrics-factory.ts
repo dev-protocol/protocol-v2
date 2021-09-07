@@ -22,12 +22,10 @@ contract(
 			before(async () => {
 				await dev.generateAddressRegistry()
 				await Promise.all([
-					dev.generateMarketGroup(),
 					dev.generateMetricsFactory(),
 					dev.generateMetricsGroup(),
 				])
-				await dev.addressRegistry.setRegistry('MarketFactory', marketFactory)
-				await dev.marketGroup.addGroup(market, { from: marketFactory })
+				await dev.marketFactory.__addMarkets(market)
 			})
 
 			it('Adds a new metrics contract address to state contract,', async () => {
@@ -64,12 +62,10 @@ contract(
 			before(async () => {
 				await dev.generateAddressRegistry()
 				await Promise.all([
-					dev.generateMarketGroup(),
 					dev.generateMetricsFactory(),
 					dev.generateMetricsGroup(),
 				])
-				await dev.addressRegistry.setRegistry('MarketFactory', marketFactory)
-				await dev.marketGroup.addGroup(market, { from: marketFactory })
+				await dev.marketFactory.__addMarkets(market)
 				const metricsFactoryResult1 = await dev.metricsFactory.create(
 					property1,
 					{ from: market }

@@ -6,8 +6,7 @@ import {
 	PropertyFactoryInstance,
 	PolicyFactoryInstance,
 	PolicyGroupInstance,
-	MarketFactoryInstance,
-	MarketGroupInstance,
+	MarketFactoryTestInstance,
 	MetricsFactoryInstance,
 	MetricsGroupTestInstance,
 	IPolicyInstance,
@@ -56,8 +55,7 @@ export class DevProtocolInstance {
 	private _propertyGroup!: PropertyGroupInstance
 	private _policyFactory!: PolicyFactoryInstance
 	private _policyGroup!: PolicyGroupInstance
-	private _marketFactory!: MarketFactoryInstance
-	private _marketGroup!: MarketGroupInstance
+	private _marketFactory!: MarketFactoryTestInstance
 	private _metricsFactory!: MetricsFactoryInstance
 	private _metricsGroup!: MetricsGroupTestInstance
 	private _withdraw!: WithdrawInstance
@@ -107,12 +105,8 @@ export class DevProtocolInstance {
 		return this._policyGroup
 	}
 
-	public get marketFactory(): MarketFactoryInstance {
+	public get marketFactory(): MarketFactoryTestInstance {
 		return this._marketFactory
-	}
-
-	public get marketGroup(): MarketGroupInstance {
-		return this._marketGroup
 	}
 
 	public get metricsFactory(): MetricsFactoryInstance {
@@ -157,13 +151,9 @@ export class DevProtocolInstance {
 	}
 
 	public async generateDevMinter(): Promise<void> {
-		this._devMinter = await deployProxy(
-			contract('DevMinter'),
-			this._deployer
-		).then(async (c) => {
-			await c.initialize(this._addressRegistry.address)
-			return c
-		})
+		const proxfied = await deployProxy(contract('DevMinter'), this._deployer)
+		await proxfied.initialize(this._addressRegistry.address)
+		this._devMinter = proxfied
 		await this._dev.grantRole(
 			web3.utils.keccak256('MINTER_ROLE'),
 			this._devMinter.address
@@ -251,28 +241,17 @@ export class DevProtocolInstance {
 	}
 
 	public async generateMarketFactory(): Promise<void> {
-		this._marketFactory = await contract('MarketFactory').new(
-			this.addressRegistry.address,
-			this.fromDeployer
+		const proxfied = await deployProxy(
+			contract('MarketFactoryTest'),
+			this._deployer
 		)
+		await proxfied.initialize(this._addressRegistry.address)
+		this._marketFactory = proxfied
 		await this.addressRegistry.setRegistry(
 			'MarketFactory',
 			this._marketFactory.address,
 			this.fromDeployer
 		)
-	}
-
-	public async generateMarketGroup(): Promise<void> {
-		this._marketGroup = await contract('MarketGroup').new(
-			this.addressRegistry.address,
-			this.fromDeployer
-		)
-		await this.addressRegistry.setRegistry(
-			'MarketGroup',
-			this._marketGroup.address,
-			this.fromDeployer
-		)
-		await this._marketGroup.createStorage(this.fromDeployer)
 	}
 
 	public async generateMetricsFactory(): Promise<void> {

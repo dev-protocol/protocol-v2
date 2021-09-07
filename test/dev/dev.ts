@@ -383,14 +383,13 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 			await dev.generateAddressRegistry()
 			await dev.generateDev()
 			await dev.generateDevMinter()
-			await dev.generateMarketGroup()
 			return dev
 		}
 
 		it('burn token as a fee', async () => {
 			const dev = await generateEnv()
 			await dev.addressRegistry.setRegistry('MarketFactory', marketFactory)
-			await dev.marketGroup.addGroup(market, { from: marketFactory })
+			await dev.marketFactory.__addMarkets(market)
 			await dev.dev.mint(user1, 100)
 			await dev.dev.fee(user1, 1, { from: market })
 			const balance = await dev.dev.balanceOf(user1)
@@ -399,7 +398,7 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 		it('burn 0 tokens as a fee', async () => {
 			const dev = await generateEnv()
 			await dev.addressRegistry.setRegistry('MarketFactory', marketFactory)
-			await dev.marketGroup.addGroup(market, { from: marketFactory })
+			await dev.marketFactory.__addMarkets(market, { from: marketFactory })
 			await dev.dev.mint(user1, 100)
 			await dev.dev.fee(user1, 0, { from: market })
 			const balance = await dev.dev.balanceOf(user1)
@@ -408,7 +407,7 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 		it('should fail to burn when sent from no balance account', async () => {
 			const dev = await generateEnv()
 			await dev.addressRegistry.setRegistry('MarketFactory', marketFactory)
-			await dev.marketGroup.addGroup(market, { from: marketFactory })
+			await dev.marketFactory.__addMarkets(market, { from: marketFactory })
 			const balance = await dev.dev.balanceOf(user1)
 			const res = await dev.dev
 				.fee(user1, 1, { from: market })
@@ -419,7 +418,7 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 		it('should fail to burn when sent from an insufficient balance account', async () => {
 			const dev = await generateEnv()
 			await dev.addressRegistry.setRegistry('MarketFactory', marketFactory)
-			await dev.marketGroup.addGroup(market, { from: marketFactory })
+			await dev.marketFactory.__addMarkets(market, { from: marketFactory })
 			await dev.dev.mint(user1, 100)
 			const res = await dev.dev
 				.fee(user1, 101, { from: market })
@@ -431,7 +430,7 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 		it('should fail to burn when sent from other than market contract', async () => {
 			const dev = await generateEnv()
 			await dev.addressRegistry.setRegistry('MarketFactory', marketFactory)
-			await dev.marketGroup.addGroup(market, { from: marketFactory })
+			await dev.marketFactory.__addMarkets(market, { from: marketFactory })
 			await dev.dev.mint(user1, 100)
 			const res = await dev.dev
 				.fee(user1, 1, { from: user2 })

@@ -17,7 +17,6 @@ contract('MarketFactoryTest', ([deployer, user, dummyMarketAddress]) => {
 			dev.generatePolicyGroup(),
 			dev.generatePolicyFactory(),
 			dev.generateMarketFactory(),
-			dev.generateMarketGroup(),
 		])
 		const policy = await dev.getPolicy('PolicyTest1', user)
 		await dev.policyFactory.create(policy.address, { from: user })
@@ -41,13 +40,6 @@ contract('MarketFactoryTest', ([deployer, user, dummyMarketAddress]) => {
 			const deployedMarket = await marketContract.at(market)
 			const behaviorAddress = await deployedMarket.behavior({ from: deployer })
 			expect(behaviorAddress).to.be.equal(marketBehavior)
-		})
-		it('Adds a new Market Contract address to State Contract,', async () => {
-			const [dev, market] = await init()
-			const result = await dev.marketGroup.isGroup(market, {
-				from: deployer,
-			})
-			expect(result).to.be.equal(true)
 		})
 		it('A freshly created market is enabled,', async () => {
 			const [, market] = await init()
@@ -104,7 +96,6 @@ contract('MarketFactoryTest', ([deployer, user, dummyMarketAddress]) => {
 			it('Only the market address can be specified.', async () => {
 				const dev = new DevProtocolInstance(deployer)
 				await dev.generateAddressRegistry()
-				await dev.generateMarketGroup()
 				await dev.generateMarketFactory()
 				const res = await dev.marketFactory
 					.enable(dummyMarketAddress)
@@ -132,6 +123,35 @@ contract('MarketFactoryTest', ([deployer, user, dummyMarketAddress]) => {
 				const deployedMarket = await marketContract.at(secoundMarketAddress)
 				expect(await deployedMarket.enabled()).to.be.equal(true)
 			})
+		})
+	})
+
+	describe('MarketFactory; isMarkets', () => {
+		it('Returns true when the passed address is the created Market', async () => {
+			const [dev, market] = await init()
+			const result = await dev.marketFactory.isMarkets(market)
+			expect(result).to.be.equal(true)
+		})
+		it('Returns false when the passed address is not the created Market', async () => {
+			const [dev] = await init()
+			const result = await dev.marketFactory.isMarkets(deployer)
+			expect(result).to.be.equal(false)
+		})
+	})
+
+	describe('MarketFactory; marketsCount', () => {
+		it('Returns the number of enabled Markets', async () => {
+			const [dev] = await init()
+			const result = await dev.marketFactory.marketsCount()
+			expect(result.toNumber()).to.be.equal(1)
+		})
+		it('Should be increased the number when a new Market is enabled', async () => {
+			const [dev] = await init()
+			const created = await dev.marketFactory.create(dummyMarketAddress)
+			const secoundMarketAddress = getMarketAddress(created)
+			await dev.marketFactory.enable(secoundMarketAddress)
+			const result = await dev.marketFactory.marketsCount()
+			expect(result.toNumber()).to.be.equal(2)
 		})
 	})
 })

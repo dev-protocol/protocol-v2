@@ -65,7 +65,6 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 			await dev.generateDevMinter()
 			await Promise.all([
 				dev.generateMarketFactory(),
-				dev.generateMarketGroup(),
 				dev.generateMetricsFactory(),
 				dev.generateMetricsGroup(),
 				dev.generatePolicyFactory(),
@@ -90,7 +89,6 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 				await dev.generateDevMinter()
 				await Promise.all([
 					dev.generateMarketFactory(),
-					dev.generateMarketGroup(),
 					dev.generateMetricsFactory(),
 					dev.generateMetricsGroup(),
 					dev.generatePolicyFactory(),

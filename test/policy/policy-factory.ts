@@ -18,7 +18,6 @@ contract('PolicyFactory', ([deployer, dummyPolicy, user1, ...accounts]) => {
 			dev.generatePolicyGroup(),
 			dev.generatePolicyFactory(),
 			dev.generateMarketFactory(),
-			dev.generateMarketGroup(),
 		])
 		const policy = await dev.getPolicy('PolicyTestForPolicyFactory', user1)
 		return [dev, policy]

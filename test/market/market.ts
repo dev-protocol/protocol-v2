@@ -111,7 +111,6 @@ contract(
 				await dev.generateDevMinter()
 				await Promise.all([
 					dev.generateMarketFactory(),
-					dev.generateMarketGroup(),
 					dev.generateMetricsFactory(),
 					dev.generateMetricsGroup(),
 					dev.generatePolicyFactory(),
@@ -327,7 +326,6 @@ contract(
 				await dev.generateDevMinter()
 				await Promise.all([
 					dev.generateMarketFactory(),
-					dev.generateMarketGroup(),
 					dev.generateMetricsFactory(),
 					dev.generateMetricsGroup(),
 					dev.generatePolicyFactory(),
