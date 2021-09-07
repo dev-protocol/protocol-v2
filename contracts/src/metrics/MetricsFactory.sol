@@ -34,7 +34,7 @@ contract MetricsFactory is InitializableUsingRegistry, IMetricsFactory {
 		 * Validates the sender is included in the Market address set.
 		 */
 		require(
-			IMarketFactory(registry().registries("MarketFactory")).isMarkets(
+			IMarketFactory(registry().registries("MarketFactory")).isMarket(
 				msg.sender
 			),
 			"this is illegal address"
@@ -68,7 +68,7 @@ contract MetricsFactory is InitializableUsingRegistry, IMetricsFactory {
 		 * Validates the sender is included in the Market address set.
 		 */
 		require(
-			IMarketFactory(registry().registries("MarketFactory")).isMarkets(
+			IMarketFactory(registry().registries("MarketFactory")).isMarket(
 				msg.sender
 			),
 			"this is illegal address"

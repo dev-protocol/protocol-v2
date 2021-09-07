@@ -125,15 +125,15 @@ contract('MarketFactoryTest', ([deployer, user, dummyMarketAddress]) => {
 		})
 	})
 
-	describe('MarketFactory; isMarkets', () => {
+	describe('MarketFactory; isMarket', () => {
 		it('Returns true when the passed address is the created Market', async () => {
 			const [dev, market] = await init()
-			const result = await dev.marketFactory.isMarkets(market)
+			const result = await dev.marketFactory.isMarket(market)
 			expect(result).to.be.equal(true)
 		})
 		it('Returns false when the passed address is not the created Market', async () => {
 			const [dev] = await init()
-			const result = await dev.marketFactory.isMarkets(deployer)
+			const result = await dev.marketFactory.isMarket(deployer)
 			expect(result).to.be.equal(false)
 		})
 	})
