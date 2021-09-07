@@ -18,11 +18,9 @@ contract MarketFactory is
 {
 	using SafeMath for uint256;
 
-	mapping(address => bool) public markets;
-	mapping(address => bool) public potentialMarkets;
+	mapping(address => bool) public override isMarket;
+	mapping(address => bool) public override isPotentialMarket;
 	uint256 public override marketsCount;
-
-	event Create(address indexed _from, address _market);
 
 	/**
 	 * Initialize the passed address as AddressRegistry address.
@@ -50,7 +48,7 @@ contract MarketFactory is
 		 * Adds the created Market contract to the Market address set.
 		 */
 		address marketAddr = address(market);
-		potentialMarkets[marketAddr] = true;
+		isPotentialMarket[marketAddr] = true;
 
 		/**
 		 * For the first Market contract, it will be activated immediately.
@@ -71,15 +69,11 @@ contract MarketFactory is
 		_enable(_addr);
 	}
 
-	function isMarkets(address _addr) external view override returns (bool) {
-		return markets[_addr];
-	}
-
 	function _enable(address _addr) internal {
 		/**
 		 * Validates the passed address is not 0 address.
 		 */
-		require(potentialMarkets[_addr], "this is illegal address");
+		require(isPotentialMarket[_addr], "this is illegal address");
 
 		_addMarkets(_addr);
 
@@ -93,7 +87,7 @@ contract MarketFactory is
 	}
 
 	function _addMarkets(address _addr) internal {
-		markets[_addr] = true;
+		isMarket[_addr] = true;
 		_addCount();
 	}
 
