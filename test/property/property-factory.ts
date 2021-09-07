@@ -2,38 +2,35 @@
 import { DevProtocolInstance } from '../test-lib/instance'
 import { getPropertyAddress, getMarketAddress } from '../test-lib/utils/log'
 import { toBigNumber } from '../test-lib/utils/common'
-import { getEventValue } from '../test-lib/utils/event'
+import { getEventValue, watch } from '../test-lib/utils/event'
 
 contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 	describe('PropertyFactory; create', () => {
-		const dev = new DevProtocolInstance(deployer)
-		const propertyContract = artifacts.require('Property')
-		let propertyAddress: string
-		before(async () => {
+		const init = async (): Promise<[DevProtocolInstance, string]> => {
+			const dev = new DevProtocolInstance(deployer)
 			await dev.generateAddressRegistry()
 			await dev.generateDev()
 			await dev.generateDevMinter()
 			await Promise.all([
+				dev.generateMetricsFactory(),
 				dev.generatePropertyFactory(),
-				dev.generatePropertyGroup(),
 				dev.generatePolicyFactory(),
 				dev.generateLockup(),
 			])
 			await dev.generatePolicy()
 			await dev.addressRegistry.setRegistry('MarketFactory', marketFactory)
-			const result = await dev.propertyFactory.create(
-				'sample',
-				'SAMPLE',
-				user,
-				{
+			const propertyAddress = await dev.propertyFactory
+				.create('sample', 'SAMPLE', user, {
 					from: user2,
-				}
-			)
-			propertyAddress = getPropertyAddress(result)
-		})
-		it('Create a new property contract and emit create event telling created property address', async () => {
+				})
+				.then(getPropertyAddress)
+			return [dev, propertyAddress]
+		}
+
+		it('Create a new property contract and emit Create event', async () => {
+			const [, property] = await init()
 			// eslint-disable-next-line @typescript-eslint/await-thenable
-			const deployedProperty = await propertyContract.at(propertyAddress)
+			const deployedProperty = await artifacts.require('Property').at(property)
 			const name = await deployedProperty.name({ from: user2 })
 			const symbol = await deployedProperty.symbol({ from: user2 })
 			const decimals = await deployedProperty.decimals({ from: user2 })
@@ -50,13 +47,22 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 			expect(author).to.be.equal(user)
 		})
 
-		it('Adds a new property contract address to state contract', async () => {
-			const isProperty = await dev.propertyGroup.isGroup(propertyAddress)
-			expect(isProperty).to.be.equal(true)
+		it('Should update to isProperty', async () => {
+			const [dev] = await init()
+			const property = await dev.propertyFactory
+				.create('sample', 'SAMPLE', user)
+				.then(getPropertyAddress)
+			const res = await dev.propertyFactory.isProperty(property)
+			expect(res).to.be.equal(true)
 		})
 	})
+	/**
+	 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	 * NOT SUPPORT YET
+	 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	describe('PropertyFactory; createAndAuthenticate', () => {
 		const dev = new DevProtocolInstance(deployer)
+		let marketAddress: string
 		before(async () => {
 			await dev.generateAddressRegistry()
 			await dev.generateDev()
@@ -66,73 +72,51 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 				dev.generateMetricsFactory(),
 				dev.generatePolicyFactory(),
 				dev.generatePropertyFactory(),
-				dev.generatePropertyGroup(),
 				dev.generateLockup(),
 				dev.generateWithdraw(),
 			])
 			await dev.generatePolicy('PolicyTest1')
 			const market = await dev.getMarket('MarketTest1', user)
-			await dev.marketFactory.create(market.address, {
+			marketAddress = await dev.marketFactory
+				.create(market.address, {
+					from: user,
+				})
+				.then(getMarketAddress)
+			await dev.dev.mint(user, 10000000000)
+			await (market as any).setAssociatedMarket(marketAddress, {
 				from: user,
 			})
 		})
-		describe('PropertyFactory; createAndAuthenticate', () => {
-			const dev = new DevProtocolInstance(deployer)
-			let marketAddress: string
-			before(async () => {
-				await dev.generateAddressRegistry()
-				await dev.generateDev()
-				await dev.generateDevMinter()
-				await Promise.all([
-					dev.generateMarketFactory(),
-					dev.generateMetricsFactory(),
-					dev.generatePolicyFactory(),
-					dev.generatePropertyFactory(),
-					dev.generatePropertyGroup(),
-					dev.generateLockup(),
-					dev.generateWithdraw(),
-				])
-				await dev.generatePolicy('PolicyTest1')
-				const market = await dev.getMarket('MarketTest1', user)
-				const result = await dev.marketFactory.create(market.address, {
-					from: user,
-				})
-				await dev.dev.mint(user, 10000000000)
-				marketAddress = getMarketAddress(result)
-				await (market as any).setAssociatedMarket(marketAddress, {
-					from: user,
-				})
-			})
 
-			it('Create a new Property and authenticate at the same time', async () => {
-				;(dev.propertyFactory as any)
-					.createAndAuthenticate(
-						'example',
-						'EXAMPLE',
-						marketAddress,
-						'test',
-						'',
-						'',
-						{ from: user }
-					)
-					.catch(console.error)
-				const [propertyCreator, property, market, metrics] = await Promise.all([
-					getEventValue(dev.propertyFactory)('Create', '_from'),
-					getEventValue(dev.propertyFactory)('Create', '_property'),
-					getEventValue(dev.metricsFactory)('Create', '_from'),
-					getEventValue(dev.metricsFactory)('Create', '_metrics'),
-				])
-				const linkedProperty = await Promise.all([
-					artifacts.require('Metrics').at(metrics as string),
-				]).then(async ([c]) => c.property())
-				const propertyAuthor = await Promise.all([
-					artifacts.require('Property').at(property as string),
-				]).then(async ([c]) => c.author())
-				expect(propertyCreator).to.be.equal(user)
-				expect(propertyAuthor).to.be.equal(user)
-				expect(property).to.be.equal(linkedProperty)
-				expect(market).to.be.equal(marketAddress)
-			})
+		it('Create a new Property and authenticate at the same time', async () => {
+			void dev.propertyFactory
+				.createAndAuthenticate(
+					'example',
+					'EXAMPLE',
+					marketAddress,
+					'test',
+					'',
+					'',
+					{ from: user }
+				)
+				.catch(console.error)
+			const [propertyCreator, property, market, metrics] = await Promise.all([
+				getEventValue(dev.propertyFactory)('Create', '_from'),
+				getEventValue(dev.propertyFactory)('Create', '_property'),
+				getEventValue(dev.metricsFactory)('Create', '_from'),
+				getEventValue(dev.metricsFactory)('Create', '_metrics'),
+			])
+			const linkedProperty = await Promise.all([
+				artifacts.require('Metrics').at(metrics as string),
+			]).then(async ([c]) => c.property())
+			const propertyAuthor = await Promise.all([
+				artifacts.require('Property').at(property as string),
+			]).then(async ([c]) => c.author())
+			expect(propertyCreator).to.be.equal(user)
+			expect(propertyAuthor).to.be.equal(user)
+			expect(property).to.be.equal(linkedProperty)
+			expect(market).to.be.equal(marketAddress)
 		})
 	})
+	*/
 })

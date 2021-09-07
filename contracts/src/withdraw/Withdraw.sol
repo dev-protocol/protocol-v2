@@ -11,7 +11,7 @@ import {IDevMinter} from "contracts/interface/IDevMinter.sol";
 import {IWithdraw} from "contracts/interface/IWithdraw.sol";
 import {ILockup} from "contracts/interface/ILockup.sol";
 import {IMetricsFactory} from "contracts/interface/IMetricsFactory.sol";
-import {IPropertyGroup} from "contracts/interface/IPropertyGroup.sol";
+import {IPropertyFactory} from "contracts/interface/IPropertyFactory.sol";
 
 /**
  * A contract that manages the withdrawal of holder rewards for Property holders.
@@ -34,9 +34,8 @@ contract Withdraw is IWithdraw, UsingRegistry, WithdrawStorage {
 		 * the passed Property address is included the Property address set.
 		 */
 		require(
-			IPropertyGroup(registry().registries("PropertyGroup")).isGroup(
-				_property
-			),
+			IPropertyFactory(registry().registries("PropertyFactory"))
+				.isProperty(_property),
 			"this is illegal address"
 		);
 
@@ -105,9 +104,8 @@ contract Withdraw is IWithdraw, UsingRegistry, WithdrawStorage {
 		 * Validates the sender is Allocator contract.
 		 */
 		require(
-			IPropertyGroup(registry().registries("PropertyGroup")).isGroup(
-				msg.sender
-			),
+			IPropertyFactory(registry().registries("PropertyFactory"))
+				.isProperty(msg.sender),
 			"this is illegal address"
 		);
 

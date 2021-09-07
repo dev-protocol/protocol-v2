@@ -31,7 +31,6 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 			dev.generateLockup(),
 			dev.generateWithdraw(),
 			dev.generatePropertyFactory(),
-			dev.generatePropertyGroup(),
 			dev.generatePolicyFactory(),
 		])
 		await dev.dev.mint(deployer, new BigNumber(1e18).times(10000000))

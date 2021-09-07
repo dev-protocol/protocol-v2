@@ -98,7 +98,6 @@ contract(
 			})
 			it('Author is changed.', async () => {
 				await dev.generatePropertyFactory()
-				await dev.generatePropertyGroup()
 				const transaction = await dev.propertyFactory.create(
 					'sample',
 					'SAMPLE',
@@ -166,7 +165,6 @@ contract(
 			})
 			it('Change the name', async () => {
 				await dev.generatePropertyFactory()
-				await dev.generatePropertyGroup()
 				const transaction = await dev.propertyFactory.create(
 					'sample',
 					'SAMPLE',
@@ -234,7 +232,6 @@ contract(
 			})
 			it('Change the symbol', async () => {
 				await dev.generatePropertyFactory()
-				await dev.generatePropertyGroup()
 				const transaction = await dev.propertyFactory.create(
 					'sample',
 					'SAMPLE',
@@ -279,7 +276,6 @@ contract(
 				await dev.generateDev()
 				await dev.generateDevMinter()
 				await Promise.all([
-					dev.generatePropertyGroup(),
 					dev.generatePropertyFactory(),
 					dev.generatePolicyFactory(),
 					dev.generateLockup(),
@@ -326,7 +322,6 @@ contract(
 				await dev.generateDevMinter()
 				await Promise.all([
 					dev.generateWithdraw(),
-					dev.generatePropertyGroup(),
 					dev.generatePropertyFactory(),
 					dev.generateLockup(),
 					dev.generatePolicyFactory(),
@@ -372,7 +367,6 @@ contract(
 				await dev.generateDevMinter()
 				await Promise.all([
 					dev.generateWithdraw(),
-					dev.generatePropertyGroup(),
 					dev.generatePropertyFactory(),
 					dev.generateLockup(),
 					dev.generatePolicyFactory(),

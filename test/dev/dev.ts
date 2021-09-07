@@ -242,7 +242,6 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 			await Promise.all([
 				dev.generateLockup(),
 				dev.generatePropertyFactory(),
-				dev.generatePropertyGroup(),
 				dev.generateWithdraw(),
 				dev.generatePolicyFactory(),
 			])

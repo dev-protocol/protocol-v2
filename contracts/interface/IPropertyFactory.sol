@@ -10,6 +10,10 @@ interface IPropertyFactory {
 		address _author
 	) external returns (address);
 
+	/*
+	 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	 * NOT SUPPORT YET
+	 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	function createAndAuthenticate(
 		string calldata _name,
 		string calldata _symbol,
@@ -18,4 +22,7 @@ interface IPropertyFactory {
 		string calldata _args2,
 		string calldata _args3
 	) external returns (bool);
+	 */
+
+	function isProperty(address _addr) external view returns (bool);
 }

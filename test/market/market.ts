@@ -105,7 +105,6 @@ contract(
 					dev.generateMetricsFactory(),
 					dev.generatePolicyFactory(),
 					dev.generatePropertyFactory(),
-					dev.generatePropertyGroup(),
 					dev.generateLockup(),
 					dev.generateWithdraw(),
 				])
@@ -321,7 +320,6 @@ contract(
 					dev.generateMetricsFactory(),
 					dev.generatePolicyFactory(),
 					dev.generatePropertyFactory(),
-					dev.generatePropertyGroup(),
 					dev.generateLockup(),
 					dev.generateWithdraw(),
 				])
