@@ -26,6 +26,24 @@ type ContractInstance = {
 	new: any
 }
 
+export const deployProxy = async <L extends ContractInstance>(
+	logic: L,
+	deployer: string
+): Promise<ReturnType<L['at']>> => {
+	const [admin, impl] = await Promise.all([
+		contract('Admin').new(),
+		logic.new(),
+	])
+	const proxy = await contract('Proxy').new(
+		impl.address,
+		admin.address,
+		web3.utils.fromUtf8(''),
+		{ from: deployer }
+	)
+	const [wrap] = await Promise.all([logic.at(proxy.address)])
+	return wrap
+}
+
 const contract = artifacts.require
 
 export class DevProtocolInstance {
@@ -130,7 +148,10 @@ export class DevProtocolInstance {
 	}
 
 	public async generateAddressRegistry(): Promise<void> {
-		const proxfied = await this.deployProxy(contract('AddressRegistry'))
+		const proxfied = await deployProxy(
+			contract('AddressRegistry'),
+			this._deployer
+		)
 		await proxfied.initialize()
 		this._addressRegistry = proxfied
 	}
@@ -358,22 +379,5 @@ export class DevProtocolInstance {
 		value = '115792089237316000000000000000000000'
 	): Promise<void> {
 		await this._lockup.updateCap(value)
-	}
-
-	private async deployProxy<L extends ContractInstance>(
-		logic: L
-	): Promise<ReturnType<L['at']>> {
-		const [admin, impl] = await Promise.all([
-			contract('Admin').new(),
-			logic.new(),
-		])
-		const proxy = await contract('Proxy').new(
-			impl.address,
-			admin.address,
-			web3.utils.fromUtf8(''),
-			this.fromDeployer
-		)
-		const [wrap] = await Promise.all([logic.at(proxy.address)])
-		return wrap
 	}
 }
