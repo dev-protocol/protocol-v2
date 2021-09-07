@@ -157,10 +157,13 @@ export class DevProtocolInstance {
 	}
 
 	public async generateDevMinter(): Promise<void> {
-		this._devMinter = await contract('DevMinter').new(
-			this.addressRegistry.address,
-			this.fromDeployer
-		)
+		this._devMinter = await deployProxy(
+			contract('DevMinter'),
+			this._deployer
+		).then(async (c) => {
+			await c.initialize(this._addressRegistry.address)
+			return c
+		})
 		await this._dev.grantRole(
 			web3.utils.keccak256('MINTER_ROLE'),
 			this._devMinter.address

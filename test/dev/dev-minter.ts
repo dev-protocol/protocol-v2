@@ -29,12 +29,9 @@ contract('DevMinter', ([deployer, user1, lockup, withdraw]) => {
 			await addressRegistry.setRegistry('Dev', dev.address, {
 				from: deployer,
 			})
-			const devMinter = await contract('DevMinter').new(
-				addressRegistry.address,
-				{
-					from: deployer,
-				}
-			)
+			const devMinter = await deployProxy(contract('DevMinter'), deployer)
+			await devMinter.initialize(addressRegistry.address)
+
 			await addressRegistry.setRegistry('Lockup', lockup, {
 				from: deployer,
 			})
