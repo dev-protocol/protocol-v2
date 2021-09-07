@@ -19,7 +19,6 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 				dev.generatePolicyFactory(),
 				dev.generatePolicyGroup(),
 				dev.generateLockup(),
-				dev.generateMetricsGroup(),
 			])
 			await dev.generatePolicy()
 			await dev.addressRegistry.setRegistry('MarketFactory', marketFactory)
@@ -66,7 +65,6 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 			await Promise.all([
 				dev.generateMarketFactory(),
 				dev.generateMetricsFactory(),
-				dev.generateMetricsGroup(),
 				dev.generatePolicyFactory(),
 				dev.generatePolicyGroup(),
 				dev.generatePropertyFactory(),
@@ -90,7 +88,6 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 				await Promise.all([
 					dev.generateMarketFactory(),
 					dev.generateMetricsFactory(),
-					dev.generateMetricsGroup(),
 					dev.generatePolicyFactory(),
 					dev.generatePolicyGroup(),
 					dev.generatePropertyFactory(),

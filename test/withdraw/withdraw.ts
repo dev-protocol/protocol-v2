@@ -44,7 +44,6 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 		await Promise.all([
 			dev.generateMarketFactory(),
 			dev.generateMetricsFactory(),
-			dev.generateMetricsGroup(),
 			dev.generateLockup(),
 			dev.generatePropertyFactory(),
 			dev.generatePropertyGroup(),
@@ -71,7 +70,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 		const [property] = await Promise.all([
 			artifacts.require('Property').at(propertyAddress),
 		])
-		await dev.metricsGroup.__setMetricsCountPerProperty(property.address, 1)
+		await dev.metricsFactory.__setMetricsCountPerProperty(property.address, 1)
 		const marketBehavior = await artifacts
 			.require('MarketTest1')
 			.new(dev.addressRegistry.address)
@@ -654,7 +653,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 					: allReward.lte(capped)
 					? allReward
 					: capped
-				const hasAssets = await dev.metricsGroup.hasAssets(prop.address)
+				const hasAssets = await dev.metricsFactory.hasAssets(prop.address)
 				if (!hasAssets) {
 					return {
 						value: new BigNumber(0),
@@ -762,7 +761,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 								)
 							),
 					])
-					await dev.metricsGroup.__setMetricsCountPerProperty(
+					await dev.metricsFactory.__setMetricsCountPerProperty(
 						property2.address,
 						1
 					)
@@ -802,7 +801,10 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 			})
 
 			it(`Unauthenticated property has no reward`, async () => {
-				await dev.metricsGroup.__setMetricsCountPerProperty(property.address, 0)
+				await dev.metricsFactory.__setMetricsCountPerProperty(
+					property.address,
+					0
+				)
 				const aliceAmount = await dev.withdraw
 					.calculateWithdrawableAmount(property.address, alice)
 					.then(toBigNumber)
@@ -812,7 +814,10 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 			})
 
 			it(`Property that unauthenticated but already staked before DIP9 has no reward`, async () => {
-				await dev.metricsGroup.__setMetricsCountPerProperty(property.address, 1)
+				await dev.metricsFactory.__setMetricsCountPerProperty(
+					property.address,
+					1
+				)
 				await dev.dev.deposit(
 					property.address,
 					toBigNumber(10000).times(1e18),
@@ -829,7 +834,10 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 					}
 				)
 				await mine(1)
-				await dev.metricsGroup.__setMetricsCountPerProperty(property.address, 0)
+				await dev.metricsFactory.__setMetricsCountPerProperty(
+					property.address,
+					0
+				)
 				const aliceAmount = await dev.withdraw
 					.calculateWithdrawableAmount(property.address, alice)
 					.then(toBigNumber)
@@ -1126,15 +1134,15 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 							)
 						),
 				])
-				await dev.metricsGroup.__setMetricsCountPerProperty(
+				await dev.metricsFactory.__setMetricsCountPerProperty(
 					property2.address,
 					1
 				)
-				await dev.metricsGroup.__setMetricsCountPerProperty(
+				await dev.metricsFactory.__setMetricsCountPerProperty(
 					property3.address,
 					1
 				)
-				await dev.metricsGroup.__setMetricsCountPerProperty(
+				await dev.metricsFactory.__setMetricsCountPerProperty(
 					property4.address,
 					1
 				)
@@ -1494,7 +1502,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 							)
 						),
 				])
-				await dev.metricsGroup.__setMetricsCountPerProperty(
+				await dev.metricsFactory.__setMetricsCountPerProperty(
 					property2.address,
 					1
 				)
@@ -1648,7 +1656,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 							)
 						),
 				])
-				await dev.metricsGroup.__setMetricsCountPerProperty(
+				await dev.metricsFactory.__setMetricsCountPerProperty(
 					property2.address,
 					1
 				)

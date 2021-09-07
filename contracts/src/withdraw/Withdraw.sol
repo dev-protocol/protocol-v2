@@ -10,7 +10,7 @@ import {WithdrawStorage} from "contracts/src/withdraw/WithdrawStorage.sol";
 import {IDevMinter} from "contracts/interface/IDevMinter.sol";
 import {IWithdraw} from "contracts/interface/IWithdraw.sol";
 import {ILockup} from "contracts/interface/ILockup.sol";
-import {IMetricsGroup} from "contracts/interface/IMetricsGroup.sol";
+import {IMetricsFactory} from "contracts/interface/IMetricsFactory.sol";
 import {IPropertyGroup} from "contracts/interface/IPropertyGroup.sol";
 
 /**
@@ -259,7 +259,7 @@ contract Withdraw is IWithdraw, UsingRegistry, WithdrawStorage {
 		 * If the passed Property has not authenticated, returns always 0.
 		 */
 		if (
-			IMetricsGroup(registry().registries("MetricsGroup")).hasAssets(
+			IMetricsFactory(registry().registries("MetricsFactory")).hasAssets(
 				_property
 			) == false
 		) {

@@ -243,7 +243,6 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 				dev.generateLockup(),
 				dev.generatePropertyFactory(),
 				dev.generatePropertyGroup(),
-				dev.generateMetricsGroup(),
 				dev.generateWithdraw(),
 				dev.generatePolicyFactory(),
 				dev.generatePolicyGroup(),
@@ -262,7 +261,7 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 		it('lockup token to properties', async () => {
 			const dev = await generateEnv()
 			const prop = await createProperty(dev)
-			await dev.metricsGroup.__setMetricsCountPerProperty(prop, 1)
+			await dev.metricsFactory.__setMetricsCountPerProperty(prop, 1)
 			await dev.dev.mint(user1, 100)
 			await dev.dev.deposit(prop, 50, { from: user1 })
 			const balance = await dev.dev.balanceOf(user1)
@@ -275,7 +274,7 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 		it('check gas used', async () => {
 			const dev = await generateEnv()
 			const prop = await createProperty(dev)
-			await dev.metricsGroup.__setMetricsCountPerProperty(prop, 1)
+			await dev.metricsFactory.__setMetricsCountPerProperty(prop, 1)
 			await dev.dev.mint(user1, 100)
 			const transaction = await dev.dev.deposit(prop, 50, { from: user1 })
 			const gasPrice = Number(transaction.receipt.gasUsed)
@@ -285,7 +284,7 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 		it('should fail to lock up token when 0 amount', async () => {
 			const dev = await generateEnv()
 			const prop = await createProperty(dev)
-			await dev.metricsGroup.__setMetricsCountPerProperty(prop, 1)
+			await dev.metricsFactory.__setMetricsCountPerProperty(prop, 1)
 			await dev.dev.mint(user1, 100)
 			const res = await dev.dev
 				.deposit(prop, 0, { from: user1 })
@@ -351,7 +350,7 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 		it('lockup token by running the depositFrom from another account after approved', async () => {
 			const dev = await generateEnv()
 			const prop = await createProperty(dev)
-			await dev.metricsGroup.__setMetricsCountPerProperty(prop, 1)
+			await dev.metricsFactory.__setMetricsCountPerProperty(prop, 1)
 			await dev.dev.mint(user1, 100)
 			await dev.dev.approve(user2, 50, { from: user1 })
 			await dev.dev.depositFrom(user1, prop, 50, { from: user2 })

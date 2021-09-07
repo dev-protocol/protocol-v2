@@ -7,8 +7,7 @@ import {
 	PolicyFactoryInstance,
 	PolicyGroupInstance,
 	MarketFactoryTestInstance,
-	MetricsFactoryInstance,
-	MetricsGroupTestInstance,
+	MetricsFactoryTestInstance,
 	IPolicyInstance,
 	IMarketInstance,
 	WithdrawInstance,
@@ -56,8 +55,7 @@ export class DevProtocolInstance {
 	private _policyFactory!: PolicyFactoryInstance
 	private _policyGroup!: PolicyGroupInstance
 	private _marketFactory!: MarketFactoryTestInstance
-	private _metricsFactory!: MetricsFactoryInstance
-	private _metricsGroup!: MetricsGroupTestInstance
+	private _metricsFactory!: MetricsFactoryTestInstance
 	private _withdraw!: WithdrawInstance
 	private _withdrawTest!: WithdrawTestInstance
 	private _lockupTest!: LockupTestInstance
@@ -109,12 +107,8 @@ export class DevProtocolInstance {
 		return this._marketFactory
 	}
 
-	public get metricsFactory(): MetricsFactoryInstance {
+	public get metricsFactory(): MetricsFactoryTestInstance {
 		return this._metricsFactory
-	}
-
-	public get metricsGroup(): MetricsGroupTestInstance {
-		return this._metricsGroup
 	}
 
 	public get withdraw(): WithdrawInstance {
@@ -255,28 +249,17 @@ export class DevProtocolInstance {
 	}
 
 	public async generateMetricsFactory(): Promise<void> {
-		this._metricsFactory = await contract('MetricsFactory').new(
-			this.addressRegistry.address,
-			this.fromDeployer
+		const proxfied = await deployProxy(
+			contract('MetricsFactoryTest'),
+			this._deployer
 		)
+		await proxfied.initialize(this._addressRegistry.address)
+		this._metricsFactory = proxfied
 		await this.addressRegistry.setRegistry(
 			'MetricsFactory',
 			this._metricsFactory.address,
 			this.fromDeployer
 		)
-	}
-
-	public async generateMetricsGroup(): Promise<void> {
-		this._metricsGroup = await contract('MetricsGroupTest').new(
-			this.addressRegistry.address,
-			this.fromDeployer
-		)
-		await this.addressRegistry.setRegistry(
-			'MetricsGroup',
-			this._metricsGroup.address,
-			this.fromDeployer
-		)
-		await this._metricsGroup.createStorage(this.fromDeployer)
 	}
 
 	public async generateWithdraw(): Promise<void> {

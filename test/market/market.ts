@@ -112,7 +112,6 @@ contract(
 				await Promise.all([
 					dev.generateMarketFactory(),
 					dev.generateMetricsFactory(),
-					dev.generateMetricsGroup(),
 					dev.generatePolicyFactory(),
 					dev.generatePolicyGroup(),
 					dev.generatePropertyFactory(),
@@ -141,7 +140,10 @@ contract(
 					propertyAuther
 				)
 				propertyAddress = getPropertyAddress(createPropertyResult)
-				await dev.metricsGroup.__setMetricsCountPerProperty(propertyAddress, 1)
+				await dev.metricsFactory.__setMetricsCountPerProperty(
+					propertyAddress,
+					1
+				)
 				await dev.dev.mint(propertyAuther, 10000000000, { from: deployer })
 			})
 			it('Proxy to mapped Behavior Contract.', async () => {
@@ -327,7 +329,6 @@ contract(
 				await Promise.all([
 					dev.generateMarketFactory(),
 					dev.generateMetricsFactory(),
-					dev.generateMetricsGroup(),
 					dev.generatePolicyFactory(),
 					dev.generatePolicyGroup(),
 					dev.generatePropertyFactory(),
@@ -356,7 +357,10 @@ contract(
 					propertyAuther
 				)
 				propertyAddress = getPropertyAddress(createPropertyResult)
-				await dev.metricsGroup.__setMetricsCountPerProperty(propertyAddress, 1)
+				await dev.metricsFactory.__setMetricsCountPerProperty(
+					propertyAddress,
+					1
+				)
 				await dev.dev.mint(propertyAuther, 10000000000, { from: deployer })
 				await dev.addressRegistry.setRegistry(
 					'PropertyFactory',

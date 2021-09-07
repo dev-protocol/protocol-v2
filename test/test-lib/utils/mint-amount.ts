@@ -7,8 +7,8 @@ async function getWithdrawAmount(
 	dev: DevProtocolInstance,
 	propertyAddress: string
 ): Promise<[BigNumber, BigNumber]> {
-	const totalIssuedMetrics = await dev.metricsGroup
-		.totalIssuedMetrics()
+	const totalIssuedMetrics = await dev.metricsFactory
+		.metricsCount()
 		.then(toBigNumber)
 	const totalLockedUps = await dev.lockup.getAllValue().then(toBigNumber)
 	const policyAddress = await dev.addressRegistry.registries('Policy')

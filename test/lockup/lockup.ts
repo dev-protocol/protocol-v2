@@ -28,7 +28,6 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 		await Promise.all([
 			dev.generateMarketFactory(),
 			dev.generateMetricsFactory(),
-			dev.generateMetricsGroup(),
 			dev.generateLockup(),
 			dev.generateWithdraw(),
 			dev.generatePropertyFactory(),
@@ -49,8 +48,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 			artifacts.require('Property').at(propertyAddress),
 		])
 
-		await dev.addressRegistry.setRegistry('MetricsFactory', deployer)
-		await dev.metricsGroup.addGroup(
+		await dev.metricsFactory.__addMetrics(
 			(
 				await dev.createMetrics(deployer, property.address)
 			).address
@@ -529,7 +527,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 							)
 						),
 				])
-				await dev.metricsGroup.__setMetricsCountPerProperty(
+				await dev.metricsFactory.__setMetricsCountPerProperty(
 					property2.address,
 					1
 				)
@@ -562,7 +560,10 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				const propertyAddress = getPropertyAddress(
 					await dev.propertyFactory.create('test', 'TEST', deployer)
 				)
-				await dev.metricsGroup.__setMetricsCountPerProperty(propertyAddress, 1)
+				await dev.metricsFactory.__setMetricsCountPerProperty(
+					propertyAddress,
+					1
+				)
 				await dev.dev
 					.deposit(propertyAddress, 1000000000000, { from: alice })
 					.then(gasLogger)
@@ -571,7 +572,10 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 					.deposit(propertyAddress, 1000000000000, { from: alice })
 					.then(gasLogger)
 				await mine(1)
-				await dev.metricsGroup.__setMetricsCountPerProperty(propertyAddress, 0)
+				await dev.metricsFactory.__setMetricsCountPerProperty(
+					propertyAddress,
+					0
+				)
 				const result = await dev.lockup
 					.calculateWithdrawableInterestAmount(propertyAddress, alice)
 					.then(toBigNumber)
@@ -904,15 +908,15 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 							)
 						),
 				])
-				await dev.metricsGroup.__setMetricsCountPerProperty(
+				await dev.metricsFactory.__setMetricsCountPerProperty(
 					property2.address,
 					1
 				)
-				await dev.metricsGroup.__setMetricsCountPerProperty(
+				await dev.metricsFactory.__setMetricsCountPerProperty(
 					property3.address,
 					1
 				)
-				await dev.metricsGroup.__setMetricsCountPerProperty(
+				await dev.metricsFactory.__setMetricsCountPerProperty(
 					property4.address,
 					1
 				)

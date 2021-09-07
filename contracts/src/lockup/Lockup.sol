@@ -10,7 +10,7 @@ import {IDevMinter} from "contracts/interface/IDevMinter.sol";
 import {IProperty} from "contracts/interface/IProperty.sol";
 import {IPolicy} from "contracts/interface/IPolicy.sol";
 import {ILockup} from "contracts/interface/ILockup.sol";
-import {IMetricsGroup} from "contracts/interface/IMetricsGroup.sol";
+import {IMetricsFactory} from "contracts/interface/IMetricsFactory.sol";
 
 /**
  * A contract that manages the staking of DEV tokens and calculates rewards.
@@ -83,7 +83,7 @@ contract Lockup is ILockup, UsingRegistry, LockupStorage {
 		 * Validates the passed Property has greater than 1 asset.
 		 */
 		require(
-			IMetricsGroup(registry().registries("MetricsGroup")).hasAssets(
+			IMetricsFactory(registry().registries("MetricsFactory")).hasAssets(
 				_property
 			),
 			"unable to stake to unauthenticated property"
@@ -379,9 +379,9 @@ contract Lockup is ILockup, UsingRegistry, LockupStorage {
 	 * @return Maximum number of mints per block.
 	 */
 	function calculateMaxRewardsPerBlock() private view returns (uint256) {
-		uint256 totalAssets = IMetricsGroup(
-			registry().registries("MetricsGroup")
-		).totalIssuedMetrics();
+		uint256 totalAssets = IMetricsFactory(
+			registry().registries("MetricsFactory")
+		).metricsCount();
 		uint256 totalLockedUps = getStorageAllValue();
 		return
 			IPolicy(registry().registries("Policy")).rewards(
@@ -497,7 +497,7 @@ contract Lockup is ILockup, UsingRegistry, LockupStorage {
 		 * If the passed Property has not authenticated, returns always 0.
 		 */
 		if (
-			IMetricsGroup(registry().registries("MetricsGroup")).hasAssets(
+			IMetricsFactory(registry().registries("MetricsFactory")).hasAssets(
 				_property
 			) == false
 		) {
