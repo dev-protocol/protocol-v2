@@ -14,7 +14,6 @@ contract('MarketFactoryTest', ([deployer, user, dummyMarketAddress]) => {
 		const dev = new DevProtocolInstance(deployer)
 		await dev.generateAddressRegistry()
 		await Promise.all([
-			dev.generatePolicyGroup(),
 			dev.generatePolicyFactory(),
 			dev.generateMarketFactory(),
 		])

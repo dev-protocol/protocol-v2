@@ -1,21 +1,32 @@
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity =0.8.6;
 
-import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
-import {UsingRegistry} from "contracts/src/common/registry/UsingRegistry.sol";
-import {IPolicyGroup} from "contracts/interface/IPolicyGroup.sol";
+import {InitializableUsingRegistry} from "contracts/src/common/registry/InitializableUsingRegistry.sol";
+import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import {IPolicy} from "contracts/interface/IPolicy.sol";
 import {IPolicyFactory} from "contracts/interface/IPolicyFactory.sol";
+import {SafeMath} from "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 /**
  * A factory contract that creates a new Policy contract.
  */
-contract PolicyFactory is UsingRegistry, IPolicyFactory, Ownable {
-	event Create(address indexed _from, address _policy);
+contract PolicyFactory is
+	InitializableUsingRegistry,
+	OwnableUpgradeable,
+	IPolicyFactory
+{
+	using SafeMath for uint256;
+
+	mapping(address => bool) public override isPotentialPolicy;
+	mapping(address => uint256) public override closeVoteAt;
 
 	/**
 	 * Initialize the passed address as AddressRegistry address.
 	 */
-	constructor(address _registry) UsingRegistry(_registry) {}
+	function initialize(address _registry) external initializer {
+		__Ownable_init();
+		__UsingRegistry_init(_registry);
+	}
 
 	/**
 	 * Creates a new Policy contract.
@@ -31,9 +42,6 @@ contract PolicyFactory is UsingRegistry, IPolicyFactory, Ownable {
 		/**
 		 * In the case of the first Policy, it will be activated immediately.
 		 */
-		IPolicyGroup policyGroup = IPolicyGroup(
-			registry().registries("PolicyGroup")
-		);
 		if (registry().registries("Policy") == address(0)) {
 			registry().setRegistry("Policy", _newPolicyAddress);
 		}
@@ -41,7 +49,7 @@ contract PolicyFactory is UsingRegistry, IPolicyFactory, Ownable {
 		/**
 		 * Adds the created Policy contract to the Policy address set.
 		 */
-		policyGroup.addGroup(_newPolicyAddress);
+		_addPolicy(_newPolicyAddress);
 	}
 
 	/**
@@ -51,21 +59,33 @@ contract PolicyFactory is UsingRegistry, IPolicyFactory, Ownable {
 		/**
 		 * Validates the passed Policy address is included the Policy address set
 		 */
-		require(
-			IPolicyGroup(registry().registries("PolicyGroup")).isGroup(_policy),
-			"this is illegal address"
-		);
+		require(isPotentialPolicy[_policy], "this is illegal address");
 		/**
 		 * Validates the voting deadline has not passed.
 		 */
-		IPolicyGroup policyGroup = IPolicyGroup(
-			registry().registries("PolicyGroup")
-		);
-		require(policyGroup.isDuringVotingPeriod(_policy), "deadline is over");
+		require(isDuringVotingPeriod(_policy), "deadline is over");
 
 		/**
 		 * Sets the passed Policy to current Policy.
 		 */
 		registry().setRegistry("Policy", _policy);
+	}
+
+	function _addPolicy(address _addr) internal {
+		isPotentialPolicy[_addr] = true;
+
+		uint256 votingPeriod = IPolicy(registry().registries("Policy"))
+			.policyVotingBlocks();
+		uint256 votingEndBlockNumber = block.number.add(votingPeriod);
+		closeVoteAt[_addr] = votingEndBlockNumber;
+	}
+
+	function isDuringVotingPeriod(address _policy)
+		public
+		view
+		override
+		returns (bool)
+	{
+		return block.number < closeVoteAt[_policy];
 	}
 }

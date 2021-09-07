@@ -4,8 +4,7 @@ import {
 	DevInstance,
 	LockupInstance,
 	PropertyFactoryInstance,
-	PolicyFactoryInstance,
-	PolicyGroupInstance,
+	PolicyFactoryTestInstance,
 	MarketFactoryTestInstance,
 	MetricsFactoryTestInstance,
 	IPolicyInstance,
@@ -52,8 +51,7 @@ export class DevProtocolInstance {
 	private _lockup!: LockupInstance
 	private _propertyFactory!: PropertyFactoryInstance
 	private _propertyGroup!: PropertyGroupInstance
-	private _policyFactory!: PolicyFactoryInstance
-	private _policyGroup!: PolicyGroupInstance
+	private _policyFactory!: PolicyFactoryTestInstance
 	private _marketFactory!: MarketFactoryTestInstance
 	private _metricsFactory!: MetricsFactoryTestInstance
 	private _withdraw!: WithdrawInstance
@@ -95,12 +93,8 @@ export class DevProtocolInstance {
 		return this._propertyGroup
 	}
 
-	public get policyFactory(): PolicyFactoryInstance {
+	public get policyFactory(): PolicyFactoryTestInstance {
 		return this._policyFactory
-	}
-
-	public get policyGroup(): PolicyGroupInstance {
-		return this._policyGroup
 	}
 
 	public get marketFactory(): MarketFactoryTestInstance {
@@ -210,26 +204,15 @@ export class DevProtocolInstance {
 	}
 
 	public async generatePolicyFactory(): Promise<void> {
-		this._policyFactory = await contract('PolicyFactory').new(
-			this.addressRegistry.address,
-			this.fromDeployer
+		const proxfied = await deployProxy(
+			contract('PolicyFactoryTest'),
+			this._deployer
 		)
+		await proxfied.initialize(this._addressRegistry.address)
+		this._policyFactory = proxfied
 		await this.addressRegistry.setRegistry(
 			'PolicyFactory',
 			this._policyFactory.address,
-			this.fromDeployer
-		)
-	}
-
-	public async generatePolicyGroup(): Promise<void> {
-		this._policyGroup = await contract('PolicyGroup').new(
-			this.addressRegistry.address,
-			this.fromDeployer
-		)
-		await this._policyGroup.createStorage({ from: this._deployer })
-		await this.addressRegistry.setRegistry(
-			'PolicyGroup',
-			this._policyGroup.address,
 			this.fromDeployer
 		)
 	}

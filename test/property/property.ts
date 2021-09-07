@@ -20,7 +20,6 @@ contract(
 				await dev.generateDev()
 				await dev.generateDevMinter()
 				await dev.generatePolicyFactory()
-				await dev.generatePolicyGroup()
 				await dev.generateLockup()
 				await dev.generatePolicy()
 			})
@@ -75,7 +74,6 @@ contract(
 				await dev.generateDev()
 				await dev.generateDevMinter()
 				await dev.generatePolicyFactory()
-				await dev.generatePolicyGroup()
 				await dev.generateLockup()
 				await dev.generatePolicy()
 			})
@@ -145,7 +143,6 @@ contract(
 				await dev.generateDevMinter()
 				await dev.generateLockup()
 				await dev.generatePolicyFactory()
-				await dev.generatePolicyGroup()
 				await dev.generatePolicy()
 			})
 			it('Should fail to call when the sender is not author', async () => {
@@ -214,7 +211,6 @@ contract(
 				await dev.generateDevMinter()
 				await dev.generateLockup()
 				await dev.generatePolicyFactory()
-				await dev.generatePolicyGroup()
 				await dev.generatePolicy()
 			})
 			it('Should fail to call when the sender is not author', async () => {
@@ -286,7 +282,6 @@ contract(
 					dev.generatePropertyGroup(),
 					dev.generatePropertyFactory(),
 					dev.generatePolicyFactory(),
-					dev.generatePolicyGroup(),
 					dev.generateLockup(),
 				])
 				await dev.generatePolicy()
@@ -335,7 +330,6 @@ contract(
 					dev.generatePropertyFactory(),
 					dev.generateLockup(),
 					dev.generatePolicyFactory(),
-					dev.generatePolicyGroup(),
 				])
 				await dev.generatePolicy('PolicyTestForProperty')
 				const result = await dev.propertyFactory.create(
@@ -382,7 +376,6 @@ contract(
 					dev.generatePropertyFactory(),
 					dev.generateLockup(),
 					dev.generatePolicyFactory(),
-					dev.generatePolicyGroup(),
 				])
 				await dev.generatePolicy('PolicyTestForProperty')
 				const result = await dev.propertyFactory.create(

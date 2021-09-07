@@ -25,10 +25,7 @@ contract(
 				validateAddressErrorMessage(result)
 			})
 			it('Each property is set.', async () => {
-				await Promise.all([
-					dev.generatePolicyFactory(),
-					dev.generatePolicyGroup(),
-				])
+				await Promise.all([dev.generatePolicyFactory()])
 				await dev.addressRegistry.setRegistry('MarketFactory', marketFactory)
 				const iPolicyInstance = await dev.getPolicy('PolicyTest1', user)
 				await dev.policyFactory.create(iPolicyInstance.address)
@@ -46,10 +43,7 @@ contract(
 			let market: MarketInstance
 			beforeEach(async () => {
 				await dev.generateAddressRegistry()
-				await Promise.all([
-					dev.generatePolicyFactory(),
-					dev.generatePolicyGroup(),
-				])
+				await Promise.all([dev.generatePolicyFactory()])
 				await dev.addressRegistry.setRegistry('MarketFactory', marketFactory)
 				const iPolicyInstance = await dev.getPolicy('PolicyTest1', user)
 				await dev.policyFactory.create(iPolicyInstance.address)
@@ -84,10 +78,7 @@ contract(
 			const dev = new DevProtocolInstance(deployer)
 			it('Get Schema of mapped Behavior Contract', async () => {
 				await dev.generateAddressRegistry()
-				await Promise.all([
-					dev.generatePolicyFactory(),
-					dev.generatePolicyGroup(),
-				])
+				await Promise.all([dev.generatePolicyFactory()])
 				await dev.addressRegistry.setRegistry('MarketFactory', marketFactory)
 				const iPolicyInstance = await dev.getPolicy('PolicyTest1', user)
 				await dev.policyFactory.create(iPolicyInstance.address)
@@ -113,7 +104,6 @@ contract(
 					dev.generateMarketFactory(),
 					dev.generateMetricsFactory(),
 					dev.generatePolicyFactory(),
-					dev.generatePolicyGroup(),
 					dev.generatePropertyFactory(),
 					dev.generatePropertyGroup(),
 					dev.generateLockup(),
@@ -330,7 +320,6 @@ contract(
 					dev.generateMarketFactory(),
 					dev.generateMetricsFactory(),
 					dev.generatePolicyFactory(),
-					dev.generatePolicyGroup(),
 					dev.generatePropertyFactory(),
 					dev.generatePropertyGroup(),
 					dev.generateLockup(),

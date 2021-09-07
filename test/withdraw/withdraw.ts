@@ -48,7 +48,6 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 			dev.generatePropertyFactory(),
 			dev.generatePropertyGroup(),
 			dev.generatePolicyFactory(),
-			dev.generatePolicyGroup(),
 		])
 		if (generateWithdrawTest) {
 			await dev.generateWithdrawTest()

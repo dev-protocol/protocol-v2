@@ -17,7 +17,6 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 				dev.generatePropertyFactory(),
 				dev.generatePropertyGroup(),
 				dev.generatePolicyFactory(),
-				dev.generatePolicyGroup(),
 				dev.generateLockup(),
 			])
 			await dev.generatePolicy()
@@ -66,7 +65,6 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 				dev.generateMarketFactory(),
 				dev.generateMetricsFactory(),
 				dev.generatePolicyFactory(),
-				dev.generatePolicyGroup(),
 				dev.generatePropertyFactory(),
 				dev.generatePropertyGroup(),
 				dev.generateLockup(),
@@ -89,7 +87,6 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 					dev.generateMarketFactory(),
 					dev.generateMetricsFactory(),
 					dev.generatePolicyFactory(),
-					dev.generatePolicyGroup(),
 					dev.generatePropertyFactory(),
 					dev.generatePropertyGroup(),
 					dev.generateLockup(),
