@@ -1,8 +1,9 @@
 import { DevProtocolInstance } from '../test-lib/instance'
-import { DevInstance } from '../../types/truffle-contracts'
+import { DevInstance, MarketTest1Instance } from '../../types/truffle-contracts'
 import { validateErrorMessage } from '../test-lib/utils/error'
+import { getMarketAddress } from '../test-lib/utils/log'
 
-contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
+contract('Dev', ([deployer, user1, user2, dummyMarket]) => {
 	const createDev = async (): Promise<DevInstance> => {
 		const dev = new DevProtocolInstance(deployer)
 		await dev.generateAddressRegistry()
@@ -376,37 +377,33 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 		})
 	})
 	describe('Dev; fee', () => {
-		const generateEnv = async (): Promise<DevProtocolInstance> => {
+		const generateEnv = async (): Promise<[DevProtocolInstance, string]> => {
 			const dev = new DevProtocolInstance(deployer)
 			await dev.generateAddressRegistry()
 			await dev.generateDev()
 			await dev.generateDevMinter()
 			await dev.generateMarketFactory()
-			return dev
+			await dev.marketFactory.__addMarket(dummyMarket)
+
+			return [dev, dummyMarket]
 		}
 
 		it('burn token as a fee', async () => {
-			const dev = await generateEnv()
-			await dev.addressRegistry.setRegistry('MarketFactory', marketFactory)
-			await dev.marketFactory.__addMarket(market)
-			await dev.dev.mint(user1, 100)
+			const [dev, market] = await generateEnv()
+			await dev.dev.mint(user1, 100).catch(console.error)
 			await dev.dev.fee(user1, 1, { from: market })
 			const balance = await dev.dev.balanceOf(user1)
 			expect(balance.toNumber()).to.be.equal(99)
 		})
 		it('burn 0 tokens as a fee', async () => {
-			const dev = await generateEnv()
-			await dev.addressRegistry.setRegistry('MarketFactory', marketFactory)
-			await dev.marketFactory.__addMarket(market, { from: marketFactory })
+			const [dev, market] = await generateEnv()
 			await dev.dev.mint(user1, 100)
 			await dev.dev.fee(user1, 0, { from: market })
 			const balance = await dev.dev.balanceOf(user1)
 			expect(balance.toNumber()).to.be.equal(100)
 		})
 		it('should fail to burn when sent from no balance account', async () => {
-			const dev = await generateEnv()
-			await dev.addressRegistry.setRegistry('MarketFactory', marketFactory)
-			await dev.marketFactory.__addMarket(market, { from: marketFactory })
+			const [dev, market] = await generateEnv()
 			const balance = await dev.dev.balanceOf(user1)
 			const res = await dev.dev
 				.fee(user1, 1, { from: market })
@@ -415,9 +412,7 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 			expect(res).to.be.an.instanceOf(Error)
 		})
 		it('should fail to burn when sent from an insufficient balance account', async () => {
-			const dev = await generateEnv()
-			await dev.addressRegistry.setRegistry('MarketFactory', marketFactory)
-			await dev.marketFactory.__addMarket(market, { from: marketFactory })
+			const [dev, market] = await generateEnv()
 			await dev.dev.mint(user1, 100)
 			const res = await dev.dev
 				.fee(user1, 101, { from: market })
@@ -427,9 +422,7 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 			expect(res).to.be.an.instanceOf(Error)
 		})
 		it('should fail to burn when sent from other than market contract', async () => {
-			const dev = await generateEnv()
-			await dev.addressRegistry.setRegistry('MarketFactory', marketFactory)
-			await dev.marketFactory.__addMarket(market, { from: marketFactory })
+			const [dev, market] = await generateEnv()
 			await dev.dev.mint(user1, 100)
 			const res = await dev.dev
 				.fee(user1, 1, { from: user2 })

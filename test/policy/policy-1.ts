@@ -228,10 +228,10 @@ contract('Policy1', ([deployer, treasury, capSetter, user]) => {
 			expect(result).to.be.equal(capSetter)
 		})
 		it('the default value is 0 address.', async () => {
-			const treasuryFeeTmp = await artifacts
-				.require('TreasuryFee')
+			const tmp = await artifacts
+				.require('Policy1')
 				.new(dev.addressRegistry.address)
-			const result = await treasuryFeeTmp.capSetter()
+			const result = await tmp.capSetter()
 			expect(result).to.be.equal(DEFAULT_ADDRESS)
 		})
 		it('No one but the owner can set the address.', async () => {
