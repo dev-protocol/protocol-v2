@@ -244,6 +244,7 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 				dev.generatePropertyFactory(),
 				dev.generateWithdraw(),
 				dev.generatePolicyFactory(),
+				dev.generateMetricsFactory(),
 			])
 			await dev.generatePolicy('PolicyTest1')
 			return dev

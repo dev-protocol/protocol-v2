@@ -21,6 +21,7 @@ contract(
 				await dev.generateDevMinter()
 				await dev.generatePolicyFactory()
 				await dev.generateLockup()
+				await dev.generateMetricsFactory()
 				await dev.generatePolicy()
 			})
 			it('Cannot be created from other than factory', async () => {
@@ -75,6 +76,7 @@ contract(
 				await dev.generateDevMinter()
 				await dev.generatePolicyFactory()
 				await dev.generateLockup()
+				await dev.generateMetricsFactory()
 				await dev.generatePolicy()
 			})
 			it('Executing a changeAuthor function with a non-Author.', async () => {
@@ -142,6 +144,7 @@ contract(
 				await dev.generateDevMinter()
 				await dev.generateLockup()
 				await dev.generatePolicyFactory()
+				await dev.generateMetricsFactory()
 				await dev.generatePolicy()
 			})
 			it('Should fail to call when the sender is not author', async () => {
@@ -209,6 +212,7 @@ contract(
 				await dev.generateDevMinter()
 				await dev.generateLockup()
 				await dev.generatePolicyFactory()
+				await dev.generateMetricsFactory()
 				await dev.generatePolicy()
 			})
 			it('Should fail to call when the sender is not author', async () => {
@@ -279,6 +283,7 @@ contract(
 					dev.generatePropertyFactory(),
 					dev.generatePolicyFactory(),
 					dev.generateLockup(),
+					dev.generateMetricsFactory(),
 				])
 				await dev.generatePolicy()
 				const result = await dev.propertyFactory.create(
@@ -325,6 +330,7 @@ contract(
 					dev.generatePropertyFactory(),
 					dev.generateLockup(),
 					dev.generatePolicyFactory(),
+					dev.generateMetricsFactory(),
 				])
 				await dev.generatePolicy('PolicyTestForProperty')
 				const result = await dev.propertyFactory.create(
@@ -370,6 +376,7 @@ contract(
 					dev.generatePropertyFactory(),
 					dev.generateLockup(),
 					dev.generatePolicyFactory(),
+					dev.generateMetricsFactory(),
 				])
 				await dev.generatePolicy('PolicyTestForProperty')
 				const result = await dev.propertyFactory.create(
