@@ -109,7 +109,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				.getValue(property.address, deployer)
 				.then(toBigNumber)
 			expect(lockedupAmount.toFixed()).to.be.equal('10000')
-			const lockedupAllAmount = await dev.lockup.getAllValue().then(toBigNumber)
+			const lockedupAllAmount = await dev.lockup.totalLocked().then(toBigNumber)
 			expect(lockedupAllAmount.toFixed()).to.be.equal('10000')
 		})
 		it('emit an event that notifies token locked-up', async () => {
@@ -144,11 +144,11 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 			const beforeTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
 
 			await dev.dev.deposit(property.address, 10000)
-			let lockedupAllAmount = await dev.lockup.getAllValue().then(toBigNumber)
+			let lockedupAllAmount = await dev.lockup.totalLocked().then(toBigNumber)
 			expect(lockedupAllAmount.toFixed()).to.be.equal('10000')
 
 			await dev.lockup.withdraw(property.address, 1000)
-			lockedupAllAmount = await dev.lockup.getAllValue().then(toBigNumber)
+			lockedupAllAmount = await dev.lockup.totalLocked().then(toBigNumber)
 			expect(lockedupAllAmount.toFixed()).to.be.equal('9000')
 			const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
 			const afterTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
@@ -212,11 +212,11 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 			const beforeTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
 
 			await dev.dev.deposit(property.address, 10000)
-			let lockedupAllAmount = await dev.lockup.getAllValue().then(toBigNumber)
+			let lockedupAllAmount = await dev.lockup.totalLocked().then(toBigNumber)
 			expect(lockedupAllAmount.toFixed()).to.be.equal('10000')
 
 			await dev.lockup.withdraw(property.address, 0)
-			lockedupAllAmount = await dev.lockup.getAllValue().then(toBigNumber)
+			lockedupAllAmount = await dev.lockup.totalLocked().then(toBigNumber)
 			expect(lockedupAllAmount.toFixed()).to.be.equal('10000')
 			const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
 			const afterTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
@@ -227,32 +227,6 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 			)
 			expect(afterTotalSupply.toFixed()).to.be.equal(
 				beforeTotalSupply.plus(reward).toFixed()
-			)
-		})
-		it(`withdraw just reward when passed amount is 0 and user withdrawn by the legacy contract`, async () => {
-			const [dev, property] = await init()
-			const beforeBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
-			const beforeTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
-
-			const storage = await dev.lockup
-				.getStorageAddress()
-				.then((x) => artifacts.require('EternalStorage').at(x))
-			await dev.lockup.changeOwner(deployer)
-			await storage.setUint(
-				keccak256('_pendingInterestWithdrawal', property.address, deployer),
-				100000
-			)
-			await storage.changeOwner(dev.lockup.address)
-
-			await dev.lockup.withdraw(property.address, 0)
-			const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
-			const afterTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
-
-			expect(afterBalance.toFixed()).to.be.equal(
-				beforeBalance.plus(100000).toFixed()
-			)
-			expect(afterTotalSupply.toFixed()).to.be.equal(
-				beforeTotalSupply.plus(100000).toFixed()
 			)
 		})
 	})
@@ -274,9 +248,9 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 					dev.lockup.calculateCumulativeRewardPrices().then((x) => x[1]),
 					dev.lockup.calculateCumulativeRewardPrices().then((x) => x[2]),
 					dev.lockup.calculateCumulativeRewardPrices().then((x) => x[3]),
-					dev.lockup.getStorageLastStakedInterestPrice(prop.address, account),
+					dev.lockup.lastLockedPrice(prop.address, account),
 					dev.lockup.getValue(prop.address, account),
-					dev.lockup.getStoragePendingInterestWithdrawal(prop.address, account),
+					dev.lockup.pendingReward(prop.address, account),
 				]).then((results) => {
 					const [
 						maxRewards,
@@ -609,7 +583,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 			describe('before second run', () => {
 				it(`Alice does staking 100% of the Property's total lockups`, async () => {
 					const total = await dev.lockup
-						.getPropertyValue(property.address)
+						.totalLockedForProperty(property.address)
 						.then(toBigNumber)
 					const aliceBalance = await dev.lockup
 						.getValue(property.address, alice)
@@ -713,7 +687,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 			describe('before second run', () => {
 				it(`Alice does staking 100% of the Property's total lockups`, async () => {
 					const total = await dev.lockup
-						.getPropertyValue(property.address)
+						.totalLockedForProperty(property.address)
 						.then(toBigNumber)
 					const aliceBalance = await dev.lockup
 						.getValue(property.address, alice)
@@ -723,7 +697,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				it(`Bob does staking 25% of the Property's total lockups, Alice's share become 80%`, async () => {
 					await dev.dev.deposit(property.address, 10000 * 0.25, { from: bob })
 					const total = await dev.lockup
-						.getPropertyValue(property.address)
+						.totalLockedForProperty(property.address)
 						.then(toBigNumber)
 					const aliceBalance = await dev.lockup
 						.getValue(property.address, alice)
@@ -934,7 +908,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				})
 				it(`Alice does staking 100% of the Property1 total lockups, Property1 is 100% of the total rewards`, async () => {
 					const total = await dev.lockup
-						.getPropertyValue(property1.address)
+						.totalLockedForProperty(property1.address)
 						.then(toBigNumber)
 					const aliceBalance = await dev.lockup
 						.getValue(property1.address, alice)
@@ -943,12 +917,12 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				})
 				it(`Bob does staking 100% of the Property2 total lockups, Property2 is 20% of the total rewards`, async () => {
 					await dev.dev.deposit(property2.address, 2500, { from: bob })
-					const total = await dev.lockup.getAllValue().then(toBigNumber)
+					const total = await dev.lockup.totalLocked().then(toBigNumber)
 					const p1 = await dev.lockup
-						.getPropertyValue(property1.address)
+						.totalLockedForProperty(property1.address)
 						.then(toBigNumber)
 					const p2 = await dev.lockup
-						.getPropertyValue(property2.address)
+						.totalLockedForProperty(property2.address)
 						.then(toBigNumber)
 					expect(p1.div(total).toNumber()).to.be.equal(0.8)
 					expect(p2.div(total).toNumber()).to.be.equal(0.2)
@@ -1219,7 +1193,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 			holderCap: BigNumber
 		): Promise<BigNumber> => {
 			const initialCap = await dev.lockup
-				.getStorageInitialCumulativeHoldersRewardCap(property.address)
+				.initialCumulativeHoldersRewardCap(property.address)
 				.then(toBigNumber)
 			return holderCap.minus(initialCap)
 		}
@@ -1230,15 +1204,13 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 			holders: BigNumber
 		): Promise<BigNumber> => {
 			const cHoldersReward = await dev.lockup
-				.getStorageLastCumulativeHoldersRewardAmountPerProperty(
-					property.address
-				)
+				.lastCumulativeHoldersRewardAmountPerProperty(property.address)
 				.then(toBigNumber)
 			const lastReward = await dev.lockup
-				.getStorageLastCumulativeHoldersRewardPricePerProperty(property.address)
+				.lastCumulativeHoldersRewardPricePerProperty(property.address)
 				.then(toBigNumber)
 			const enabledStakingValue = await dev.lockup
-				.getStoragePropertyValue(property.address)
+				.totalLockedForProperty(property.address)
 				.then(toBigNumber)
 			const additionalHoldersReward = holders
 				.minus(lastReward)
@@ -1275,7 +1247,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 			const holderPrice = toBigNumber(tmp[1])
 			const cCap = toBigNumber(tmp[3])
 			const lastHoldersPrice = await dev.lockup
-				.getStorageLastCumulativeHoldersPriceCap()
+				.lastCumulativeHoldersPriceCap()
 				.then(toBigNumber)
 			const additionalCap = holderPrice.minus(lastHoldersPrice).times(cap)
 			const capValue = cCap.plus(additionalCap)
@@ -1295,11 +1267,11 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 					toBigNumber(100)
 				)
 				const holderRewardCap = await dev.lockup
-					.getStorageCumulativeHoldersRewardCap()
+					.cumulativeHoldersRewardCap()
 					.then(toBigNumber)
 				expect(holderRewardCap.toString()).to.be.equal(capValue.toString())
 				const holdersPriceCap = await dev.lockup
-					.getStorageLastCumulativeHoldersPriceCap()
+					.lastCumulativeHoldersPriceCap()
 					.then(toBigNumber)
 				expect(holdersPriceCap.toString()).to.be.equal(holdersPrice.toString())
 			})

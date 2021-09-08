@@ -52,7 +52,6 @@ export class DevProtocolInstance {
 	private _marketFactory!: MarketFactoryTestInstance
 	private _metricsFactory!: MetricsFactoryTestInstance
 	private _withdraw!: WithdrawTestInstance
-	private _lockupTest!: LockupTestInstance
 	private _treasury!: TreasuryTestInstance
 	private _devMinter!: DevMinterInstance
 	private readonly _policy!: IPolicyContract
@@ -101,10 +100,6 @@ export class DevProtocolInstance {
 		return this._withdraw
 	}
 
-	public get lockupTest(): LockupTestInstance {
-		return this._lockupTest
-	}
-
 	public get treasury(): TreasuryTestInstance {
 		return this._treasury
 	}
@@ -146,16 +141,14 @@ export class DevProtocolInstance {
 	}
 
 	public async generateLockup(): Promise<void> {
-		this._lockup = await contract('Lockup').new(
-			this.addressRegistry.address,
-			this.fromDeployer
-		)
+		const proxfied = await deployProxy(contract('Lockup'), this._deployer)
+		await proxfied.initialize(this._addressRegistry.address)
+		this._lockup = proxfied
 		await this.addressRegistry.setRegistry(
 			'Lockup',
 			this._lockup.address,
 			this.fromDeployer
 		)
-		await this._lockup.createStorage()
 	}
 
 	public async generatePropertyFactory(): Promise<void> {
@@ -223,19 +216,6 @@ export class DevProtocolInstance {
 			this._withdraw.address,
 			this.fromDeployer
 		)
-	}
-
-	public async generateLockupTest(): Promise<void> {
-		this._lockupTest = await contract('LockupTest').new(
-			this.addressRegistry.address,
-			this.fromDeployer
-		)
-		await this.addressRegistry.setRegistry(
-			'Lockup',
-			this._lockupTest.address,
-			this.fromDeployer
-		)
-		await this._lockupTest.createStorage(this.fromDeployer)
 	}
 
 	public async generatePolicy(

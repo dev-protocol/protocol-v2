@@ -194,7 +194,7 @@ contract Market is UsingRegistry, IMarket {
 		returns (uint256)
 	{
 		uint256 tokenValue = ILockup(registry().registries("Lockup"))
-			.getPropertyValue(_property);
+			.totalLockedForProperty(_property);
 		IPolicy policy = IPolicy(registry().registries("Policy"));
 		IMetricsFactory metricsFactory = IMetricsFactory(
 			registry().registries("MetricsFactory")

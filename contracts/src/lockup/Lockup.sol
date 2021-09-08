@@ -4,8 +4,7 @@ pragma solidity =0.8.6;
 // prettier-ignore
 import {SafeMath} from "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import {Decimals} from "contracts/src/common/libs/Decimals.sol";
-import {UsingRegistry} from "contracts/src/common/registry/UsingRegistry.sol";
-import {LockupStorage} from "contracts/src/lockup/LockupStorage.sol";
+import {InitializableUsingRegistry} from "contracts/src/common/registry/InitializableUsingRegistry.sol";
 import {IDevMinter} from "contracts/interface/IDevMinter.sol";
 import {IProperty} from "contracts/interface/IProperty.sol";
 import {IPolicy} from "contracts/interface/IPolicy.sol";
@@ -40,7 +39,7 @@ import {IMetricsFactory} from "contracts/interface/IMetricsFactory.sol";
  * - After 10 blocks, Carol stakes 40 DEV on Property-A (Alice's staking state on Property-A: `M`=500, `B`=20, `P`=140, `S`=200, `U`=100)
  * - After 10 blocks, Alice withdraws Property-A staking reward. The reward at this time is 5000 DEV (10 blocks * 500 DEV) + 3125 DEV (10 blocks * 62.5% * 500 DEV) + 2500 DEV (10 blocks * 50% * 500 DEV).
  */
-contract Lockup is ILockup, UsingRegistry, LockupStorage {
+contract Lockup is ILockup, InitializableUsingRegistry {
 	using SafeMath for uint256;
 	using Decimals for uint256;
 	struct RewardPrices {
@@ -52,10 +51,32 @@ contract Lockup is ILockup, UsingRegistry, LockupStorage {
 	event Lockedup(address _from, address _property, uint256 _value);
 	event UpdateCap(uint256 _cap);
 
+	uint256 public override cap; // From [get/set]StorageCap
+	uint256 public override totalLocked; // From [get/set]StorageAllValue
+	uint256 public cumulativeHoldersRewardCap; // From [get/set]StorageCumulativeHoldersRewardCap
+	uint256 public lastCumulativeHoldersPriceCap; // From [get/set]StorageLastCumulativeHoldersPriceCap
+	uint256 public lastLockedChangedCumulativeReward; // From [get/set]StorageLastStakesChangedCumulativeReward
+	uint256 public lastCumulativeHoldersRewardPrice; // From [get/set]StorageLastCumulativeHoldersRewardPrice
+	uint256 public lastCumulativeRewardPrice; // From [get/set]StorageLastCumulativeInterestPrice
+	uint256 public cumulativeGlobalReward; // From [get/set]StorageCumulativeGlobalRewards
+	uint256 public lastSameGlobalRewardAmount; // From [get/set]StorageLastSameRewardsAmountAndBlock
+	uint256 public lastSameGlobalRewardBlock; // From [get/set]StorageLastSameRewardsAmountAndBlock
+	mapping(address => uint256)
+		public lastCumulativeHoldersRewardPricePerProperty; // {Property: Value} // [get/set]StorageLastCumulativeHoldersRewardPricePerProperty
+	mapping(address => uint256) public initialCumulativeHoldersRewardCap; // {Property: Value} // From [get/set]StorageInitialCumulativeHoldersRewardCap
+	mapping(address => uint256) public override totalLockedForProperty; // {Property: Value} // From [get/set]StoragePropertyValue
+	mapping(address => uint256)
+		public lastCumulativeHoldersRewardAmountPerProperty; // {Property: Value} // From [get/set]StorageLastCumulativeHoldersRewardAmountPerProperty
+	mapping(address => mapping(address => uint256)) public override getValue; // {Property: {User: Value}} // From [get/set]StorageValue
+	mapping(address => mapping(address => uint256)) public pendingReward; // {Property: {User: Value}} // From [get/set]StoragePendingInterestWithdrawal
+	mapping(address => mapping(address => uint256)) public lastLockedPrice; // {Property: {User: Value}} // From [get/set]StorageLastStakedInterestPrice
+
 	/**
 	 * Initialize the passed address as AddressRegistry address.
 	 */
-	constructor(address _registry) UsingRegistry(_registry) {}
+	function initialize(address _registry) external initializer {
+		__UsingRegistry_init(_registry);
+	}
 
 	/**
 	 * Adds staking.
@@ -138,13 +159,6 @@ contract Lockup is ILockup, UsingRegistry, LockupStorage {
 	}
 
 	/**
-	 * get cap
-	 */
-	function cap() external view override returns (uint256) {
-		return getStorageCap();
-	}
-
-	/**
 	 * set cap
 	 */
 	function updateCap(uint256 _cap) external override {
@@ -161,10 +175,10 @@ contract Lockup is ILockup, UsingRegistry, LockupStorage {
 			uint256 cCap
 		) = calculateCumulativeRewardPrices();
 
-		// TODO: When this function is improved to be called on-chain, the source of `getStorageLastCumulativeHoldersPriceCap` can be rewritten to `getStorageLastCumulativeHoldersRewardPrice`.
-		setStorageCumulativeHoldersRewardCap(cCap);
-		setStorageLastCumulativeHoldersPriceCap(holdersPrice);
-		setStorageCap(_cap);
+		// TODO: When this function is improved to be called on-chain, the source of `lastCumulativeHoldersPriceCap` can be rewritten to `lastCumulativeHoldersRewardPrice`.
+		cumulativeHoldersRewardCap = cCap;
+		lastCumulativeHoldersPriceCap = holdersPrice;
+		cap = _cap;
 		emit UpdateCap(_cap);
 	}
 
@@ -176,11 +190,9 @@ contract Lockup is ILockup, UsingRegistry, LockupStorage {
 		view
 		returns (uint256)
 	{
-		uint256 cCap = getStorageCumulativeHoldersRewardCap();
-		uint256 lastHoldersPrice = getStorageLastCumulativeHoldersPriceCap();
-		uint256 additionalCap = _holdersPrice.sub(lastHoldersPrice).mul(
-			getStorageCap()
-		);
+		uint256 cCap = cumulativeHoldersRewardCap;
+		uint256 lastHoldersPrice = lastCumulativeHoldersPriceCap;
+		uint256 additionalCap = _holdersPrice.sub(lastHoldersPrice).mul(cap);
 		return cCap.add(additionalCap);
 	}
 
@@ -205,34 +217,27 @@ contract Lockup is ILockup, UsingRegistry, LockupStorage {
 		 * Records this value only when the "first staking to the passed Property" is transacted.
 		 */
 		if (
-			getStorageLastCumulativeHoldersRewardPricePerProperty(_property) ==
-			0 &&
-			getStorageInitialCumulativeHoldersRewardCap(_property) == 0 &&
-			getStoragePropertyValue(_property) == 0
+			lastCumulativeHoldersRewardPricePerProperty[_property] == 0 &&
+			initialCumulativeHoldersRewardCap[_property] == 0 &&
+			totalLockedForProperty[_property] == 0
 		) {
-			setStorageInitialCumulativeHoldersRewardCap(
-				_property,
-				_prices.holdersCap
-			);
+			initialCumulativeHoldersRewardCap[_property] = _prices.holdersCap;
 		}
 
 		/**
 		 * Store each value.
 		 */
-		setStorageLastStakedInterestPrice(_property, _user, _prices.interest);
-		setStorageLastStakesChangedCumulativeReward(_prices.reward);
-		setStorageLastCumulativeHoldersRewardPrice(_prices.holders);
-		setStorageLastCumulativeInterestPrice(_prices.interest);
-		setStorageLastCumulativeHoldersRewardAmountPerProperty(
-			_property,
-			cHoldersReward
-		);
-		setStorageLastCumulativeHoldersRewardPricePerProperty(
-			_property,
-			_prices.holders
-		);
-		setStorageCumulativeHoldersRewardCap(_prices.holdersCap);
-		setStorageLastCumulativeHoldersPriceCap(_prices.holders);
+		lastLockedPrice[_property][_user] = _prices.interest;
+		lastLockedChangedCumulativeReward = _prices.reward;
+		lastCumulativeHoldersRewardPrice = _prices.holders;
+		lastCumulativeRewardPrice = _prices.interest;
+		lastCumulativeHoldersRewardAmountPerProperty[
+			_property
+		] = cHoldersReward;
+		lastCumulativeHoldersRewardPricePerProperty[_property] = _prices
+			.holders;
+		cumulativeHoldersRewardCap = _prices.holdersCap;
+		lastCumulativeHoldersPriceCap = _prices.holders;
 	}
 
 	/**
@@ -249,10 +254,10 @@ contract Lockup is ILockup, UsingRegistry, LockupStorage {
 			uint256 _holdersCap
 		)
 	{
-		uint256 lastReward = getStorageLastStakesChangedCumulativeReward();
-		uint256 lastHoldersPrice = getStorageLastCumulativeHoldersRewardPrice();
-		uint256 lastInterestPrice = getStorageLastCumulativeInterestPrice();
-		uint256 allStakes = getStorageAllValue();
+		uint256 lastReward = lastLockedChangedCumulativeReward;
+		uint256 lastHoldersPrice = lastCumulativeHoldersRewardPrice;
+		uint256 lastInterestPrice = lastCumulativeRewardPrice;
+		uint256 allStakes = totalLocked;
 
 		/**
 		 * Gets latest cumulative sum of the reward amount.
@@ -292,15 +297,15 @@ contract Lockup is ILockup, UsingRegistry, LockupStorage {
 		address _property
 	) private view returns (uint256) {
 		(uint256 cHoldersReward, uint256 lastReward) = (
-			getStorageLastCumulativeHoldersRewardAmountPerProperty(_property),
-			getStorageLastCumulativeHoldersRewardPricePerProperty(_property)
+			lastCumulativeHoldersRewardAmountPerProperty[_property],
+			lastCumulativeHoldersRewardPricePerProperty[_property]
 		);
 
 		/**
 		 * `cHoldersReward` contains the calculation of `lastReward`, so subtract it here.
 		 */
 		uint256 additionalHoldersReward = _holdersPrice.sub(lastReward).mul(
-			getStoragePropertyValue(_property)
+			totalLockedForProperty[_property]
 		);
 
 		/**
@@ -339,7 +344,7 @@ contract Lockup is ILockup, UsingRegistry, LockupStorage {
 			,
 			uint256 holdersCap
 		) = calculateCumulativeRewardPrices();
-		uint256 initialCap = _getInitialCap(_property);
+		uint256 initialCap = initialCumulativeHoldersRewardCap[_property];
 
 		/**
 		 * Calculates the cap
@@ -349,10 +354,6 @@ contract Lockup is ILockup, UsingRegistry, LockupStorage {
 			_calculateCumulativeHoldersRewardAmount(holders, _property),
 			capValue
 		);
-	}
-
-	function _getInitialCap(address _property) private view returns (uint256) {
-		return getStorageInitialCumulativeHoldersRewardCap(_property);
 	}
 
 	/**
@@ -370,8 +371,9 @@ contract Lockup is ILockup, UsingRegistry, LockupStorage {
 		/**
 		 * Records each value and the latest block number.
 		 */
-		setStorageCumulativeGlobalRewards(_nextRewards);
-		setStorageLastSameRewardsAmountAndBlock(_amount, block.number);
+		cumulativeGlobalReward = _nextRewards;
+		lastSameGlobalRewardAmount = _amount;
+		lastSameGlobalRewardBlock = block.number;
 	}
 
 	/**
@@ -382,7 +384,7 @@ contract Lockup is ILockup, UsingRegistry, LockupStorage {
 		uint256 totalAssets = IMetricsFactory(
 			registry().registries("MetricsFactory")
 		).metricsCount();
-		uint256 totalLockedUps = getStorageAllValue();
+		uint256 totalLockedUps = totalLocked;
 		return
 			IPolicy(registry().registries("Policy")).rewards(
 				totalLockedUps,
@@ -406,10 +408,10 @@ contract Lockup is ILockup, UsingRegistry, LockupStorage {
 		/**
 		 * Gets the maximum mint amount per block, and the last recorded block number from `LastSameRewardsAmountAndBlock` storage.
 		 */
-		(
-			uint256 lastAmount,
-			uint256 lastBlock
-		) = getStorageLastSameRewardsAmountAndBlock();
+		(uint256 lastAmount, uint256 lastBlock) = (
+			lastSameGlobalRewardAmount,
+			lastSameGlobalRewardBlock
+		);
 
 		/**
 		 * If the recorded maximum mint amount per block and the result of the Allocator contract are different,
@@ -428,9 +430,7 @@ contract Lockup is ILockup, UsingRegistry, LockupStorage {
 		 * Adds the calculated new cumulative maximum mint amount to the recorded cumulative maximum mint amount.
 		 */
 		uint256 additionalRewards = lastMaxRewards.mul(blocks);
-		uint256 nextRewards = getStorageCumulativeGlobalRewards().add(
-			additionalRewards
-		);
+		uint256 nextRewards = cumulativeGlobalReward.add(additionalRewards);
 
 		/**
 		 * Returns the latest theoretical cumulative sum of maximum mint amount and maximum mint amount per block.
@@ -453,15 +453,12 @@ contract Lockup is ILockup, UsingRegistry, LockupStorage {
 		/**
 		 * Get the amount the user is staking for the Property.
 		 */
-		uint256 lockedUpPerAccount = getStorageValue(_property, _user);
+		uint256 lockedUpPerAccount = getValue[_property][_user];
 
 		/**
 		 * Gets the cumulative sum of the interest price recorded the last time you withdrew.
 		 */
-		uint256 lastInterest = getStorageLastStakedInterestPrice(
-			_property,
-			_user
-		);
+		uint256 lastInterest = lastLockedPrice[_property][_user];
 
 		/**
 		 * Gets the latest cumulative sum of the interest price.
@@ -507,7 +504,7 @@ contract Lockup is ILockup, UsingRegistry, LockupStorage {
 		/**
 		 * Gets the reward amount in saved without withdrawal.
 		 */
-		uint256 pending = getStoragePendingInterestWithdrawal(_property, _user);
+		uint256 pending = pendingReward[_property][_user];
 
 		/**
 		 * Gets the latest withdrawal reward amount.
@@ -557,16 +554,12 @@ contract Lockup is ILockup, UsingRegistry, LockupStorage {
 		/**
 		 * Sets the unwithdrawn reward amount to 0.
 		 */
-		setStoragePendingInterestWithdrawal(_property, msg.sender, 0);
+		pendingReward[_property][msg.sender] = 0;
 
 		/**
 		 * Updates the staking status to avoid double rewards.
 		 */
-		setStorageLastStakedInterestPrice(
-			_property,
-			msg.sender,
-			prices.interest
-		);
+		lastLockedPrice[_property][msg.sender] = prices.interest;
 
 		/**
 		 * Mints the reward.
@@ -644,40 +637,21 @@ contract Lockup is ILockup, UsingRegistry, LockupStorage {
 	}
 
 	/**
-	 * Returns the staking amount of the protocol total.
-	 */
-	function getAllValue() external view override returns (uint256) {
-		return getStorageAllValue();
-	}
-
-	/**
 	 * Adds the staking amount of the protocol total.
 	 */
 	function addAllValue(uint256 _value) private {
-		uint256 value = getStorageAllValue();
+		uint256 value = totalLocked;
 		value = value.add(_value);
-		setStorageAllValue(value);
+		totalLocked = value;
 	}
 
 	/**
 	 * Subtracts the staking amount of the protocol total.
 	 */
 	function subAllValue(uint256 _value) private {
-		uint256 value = getStorageAllValue();
+		uint256 value = totalLocked;
 		value = value.sub(_value);
-		setStorageAllValue(value);
-	}
-
-	/**
-	 * Returns the user's staking amount in the Property.
-	 */
-	function getValue(address _property, address _sender)
-		external
-		view
-		override
-		returns (uint256)
-	{
-		return getStorageValue(_property, _sender);
+		totalLocked = value;
 	}
 
 	/**
@@ -688,9 +662,9 @@ contract Lockup is ILockup, UsingRegistry, LockupStorage {
 		address _sender,
 		uint256 _value
 	) private {
-		uint256 value = getStorageValue(_property, _sender);
+		uint256 value = getValue[_property][_sender];
 		value = value.add(_value);
-		setStorageValue(_property, _sender, value);
+		getValue[_property][_sender] = value;
 	}
 
 	/**
@@ -701,9 +675,9 @@ contract Lockup is ILockup, UsingRegistry, LockupStorage {
 		address _sender,
 		uint256 _value
 	) private {
-		uint256 value = getStorageValue(_property, _sender);
+		uint256 value = getValue[_property][_sender];
 		value = value.sub(_value);
-		setStorageValue(_property, _sender, value);
+		getValue[_property][_sender] = value;
 	}
 
 	/**
@@ -714,38 +688,26 @@ contract Lockup is ILockup, UsingRegistry, LockupStorage {
 		address _sender,
 		uint256 _amount
 	) private view returns (bool) {
-		uint256 value = getStorageValue(_property, _sender);
+		uint256 value = getValue[_property][_sender];
 		return value >= _amount;
-	}
-
-	/**
-	 * Returns the staking amount of the Property.
-	 */
-	function getPropertyValue(address _property)
-		external
-		view
-		override
-		returns (uint256)
-	{
-		return getStoragePropertyValue(_property);
 	}
 
 	/**
 	 * Adds the staking amount of the Property.
 	 */
 	function addPropertyValue(address _property, uint256 _value) private {
-		uint256 value = getStoragePropertyValue(_property);
+		uint256 value = totalLockedForProperty[_property];
 		value = value.add(_value);
-		setStoragePropertyValue(_property, value);
+		totalLockedForProperty[_property] = value;
 	}
 
 	/**
 	 * Subtracts the staking amount of the Property.
 	 */
 	function subPropertyValue(address _property, uint256 _value) private {
-		uint256 value = getStoragePropertyValue(_property);
+		uint256 value = totalLockedForProperty[_property];
 		uint256 nextValue = value.sub(_value);
-		setStoragePropertyValue(_property, nextValue);
+		totalLockedForProperty[_property] = nextValue;
 	}
 
 	/**
@@ -766,11 +728,7 @@ contract Lockup is ILockup, UsingRegistry, LockupStorage {
 		/**
 		 * Saves the amount to `PendingInterestWithdrawal` storage.
 		 */
-		setStoragePendingInterestWithdrawal(
-			_property,
-			_user,
-			withdrawableAmount
-		);
+		pendingReward[_property][_user] = withdrawableAmount;
 
 		return prices;
 	}
