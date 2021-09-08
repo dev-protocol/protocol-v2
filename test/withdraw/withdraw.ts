@@ -705,7 +705,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 
 			describe('When totally is 0', () => {
 				it(`Alice's withdrawable reward is 0`, async () => {
-					const total = await dev.lockup.getAllValue().then(toBigNumber)
+					const total = await dev.lockup.totalLocked().then(toBigNumber)
 					const aliceAmount = await dev.withdraw
 						.calculateWithdrawableAmount(property.address, alice)
 						.then(toBigNumber)
@@ -738,7 +738,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 				})
 
 				it(`Alice's withdrawable reward is 0`, async () => {
-					const total = await dev.lockup.getAllValue().then(toBigNumber)
+					const total = await dev.lockup.totalLocked().then(toBigNumber)
 					const aliceAmount = await dev.withdraw
 						.calculateWithdrawableAmount(property.address, alice)
 						.then(toBigNumber)
@@ -838,9 +838,9 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 
 			describe('before withdrawal', () => {
 				it(`Property1 is locked-up 100% of all Property's locked-ups`, async () => {
-					const total = await dev.lockup.getAllValue().then(toBigNumber)
+					const total = await dev.lockup.totalLocked().then(toBigNumber)
 					const property1 = await dev.lockup
-						.getPropertyValue(property.address)
+						.totalLockedForProperty(property.address)
 						.then(toBigNumber)
 					expect(property1.toFixed()).to.be.equal(total.toFixed())
 				})
@@ -1134,9 +1134,9 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 					)
 				})
 				it(`Property1 is locked-up 100% of all Property's locked-ups`, async () => {
-					const total = await dev.lockup.getAllValue().then(toBigNumber)
+					const total = await dev.lockup.totalLocked().then(toBigNumber)
 					const property1Balance = await dev.lockup
-						.getPropertyValue(property1.address)
+						.totalLockedForProperty(property1.address)
 						.then(toBigNumber)
 					expect(property1Balance.toFixed()).to.be.equal(total.toFixed())
 				})
@@ -1158,12 +1158,12 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 					await dev.dev.deposit(property2.address, '2500000000000000000000', {
 						from: dave,
 					})
-					const total = await dev.lockup.getAllValue().then(toBigNumber)
+					const total = await dev.lockup.totalLocked().then(toBigNumber)
 					const p1 = await dev.lockup
-						.getPropertyValue(property1.address)
+						.totalLockedForProperty(property1.address)
 						.then(toBigNumber)
 					const p2 = await dev.lockup
-						.getPropertyValue(property2.address)
+						.totalLockedForProperty(property2.address)
 						.then(toBigNumber)
 					expect(p1.div(total).toNumber()).to.be.equal(0.8)
 					expect(p2.div(total).toNumber()).to.be.equal(0.2)
@@ -1176,15 +1176,15 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 					await dev.dev.deposit(property3.address, '3750000000000000000000', {
 						from: dave,
 					})
-					const total = await dev.lockup.getAllValue().then(toBigNumber)
+					const total = await dev.lockup.totalLocked().then(toBigNumber)
 					const p1 = await dev.lockup
-						.getPropertyValue(property1.address)
+						.totalLockedForProperty(property1.address)
 						.then(toBigNumber)
 					const p2 = await dev.lockup
-						.getPropertyValue(property2.address)
+						.totalLockedForProperty(property2.address)
 						.then(toBigNumber)
 					const p3 = await dev.lockup
-						.getPropertyValue(property3.address)
+						.totalLockedForProperty(property3.address)
 						.then(toBigNumber)
 					expect(p1.div(total).toNumber()).to.be.equal(10000 / 16250)
 					expect(p2.div(total).toNumber()).to.be.equal(2500 / 16250)

@@ -10,7 +10,7 @@ async function getWithdrawAmount(
 	const totalIssuedMetrics = await dev.metricsFactory
 		.metricsCount()
 		.then(toBigNumber)
-	const totalLockedUps = await dev.lockup.getAllValue().then(toBigNumber)
+	const totalLockedUps = await dev.lockup.totalLocked().then(toBigNumber)
 	const policyAddress = await dev.addressRegistry.registries('Policy')
 	// eslint-disable-next-line @typescript-eslint/await-thenable
 	const policyInstance = await artifacts.require('IPolicy').at(policyAddress)
@@ -19,7 +19,7 @@ async function getWithdrawAmount(
 		.then(toBigNumber)
 
 	// eslint-disable-next-line @typescript-eslint/await-thenable
-	const value = await dev.lockup.getPropertyValue(propertyAddress)
+	const value = await dev.lockup.totalLockedForProperty(propertyAddress)
 	const share = await policyInstance
 		.holdersShare(cal.toFixed(), value.toString())
 		.then(toBigNumber)
