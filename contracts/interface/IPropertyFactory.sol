@@ -18,4 +18,6 @@ interface IPropertyFactory {
 		string calldata _args2,
 		string calldata _args3
 	) external returns (bool);
+
+	function isProperty(address _addr) external view returns (bool);
 }

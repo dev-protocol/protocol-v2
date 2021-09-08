@@ -53,7 +53,8 @@
 		"web3": "1.5.2"
 	},
 	"dependencies": {
-		"@openzeppelin/contracts": "4.3.1"
+		"@openzeppelin/contracts": "4.3.1",
+		"@openzeppelin/contracts-upgradeable": "^4.3.1"
 	},
 	"directories": {
 		"doc": "docs",

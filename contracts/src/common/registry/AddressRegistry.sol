@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity =0.8.6;
 
-import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {IAddressRegistry} from "contracts/interface/IAddressRegistry.sol";
 
 /**
@@ -9,8 +9,12 @@ import {IAddressRegistry} from "contracts/interface/IAddressRegistry.sol";
  * Dev Protocol will be upgradeable by this contract.
  */
 /* solhint-disable max-states-count */
-contract AddressRegistry is Ownable, IAddressRegistry {
+contract AddressRegistry is OwnableUpgradeable, IAddressRegistry {
 	mapping(string => address) private reg;
+
+	function initialize() external initializer {
+		__Ownable_init();
+	}
 
 	function setRegistry(string calldata _key, address _addr)
 		external

@@ -1,18 +1,13 @@
 import {
 	AddressRegistryInstance,
-	PropertyGroupInstance,
 	DevInstance,
 	LockupInstance,
 	PropertyFactoryInstance,
-	PolicyFactoryInstance,
-	PolicyGroupInstance,
-	MarketFactoryInstance,
-	MarketGroupInstance,
-	MetricsFactoryInstance,
-	MetricsGroupTestInstance,
+	PolicyFactoryTestInstance,
+	MarketFactoryTestInstance,
+	MetricsFactoryTestInstance,
 	IPolicyInstance,
 	IMarketInstance,
-	WithdrawInstance,
 	WithdrawTestInstance,
 	MetricsInstance,
 	TreasuryTestInstance,
@@ -20,6 +15,29 @@ import {
 	LockupTestInstance,
 	DevMinterInstance,
 } from '../../types/truffle-contracts'
+
+type ContractInstance = {
+	at: any
+	new: any
+}
+
+export const deployProxy = async <L extends ContractInstance>(
+	logic: L,
+	deployer: string
+): Promise<ReturnType<L['at']>> => {
+	const [admin, impl] = await Promise.all([
+		contract('Admin').new(),
+		logic.new(),
+	])
+	const proxy = await contract('Proxy').new(
+		impl.address,
+		admin.address,
+		web3.utils.fromUtf8(''),
+		{ from: deployer }
+	)
+	const [wrap] = await Promise.all([logic.at(proxy.address)])
+	return wrap
+}
 
 const contract = artifacts.require
 
@@ -30,16 +48,10 @@ export class DevProtocolInstance {
 	private _dev!: DevInstance
 	private _lockup!: LockupInstance
 	private _propertyFactory!: PropertyFactoryInstance
-	private _propertyGroup!: PropertyGroupInstance
-	private _policyFactory!: PolicyFactoryInstance
-	private _policyGroup!: PolicyGroupInstance
-	private _marketFactory!: MarketFactoryInstance
-	private _marketGroup!: MarketGroupInstance
-	private _metricsFactory!: MetricsFactoryInstance
-	private _metricsGroup!: MetricsGroupTestInstance
-	private _withdraw!: WithdrawInstance
-	private _withdrawTest!: WithdrawTestInstance
-	private _lockupTest!: LockupTestInstance
+	private _policyFactory!: PolicyFactoryTestInstance
+	private _marketFactory!: MarketFactoryTestInstance
+	private _metricsFactory!: MetricsFactoryTestInstance
+	private _withdraw!: WithdrawTestInstance
 	private _treasury!: TreasuryTestInstance
 	private _devMinter!: DevMinterInstance
 	private readonly _policy!: IPolicyContract
@@ -72,68 +84,39 @@ export class DevProtocolInstance {
 		return this._propertyFactory
 	}
 
-	public get propertyGroup(): PropertyGroupInstance {
-		return this._propertyGroup
-	}
-
-	public get policyFactory(): PolicyFactoryInstance {
+	public get policyFactory(): PolicyFactoryTestInstance {
 		return this._policyFactory
 	}
 
-	public get policyGroup(): PolicyGroupInstance {
-		return this._policyGroup
-	}
-
-	public get marketFactory(): MarketFactoryInstance {
+	public get marketFactory(): MarketFactoryTestInstance {
 		return this._marketFactory
 	}
 
-	public get marketGroup(): MarketGroupInstance {
-		return this._marketGroup
-	}
-
-	public get metricsFactory(): MetricsFactoryInstance {
+	public get metricsFactory(): MetricsFactoryTestInstance {
 		return this._metricsFactory
 	}
 
-	public get metricsGroup(): MetricsGroupTestInstance {
-		return this._metricsGroup
-	}
-
-	public get withdraw(): WithdrawInstance {
+	public get withdraw(): WithdrawTestInstance {
 		return this._withdraw
-	}
-
-	public get withdrawTest(): WithdrawTestInstance {
-		return this._withdrawTest
-	}
-
-	public get lockupTest(): LockupTestInstance {
-		return this._lockupTest
 	}
 
 	public get treasury(): TreasuryTestInstance {
 		return this._treasury
 	}
 
-	public get activeWithdraw(): WithdrawInstance | WithdrawTestInstance {
-		if (typeof this._withdraw === 'undefined') {
-			return this._withdrawTest
-		}
-
-		return this._withdraw
-	}
-
 	public async generateAddressRegistry(): Promise<void> {
-		const instance = contract('AddressRegistry')
-		this._addressRegistry = await instance.new(this.fromDeployer)
+		const proxfied = await deployProxy(
+			contract('AddressRegistry'),
+			this._deployer
+		)
+		await proxfied.initialize()
+		this._addressRegistry = proxfied
 	}
 
 	public async generateDevMinter(): Promise<void> {
-		this._devMinter = await contract('DevMinter').new(
-			this.addressRegistry.address,
-			this.fromDeployer
-		)
+		const proxfied = await deployProxy(contract('DevMinter'), this._deployer)
+		await proxfied.initialize(this._addressRegistry.address)
+		this._devMinter = proxfied
 		await this._dev.grantRole(
 			web3.utils.keccak256('MINTER_ROLE'),
 			this._devMinter.address
@@ -158,23 +141,23 @@ export class DevProtocolInstance {
 	}
 
 	public async generateLockup(): Promise<void> {
-		this._lockup = await contract('Lockup').new(
-			this.addressRegistry.address,
-			this.fromDeployer
-		)
+		const proxfied = await deployProxy(contract('Lockup'), this._deployer)
+		await proxfied.initialize(this._addressRegistry.address)
+		this._lockup = proxfied
 		await this.addressRegistry.setRegistry(
 			'Lockup',
 			this._lockup.address,
 			this.fromDeployer
 		)
-		await this._lockup.createStorage()
 	}
 
 	public async generatePropertyFactory(): Promise<void> {
-		this._propertyFactory = await contract('PropertyFactory').new(
-			this.addressRegistry.address,
-			this.fromDeployer
+		const proxfied = await deployProxy(
+			contract('PropertyFactory'),
+			this._deployer
 		)
+		await proxfied.initialize(this._addressRegistry.address)
+		this._propertyFactory = proxfied
 		await this.addressRegistry.setRegistry(
 			'PropertyFactory',
 			this._propertyFactory.address,
@@ -182,24 +165,13 @@ export class DevProtocolInstance {
 		)
 	}
 
-	public async generatePropertyGroup(): Promise<void> {
-		this._propertyGroup = await contract('PropertyGroup').new(
-			this.addressRegistry.address,
-			this.fromDeployer
-		)
-		await this._propertyGroup.createStorage({ from: this._deployer })
-		await this.addressRegistry.setRegistry(
-			'PropertyGroup',
-			this._propertyGroup.address,
-			this.fromDeployer
-		)
-	}
-
 	public async generatePolicyFactory(): Promise<void> {
-		this._policyFactory = await contract('PolicyFactory').new(
-			this.addressRegistry.address,
-			this.fromDeployer
+		const proxfied = await deployProxy(
+			contract('PolicyFactoryTest'),
+			this._deployer
 		)
+		await proxfied.initialize(this._addressRegistry.address)
+		this._policyFactory = proxfied
 		await this.addressRegistry.setRegistry(
 			'PolicyFactory',
 			this._policyFactory.address,
@@ -207,24 +179,13 @@ export class DevProtocolInstance {
 		)
 	}
 
-	public async generatePolicyGroup(): Promise<void> {
-		this._policyGroup = await contract('PolicyGroup').new(
-			this.addressRegistry.address,
-			this.fromDeployer
-		)
-		await this._policyGroup.createStorage({ from: this._deployer })
-		await this.addressRegistry.setRegistry(
-			'PolicyGroup',
-			this._policyGroup.address,
-			this.fromDeployer
-		)
-	}
-
 	public async generateMarketFactory(): Promise<void> {
-		this._marketFactory = await contract('MarketFactory').new(
-			this.addressRegistry.address,
-			this.fromDeployer
+		const proxfied = await deployProxy(
+			contract('MarketFactoryTest'),
+			this._deployer
 		)
+		await proxfied.initialize(this._addressRegistry.address)
+		this._marketFactory = proxfied
 		await this.addressRegistry.setRegistry(
 			'MarketFactory',
 			this._marketFactory.address,
@@ -232,24 +193,13 @@ export class DevProtocolInstance {
 		)
 	}
 
-	public async generateMarketGroup(): Promise<void> {
-		this._marketGroup = await contract('MarketGroup').new(
-			this.addressRegistry.address,
-			this.fromDeployer
-		)
-		await this.addressRegistry.setRegistry(
-			'MarketGroup',
-			this._marketGroup.address,
-			this.fromDeployer
-		)
-		await this._marketGroup.createStorage(this.fromDeployer)
-	}
-
 	public async generateMetricsFactory(): Promise<void> {
-		this._metricsFactory = await contract('MetricsFactory').new(
-			this.addressRegistry.address,
-			this.fromDeployer
+		const proxfied = await deployProxy(
+			contract('MetricsFactoryTest'),
+			this._deployer
 		)
+		await proxfied.initialize(this._addressRegistry.address)
+		this._metricsFactory = proxfied
 		await this.addressRegistry.setRegistry(
 			'MetricsFactory',
 			this._metricsFactory.address,
@@ -257,56 +207,15 @@ export class DevProtocolInstance {
 		)
 	}
 
-	public async generateMetricsGroup(): Promise<void> {
-		this._metricsGroup = await contract('MetricsGroupTest').new(
-			this.addressRegistry.address,
-			this.fromDeployer
-		)
-		await this.addressRegistry.setRegistry(
-			'MetricsGroup',
-			this._metricsGroup.address,
-			this.fromDeployer
-		)
-		await this._metricsGroup.createStorage(this.fromDeployer)
-	}
-
 	public async generateWithdraw(): Promise<void> {
-		this._withdraw = await contract('Withdraw').new(
-			this.addressRegistry.address,
-			this.fromDeployer
-		)
+		const proxfied = await deployProxy(contract('WithdrawTest'), this._deployer)
+		await proxfied.initialize(this._addressRegistry.address)
+		this._withdraw = proxfied
 		await this.addressRegistry.setRegistry(
 			'Withdraw',
 			this._withdraw.address,
 			this.fromDeployer
 		)
-		await this._withdraw.createStorage(this.fromDeployer)
-	}
-
-	public async generateWithdrawTest(): Promise<void> {
-		this._withdrawTest = await contract('WithdrawTest').new(
-			this.addressRegistry.address,
-			this.fromDeployer
-		)
-		await this.addressRegistry.setRegistry(
-			'Withdraw',
-			this._withdrawTest.address,
-			this.fromDeployer
-		)
-		await this._withdrawTest.createStorage(this.fromDeployer)
-	}
-
-	public async generateLockupTest(): Promise<void> {
-		this._lockupTest = await contract('LockupTest').new(
-			this.addressRegistry.address,
-			this.fromDeployer
-		)
-		await this.addressRegistry.setRegistry(
-			'Lockup',
-			this._lockupTest.address,
-			this.fromDeployer
-		)
-		await this._lockupTest.createStorage(this.fromDeployer)
 	}
 
 	public async generatePolicy(

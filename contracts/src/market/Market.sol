@@ -9,7 +9,6 @@ import {IMarketBehavior} from "contracts/interface/IMarketBehavior.sol";
 import {IPolicy} from "contracts/interface/IPolicy.sol";
 import {IMetrics} from "contracts/interface/IMetrics.sol";
 import {IMetricsFactory} from "contracts/interface/IMetricsFactory.sol";
-import {IMetricsGroup} from "contracts/interface/IMetricsGroup.sol";
 import {ILockup} from "contracts/interface/ILockup.sol";
 import {IDev} from "contracts/interface/IDev.sol";
 
@@ -171,8 +170,6 @@ contract Market is UsingRegistry, IMarket {
 		string memory _args4,
 		string memory _args5
 	) private returns (bool) {
-		require(bytes(_args1).length > 0, "id is required");
-
 		return
 			IMarketBehavior(behavior).authenticate(
 				_prop,
@@ -197,16 +194,13 @@ contract Market is UsingRegistry, IMarket {
 		returns (uint256)
 	{
 		uint256 tokenValue = ILockup(registry().registries("Lockup"))
-			.getPropertyValue(_property);
+			.totalLockedForProperty(_property);
 		IPolicy policy = IPolicy(registry().registries("Policy"));
-		IMetricsGroup metricsGroup = IMetricsGroup(
-			registry().registries("MetricsGroup")
+		IMetricsFactory metricsFactory = IMetricsFactory(
+			registry().registries("MetricsFactory")
 		);
 		return
-			policy.authenticationFee(
-				metricsGroup.totalIssuedMetrics(),
-				tokenValue
-			);
+			policy.authenticationFee(metricsFactory.metricsCount(), tokenValue);
 	}
 
 	/**

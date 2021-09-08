@@ -5,25 +5,33 @@ import {SafeMath} from "@openzeppelin/contracts/utils/math/SafeMath.sol";
 // prettier-ignore
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {Decimals} from "contracts/src/common/libs/Decimals.sol";
-import {UsingRegistry} from "contracts/src/common/registry/UsingRegistry.sol";
-import {WithdrawStorage} from "contracts/src/withdraw/WithdrawStorage.sol";
+import {InitializableUsingRegistry} from "contracts/src/common/registry/InitializableUsingRegistry.sol";
 import {IDevMinter} from "contracts/interface/IDevMinter.sol";
 import {IWithdraw} from "contracts/interface/IWithdraw.sol";
 import {ILockup} from "contracts/interface/ILockup.sol";
-import {IMetricsGroup} from "contracts/interface/IMetricsGroup.sol";
-import {IPropertyGroup} from "contracts/interface/IPropertyGroup.sol";
+import {IMetricsFactory} from "contracts/interface/IMetricsFactory.sol";
+import {IPropertyFactory} from "contracts/interface/IPropertyFactory.sol";
 
 /**
  * A contract that manages the withdrawal of holder rewards for Property holders.
  */
-contract Withdraw is IWithdraw, UsingRegistry, WithdrawStorage {
+contract Withdraw is IWithdraw, InitializableUsingRegistry {
 	using SafeMath for uint256;
 	using Decimals for uint256;
+
+	mapping(address => mapping(address => uint256))
+		public lastWithdrawnRewardPrice; // {Property: {User: Value}} // From [get/set]StorageLastWithdrawnReward
+	mapping(address => mapping(address => uint256))
+		public lastWithdrawnRewardCapPrice; // {Property: {User: Value}} // From [get/set]PendingWithdrawal
+	mapping(address => mapping(address => uint256)) public pendingWithdrawal; // {Property: {User: Value}}
+	mapping(address => uint256) public cumulativeWithdrawnReward; // {Property: Value} // From [get/set]RewardsAmount
 
 	/**
 	 * Initialize the passed address as AddressRegistry address.
 	 */
-	constructor(address _registry) UsingRegistry(_registry) {}
+	function initialize(address _registry) external initializer {
+		__UsingRegistry_init(_registry);
+	}
 
 	/**
 	 * Withdraws rewards.
@@ -34,9 +42,8 @@ contract Withdraw is IWithdraw, UsingRegistry, WithdrawStorage {
 		 * the passed Property address is included the Property address set.
 		 */
 		require(
-			IPropertyGroup(registry().registries("PropertyGroup")).isGroup(
-				_property
-			),
+			IPropertyFactory(registry().registries("PropertyFactory"))
+				.isProperty(_property),
 			"this is illegal address"
 		);
 
@@ -59,18 +66,13 @@ contract Withdraw is IWithdraw, UsingRegistry, WithdrawStorage {
 		 * Saves the latest cumulative sum of the holder reward price.
 		 * By subtracting this value when calculating the next rewards, always withdrawal the difference from the previous time.
 		 */
-		setStorageLastWithdrawnReward(_property, msg.sender, lastPrice);
-		setStorageLastWithdrawnRewardCap(_property, msg.sender, lastPriceCap);
+		lastWithdrawnRewardPrice[_property][msg.sender] = lastPrice;
+		lastWithdrawnRewardCapPrice[_property][msg.sender] = lastPriceCap;
 
 		/**
 		 * Sets the number of unwithdrawn rewards to 0.
 		 */
-		setPendingWithdrawal(_property, msg.sender, 0);
-
-		/**
-		 * Updates the withdrawal status to avoid double withdrawal for before DIP4.
-		 */
-		__updateLegacyWithdrawableAmount(_property, msg.sender);
+		pendingWithdrawal[_property][msg.sender] = 0;
 
 		/**
 		 * Mints the holder reward.
@@ -92,7 +94,9 @@ contract Withdraw is IWithdraw, UsingRegistry, WithdrawStorage {
 		/**
 		 * Adds the reward amount already withdrawn in the passed Property.
 		 */
-		setRewardsAmount(_property, getRewardsAmount(_property).add(value));
+		cumulativeWithdrawnReward[_property] = cumulativeWithdrawnReward[
+			_property
+		].add(value);
 	}
 
 	/**
@@ -105,9 +109,8 @@ contract Withdraw is IWithdraw, UsingRegistry, WithdrawStorage {
 		 * Validates the sender is Allocator contract.
 		 */
 		require(
-			IPropertyGroup(registry().registries("PropertyGroup")).isGroup(
-				msg.sender
-			),
+			IPropertyFactory(registry().registries("PropertyFactory"))
+				.isProperty(msg.sender),
 			"this is illegal address"
 		);
 
@@ -134,22 +137,22 @@ contract Withdraw is IWithdraw, UsingRegistry, WithdrawStorage {
 		/**
 		 * Updates the last cumulative sum of the maximum mint amount of the transfer source and destination.
 		 */
-		setStorageLastWithdrawnReward(msg.sender, _from, priceFrom);
-		setStorageLastWithdrawnReward(msg.sender, _to, priceTo);
-		setStorageLastWithdrawnRewardCap(msg.sender, _from, priceCapFrom);
-		setStorageLastWithdrawnRewardCap(msg.sender, _to, priceCapTo);
+		lastWithdrawnRewardPrice[msg.sender][_from] = priceFrom;
+		lastWithdrawnRewardPrice[msg.sender][_to] = priceTo;
+		lastWithdrawnRewardCapPrice[msg.sender][_from] = priceCapFrom;
+		lastWithdrawnRewardCapPrice[msg.sender][_to] = priceCapTo;
 
 		/**
 		 * Gets the unwithdrawn reward amount of the transfer source and destination.
 		 */
-		uint256 pendFrom = getPendingWithdrawal(msg.sender, _from);
-		uint256 pendTo = getPendingWithdrawal(msg.sender, _to);
+		uint256 pendFrom = pendingWithdrawal[msg.sender][_from];
+		uint256 pendTo = pendingWithdrawal[msg.sender][_to];
 
 		/**
 		 * Adds the undrawn reward amount of the transfer source and destination.
 		 */
-		setPendingWithdrawal(msg.sender, _from, pendFrom.add(amountFrom));
-		setPendingWithdrawal(msg.sender, _to, pendTo.add(amountTo));
+		pendingWithdrawal[msg.sender][_from] = pendFrom.add(amountFrom);
+		pendingWithdrawal[msg.sender][_to] = pendTo.add(amountTo);
 
 		emit PropertyTransfer(msg.sender, _from, _to);
 	}
@@ -200,10 +203,7 @@ contract Withdraw is IWithdraw, UsingRegistry, WithdrawStorage {
 		/**
 		 * Gets the cumulative sum of the holder reward price recorded the last time you withdrew.
 		 */
-		uint256 _lastRewardCap = getStorageLastWithdrawnRewardCap(
-			_property,
-			_user
-		);
+		uint256 _lastRewardCap = lastWithdrawnRewardCapPrice[_property][_user];
 		IERC20 property = IERC20(_property);
 		uint256 balance = property.balanceOf(_user);
 		uint256 totalSupply = property.totalSupply();
@@ -222,7 +222,7 @@ contract Withdraw is IWithdraw, UsingRegistry, WithdrawStorage {
 		/**
 		 * Gets the cumulative sum of the holder reward price recorded the last time you withdrew.
 		 */
-		uint256 _lastReward = getStorageLastWithdrawnReward(_property, _user);
+		uint256 _lastReward = lastWithdrawnRewardPrice[_property][_user];
 		IERC20 property = IERC20(_property);
 		uint256 balance = property.balanceOf(_user);
 		uint256 totalSupply = property.totalSupply();
@@ -259,7 +259,7 @@ contract Withdraw is IWithdraw, UsingRegistry, WithdrawStorage {
 		 * If the passed Property has not authenticated, returns always 0.
 		 */
 		if (
-			IMetricsGroup(registry().registries("MetricsGroup")).hasAssets(
+			IMetricsFactory(registry().registries("MetricsFactory")).hasAssets(
 				_property
 			) == false
 		) {
@@ -267,16 +267,9 @@ contract Withdraw is IWithdraw, UsingRegistry, WithdrawStorage {
 		}
 
 		/**
-		 * Gets the reward amount of before DIP4.
-		 */
-		uint256 legacy = __legacyWithdrawableAmount(_property, _user);
-
-		/**
 		 * Gets the reward amount in saved without withdrawal and returns the sum of all values.
 		 */
-		uint256 value = _value.add(getPendingWithdrawal(_property, _user)).add(
-			legacy
-		);
+		uint256 value = _value.add(pendingWithdrawal[_property][_user]);
 		return (value, price, cap, allReward);
 	}
 
@@ -310,33 +303,5 @@ contract Withdraw is IWithdraw, UsingRegistry, WithdrawStorage {
 		)
 	{
 		return _calculateWithdrawableAmount(_property, _user);
-	}
-
-	/**
-	 * Returns the reward amount of the calculation model before DIP4.
-	 * It can be calculated by subtracting "the last cumulative sum of reward unit price" from
-	 * "the current cumulative sum of reward unit price," and multiplying by the balance of the user.
-	 */
-	function __legacyWithdrawableAmount(address _property, address _user)
-		private
-		view
-		returns (uint256)
-	{
-		uint256 _last = getLastWithdrawalPrice(_property, _user);
-		uint256 price = getCumulativePrice(_property);
-		uint256 priceGap = price.sub(_last);
-		uint256 balance = IERC20(_property).balanceOf(_user);
-		uint256 value = priceGap.mul(balance);
-		return value.divBasis();
-	}
-
-	/**
-	 * Updates and treats the reward of before DIP4 as already received.
-	 */
-	function __updateLegacyWithdrawableAmount(address _property, address _user)
-		private
-	{
-		uint256 price = getCumulativePrice(_property);
-		setLastWithdrawalPrice(_property, _user, price);
 	}
 }

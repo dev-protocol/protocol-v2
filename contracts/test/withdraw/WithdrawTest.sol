@@ -4,19 +4,13 @@ pragma solidity =0.8.6;
 import {Withdraw} from "contracts/src/withdraw/Withdraw.sol";
 
 contract WithdrawTest is Withdraw {
-	constructor(address _registry) Withdraw(_registry) {}
+	constructor() Withdraw() {}
 
-	function setCumulativePriceTest(address _property, uint256 _value)
-		external
-	{
-		setCumulativePrice(_property, _value);
-	}
-
-	function setLastWithdrawalPriceTest(
+	function __setLastWithdrawnRewardPrice(
 		address _property,
 		address _user,
 		uint256 _value
 	) external {
-		setLastWithdrawalPrice(_property, _user, _value);
+		lastWithdrawnRewardPrice[_property][_user] = _value;
 	}
 }

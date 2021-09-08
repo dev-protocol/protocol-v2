@@ -2,10 +2,9 @@
 pragma solidity =0.8.6;
 
 import {Lockup} from "contracts/src/lockup/Lockup.sol";
-import {LockupStorageTest} from "contracts/test/lockup/LockupStorageTest.sol";
 
-contract LockupTest is LockupStorageTest, Lockup {
-	constructor(address _registry) Lockup(_registry) {}
+contract LockupTest is Lockup {
+	constructor() Lockup() {}
 }
 
 // TODO いらないのでは

@@ -36,13 +36,14 @@ interface ILockup {
 		view
 		returns (uint256);
 
-	function getPropertyValue(address _property)
+	function totalLockedForProperty(address _property)
 		external
 		view
 		returns (uint256);
 
-	function getAllValue() external view returns (uint256);
+	function totalLocked() external view returns (uint256);
 
+	// !!!!!!!!!!!!!!!!!! TO BE DELETED !!!!!!!!!!!!!!!!!!
 	function getValue(address _property, address _sender)
 		external
 		view

@@ -19,10 +19,9 @@ contract(
 				await dev.generateAddressRegistry()
 				await dev.generateDev()
 				await dev.generateDevMinter()
-				await dev.generateMetricsGroup()
 				await dev.generatePolicyFactory()
-				await dev.generatePolicyGroup()
 				await dev.generateLockup()
+				await dev.generateMetricsFactory()
 				await dev.generatePolicy()
 			})
 			it('Cannot be created from other than factory', async () => {
@@ -75,10 +74,9 @@ contract(
 				await dev.generateAddressRegistry()
 				await dev.generateDev()
 				await dev.generateDevMinter()
-				await dev.generateMetricsGroup()
 				await dev.generatePolicyFactory()
-				await dev.generatePolicyGroup()
 				await dev.generateLockup()
+				await dev.generateMetricsFactory()
 				await dev.generatePolicy()
 			})
 			it('Executing a changeAuthor function with a non-Author.', async () => {
@@ -102,7 +100,6 @@ contract(
 			})
 			it('Author is changed.', async () => {
 				await dev.generatePropertyFactory()
-				await dev.generatePropertyGroup()
 				const transaction = await dev.propertyFactory.create(
 					'sample',
 					'SAMPLE',
@@ -146,9 +143,8 @@ contract(
 				await dev.generateDev()
 				await dev.generateDevMinter()
 				await dev.generateLockup()
-				await dev.generateMetricsGroup()
 				await dev.generatePolicyFactory()
-				await dev.generatePolicyGroup()
+				await dev.generateMetricsFactory()
 				await dev.generatePolicy()
 			})
 			it('Should fail to call when the sender is not author', async () => {
@@ -172,7 +168,6 @@ contract(
 			})
 			it('Change the name', async () => {
 				await dev.generatePropertyFactory()
-				await dev.generatePropertyGroup()
 				const transaction = await dev.propertyFactory.create(
 					'sample',
 					'SAMPLE',
@@ -216,9 +211,8 @@ contract(
 				await dev.generateDev()
 				await dev.generateDevMinter()
 				await dev.generateLockup()
-				await dev.generateMetricsGroup()
 				await dev.generatePolicyFactory()
-				await dev.generatePolicyGroup()
+				await dev.generateMetricsFactory()
 				await dev.generatePolicy()
 			})
 			it('Should fail to call when the sender is not author', async () => {
@@ -242,7 +236,6 @@ contract(
 			})
 			it('Change the symbol', async () => {
 				await dev.generatePropertyFactory()
-				await dev.generatePropertyGroup()
 				const transaction = await dev.propertyFactory.create(
 					'sample',
 					'SAMPLE',
@@ -287,12 +280,10 @@ contract(
 				await dev.generateDev()
 				await dev.generateDevMinter()
 				await Promise.all([
-					dev.generateMetricsGroup(),
-					dev.generatePropertyGroup(),
 					dev.generatePropertyFactory(),
 					dev.generatePolicyFactory(),
-					dev.generatePolicyGroup(),
 					dev.generateLockup(),
+					dev.generateMetricsFactory(),
 				])
 				await dev.generatePolicy()
 				const result = await dev.propertyFactory.create(
@@ -336,12 +327,10 @@ contract(
 				await dev.generateDevMinter()
 				await Promise.all([
 					dev.generateWithdraw(),
-					dev.generatePropertyGroup(),
 					dev.generatePropertyFactory(),
 					dev.generateLockup(),
-					dev.generateMetricsGroup(),
 					dev.generatePolicyFactory(),
-					dev.generatePolicyGroup(),
+					dev.generateMetricsFactory(),
 				])
 				await dev.generatePolicy('PolicyTestForProperty')
 				const result = await dev.propertyFactory.create(
@@ -384,12 +373,10 @@ contract(
 				await dev.generateDevMinter()
 				await Promise.all([
 					dev.generateWithdraw(),
-					dev.generatePropertyGroup(),
 					dev.generatePropertyFactory(),
 					dev.generateLockup(),
-					dev.generateMetricsGroup(),
 					dev.generatePolicyFactory(),
-					dev.generatePolicyGroup(),
+					dev.generateMetricsFactory(),
 				])
 				await dev.generatePolicy('PolicyTestForProperty')
 				const result = await dev.propertyFactory.create(

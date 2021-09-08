@@ -25,10 +25,7 @@ contract(
 				validateAddressErrorMessage(result)
 			})
 			it('Each property is set.', async () => {
-				await Promise.all([
-					dev.generatePolicyFactory(),
-					dev.generatePolicyGroup(),
-				])
+				await Promise.all([dev.generatePolicyFactory()])
 				await dev.addressRegistry.setRegistry('MarketFactory', marketFactory)
 				const iPolicyInstance = await dev.getPolicy('PolicyTest1', user)
 				await dev.policyFactory.create(iPolicyInstance.address)
@@ -46,10 +43,7 @@ contract(
 			let market: MarketInstance
 			beforeEach(async () => {
 				await dev.generateAddressRegistry()
-				await Promise.all([
-					dev.generatePolicyFactory(),
-					dev.generatePolicyGroup(),
-				])
+				await Promise.all([dev.generatePolicyFactory()])
 				await dev.addressRegistry.setRegistry('MarketFactory', marketFactory)
 				const iPolicyInstance = await dev.getPolicy('PolicyTest1', user)
 				await dev.policyFactory.create(iPolicyInstance.address)
@@ -84,10 +78,7 @@ contract(
 			const dev = new DevProtocolInstance(deployer)
 			it('Get Schema of mapped Behavior Contract', async () => {
 				await dev.generateAddressRegistry()
-				await Promise.all([
-					dev.generatePolicyFactory(),
-					dev.generatePolicyGroup(),
-				])
+				await Promise.all([dev.generatePolicyFactory()])
 				await dev.addressRegistry.setRegistry('MarketFactory', marketFactory)
 				const iPolicyInstance = await dev.getPolicy('PolicyTest1', user)
 				await dev.policyFactory.create(iPolicyInstance.address)
@@ -111,13 +102,9 @@ contract(
 				await dev.generateDevMinter()
 				await Promise.all([
 					dev.generateMarketFactory(),
-					dev.generateMarketGroup(),
 					dev.generateMetricsFactory(),
-					dev.generateMetricsGroup(),
 					dev.generatePolicyFactory(),
-					dev.generatePolicyGroup(),
 					dev.generatePropertyFactory(),
-					dev.generatePropertyGroup(),
 					dev.generateLockup(),
 					dev.generateWithdraw(),
 				])
@@ -142,7 +129,10 @@ contract(
 					propertyAuther
 				)
 				propertyAddress = getPropertyAddress(createPropertyResult)
-				await dev.metricsGroup.__setMetricsCountPerProperty(propertyAddress, 1)
+				await dev.metricsFactory.__setMetricsCountPerProperty(
+					propertyAddress,
+					1
+				)
 				await dev.dev.mint(propertyAuther, 10000000000, { from: deployer })
 			})
 			it('Proxy to mapped Behavior Contract.', async () => {
@@ -203,16 +193,6 @@ contract(
 					})
 					.catch((err: Error) => err)
 				validateErrorMessage(result, 'market is not enabled')
-			})
-			it('Should fail to run when not passed the ID.', async () => {
-				// eslint-disable-next-line @typescript-eslint/await-thenable
-				const marketInstance = await marketContract.at(marketAddress1)
-				const result = await marketInstance
-					.authenticate(propertyAddress, '', '', '', '', '', {
-						from: propertyAuther,
-					})
-					.catch((err: Error) => err)
-				validateErrorMessage(result, 'id is required')
 			})
 			it('Should fail to run when sent from other than Property Factory Contract.', async () => {
 				// eslint-disable-next-line @typescript-eslint/await-thenable
@@ -327,13 +307,9 @@ contract(
 				await dev.generateDevMinter()
 				await Promise.all([
 					dev.generateMarketFactory(),
-					dev.generateMarketGroup(),
 					dev.generateMetricsFactory(),
-					dev.generateMetricsGroup(),
 					dev.generatePolicyFactory(),
-					dev.generatePolicyGroup(),
 					dev.generatePropertyFactory(),
-					dev.generatePropertyGroup(),
 					dev.generateLockup(),
 					dev.generateWithdraw(),
 				])
@@ -358,7 +334,10 @@ contract(
 					propertyAuther
 				)
 				propertyAddress = getPropertyAddress(createPropertyResult)
-				await dev.metricsGroup.__setMetricsCountPerProperty(propertyAddress, 1)
+				await dev.metricsFactory.__setMetricsCountPerProperty(
+					propertyAddress,
+					1
+				)
 				await dev.dev.mint(propertyAuther, 10000000000, { from: deployer })
 				await dev.addressRegistry.setRegistry(
 					'PropertyFactory',
@@ -440,25 +419,6 @@ contract(
 					)
 					.catch((err: Error) => err)
 				validateErrorMessage(result, 'market is not enabled')
-			})
-			it('Should fail to run when not passed the ID.', async () => {
-				// eslint-disable-next-line @typescript-eslint/await-thenable
-				const marketInstance = await marketContract.at(marketAddress1)
-				const result = await marketInstance
-					.authenticateFromPropertyFactory(
-						propertyAddress,
-						propertyAuther,
-						'',
-						'',
-						'',
-						'',
-						'',
-						{
-							from: propertyFactory,
-						}
-					)
-					.catch((err: Error) => err)
-				validateErrorMessage(result, 'id is required')
 			})
 			it('Should fail to run when sent from other than Property Factory Contract.', async () => {
 				// eslint-disable-next-line @typescript-eslint/await-thenable

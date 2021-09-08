@@ -6,7 +6,7 @@ import {ERC20PresetMinterPauser} from "@openzeppelin/contracts/token/ERC20/prese
 import {UsingRegistry} from "contracts/src/common/registry/UsingRegistry.sol";
 import {ILockup} from "contracts/interface/ILockup.sol";
 import {IDev} from "contracts/interface/IDev.sol";
-import {IMarketGroup} from "contracts/interface/IMarketGroup.sol";
+import {IMarketFactory} from "contracts/interface/IMarketFactory.sol";
 
 /**
  * The contract used as the DEV token.
@@ -65,7 +65,7 @@ contract Dev is ERC20PresetMinterPauser, UsingRegistry, IDev {
 		returns (bool)
 	{
 		require(
-			IMarketGroup(registry().registries("MarketGroup")).isGroup(
+			IMarketFactory(registry().registries("MarketFactory")).isMarket(
 				msg.sender
 			),
 			"this is illegal address"

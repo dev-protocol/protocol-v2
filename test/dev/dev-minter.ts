@@ -1,4 +1,4 @@
-import { DevProtocolInstance } from '../test-lib/instance'
+import { deployProxy, DevProtocolInstance } from '../test-lib/instance'
 import { DevMinterInstance } from '../../types/truffle-contracts'
 import { validateErrorMessage } from '../test-lib/utils/error'
 
@@ -17,21 +17,21 @@ contract('DevMinter', ([deployer, user1, lockup, withdraw]) => {
 		async (): Promise<DevMinterInstance> => {
 			const contract = artifacts.require
 
-			const addressRegistry = await contract('AddressRegistry').new({
-				from: deployer,
-			})
+			const addressRegistry = await deployProxy(
+				contract('AddressRegistry'),
+				deployer
+			)
+			await addressRegistry.initialize()
+
 			const dev = await contract('Dev').new(addressRegistry.address, {
 				from: deployer,
 			})
 			await addressRegistry.setRegistry('Dev', dev.address, {
 				from: deployer,
 			})
-			const devMinter = await contract('DevMinter').new(
-				addressRegistry.address,
-				{
-					from: deployer,
-				}
-			)
+			const devMinter = await deployProxy(contract('DevMinter'), deployer)
+			await devMinter.initialize(addressRegistry.address)
+
 			await addressRegistry.setRegistry('Lockup', lockup, {
 				from: deployer,
 			})
