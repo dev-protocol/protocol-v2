@@ -36,9 +36,6 @@ contract PropertyFactory is InitializableUsingRegistry, IPropertyFactory {
 	}
 
 	/**
-	 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	 * NOT SUPPORT YET
-	 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	 * @dev Creates a new Property contract and authenticate.
 	 * There are too many local variables, so when using this method limit the number of arguments that can be used to authenticate to a maximum of 3.
 	 * @param _name Name of the new Property.
@@ -48,6 +45,7 @@ contract PropertyFactory is InitializableUsingRegistry, IPropertyFactory {
 	 * @param _args2 Second argument to pass through to Market.
 	 * @param _args3 Third argument to pass through to Market.
 	 * @return The transaction fail/success.
+	 */
 	function createAndAuthenticate(
 		string calldata _name,
 		string calldata _symbol,
@@ -67,7 +65,6 @@ contract PropertyFactory is InitializableUsingRegistry, IPropertyFactory {
 				""
 			);
 	}
-	 */
 
 	/**
 	 * @dev Creates a new Property contract.

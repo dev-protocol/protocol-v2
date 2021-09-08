@@ -56,10 +56,6 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 			expect(res).to.be.equal(true)
 		})
 	})
-	/**
-	 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	 * NOT SUPPORT YET
-	 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	describe('PropertyFactory; createAndAuthenticate', () => {
 		const dev = new DevProtocolInstance(deployer)
 		let marketAddress: string
@@ -118,5 +114,4 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 			expect(market).to.be.equal(marketAddress)
 		})
 	})
-	*/
 })
