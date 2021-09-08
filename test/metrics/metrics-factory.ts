@@ -16,7 +16,7 @@ contract(
 				dev.generateMarketFactory(),
 				dev.generateMetricsFactory(),
 			])
-			await dev.marketFactory.__addMarkets(market)
+			await dev.marketFactory.__addMarket(market)
 			return [dev]
 		}
 
