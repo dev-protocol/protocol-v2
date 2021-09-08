@@ -8,7 +8,6 @@ import {
 	MetricsFactoryTestInstance,
 	IPolicyInstance,
 	IMarketInstance,
-	WithdrawInstance,
 	WithdrawTestInstance,
 	MetricsInstance,
 	TreasuryTestInstance,
@@ -52,8 +51,7 @@ export class DevProtocolInstance {
 	private _policyFactory!: PolicyFactoryTestInstance
 	private _marketFactory!: MarketFactoryTestInstance
 	private _metricsFactory!: MetricsFactoryTestInstance
-	private _withdraw!: WithdrawInstance
-	private _withdrawTest!: WithdrawTestInstance
+	private _withdraw!: WithdrawTestInstance
 	private _lockupTest!: LockupTestInstance
 	private _treasury!: TreasuryTestInstance
 	private _devMinter!: DevMinterInstance
@@ -99,12 +97,8 @@ export class DevProtocolInstance {
 		return this._metricsFactory
 	}
 
-	public get withdraw(): WithdrawInstance {
+	public get withdraw(): WithdrawTestInstance {
 		return this._withdraw
-	}
-
-	public get withdrawTest(): WithdrawTestInstance {
-		return this._withdrawTest
 	}
 
 	public get lockupTest(): LockupTestInstance {
@@ -113,14 +107,6 @@ export class DevProtocolInstance {
 
 	public get treasury(): TreasuryTestInstance {
 		return this._treasury
-	}
-
-	public get activeWithdraw(): WithdrawInstance | WithdrawTestInstance {
-		if (typeof this._withdraw === 'undefined') {
-			return this._withdrawTest
-		}
-
-		return this._withdraw
 	}
 
 	public async generateAddressRegistry(): Promise<void> {
@@ -229,29 +215,14 @@ export class DevProtocolInstance {
 	}
 
 	public async generateWithdraw(): Promise<void> {
-		this._withdraw = await contract('Withdraw').new(
-			this.addressRegistry.address,
-			this.fromDeployer
-		)
+		const proxfied = await deployProxy(contract('WithdrawTest'), this._deployer)
+		await proxfied.initialize(this._addressRegistry.address)
+		this._withdraw = proxfied
 		await this.addressRegistry.setRegistry(
 			'Withdraw',
 			this._withdraw.address,
 			this.fromDeployer
 		)
-		await this._withdraw.createStorage(this.fromDeployer)
-	}
-
-	public async generateWithdrawTest(): Promise<void> {
-		this._withdrawTest = await contract('WithdrawTest').new(
-			this.addressRegistry.address,
-			this.fromDeployer
-		)
-		await this.addressRegistry.setRegistry(
-			'Withdraw',
-			this._withdrawTest.address,
-			this.fromDeployer
-		)
-		await this._withdrawTest.createStorage(this.fromDeployer)
 	}
 
 	public async generateLockupTest(): Promise<void> {

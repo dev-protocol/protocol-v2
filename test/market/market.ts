@@ -194,16 +194,6 @@ contract(
 					.catch((err: Error) => err)
 				validateErrorMessage(result, 'market is not enabled')
 			})
-			it('Should fail to run when not passed the ID.', async () => {
-				// eslint-disable-next-line @typescript-eslint/await-thenable
-				const marketInstance = await marketContract.at(marketAddress1)
-				const result = await marketInstance
-					.authenticate(propertyAddress, '', '', '', '', '', {
-						from: propertyAuther,
-					})
-					.catch((err: Error) => err)
-				validateErrorMessage(result, 'id is required')
-			})
 			it('Should fail to run when sent from other than Property Factory Contract.', async () => {
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const marketInstance = await marketContract.at(marketAddress1)
@@ -429,25 +419,6 @@ contract(
 					)
 					.catch((err: Error) => err)
 				validateErrorMessage(result, 'market is not enabled')
-			})
-			it('Should fail to run when not passed the ID.', async () => {
-				// eslint-disable-next-line @typescript-eslint/await-thenable
-				const marketInstance = await marketContract.at(marketAddress1)
-				const result = await marketInstance
-					.authenticateFromPropertyFactory(
-						propertyAddress,
-						propertyAuther,
-						'',
-						'',
-						'',
-						'',
-						'',
-						{
-							from: propertyFactory,
-						}
-					)
-					.catch((err: Error) => err)
-				validateErrorMessage(result, 'id is required')
 			})
 			it('Should fail to run when sent from other than Property Factory Contract.', async () => {
 				// eslint-disable-next-line @typescript-eslint/await-thenable

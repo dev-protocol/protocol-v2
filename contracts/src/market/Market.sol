@@ -170,8 +170,6 @@ contract Market is UsingRegistry, IMarket {
 		string memory _args4,
 		string memory _args5
 	) private returns (bool) {
-		require(bytes(_args1).length > 0, "id is required");
-
 		return
 			IMarketBehavior(behavior).authenticate(
 				_prop,
