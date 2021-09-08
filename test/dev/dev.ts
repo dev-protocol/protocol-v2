@@ -381,6 +381,7 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 			await dev.generateAddressRegistry()
 			await dev.generateDev()
 			await dev.generateDevMinter()
+			await dev.generateMarketFactory()
 			return dev
 		}
 
