@@ -9,7 +9,7 @@ import {MarketFactory} from "contracts/src/market/MarketFactory.sol";
 contract MarketFactoryTest is MarketFactory {
 	constructor() MarketFactory() {}
 
-	function __addMarkets(address _addr) public {
-		_addMarkets(_addr);
+	function __addMarket(address _addr) public {
+		_addMarket(_addr);
 	}
 }

@@ -75,7 +75,7 @@ contract MarketFactory is
 		 */
 		require(isPotentialMarket[_addr], "this is illegal address");
 
-		_addMarkets(_addr);
+		_addMarket(_addr);
 
 		/**
 		 * Market will be enable.
@@ -86,7 +86,7 @@ contract MarketFactory is
 		market.toEnable();
 	}
 
-	function _addMarkets(address _addr) internal {
+	function _addMarket(address _addr) internal {
 		isMarket[_addr] = true;
 		_addCount();
 	}
