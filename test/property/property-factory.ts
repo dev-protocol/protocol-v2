@@ -1,4 +1,3 @@
-/* eslint-disable max-nested-callbacks */
 import { DevProtocolInstance } from '../test-lib/instance'
 import { getPropertyAddress, getMarketAddress } from '../test-lib/utils/log'
 import { toBigNumber } from '../test-lib/utils/common'
