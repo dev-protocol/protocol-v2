@@ -135,10 +135,14 @@ contract(
 					1
 				)
 				await dev.dev.mint(propertyAuther, 10000000000, { from: deployer })
-				await dev.dev.approve(dev.lockup.address, 100000, { from: propertyAuther })
+				await dev.dev.approve(dev.lockup.address, 100000, {
+					from: propertyAuther,
+				})
 			})
 			it('Proxy to mapped Behavior Contract.', async () => {
-				await dev.lockup.depositToProperty(propertyAddress, 100000, { from: propertyAuther })
+				await dev.lockup.depositToProperty(propertyAddress, 100000, {
+					from: propertyAuther,
+				})
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const marketInstance = await marketContract.at(marketAddress1)
 				marketInstance
@@ -346,10 +350,14 @@ contract(
 					'PropertyFactory',
 					propertyFactory
 				)
-				await dev.dev.approve(dev.lockup.address, 100000, { from: propertyAuther })
+				await dev.dev.approve(dev.lockup.address, 100000, {
+					from: propertyAuther,
+				})
 			})
 			it('Proxy to mapped Behavior Contract.', async () => {
-				await dev.lockup.depositToProperty(propertyAddress, 100000, { from: propertyAuther })
+				await dev.lockup.depositToProperty(propertyAddress, 100000, {
+					from: propertyAuther,
+				})
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const marketInstance = await marketContract.at(marketAddress1)
 				void marketInstance.authenticateFromPropertyFactory(

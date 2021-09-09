@@ -98,8 +98,9 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 	 */
 	modifier onlyPositionOwner(uint256 _tokenId) {
 		require(
-			IERC721(registry().registries("STokensManager")).ownerOf(_tokenId) ==
-				msg.sender,
+			IERC721(registry().registries("STokensManager")).ownerOf(
+				_tokenId
+			) == msg.sender,
 			"illegal sender"
 		);
 		_;
