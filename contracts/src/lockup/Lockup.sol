@@ -98,7 +98,7 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 	 */
 	modifier onlyPositionOwner(uint256 _tokenId) {
 		require(
-			IERC721(registry().registries("STokenManager")).ownerOf(_tokenId) ==
+			IERC721(registry().registries("STokensManager")).ownerOf(_tokenId) ==
 				msg.sender,
 			"illegal sender"
 		);
@@ -154,7 +154,7 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		 * mint s tokens
 		 */
 		uint256 tokenId = ISTokensManager(
-			registry().registries("STokenManager")
+			registry().registries("STokensManager")
 		).mint(msg.sender, _property, _amount, interest);
 		emit Lockedup(msg.sender, _property, _amount);
 		return tokenId;
@@ -176,8 +176,8 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		 * Validates _amount is not 0.
 		 */
 		require(_amount != 0, "illegal deposit amount");
-		ISTokensManager sTokenManagerInstance = ISTokensManager(
-			registry().registries("STokenManager")
+		ISTokensManager sTokensManagerInstance = ISTokensManager(
+			registry().registries("STokensManager")
 		);
 		/**
 		 * get position information
@@ -188,7 +188,7 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 			uint256 price,
 			uint256 cumulativeReward,
 			uint256 pendingReward
-		) = sTokenManagerInstance.positions(_tokenId);
+		) = sTokensManagerInstance.positions(_tokenId);
 		/**
 		 * Gets the withdrawable amount.
 		 */
@@ -219,7 +219,7 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		/**
 		 * update position information
 		 */
-		bool result = sTokenManagerInstance.update(
+		bool result = sTokensManagerInstance.update(
 			_tokenId,
 			amount.add(_amount),
 			prices.interest,
@@ -244,8 +244,8 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		onlyPositionOwner(_tokenId)
 		returns (bool)
 	{
-		ISTokensManager sTokenManagerInstance = ISTokensManager(
-			registry().registries("STokenManager")
+		ISTokensManager sTokensManagerInstance = ISTokensManager(
+			registry().registries("STokensManager")
 		);
 		/**
 		 * get position information
@@ -256,7 +256,7 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 			uint256 price,
 			uint256 cumulativeReward,
 			uint256 pendingReward
-		) = sTokenManagerInstance.positions(_tokenId);
+		) = sTokensManagerInstance.positions(_tokenId);
 		/**
 		 * If the balance of the withdrawal request is bigger than the balance you are staking
 		 */
@@ -285,7 +285,7 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		 * update position information
 		 */
 		return
-			sTokenManagerInstance.update(
+			sTokensManagerInstance.update(
 				_tokenId,
 				amount.sub(_amount),
 				prices.interest,
@@ -636,8 +636,8 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		override
 		returns (uint256)
 	{
-		ISTokensManager sTokenManagerInstance = ISTokensManager(
-			registry().registries("STokenManager")
+		ISTokensManager sTokensManagerInstance = ISTokensManager(
+			registry().registries("STokensManager")
 		);
 		(
 			address property,
@@ -645,7 +645,7 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 			uint256 price,
 			,
 			uint256 pendingReward
-		) = sTokenManagerInstance.positions(_tokenId);
+		) = sTokensManagerInstance.positions(_tokenId);
 		(uint256 result, ) = _calculateWithdrawableInterestAmount(
 			property,
 			amount,
