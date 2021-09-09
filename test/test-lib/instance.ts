@@ -146,10 +146,17 @@ export class DevProtocolInstance {
 	}
 
 	public async generateSTokenManager(): Promise<void> {
-		const proxfied = await deployProxy(contract('STokensManager'), this._deployer)
+		const proxfied = await deployProxy(
+			contract('STokensManager'),
+			this._deployer
+		)
 		await proxfied.initialize(this._addressRegistry.address)
 		this._sTokensManager = proxfied
-		await this.addressRegistry.setRegistry('STokensManager', this._sTokensManager.address, this.fromDeployer)
+		await this.addressRegistry.setRegistry(
+			'STokensManager',
+			this._sTokensManager.address,
+			this.fromDeployer
+		)
 	}
 
 	public async generateLockup(): Promise<void> {
