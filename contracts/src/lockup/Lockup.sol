@@ -3,6 +3,8 @@ pragma solidity =0.8.6;
 
 // prettier-ignore
 import {SafeMath} from "@openzeppelin/contracts/utils/math/SafeMath.sol";
+import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {Decimals} from "contracts/src/common/libs/Decimals.sol";
 import {InitializableUsingRegistry} from "contracts/src/common/registry/InitializableUsingRegistry.sol";
 import {IDevMinter} from "contracts/interface/IDevMinter.sol";
@@ -10,6 +12,7 @@ import {IProperty} from "contracts/interface/IProperty.sol";
 import {IPolicy} from "contracts/interface/IPolicy.sol";
 import {ILockup} from "contracts/interface/ILockup.sol";
 import {IMetricsFactory} from "contracts/interface/IMetricsFactory.sol";
+import {ISTokensManager} from "contracts/interface/ISTokensManager.sol";
 
 /**
  * A contract that manages the staking of DEV tokens and calculates rewards.
@@ -67,9 +70,6 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 	mapping(address => uint256) public override totalLockedForProperty; // {Property: Value} // From [get/set]StoragePropertyValue
 	mapping(address => uint256)
 		public lastCumulativeHoldersRewardAmountPerProperty; // {Property: Value} // From [get/set]StorageLastCumulativeHoldersRewardAmountPerProperty
-	mapping(address => mapping(address => uint256)) public override getValue; // {Property: {User: Value}} // From [get/set]StorageValue
-	mapping(address => mapping(address => uint256)) public pendingReward; // {Property: {User: Value}} // From [get/set]StoragePendingInterestWithdrawal
-	mapping(address => mapping(address => uint256)) public lastLockedPrice; // {Property: {User: Value}} // From [get/set]StorageLastStakedInterestPrice
 
 	/**
 	 * Initialize the passed address as AddressRegistry address.
@@ -79,83 +79,212 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 	}
 
 	/**
-	 * Adds staking.
-	 * Only the Dev contract can execute this function.
+	 * @dev Validates the passed Property has greater than 1 asset.
+	 * @param _property property address
 	 */
-	function lockup(
-		address _from,
-		address _property,
-		uint256 _value
-	) external override {
-		/**
-		 * Validates the sender is Dev contract.
-		 */
+	modifier onlyAuthenticatedProperty(address _property) {
 		require(
-			msg.sender == registry().registries("Dev"),
-			"this is illegal address"
-		);
-
-		/**
-		 * Validates _value is not 0.
-		 */
-		require(_value != 0, "illegal lockup value");
-
-		/**
-		 * Validates the passed Property has greater than 1 asset.
-		 */
-		require(
-			IMetricsFactory(registry().registries("MetricsFactory")).hasAssets(
-				_property
-			),
+			IMetricsFactory(registry().registries("MetricsFactory")).hasAssets(_property),
 			"unable to stake to unauthenticated property"
 		);
-
-		/**
-		 * Since the reward per block that can be withdrawn will change with the addition of staking,
-		 * saves the undrawn withdrawable reward before addition it.
-		 */
-		RewardPrices memory prices = updatePendingInterestWithdrawal(
-			_property,
-			_from
-		);
-
-		/**
-		 * Saves variables that should change due to the addition of staking.
-		 */
-		updateValues(true, _from, _property, _value, prices);
-
-		emit Lockedup(_from, _property, _value);
+		_;
 	}
 
 	/**
-	 * Withdraw staking.
-	 * Releases staking, withdraw rewards, and transfer the staked and withdraw rewards amount to the sender.
+	 * @dev Check if the owner of the token is a sender.
+	 * @param _tokenId The ID of the staking position
 	 */
-	function withdraw(address _property, uint256 _amount) external override {
+	modifier onlyPositionOwner(uint256 _tokenId) {
+		require(
+			IERC721(registry().registries("STokenManager")).ownerOf(_tokenId) == msg.sender,
+			"illegal sender"
+		);
+		_;
+	}
+
+	/**
+	 * @dev deposit dev token to dev protocol and generate s-token
+	 * @param _property target property address
+	 * @param _amount staking value
+	 * @return tokenId The ID of the created new staking position
+	 */
+	function depositToProperty(address _property, uint256 _amount)
+		external override
+		onlyAuthenticatedProperty(_property)
+		returns (uint256)
+	{
 		/**
-		 * Validates the sender is staking to the target Property.
+		 * Validates _amount is not 0.
+		 */
+		require(_amount != 0, "illegal deposit amount");
+		/**
+		 * Gets the latest cumulative sum of the interest price.
+		 */
+		(
+			uint256 reward,
+			uint256 holders,
+			uint256 interest,
+			uint256 holdersCap
+		) = calculateCumulativeRewardPrices();
+		/**
+		 * Saves variables that should change due to the addition of staking.
+		 */
+		updateValues(
+			true,
+			_property,
+			_amount,
+			RewardPrices(reward, holders, interest, holdersCap)
+		);
+		/**
+		 * transfer dev tokens
 		 */
 		require(
-			hasValue(_property, msg.sender, _amount),
-			"insufficient tokens staked"
+			IERC20(registry().registries("Dev")).transferFrom(
+				msg.sender,
+				_property,
+				_amount
+			),
+			"dev transfer failed"
 		);
+		/**
+		 * mint s tokens
+		 */
+		uint256 tokenId = ISTokensManager(registry().registries("STokenManager")).mint(
+			msg.sender,
+			_property,
+			_amount,
+			interest
+		);
+		emit Lockedup(msg.sender, _property, _amount);
+		return tokenId;
+	}
 
+	/**
+	 * @dev deposit dev token to dev protocol and update s-token status
+	 * @param _tokenId s-token id
+	 * @param _amount staking value
+	 * @return bool On success, true will be returned
+	 */
+	function depositToPosition(uint256 _tokenId, uint256 _amount)
+		external override
+		onlyPositionOwner(_tokenId)
+		returns (bool)
+	{
+		/**
+		 * Validates _amount is not 0.
+		 */
+		require(_amount != 0, "illegal deposit amount");
+		ISTokensManager sTokenManagerInstance = ISTokensManager(registry().registries("STokenManager"));
+		/**
+		 * get position information
+		 */
+		(
+			address property,
+			uint256 amount,
+			uint256 price,
+			uint256 cumulativeReward,
+			uint256 pendingReward
+		) = sTokenManagerInstance.positions(_tokenId);
+		/**
+		 * Gets the withdrawable amount.
+		 */
+		(
+			uint256 withdrawable,
+			RewardPrices memory prices
+		) = _calculateWithdrawableInterestAmount(
+				property,
+				amount,
+				price,
+				pendingReward
+			);
+		/**
+		 * Saves variables that should change due to the addition of staking.
+		 */
+		updateValues(true, property, _amount, prices);
+		/**
+		 * transfer dev tokens
+		 */
+		require(
+			IERC20(registry().registries("Dev")).transferFrom(
+				msg.sender,
+				property,
+				_amount
+			),
+			"dev transfer failed"
+		);
+		/**
+		 * update position information
+		 */
+		bool result = sTokenManagerInstance.update(
+			_tokenId,
+			amount.add(_amount),
+			prices.interest,
+			cumulativeReward.add(withdrawable),
+			pendingReward.add(withdrawable)
+		);
+		require(result, "failed to update");
+		/**
+		 * generate events
+		 */
+		emit Lockedup(msg.sender, property, _amount);
+		return true;
+	}
+
+	/**
+	 * Withdraw staking.(NFT)
+	 * Releases staking, withdraw rewards, and transfer the staked and withdraw rewards amount to the sender.
+	 */
+	function withdrawByPosition(uint256 _tokenId, uint256 _amount)
+		external override
+		onlyPositionOwner(_tokenId)
+		returns (bool)
+	{
+		ISTokensManager sTokenManagerInstance = ISTokensManager(registry().registries("STokenManager"));
+		/**
+		 * get position information
+		 */
+		(
+			address property,
+			uint256 amount,
+			uint256 price,
+			uint256 cumulativeReward,
+			uint256 pendingReward
+		) = sTokenManagerInstance.positions(_tokenId);
+		/**
+		 * If the balance of the withdrawal request is bigger than the balance you are staking
+		 */
+		require(amount >= _amount, "insufficient tokens staked");
 		/**
 		 * Withdraws the staking reward
 		 */
-		RewardPrices memory prices = _withdrawInterest(_property);
-
+		(uint256 value, RewardPrices memory prices) = _withdrawInterest(
+			property,
+			amount,
+			price,
+			pendingReward
+		);
 		/**
 		 * Transfer the staked amount to the sender.
 		 */
 		if (_amount != 0) {
-			IProperty(_property).withdraw(msg.sender, _amount);
+			IProperty(property).withdraw(msg.sender, _amount);
 		}
-
 		/**
 		 * Saves variables that should change due to the canceling staking..
 		 */
-		updateValues(false, msg.sender, _property, _amount, prices);
+		updateValues(false, property, _amount, prices);
+		uint256 cumulative = cumulativeReward.add(value);
+		/**
+		 * update position information
+		 */
+		return
+			sTokenManagerInstance.update(
+				_tokenId,
+				amount.sub(_amount),
+				prices.interest,
+				cumulative,
+				0
+			);
 	}
 
 	/**
@@ -201,7 +330,6 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 	 */
 	function beforeStakesChanged(
 		address _property,
-		address _user,
 		RewardPrices memory _prices
 	) private {
 		/**
@@ -227,7 +355,6 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		/**
 		 * Store each value.
 		 */
-		lastLockedPrice[_property][_user] = _prices.interest;
 		lastLockedChangedCumulativeReward = _prices.reward;
 		lastCumulativeHoldersRewardPrice = _prices.holders;
 		lastCumulativeRewardPrice = _prices.interest;
@@ -441,25 +568,15 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 	/**
 	 * Returns the staker reward as interest.
 	 */
-	function _calculateInterestAmount(address _property, address _user)
+	function _calculateInterestAmount(uint256 _amount, uint256 _price)
 		private
 		view
 		returns (
-			uint256 _amount,
-			uint256 _interestPrice,
-			RewardPrices memory _prices
+			uint256 amount_,
+			uint256 interestPrice_,
+			RewardPrices memory prices_
 		)
 	{
-		/**
-		 * Get the amount the user is staking for the Property.
-		 */
-		uint256 lockedUpPerAccount = getValue[_property][_user];
-
-		/**
-		 * Gets the cumulative sum of the interest price recorded the last time you withdrew.
-		 */
-		uint256 lastInterest = lastLockedPrice[_property][_user];
-
 		/**
 		 * Gets the latest cumulative sum of the interest price.
 		 */
@@ -473,8 +590,8 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		/**
 		 * Calculates and returns the latest withdrawable reward amount from the difference.
 		 */
-		uint256 result = interest >= lastInterest
-			? interest.sub(lastInterest).mul(lockedUpPerAccount).divBasis()
+		uint256 result = interest >= _price
+			? interest.sub(_price).mul(_amount).divBasis()
 			: 0;
 		return (
 			result,
@@ -488,23 +605,18 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 	 */
 	function _calculateWithdrawableInterestAmount(
 		address _property,
-		address _user
-	) private view returns (uint256 _amount, RewardPrices memory _prices) {
+		uint256 _amount,
+		uint256 _price,
+		uint256 _pendingReward
+	) private view returns (uint256 amount_, RewardPrices memory prices_) {
 		/**
 		 * If the passed Property has not authenticated, returns always 0.
 		 */
 		if (
-			IMetricsFactory(registry().registries("MetricsFactory")).hasAssets(
-				_property
-			) == false
+			IMetricsFactory(registry().registries("MetricsFactory")).hasAssets(_property) == false
 		) {
 			return (0, RewardPrices(0, 0, 0, 0));
 		}
-
-		/**
-		 * Gets the reward amount in saved without withdrawal.
-		 */
-		uint256 pending = pendingReward[_property][_user];
 
 		/**
 		 * Gets the latest withdrawal reward amount.
@@ -513,62 +625,67 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 			uint256 amount,
 			,
 			RewardPrices memory prices
-		) = _calculateInterestAmount(_property, _user);
+		) = _calculateInterestAmount(_amount, _price);
 
 		/**
 		 * Returns the sum of all values.
 		 */
-		uint256 withdrawableAmount = amount.add(pending);
+		uint256 withdrawableAmount = amount.add(_pendingReward);
 		return (withdrawableAmount, prices);
 	}
 
 	/**
 	 * Returns the total rewards currently available for withdrawal. (For calling from external of the contract)
 	 */
-	function calculateWithdrawableInterestAmount(
-		address _property,
-		address _user
-	) public view override returns (uint256) {
-		(uint256 amount, ) = _calculateWithdrawableInterestAmount(
-			_property,
-			_user
+	function calculateWithdrawableInterestAmountByPosition(uint256 _tokenId)
+		external override
+		view
+		returns (uint256)
+	{
+		ISTokensManager sTokenManagerInstance = ISTokensManager(registry().registries("STokenManager"));
+		(
+			address property,
+			uint256 amount,
+			uint256 price,
+			,
+			uint256 pendingReward
+		) = sTokenManagerInstance.positions(_tokenId);
+		(uint256 result, ) = _calculateWithdrawableInterestAmount(
+			property,
+			amount,
+			price,
+			pendingReward
 		);
-		return amount;
+		return result;
 	}
 
 	/**
 	 * Withdraws staking reward as an interest.
 	 */
-	function _withdrawInterest(address _property)
-		private
-		returns (RewardPrices memory _prices)
-	{
+	function _withdrawInterest(
+		address _property,
+		uint256 _amount,
+		uint256 _price,
+		uint256 _pendingReward
+	) private returns (uint256 value_, RewardPrices memory prices_) {
 		/**
 		 * Gets the withdrawable amount.
 		 */
 		(
 			uint256 value,
 			RewardPrices memory prices
-		) = _calculateWithdrawableInterestAmount(_property, msg.sender);
-
-		/**
-		 * Sets the unwithdrawn reward amount to 0.
-		 */
-		pendingReward[_property][msg.sender] = 0;
-
-		/**
-		 * Updates the staking status to avoid double rewards.
-		 */
-		lastLockedPrice[_property][msg.sender] = prices.interest;
+		) = _calculateWithdrawableInterestAmount(
+				_property,
+				_amount,
+				_price,
+				_pendingReward
+			);
 
 		/**
 		 * Mints the reward.
 		 */
 		require(
-			IDevMinter(registry().registries("DevMinter")).mint(
-				msg.sender,
-				value
-			),
+			IDevMinter(registry().registries("DevMinter")).mint(msg.sender, value),
 			"dev mint failed"
 		);
 
@@ -577,7 +694,7 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		 */
 		update();
 
-		return prices;
+		return (value, prices);
 	}
 
 	/**
@@ -585,12 +702,11 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 	 */
 	function updateValues(
 		bool _addition,
-		address _account,
 		address _property,
 		uint256 _value,
 		RewardPrices memory _prices
 	) private {
-		beforeStakesChanged(_property, _account, _prices);
+		beforeStakesChanged(_property, _prices);
 		/**
 		 * If added staking:
 		 */
@@ -605,14 +721,9 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 			 */
 			addPropertyValue(_property, _value);
 
-			/**
-			 * Updates the user's current staking amount in the Property.
-			 */
-			addValue(_property, _account, _value);
-
-			/**
-			 * If released staking:
-			 */
+		/**
+		* If released staking:
+		*/
 		} else {
 			/**
 			 * Updates the current staking amount of the protocol total.
@@ -623,11 +734,6 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 			 * Updates the current staking amount of the Property.
 			 */
 			subPropertyValue(_property, _value);
-
-			/**
-			 * Updates the current staking amount of the Property.
-			 */
-			subValue(_property, _account, _value);
 		}
 
 		/**
@@ -655,44 +761,6 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 	}
 
 	/**
-	 * Adds the user's staking amount in the Property.
-	 */
-	function addValue(
-		address _property,
-		address _sender,
-		uint256 _value
-	) private {
-		uint256 value = getValue[_property][_sender];
-		value = value.add(_value);
-		getValue[_property][_sender] = value;
-	}
-
-	/**
-	 * Subtracts the user's staking amount in the Property.
-	 */
-	function subValue(
-		address _property,
-		address _sender,
-		uint256 _value
-	) private {
-		uint256 value = getValue[_property][_sender];
-		value = value.sub(_value);
-		getValue[_property][_sender] = value;
-	}
-
-	/**
-	 * Returns whether the user is staking in the Property.
-	 */
-	function hasValue(
-		address _property,
-		address _sender,
-		uint256 _amount
-	) private view returns (bool) {
-		uint256 value = getValue[_property][_sender];
-		return value >= _amount;
-	}
-
-	/**
 	 * Adds the staking amount of the Property.
 	 */
 	function addPropertyValue(address _property, uint256 _value) private {
@@ -708,28 +776,5 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		uint256 value = totalLockedForProperty[_property];
 		uint256 nextValue = value.sub(_value);
 		totalLockedForProperty[_property] = nextValue;
-	}
-
-	/**
-	 * Saves the latest reward amount as an undrawn amount.
-	 */
-	function updatePendingInterestWithdrawal(address _property, address _user)
-		private
-		returns (RewardPrices memory _prices)
-	{
-		/**
-		 * Gets the latest reward amount.
-		 */
-		(
-			uint256 withdrawableAmount,
-			RewardPrices memory prices
-		) = _calculateWithdrawableInterestAmount(_property, _user);
-
-		/**
-		 * Saves the amount to `PendingInterestWithdrawal` storage.
-		 */
-		pendingReward[_property][_user] = withdrawableAmount;
-
-		return prices;
 	}
 }

@@ -2,15 +2,19 @@
 pragma solidity =0.8.6;
 
 interface ILockup {
-	function lockup(
-		address _from,
-		address _property,
-		uint256 _value
-	) external;
+	function depositToProperty(address _property, uint256 _amount)
+		external
+		returns (uint256);
+
+	function depositToPosition(uint256 _tokenId, uint256 _amount)
+		external
+		returns (bool);
 
 	function update() external;
 
-	function withdraw(address _property, uint256 _amount) external;
+	function withdrawByPosition(uint256 _tokenId, uint256 _amount)
+		external
+		returns (bool);
 
 	function calculateCumulativeRewardPrices()
 		external
@@ -43,16 +47,10 @@ interface ILockup {
 
 	function totalLocked() external view returns (uint256);
 
-	// !!!!!!!!!!!!!!!!!! TO BE DELETED !!!!!!!!!!!!!!!!!!
-	function getValue(address _property, address _sender)
+	function calculateWithdrawableInterestAmountByPosition(uint256 _tokenId)
 		external
 		view
 		returns (uint256);
-
-	function calculateWithdrawableInterestAmount(
-		address _property,
-		address _user
-	) external view returns (uint256);
 
 	function cap() external view returns (uint256);
 
