@@ -12,7 +12,7 @@ import {
 	MetricsInstance,
 	TreasuryTestInstance,
 	IPolicyContract,
-	LockupTestInstance,
+	STokensManagerInstance,
 	DevMinterInstance,
 } from '../../types/truffle-contracts'
 
@@ -54,6 +54,7 @@ export class DevProtocolInstance {
 	private _withdraw!: WithdrawTestInstance
 	private _treasury!: TreasuryTestInstance
 	private _devMinter!: DevMinterInstance
+	private _sTokensManager!: STokensManagerInstance
 	private readonly _policy!: IPolicyContract
 
 	constructor(deployer: string) {
@@ -104,6 +105,10 @@ export class DevProtocolInstance {
 		return this._treasury
 	}
 
+	public get sTokenManager(): STokensManagerInstance {
+		return this._sTokensManager
+	}
+
 	public async generateAddressRegistry(): Promise<void> {
 		const proxfied = await deployProxy(
 			contract('AddressRegistry'),
@@ -138,6 +143,13 @@ export class DevProtocolInstance {
 			this._dev.address,
 			this.fromDeployer
 		)
+	}
+
+	public async generateSTokenManager(): Promise<void> {
+		const proxfied = await deployProxy(contract('STokensManager'), this._deployer)
+		await proxfied.initialize(this._addressRegistry.address)
+		this._sTokensManager = proxfied
+		await this.addressRegistry.setRegistry('STokensManager', this._sTokensManager.address, this.fromDeployer)
 	}
 
 	public async generateLockup(): Promise<void> {

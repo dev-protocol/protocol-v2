@@ -31,15 +31,6 @@ interface ILockup {
 		view
 		returns (uint256, uint256);
 
-	/**
-	 * caution!!!this function is deprecated!!!
-	 * use calculateRewardAmount
-	 */
-	function calculateCumulativeHoldersRewardAmount(address _property)
-		external
-		view
-		returns (uint256);
-
 	function totalLockedForProperty(address _property)
 		external
 		view

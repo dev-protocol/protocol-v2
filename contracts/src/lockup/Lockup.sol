@@ -448,21 +448,6 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 	}
 
 	/**
-	 * Calculates cumulative sum of the holders reward per Property.
-	 * caution!!!this function is deprecated!!!
-	 * use calculateRewardAmount
-	 */
-	function calculateCumulativeHoldersRewardAmount(address _property)
-		external
-		view
-		override
-		returns (uint256)
-	{
-		(, uint256 holders, , ) = calculateCumulativeRewardPrices();
-		return _calculateCumulativeHoldersRewardAmount(holders, _property);
-	}
-
-	/**
 	 * Calculates holders reward and cap per Property.
 	 */
 	function calculateRewardAmount(address _property)
