@@ -84,7 +84,9 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 	 */
 	modifier onlyAuthenticatedProperty(address _property) {
 		require(
-			IMetricsFactory(registry().registries("MetricsFactory")).hasAssets(_property),
+			IMetricsFactory(registry().registries("MetricsFactory")).hasAssets(
+				_property
+			),
 			"unable to stake to unauthenticated property"
 		);
 		_;
@@ -96,7 +98,8 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 	 */
 	modifier onlyPositionOwner(uint256 _tokenId) {
 		require(
-			IERC721(registry().registries("STokenManager")).ownerOf(_tokenId) == msg.sender,
+			IERC721(registry().registries("STokenManager")).ownerOf(_tokenId) ==
+				msg.sender,
 			"illegal sender"
 		);
 		_;
@@ -109,7 +112,8 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 	 * @return tokenId The ID of the created new staking position
 	 */
 	function depositToProperty(address _property, uint256 _amount)
-		external override
+		external
+		override
 		onlyAuthenticatedProperty(_property)
 		returns (uint256)
 	{
@@ -149,12 +153,9 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		/**
 		 * mint s tokens
 		 */
-		uint256 tokenId = ISTokensManager(registry().registries("STokenManager")).mint(
-			msg.sender,
-			_property,
-			_amount,
-			interest
-		);
+		uint256 tokenId = ISTokensManager(
+			registry().registries("STokenManager")
+		).mint(msg.sender, _property, _amount, interest);
 		emit Lockedup(msg.sender, _property, _amount);
 		return tokenId;
 	}
@@ -166,7 +167,8 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 	 * @return bool On success, true will be returned
 	 */
 	function depositToPosition(uint256 _tokenId, uint256 _amount)
-		external override
+		external
+		override
 		onlyPositionOwner(_tokenId)
 		returns (bool)
 	{
@@ -174,7 +176,9 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		 * Validates _amount is not 0.
 		 */
 		require(_amount != 0, "illegal deposit amount");
-		ISTokensManager sTokenManagerInstance = ISTokensManager(registry().registries("STokenManager"));
+		ISTokensManager sTokenManagerInstance = ISTokensManager(
+			registry().registries("STokenManager")
+		);
 		/**
 		 * get position information
 		 */
@@ -235,11 +239,14 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 	 * Releases staking, withdraw rewards, and transfer the staked and withdraw rewards amount to the sender.
 	 */
 	function withdrawByPosition(uint256 _tokenId, uint256 _amount)
-		external override
+		external
+		override
 		onlyPositionOwner(_tokenId)
 		returns (bool)
 	{
-		ISTokensManager sTokenManagerInstance = ISTokensManager(registry().registries("STokenManager"));
+		ISTokensManager sTokenManagerInstance = ISTokensManager(
+			registry().registries("STokenManager")
+		);
 		/**
 		 * get position information
 		 */
@@ -328,10 +335,9 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 	/**
 	 * Store staking states as a snapshot.
 	 */
-	function beforeStakesChanged(
-		address _property,
-		RewardPrices memory _prices
-	) private {
+	function beforeStakesChanged(address _property, RewardPrices memory _prices)
+		private
+	{
 		/**
 		 * Gets latest cumulative holders reward for the passed Property.
 		 */
@@ -613,7 +619,9 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		 * If the passed Property has not authenticated, returns always 0.
 		 */
 		if (
-			IMetricsFactory(registry().registries("MetricsFactory")).hasAssets(_property) == false
+			IMetricsFactory(registry().registries("MetricsFactory")).hasAssets(
+				_property
+			) == false
 		) {
 			return (0, RewardPrices(0, 0, 0, 0));
 		}
@@ -638,11 +646,14 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 	 * Returns the total rewards currently available for withdrawal. (For calling from external of the contract)
 	 */
 	function calculateWithdrawableInterestAmountByPosition(uint256 _tokenId)
-		external override
+		external
 		view
+		override
 		returns (uint256)
 	{
-		ISTokensManager sTokenManagerInstance = ISTokensManager(registry().registries("STokenManager"));
+		ISTokensManager sTokenManagerInstance = ISTokensManager(
+			registry().registries("STokenManager")
+		);
 		(
 			address property,
 			uint256 amount,
@@ -685,7 +696,10 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		 * Mints the reward.
 		 */
 		require(
-			IDevMinter(registry().registries("DevMinter")).mint(msg.sender, value),
+			IDevMinter(registry().registries("DevMinter")).mint(
+				msg.sender,
+				value
+			),
 			"dev mint failed"
 		);
 
@@ -721,9 +735,9 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 			 */
 			addPropertyValue(_property, _value);
 
-		/**
-		* If released staking:
-		*/
+			/**
+			 * If released staking:
+			 */
 		} else {
 			/**
 			 * Updates the current staking amount of the protocol total.
