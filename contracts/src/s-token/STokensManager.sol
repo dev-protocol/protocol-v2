@@ -51,7 +51,7 @@ contract STokensManager is
 		address _property,
 		uint256 _amount,
 		uint256 _price
-	) external override onlyLockup returns (uint256 tikenId_) {
+	) external override onlyLockup returns (uint256 tokenId_) {
 		_tokenIds.increment();
 		uint256 newTokenId = _tokenIds.current();
 		_safeMint(_owner, newTokenId);
@@ -69,22 +69,22 @@ contract STokensManager is
 	}
 
 	function update(
-		uint256 _tikenId,
+		uint256 _tokenId,
 		uint256 _amount,
 		uint256 _price,
 		uint256 _cumulativeReward,
 		uint256 _pendingReward
 	) external override onlyLockup returns (bool) {
 		StakingPositionV1 memory currentPosition = getStoragePositionsV1(
-			_tikenId
+			_tokenId
 		);
 		currentPosition.amount = _amount;
 		currentPosition.price = _price;
 		currentPosition.cumulativeReward = _cumulativeReward;
 		currentPosition.pendingReward = _pendingReward;
-		setStoragePositionsV1(_tikenId, currentPosition);
+		setStoragePositionsV1(_tokenId, currentPosition);
 		emit Updated(
-			_tikenId,
+			_tokenId,
 			_amount,
 			_price,
 			_cumulativeReward,
@@ -153,6 +153,9 @@ contract STokensManager is
 		override
 		returns (uint256[] memory)
 	{
+		if (_owner == address(0)) {
+			return new uint256[](0);
+		}
 		uint256 balance = balanceOf(_owner);
 		uint256[] memory tokenIds = new uint256[](balance);
 		for (uint256 i = 0; i < balance; i++) {

@@ -72,10 +72,6 @@ export async function getAmountFromPosition(
 	dev: DevProtocolInstance,
 	tokenId: number
 ): Promise<BigNumber> {
-	const position = await dev.sTokenManager.positions(tokenId)
+	const position = await dev.sTokensManager.positions(tokenId)
 	return toBigNumber(position[1])
 }
-
-const daveFirstDepositTokenId = 1
-const daveSecondDepositTokenId = 2
-const daveThirdDepositTokenId = 3

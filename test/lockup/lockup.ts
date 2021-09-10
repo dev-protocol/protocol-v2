@@ -18,7 +18,7 @@ contract('LockupTest', ([deployer, user1, user2]) => {
 		await dev.generateAddressRegistry()
 		await dev.generateDev()
 		await dev.generateDevMinter()
-		await dev.generateSTokenManager()
+		await dev.generateSTokensManager()
 		await Promise.all([
 			dev.generateMarketFactory(),
 			dev.generateMetricsFactory(),

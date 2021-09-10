@@ -20,7 +20,7 @@ interface ISTokensManager {
 
 	/*
 	 * @dev The event fired when a token is updated.
-	 * @param tikenId The ID of the staking position
+	 * @param tokenId The ID of the staking position
 	 * @param amount The new staking amount
 	 * @param price The latest unit price of the cumulative staking reward
 	 * This value equals the 3rd return value of the Lockup.calculateCumulativeRewardPrices
@@ -28,7 +28,7 @@ interface ISTokensManager {
 	 * @param pendingReward The pending withdrawal reward amount amount
 	 */
 	event Updated(
-		uint256 tikenId,
+		uint256 tokenId,
 		uint256 amount,
 		uint256 price,
 		uint256 cumulativeReward,
@@ -60,7 +60,7 @@ interface ISTokensManager {
 	/*
 	 * @dev Updates the existing staking position.
 	 * Update must be called from the Lockup contract.
-	 * @param _tikenId The ID of the staking position
+	 * @param _tokenId The ID of the staking position
 	 * @param _amount The new staking amount
 	 * @param _price The latest unit price of the cumulative staking reward
 	 * This value equals the 3rd return value of the Lockup.calculateCumulativeRewardPrices
@@ -69,7 +69,7 @@ interface ISTokensManager {
 	 * @return bool On success, true will be returned
 	 */
 	function update(
-		uint256 _tikenId,
+		uint256 _tokenId,
 		uint256 _amount,
 		uint256 _price,
 		uint256 _cumulativeReward,
