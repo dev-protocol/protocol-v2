@@ -635,7 +635,7 @@
   dependencies:
     "@cspotcode/source-map-consumer" "0.8.0"
 
-"@devprotocol/util-contracts@^3.3.0":
+"@devprotocol/util-contracts@3.3.0":
   version "3.3.0"
   resolved "https://registry.yarnpkg.com/@devprotocol/util-contracts/-/util-contracts-3.3.0.tgz#56978e832f12b1796d937b20e57be307f2fcbc07"
   integrity sha512-5KgaYUcp7tbPIjSzoxE/40pMYqfFdqHsMraKy+ATDWVEy1D7gfdQEvOyx2nMwE/a5pjSO+UDgZP1hclEbnyTRQ==
@@ -14519,10 +14519,10 @@ typescript-tuple@^2.2.1:
   dependencies:
     typescript-compare "^0.0.2"
 
-typescript@4.4.2:
-  version "4.4.2"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.4.2.tgz#6d618640d430e3569a1dfb44f7d7e600ced3ee86"
-  integrity sha512-gzP+t5W4hdy4c+68bfcv0t400HVJMMd2+H9B7gae1nQlBzCqvrXX+6GL/b3GAgyTH966pzrZ70/fRjwAtZksSQ==
+typescript@4.4.3:
+  version "4.4.3"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.4.3.tgz#bdc5407caa2b109efd4f82fe130656f977a29324"
+  integrity sha512-4xfscpisVgqqDfPaJo5vkd+Qd/ItkoagnHpufr+i2QCHBsNYp+G7UAoyFl8aPtx879u38wPV65rZ8qbGZijalA==
 
 typewise-core@^1.2, typewise-core@^1.2.0:
   version "1.2.0"
