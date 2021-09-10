@@ -1,4 +1,3 @@
-/* eslint-disable max-params */
 import { DevProtocolInstance } from '../test-lib/instance'
 import {
 	MetricsInstance,
