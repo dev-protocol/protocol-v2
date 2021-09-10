@@ -19,6 +19,26 @@ export async function mine(count: number): Promise<void> {
 	}
 }
 
+export const sleep = async (ms: number): Promise<void> =>
+	new Promise((resolve) => {
+		setTimeout(resolve, ms)
+	})
+
+export const forwardBlockTimestamp = async (seconds: number): Promise<void> => {
+	await new Promise((resolve) => {
+		web3.currentProvider.send(
+			{
+				jsonrpc: '2.0',
+				method: 'evm_increaseTime',
+				params: [seconds],
+				id: 0,
+			},
+			resolve
+		)
+	})
+	return mine(1)
+}
+
 export const toBigNumber = (v: string | BigNumber | number): BigNumber =>
 	new BigNumber(v)
 
@@ -49,6 +69,9 @@ export const collectsEth =
 	}
 
 export const getBlock = async (): Promise<number> => web3.eth.getBlockNumber()
+
+export const getBlockTimestamp = async (): Promise<number> =>
+	web3.eth.getBlock(await getBlock()).then((x: any) => x.timestamp)
 
 export function gasLogger(txRes: Truffle.TransactionResponse) {
 	console.log(txRes.receipt.gasUsed)

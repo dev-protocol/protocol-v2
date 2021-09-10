@@ -5,11 +5,11 @@ import {
 } from '../../types/truffle-contracts'
 import BigNumber from 'bignumber.js'
 import {
-	mine,
 	toBigNumber,
 	getBlock,
 	gasLogger,
-	keccak256,
+	forwardBlockTimestamp,
+	getBlockTimestamp,
 } from '../test-lib/utils/common'
 import { getPropertyAddress } from '../test-lib/utils/log'
 import { waitForEvent, getEventValue } from '../test-lib/utils/event'
@@ -183,7 +183,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 
 			await dev.dev.deposit(property.address, 10000)
 			const lastBlock = await getBlock()
-			await mine(3)
+			await forwardBlockTimestamp(3)
 			await dev.lockup.withdraw(property.address, 10000)
 			const block = await getBlock()
 			const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
@@ -197,7 +197,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 			expect(afterTotalSupply.toFixed()).to.be.equal(
 				beforeTotalSupply.plus(reward).toFixed()
 			)
-			await mine(3)
+			await forwardBlockTimestamp(3)
 			await dev.lockup.withdraw(property.address, 0)
 			const afterBalance2 = await dev.dev.balanceOf(deployer).then(toBigNumber)
 			const afterTotalSupply2 = await dev.dev.totalSupply().then(toBigNumber)
@@ -287,6 +287,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 			let dev: DevProtocolInstance
 			let property: PropertyInstance
 			let calc: Calculator
+			const timestamps: Map<string, number> = new Map()
 
 			const alice = deployer
 			const bob = user1
@@ -306,11 +307,15 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				await dev.dev
 					.deposit(property.address, 1000000000000, { from: alice })
 					.then(gasLogger)
-				await mine(1)
+				const t1 = await getBlockTimestamp()
+				await forwardBlockTimestamp(1)
 				const result = await dev.lockup
 					.calculateWithdrawableInterestAmount(property.address, alice)
 					.then(toBigNumber)
-				const expected = toBigNumber(10).times(1e18)
+				const t2 = await getBlockTimestamp()
+				const expected = toBigNumber(10)
+					.times(t2 - t1)
+					.times(1e18)
 				const calculated = await calc(property, alice)
 
 				expect(result.toFixed()).to.be.equal(expected.toFixed())
@@ -318,11 +323,15 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 			})
 			it('Alice has a 100% of interests after withdrawal', async () => {
 				await dev.lockup.withdraw(property.address, 0, { from: alice })
-				await mine(1)
+				const t1 = await getBlockTimestamp()
+				await forwardBlockTimestamp(1)
 				const result = await dev.lockup
 					.calculateWithdrawableInterestAmount(property.address, alice)
 					.then(toBigNumber)
-				const expected = toBigNumber(10).times(1e18)
+				const t2 = await getBlockTimestamp()
+				const expected = toBigNumber(10)
+					.times(t2 - t1)
+					.times(1e18)
 				const calculated = await calc(property, alice)
 
 				expect(result.toFixed()).to.be.equal(expected.toFixed())
@@ -332,12 +341,16 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				await dev.dev
 					.deposit(property.address, 1000000000000, { from: bob })
 					.then(gasLogger)
+				timestamps.set('a1', await getBlockTimestamp())
 				await dev.lockup.withdraw(property.address, 0, { from: alice })
-				await mine(1)
+				const t1 = await getBlockTimestamp()
+				await forwardBlockTimestamp(1)
 				const result = await dev.lockup
 					.calculateWithdrawableInterestAmount(property.address, alice)
 					.then(toBigNumber)
+				const t2 = await getBlockTimestamp()
 				const expected = toBigNumber(10)
+					.times(t2 - t1)
 					.times(1e18)
 					.times(1000000000000 / (1000000000000 * 2))
 				const calculated = await calc(property, alice)
@@ -349,15 +362,20 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				await dev.dev
 					.deposit(property.address, 1000000000000, { from: alice })
 					.then(gasLogger)
+				timestamps.set('a2', await getBlockTimestamp())
 				await dev.dev
 					.deposit(property.address, 1000000000000, { from: alice })
 					.then(gasLogger)
+				timestamps.set('b1', await getBlockTimestamp())
 				await dev.lockup.withdraw(property.address, 0, { from: alice })
-				await mine(1)
+				const t1 = await getBlockTimestamp()
+				await forwardBlockTimestamp(1)
 				const result = await dev.lockup
 					.calculateWithdrawableInterestAmount(property.address, alice)
 					.then(toBigNumber)
+				const t2 = await getBlockTimestamp()
 				const expected = toBigNumber(10)
+					.times(t2 - t1)
 					.times(1e18)
 					.times(3000000000000 / (1000000000000 * 4))
 				const calculated = await calc(property, alice)
@@ -366,17 +384,19 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				expect(result.toFixed()).to.be.equal(calculated.toFixed())
 			})
 			it('Bob has a 30% of interests before withdrawal', async () => {
+				timestamps.set('b2', await getBlockTimestamp())
 				const result = await dev.lockup
 					.calculateWithdrawableInterestAmount(property.address, bob)
 					.then(toBigNumber)
 				const expected = toBigNumber(10)
+					.times(timestamps.get('a2')! - timestamps.get('a1')!)
 					.times(1e18)
 					.times(
 						toBigNumber(1000000000000).div(toBigNumber(1000000000000).times(2))
 					)
-					.times(3)
 					.plus(
 						toBigNumber(10)
+							.times(timestamps.get('b1')! - timestamps.get('a2')!)
 							.times(1e18)
 							.times(
 								toBigNumber(1000000000000).div(
@@ -386,13 +406,13 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 					)
 					.plus(
 						toBigNumber(10)
+							.times(timestamps.get('b2')! - timestamps.get('b1')!)
 							.times(1e18)
 							.times(
 								toBigNumber(1000000000000).div(
 									toBigNumber(1000000000000).times(4)
 								)
 							)
-							.times(2)
 					)
 					.integerValue()
 				const calculated = await calc(property, bob)
@@ -402,11 +422,14 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 			})
 			it('Bob has a 25% of interests', async () => {
 				await dev.lockup.withdraw(property.address, 0, { from: bob })
-				await mine(1)
+				const t1 = await getBlockTimestamp()
+				await forwardBlockTimestamp(1)
 				const result = await dev.lockup
 					.calculateWithdrawableInterestAmount(property.address, bob)
 					.then(toBigNumber)
+				const t2 = await getBlockTimestamp()
 				const expected = toBigNumber(10)
+					.times(t2 - t1)
 					.times(1e18)
 					.times(1000000000000 / (1000000000000 * 4))
 				const calculated = await calc(property, bob)
@@ -416,14 +439,16 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 			})
 			it('Alice can withdraw 5 blocks', async () => {
 				await dev.lockup.withdraw(property.address, 0, { from: alice })
-				await mine(5)
+				const t1 = await getBlockTimestamp()
+				await forwardBlockTimestamp(5)
 				const result = await dev.lockup
 					.calculateWithdrawableInterestAmount(property.address, alice)
 					.then(toBigNumber)
+				const t2 = await getBlockTimestamp()
 				const expected = toBigNumber(10)
+					.times(t2 - t1)
 					.times(1e18)
 					.times(3000000000000 / (1000000000000 * 4))
-					.times(5)
 				const calculated = await calc(property, alice)
 
 				expect(result.toFixed()).to.be.equal(expected.toFixed())
@@ -443,11 +468,15 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				await dev.dev
 					.deposit(property.address, 1000000000000, { from: alice })
 					.then(gasLogger)
-				await mine(1)
+				const t1 = await getBlockTimestamp()
+				await forwardBlockTimestamp(1)
 				const result = await dev.lockup
 					.calculateWithdrawableInterestAmount(property.address, alice)
 					.then(toBigNumber)
-				const expected = toBigNumber(10).times(1e18)
+				const t2 = await getBlockTimestamp()
+				const expected = toBigNumber(10)
+					.times(t2 - t1)
+					.times(1e18)
 				const calculated = await calc(property, alice)
 
 				expect(result.toFixed()).to.be.equal(expected.toFixed())
@@ -460,7 +489,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				await dev.dev
 					.deposit(property.address, 1000000000000, { from: bob })
 					.then(gasLogger)
-				await mine(2)
+				await forwardBlockTimestamp(2)
 				await dev.lockup.withdraw(
 					property.address,
 					await dev.lockup.getValue(property.address, alice),
@@ -471,7 +500,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 					await dev.lockup.getValue(property.address, bob),
 					{ from: bob }
 				)
-				await mine(1)
+				await forwardBlockTimestamp(1)
 				const aliceAmount =
 					await dev.lockup.calculateWithdrawableInterestAmount(
 						property.address,
@@ -509,16 +538,19 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				await dev.dev
 					.deposit(property.address, bobBalance, { from: bob })
 					.then(gasLogger)
-				await mine(10)
+				await forwardBlockTimestamp(10)
 
 				await dev.dev
 					.deposit(property2.address, 10000000, { from: alice })
 					.then(gasLogger)
-				await mine(1)
+				const t1 = await getBlockTimestamp()
+				await forwardBlockTimestamp(1)
 				const result = await dev.lockup
 					.calculateWithdrawableInterestAmount(property2.address, alice)
 					.then(toBigNumber)
+				const t2 = await getBlockTimestamp()
 				const expected = toBigNumber(10)
+					.times(t2 - t1)
 					.times(1e18)
 					.times(
 						toBigNumber(10000000).div(toBigNumber(10000000).plus(bobBalance))
@@ -539,11 +571,11 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				await dev.dev
 					.deposit(propertyAddress, 1000000000000, { from: alice })
 					.then(gasLogger)
-				await mine(1)
+				await forwardBlockTimestamp(1)
 				await dev.dev
 					.deposit(propertyAddress, 1000000000000, { from: alice })
 					.then(gasLogger)
-				await mine(1)
+				await forwardBlockTimestamp(1)
 				await dev.metricsFactory.__setMetricsCountPerProperty(
 					propertyAddress,
 					0
@@ -560,7 +592,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 		describe('scenario; single lockup', () => {
 			let dev: DevProtocolInstance
 			let property: PropertyInstance
-			let lastBlock: BigNumber
+			let lastBlockTimestamp: number
 
 			const alice = deployer
 			const bob = user1
@@ -572,7 +604,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				await dev.dev
 					.deposit(property.address, 10000, { from: alice })
 					.then(gasLogger)
-				lastBlock = await getBlock().then(toBigNumber)
+				lastBlockTimestamp = await getBlockTimestamp()
 			})
 
 			/*
@@ -591,30 +623,32 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 					expect(aliceBalance.toFixed()).to.be.equal(total.toFixed())
 				})
 				it(`Alice's withdrawable interest is 100% of the Property's interest`, async () => {
-					await mine(9)
-					const block = await getBlock().then(toBigNumber)
+					await forwardBlockTimestamp(9)
+					const t1 = await getBlockTimestamp()
 					const aliceAmount = await dev.lockup
 						.calculateWithdrawableInterestAmount(property.address, alice)
 						.then(toBigNumber)
 					const expected = toBigNumber(10) // In PolicyTestBase, the max staker reward per block is 10.
 						.times(1e18)
-						.times(block.minus(lastBlock))
+						.times(t1 - lastBlockTimestamp)
 					expect(aliceAmount.toFixed()).to.be.equal(expected.toFixed())
 				})
 			})
 			describe('after second run', () => {
 				before(async () => {
 					await dev.lockup.withdraw(property.address, 0, { from: alice })
-					lastBlock = await getBlock().then(toBigNumber)
+					lastBlockTimestamp = await getBlockTimestamp()
 				})
 				it(`Alice's withdrawable interest is 100% of the Property's interest`, async () => {
-					await mine(3)
+					const t1 = await getBlockTimestamp()
+					await forwardBlockTimestamp(3)
 					const aliceAmount = await dev.lockup
 						.calculateWithdrawableInterestAmount(property.address, alice)
 						.then(toBigNumber)
+					const t2 = await getBlockTimestamp()
 					const expected = toBigNumber(10) // In PolicyTestBase, the max staker reward per block is 10.
 						.times(1e18)
-						.times(3)
+						.times(t2 - t1)
 					expect(aliceAmount.toFixed()).to.be.equal(expected.toFixed())
 				})
 			})
@@ -623,13 +657,13 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 					await dev.dev.deposit(property.address, 10000, { from: alice })
 				})
 				it(`Alice's withdrawable interest is 100% of the Property's interest`, async () => {
-					const block = await getBlock().then(toBigNumber)
+					const t1 = await getBlockTimestamp()
 					const aliceAmount = await dev.lockup
 						.calculateWithdrawableInterestAmount(property.address, alice)
 						.then(toBigNumber)
 					const expected = toBigNumber(10) // In PolicyTestBase, the max staker reward per block is 10.
 						.times(1e18)
-						.times(block.minus(lastBlock))
+						.times(t1 - lastBlockTimestamp)
 
 					expect(aliceAmount.toFixed()).to.be.equal(expected.toFixed())
 				})
@@ -647,7 +681,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 					})
 				})
 				it(`Alice's withdrawable interest is 100% of the Property's interest`, async () => {
-					const block = await getBlock().then(toBigNumber)
+					const t1 = await getBlockTimestamp()
 					const aliceLockup = await dev.lockup
 						.getValue(property.address, alice)
 						.then(toBigNumber)
@@ -659,7 +693,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 						.then(toBigNumber)
 					const reward = toBigNumber(10) // In PolicyTestBase, the max staker reward per block is 10.
 						.times(1e18)
-						.times(block.minus(lastBlock))
+						.times(t1 - lastBlockTimestamp)
 					expect(aliceAmount.toFixed()).to.be.equal('0')
 					expect(aliceLockup.toFixed()).to.be.equal('0')
 					expect(afterAliceBalance.toFixed()).to.be.equal(
@@ -714,7 +748,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 					)
 				})
 				it(`Alice's withdrawable interest is 100% of between lastBlockNumber and Bob's first deposit block interest and 80% of current interest`, async () => {
-					await mine(3)
+					await forwardBlockTimestamp(3)
 					const aliceAmount = await dev.lockup
 						.calculateWithdrawableInterestAmount(property.address, alice)
 						.then(toBigNumber)
@@ -722,7 +756,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 					expect(aliceAmount.toFixed()).to.be.equal(expected.toFixed())
 				})
 				it(`Bob's withdrawable interest is 20% of interest since the first deposit`, async () => {
-					await mine(3)
+					await forwardBlockTimestamp(3)
 					const bobAmount = await dev.lockup
 						.calculateWithdrawableInterestAmount(property.address, bob)
 						.then(toBigNumber)
@@ -734,7 +768,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				before(async () => {
 					await dev.lockup.withdraw(property.address, 0, { from: alice })
 					await dev.lockup.withdraw(property.address, 0, { from: bob })
-					await mine(3)
+					await forwardBlockTimestamp(3)
 				})
 				it(`Alice's withdrawable interest is 80% of current interest`, async () => {
 					const aliceAmount = await dev.lockup
@@ -756,7 +790,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 			describe('additional staking', () => {
 				before(async () => {
 					await dev.dev.deposit(property.address, 12500 * 0.3, { from: bob })
-					await mine(3)
+					await forwardBlockTimestamp(3)
 				})
 				it(`Bob does staking 30% of the Property's total lockups, Bob's share become ${
 					625000 / 16250
@@ -813,7 +847,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 							from: alice,
 						}
 					)
-					await mine(3)
+					await forwardBlockTimestamp(3)
 					await dev.lockup.withdraw(
 						property.address,
 						await dev.lockup.getValue(property.address, bob),
@@ -821,7 +855,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 							from: bob,
 						}
 					)
-					await mine(3)
+					await forwardBlockTimestamp(3)
 				})
 				it(`Alice's withdrawable interest is 0`, async () => {
 					const aliceAmount = await dev.lockup
@@ -894,7 +928,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				)
 
 				await dev.dev.deposit(property1.address, 10000, { from: alice })
-				await mine(3)
+				await forwardBlockTimestamp(3)
 			})
 
 			describe('before withdrawal', () => {
@@ -928,7 +962,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 					expect(p2.div(total).toNumber()).to.be.equal(0.2)
 				})
 				it(`Alice's withdrawable interest is 100% of between lastBlockNumber and Bob's first deposit block interest and 80% of current interest`, async () => {
-					await mine(3)
+					await forwardBlockTimestamp(3)
 					const aliceAmount = await dev.lockup
 						.calculateWithdrawableInterestAmount(property1.address, alice)
 						.then(toBigNumber)
@@ -936,7 +970,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 					expect(aliceAmount.toFixed()).to.be.equal(expected.toFixed())
 				})
 				it(`Bob's withdrawable interest is 20% of interest since the first deposit`, async () => {
-					await mine(3)
+					await forwardBlockTimestamp(3)
 					const bobAmount = await dev.lockup
 						.calculateWithdrawableInterestAmount(property2.address, bob)
 						.then(toBigNumber)
@@ -948,7 +982,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				before(async () => {
 					await dev.lockup.withdraw(property1.address, 0, { from: alice })
 					await dev.lockup.withdraw(property2.address, 0, { from: bob })
-					await mine(3)
+					await forwardBlockTimestamp(3)
 				})
 				it('No staked Property is 0 interest', async () => {
 					const result = await dev.lockup
@@ -978,7 +1012,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 			describe('additional staking', () => {
 				before(async () => {
 					await dev.dev.deposit(property2.address, 12500 * 0.3, { from: bob })
-					await mine(3)
+					await forwardBlockTimestamp(3)
 				})
 				it('No staked Property is 0 interest', async () => {
 					const result = await dev.lockup
@@ -1049,7 +1083,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 			describe('additional staking', () => {
 				before(async () => {
 					await dev.dev.deposit(property3.address, 16250 * 0.6, { from: alice })
-					await mine(3)
+					await forwardBlockTimestamp(3)
 				})
 				it('No staked Property is 0 interest', async () => {
 					const result = await dev.lockup
@@ -1133,7 +1167,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 							from: alice,
 						}
 					)
-					await mine(3)
+					await forwardBlockTimestamp(3)
 					await dev.lockup.withdraw(
 						property3.address,
 						await dev.lockup.getValue(property3.address, alice),
@@ -1141,7 +1175,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 							from: alice,
 						}
 					)
-					await mine(3)
+					await forwardBlockTimestamp(3)
 					await dev.lockup.withdraw(
 						property2.address,
 						await dev.lockup.getValue(property2.address, bob),
@@ -1149,7 +1183,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 							from: bob,
 						}
 					)
-					await mine(3)
+					await forwardBlockTimestamp(3)
 				})
 				it('No staked Property is 0 interest', async () => {
 					const result = await dev.lockup

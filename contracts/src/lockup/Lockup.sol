@@ -16,8 +16,8 @@ import {IMetricsFactory} from "contracts/interface/IMetricsFactory.sol";
  * Staking and the following mechanism determines that reward calculation.
  *
  * Variables:
- * -`M`: Maximum mint amount per block determined by Allocator contract
- * -`B`: Number of blocks during staking
+ * -`M`: Maximum mint amount per second determined by Allocator contract
+ * -`B`: Number of seconds during staking
  * -`P`: Total number of staking locked up in a Property contract
  * -`S`: Total number of staking locked up in all Property contracts
  * -`U`: Number of staking per account locked up in a Property contract
@@ -26,8 +26,8 @@ import {IMetricsFactory} from "contracts/interface/IMetricsFactory.sol";
  * Staking Rewards = M * B * (P / S) * (U / P)
  *
  * Note:
- * -`M`, `P` and `S` vary from block to block, and the variation cannot be predicted.
- * -`B` is added every time the Ethereum block is created.
+ * -`M`, `P` and `S` vary from second to second, and the variation cannot be predicted.
+ * -`B` is added every time the Ethereum second is created.
  * - Only `U` and `B` are predictable variables.
  * - As `M`, `P` and `S` cannot be observed from a staker, the "cumulative sum" is often used to calculate ratio variation with history.
  * - Reward withdrawal always withdraws the total withdrawable amount.
@@ -35,9 +35,9 @@ import {IMetricsFactory} from "contracts/interface/IMetricsFactory.sol";
  * Scenario:
  * - Assume `M` is fixed at 500
  * - Alice stakes 100 DEV on Property-A (Alice's staking state on Property-A: `M`=500, `B`=0, `P`=100, `S`=100, `U`=100)
- * - After 10 blocks, Bob stakes 60 DEV on Property-B (Alice's staking state on Property-A: `M`=500, `B`=10, `P`=100, `S`=160, `U`=100)
- * - After 10 blocks, Carol stakes 40 DEV on Property-A (Alice's staking state on Property-A: `M`=500, `B`=20, `P`=140, `S`=200, `U`=100)
- * - After 10 blocks, Alice withdraws Property-A staking reward. The reward at this time is 5000 DEV (10 blocks * 500 DEV) + 3125 DEV (10 blocks * 62.5% * 500 DEV) + 2500 DEV (10 blocks * 50% * 500 DEV).
+ * - After 10 seconds, Bob stakes 60 DEV on Property-B (Alice's staking state on Property-A: `M`=500, `B`=10, `P`=100, `S`=160, `U`=100)
+ * - After 10 seconds, Carol stakes 40 DEV on Property-A (Alice's staking state on Property-A: `M`=500, `B`=20, `P`=140, `S`=200, `U`=100)
+ * - After 10 seconds, Alice withdraws Property-A staking reward. The reward at this time is 5000 DEV (10 seconds * 500 DEV) + 3125 DEV (10 seconds * 62.5% * 500 DEV) + 2500 DEV (10 seconds * 50% * 500 DEV).
  */
 contract Lockup is ILockup, InitializableUsingRegistry {
 	using SafeMath for uint256;
@@ -60,7 +60,7 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 	uint256 public lastCumulativeRewardPrice; // From [get/set]StorageLastCumulativeInterestPrice
 	uint256 public cumulativeGlobalReward; // From [get/set]StorageCumulativeGlobalRewards
 	uint256 public lastSameGlobalRewardAmount; // From [get/set]StorageLastSameRewardsAmountAndBlock
-	uint256 public lastSameGlobalRewardBlock; // From [get/set]StorageLastSameRewardsAmountAndBlock
+	uint256 public lastSameGlobalRewardTimestamp; // From [get/set]StorageLastSameRewardsAmountAndBlock
 	mapping(address => uint256)
 		public lastCumulativeHoldersRewardPricePerProperty; // {Property: Value} // [get/set]StorageLastCumulativeHoldersRewardPricePerProperty
 	mapping(address => uint256) public initialCumulativeHoldersRewardCap; // {Property: Value} // From [get/set]StorageInitialCumulativeHoldersRewardCap
@@ -111,7 +111,7 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		);
 
 		/**
-		 * Since the reward per block that can be withdrawn will change with the addition of staking,
+		 * Since the reward per Timestamp that can be withdrawn will change with the addition of staking,
 		 * saves the undrawn withdrawable reward before addition it.
 		 */
 		RewardPrices memory prices = updatePendingInterestWithdrawal(
@@ -357,30 +357,30 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 	}
 
 	/**
-	 * Updates cumulative sum of the maximum mint amount calculated by Allocator contract, the latest maximum mint amount per block,
-	 * and the last recorded block number.
+	 * Updates cumulative sum of the maximum mint amount calculated by Allocator contract, the latest maximum mint amount per second,
+	 * and the last recorded timestamp.
 	 * The cumulative sum of the maximum mint amount is always added.
 	 * By recording that value when the staker last stakes, the difference from the when the staker stakes can be calculated.
 	 */
 	function update() public override {
 		/**
-		 * Gets the cumulative sum of the maximum mint amount and the maximum mint number per block.
+		 * Gets the cumulative sum of the maximum mint amount and the maximum mint number per second.
 		 */
 		(uint256 _nextRewards, uint256 _amount) = dry();
 
 		/**
-		 * Records each value and the latest block number.
+		 * Records each value and the latest timestamp.
 		 */
 		cumulativeGlobalReward = _nextRewards;
 		lastSameGlobalRewardAmount = _amount;
-		lastSameGlobalRewardBlock = block.number;
+		lastSameGlobalRewardTimestamp = block.timestamp;
 	}
 
 	/**
-	 * @dev Returns the maximum number of mints per block.
-	 * @return Maximum number of mints per block.
+	 * @dev Returns the maximum number of mints per second.
+	 * @return Maximum number of mints per second.
 	 */
-	function calculateMaxRewardsPerBlock() private view returns (uint256) {
+	function calculateMaxRewardsPerSecond() private view returns (uint256) {
 		uint256 totalAssets = IMetricsFactory(
 			registry().registries("MetricsFactory")
 		).metricsCount();
@@ -401,39 +401,39 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		returns (uint256 _nextRewards, uint256 _amount)
 	{
 		/**
-		 * Gets the latest mint amount per block from Allocator contract.
+		 * Gets the latest mint amount per second from Allocator contract.
 		 */
-		uint256 rewardsAmount = calculateMaxRewardsPerBlock();
+		uint256 rewardsAmount = calculateMaxRewardsPerSecond();
 
 		/**
-		 * Gets the maximum mint amount per block, and the last recorded block number from `LastSameRewardsAmountAndBlock` storage.
+		 * Gets the maximum mint amount per second, and the last recorded timestamp from `LastSameRewardsAmountAndTimestamp` storage.
 		 */
-		(uint256 lastAmount, uint256 lastBlock) = (
+		(uint256 lastAmount, uint256 lastTs) = (
 			lastSameGlobalRewardAmount,
-			lastSameGlobalRewardBlock
+			lastSameGlobalRewardTimestamp
 		);
 
 		/**
-		 * If the recorded maximum mint amount per block and the result of the Allocator contract are different,
-		 * the result of the Allocator contract takes precedence as a maximum mint amount per block.
+		 * If the recorded maximum mint amount per second and the result of the Allocator contract are different,
+		 * the result of the Allocator contract takes precedence as a maximum mint amount per second.
 		 */
 		uint256 lastMaxRewards = lastAmount == rewardsAmount
 			? rewardsAmount
 			: lastAmount;
 
 		/**
-		 * Calculates the difference between the latest block number and the last recorded block number.
+		 * Calculates the difference between the latest timestamp and the last recorded timestamp.
 		 */
-		uint256 blocks = lastBlock > 0 ? block.number.sub(lastBlock) : 0;
+		uint256 time = lastTs > 0 ? block.timestamp.sub(lastTs) : 0;
 
 		/**
 		 * Adds the calculated new cumulative maximum mint amount to the recorded cumulative maximum mint amount.
 		 */
-		uint256 additionalRewards = lastMaxRewards.mul(blocks);
+		uint256 additionalRewards = lastMaxRewards.mul(time);
 		uint256 nextRewards = cumulativeGlobalReward.add(additionalRewards);
 
 		/**
-		 * Returns the latest theoretical cumulative sum of maximum mint amount and maximum mint amount per block.
+		 * Returns the latest theoretical cumulative sum of maximum mint amount and maximum mint amount per second.
 		 */
 		return (nextRewards, rewardsAmount);
 	}
