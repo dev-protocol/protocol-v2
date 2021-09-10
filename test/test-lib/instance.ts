@@ -105,7 +105,7 @@ export class DevProtocolInstance {
 		return this._treasury
 	}
 
-	public get sTokenManager(): STokensManagerInstance {
+	public get sTokensManager(): STokensManagerInstance {
 		return this._sTokensManager
 	}
 
@@ -145,7 +145,7 @@ export class DevProtocolInstance {
 		)
 	}
 
-	public async generateSTokenManager(): Promise<void> {
+	public async generateSTokensManager(): Promise<void> {
 		const proxfied = await deployProxy(
 			contract('STokensManager'),
 			this._deployer

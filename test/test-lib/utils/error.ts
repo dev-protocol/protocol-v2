@@ -16,4 +16,15 @@ export function validateNotOwnerErrorMessage(result: any, reason = true): void {
 	validateErrorMessage(result, 'Ownable: caller is not the owner.', reason)
 }
 
+export function validateVmExceptionErrorMessage(
+	result: any,
+	reason = true
+): void {
+	validateErrorMessage(
+		result,
+		'Returned error: VM Exception while processing transaction: revert',
+		reason
+	)
+}
+
 export const errorCatch = (err: Error) => err

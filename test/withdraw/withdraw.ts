@@ -39,7 +39,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 		await dev.generateAddressRegistry()
 		await dev.generateDev()
 		await dev.generateDevMinter()
-		await dev.generateSTokenManager()
+		await dev.generateSTokensManager()
 		await Promise.all([
 			dev.generateMarketFactory(),
 			dev.generateMetricsFactory(),
@@ -949,7 +949,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 			})
 			describe('after staking withdrawal', () => {
 				before(async () => {
-					await dev.sTokenManager.positions(1)
+					await dev.sTokensManager.positions(1)
 					await dev.lockup.withdrawByPosition(
 						1,
 						await getAmountFromPosition(dev, 1),

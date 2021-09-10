@@ -100,7 +100,7 @@ contract(
 				await dev.generateAddressRegistry()
 				await dev.generateDev()
 				await dev.generateDevMinter()
-				await dev.generateSTokenManager()
+				await dev.generateSTokensManager()
 				await Promise.all([
 					dev.generateMarketFactory(),
 					dev.generateMetricsFactory(),
@@ -311,7 +311,7 @@ contract(
 				await dev.generateAddressRegistry()
 				await dev.generateDev()
 				await dev.generateDevMinter()
-				await dev.generateSTokenManager()
+				await dev.generateSTokensManager()
 				await Promise.all([
 					dev.generateMarketFactory(),
 					dev.generateMetricsFactory(),

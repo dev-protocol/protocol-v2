@@ -7,7 +7,6 @@ import {
 } from '../test-lib/utils/error'
 import { DEFAULT_ADDRESS } from '../test-lib/const'
 import { toBigNumber, splitValue } from '../test-lib/utils/common'
-import { getEventValue } from '../test-lib/utils/event'
 
 contract(
 	'PropertyTest',
@@ -19,7 +18,7 @@ contract(
 				await dev.generateAddressRegistry()
 				await dev.generateDev()
 				await dev.generateDevMinter()
-				await dev.generateSTokenManager()
+				await dev.generateSTokensManager()
 				await dev.generatePolicyFactory()
 				await dev.generateLockup()
 				await dev.generateMetricsFactory()
@@ -75,7 +74,7 @@ contract(
 				await dev.generateAddressRegistry()
 				await dev.generateDev()
 				await dev.generateDevMinter()
-				await dev.generateSTokenManager()
+				await dev.generateSTokensManager()
 				await dev.generatePolicyFactory()
 				await dev.generateLockup()
 				await dev.generateMetricsFactory()
@@ -144,7 +143,7 @@ contract(
 				await dev.generateAddressRegistry()
 				await dev.generateDev()
 				await dev.generateDevMinter()
-				await dev.generateSTokenManager()
+				await dev.generateSTokensManager()
 				await dev.generateLockup()
 				await dev.generatePolicyFactory()
 				await dev.generateMetricsFactory()
@@ -213,7 +212,7 @@ contract(
 				await dev.generateAddressRegistry()
 				await dev.generateDev()
 				await dev.generateDevMinter()
-				await dev.generateSTokenManager()
+				await dev.generateSTokensManager()
 				await dev.generateLockup()
 				await dev.generatePolicyFactory()
 				await dev.generateMetricsFactory()
@@ -283,7 +282,7 @@ contract(
 				await dev.generateAddressRegistry()
 				await dev.generateDev()
 				await dev.generateDevMinter()
-				await dev.generateSTokenManager()
+				await dev.generateSTokensManager()
 				await Promise.all([
 					dev.generatePropertyFactory(),
 					dev.generatePolicyFactory(),
@@ -330,7 +329,7 @@ contract(
 				await dev.generateAddressRegistry()
 				await dev.generateDev()
 				await dev.generateDevMinter()
-				await dev.generateSTokenManager()
+				await dev.generateSTokensManager()
 				await Promise.all([
 					dev.generateWithdraw(),
 					dev.generatePropertyFactory(),
@@ -377,7 +376,7 @@ contract(
 				await dev.generateAddressRegistry()
 				await dev.generateDev()
 				await dev.generateDevMinter()
-				await dev.generateSTokenManager()
+				await dev.generateSTokensManager()
 				await Promise.all([
 					dev.generateWithdraw(),
 					dev.generatePropertyFactory(),

@@ -1,7 +1,7 @@
 import { DevProtocolInstance } from '../test-lib/instance'
 import { getPropertyAddress, getMarketAddress } from '../test-lib/utils/log'
 import { toBigNumber } from '../test-lib/utils/common'
-import { getEventValue, watch } from '../test-lib/utils/event'
+import { getEventValue } from '../test-lib/utils/event'
 
 contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 	describe('PropertyFactory; create', () => {
@@ -10,7 +10,7 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 			await dev.generateAddressRegistry()
 			await dev.generateDev()
 			await dev.generateDevMinter()
-			await dev.generateSTokenManager()
+			await dev.generateSTokensManager()
 			await Promise.all([
 				dev.generateMetricsFactory(),
 				dev.generatePropertyFactory(),
@@ -63,7 +63,7 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 			await dev.generateAddressRegistry()
 			await dev.generateDev()
 			await dev.generateDevMinter()
-			await dev.generateSTokenManager()
+			await dev.generateSTokensManager()
 			await Promise.all([
 				dev.generateMarketFactory(),
 				dev.generateMetricsFactory(),

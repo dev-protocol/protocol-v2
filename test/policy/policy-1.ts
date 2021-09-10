@@ -14,7 +14,7 @@ contract('Policy1', ([deployer, treasury, capSetter, user]) => {
 		await dev.generateAddressRegistry()
 		await dev.generateDev()
 		await dev.generateDevMinter()
-		await dev.generateSTokenManager()
+		await dev.generateSTokensManager()
 		await dev.generateLockup()
 		await dev.dev.mint(deployer, new BigNumber(1e18).times(10000000))
 		policy = await artifacts.require('Policy1').new(dev.addressRegistry.address)
