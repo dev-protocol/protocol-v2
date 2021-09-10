@@ -1,6 +1,7 @@
 import Web3 from 'web3'
 import BigNumber from 'bignumber.js'
 import { SHARE_OF_TREASURY } from './../const'
+import { DevProtocolInstance } from '../instance'
 
 export async function mine(count: number): Promise<void> {
 	for (let i = 0; i < count; i++) {
@@ -66,3 +67,15 @@ export function splitValue(
 	const tmp2 = _value.minus(tmp)
 	return [tmp2, tmp]
 }
+
+export async function getAmountFromPosition(
+	dev: DevProtocolInstance,
+	tokenId: number
+): Promise<BigNumber> {
+	const position = await dev.sTokenManager.positions(tokenId)
+	return toBigNumber(position[1])
+}
+
+const daveFirstDepositTokenId = 1
+const daveSecondDepositTokenId = 2
+const daveThirdDepositTokenId = 3

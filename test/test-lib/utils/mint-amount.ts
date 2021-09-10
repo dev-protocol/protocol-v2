@@ -18,7 +18,6 @@ async function getWithdrawAmount(
 		.rewards(totalLockedUps.toFixed(), totalIssuedMetrics.toFixed())
 		.then(toBigNumber)
 
-	// eslint-disable-next-line @typescript-eslint/await-thenable
 	const value = await dev.lockup.totalLockedForProperty(propertyAddress)
 	const share = await policyInstance
 		.holdersShare(cal.toFixed(), value.toString())

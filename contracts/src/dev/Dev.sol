@@ -26,36 +26,6 @@ contract Dev is ERC20PresetMinterPauser, UsingRegistry, IDev {
 	{}
 
 	/**
-	 * Staking DEV tokens.
-	 * The transfer destination must always be included in the address set for Property tokens.
-	 * This is because if the transfer destination is not a Property token, it is possible that the staked DEV token cannot be withdrawn.
-	 */
-	function deposit(address _to, uint256 _amount)
-		external
-		override
-		returns (bool)
-	{
-		require(transfer(_to, _amount), "dev transfer failed");
-		lock(msg.sender, _to, _amount);
-		return true;
-	}
-
-	/**
-	 * Staking DEV tokens by an allowanced address.
-	 * The transfer destination must always be included in the address set for Property tokens.
-	 * This is because if the transfer destination is not a Property token, it is possible that the staked DEV token cannot be withdrawn.
-	 */
-	function depositFrom(
-		address _from,
-		address _to,
-		uint256 _amount
-	) external override returns (bool) {
-		require(transferFrom(_from, _to, _amount), "dev transferFrom failed");
-		lock(_from, _to, _amount);
-		return true;
-	}
-
-	/**
 	 * Burn the DEV tokens as an authentication fee.
 	 * Only Market contracts can execute this function.
 	 */
@@ -72,16 +42,5 @@ contract Dev is ERC20PresetMinterPauser, UsingRegistry, IDev {
 		);
 		_burn(_from, _amount);
 		return true;
-	}
-
-	/**
-	 * Call `Lockup.lockup` to execute staking.
-	 */
-	function lock(
-		address _from,
-		address _to,
-		uint256 _amount
-	) private {
-		ILockup(registry().registries("Lockup")).lockup(_from, _to, _amount);
 	}
 }
