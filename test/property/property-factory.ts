@@ -1,7 +1,7 @@
 import { DevProtocolInstance } from '../test-lib/instance'
 import { getPropertyAddress, getMarketAddress } from '../test-lib/utils/log'
 import { toBigNumber } from '../test-lib/utils/common'
-import { getEventValue, watch } from '../test-lib/utils/event'
+import { getEventValue } from '../test-lib/utils/event'
 
 contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 	describe('PropertyFactory; create', () => {
