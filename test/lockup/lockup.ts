@@ -128,1117 +128,1117 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 			expect(_value).to.be.equal('10000')
 		})
 	})
-	describe('Lockup; withdraw', () => {
-		it('should fail to call when tokens are insufficient', async () => {
-			const [dev, property] = await init()
-			const amount = 1000000
-			await dev.dev.deposit(property.address, amount)
-
-			const res = await dev.lockup
-				.withdraw(property.address, amount + 1)
-				.catch(err)
-			validateErrorMessage(res, 'insufficient tokens staked')
-		})
-		it(`withdraw the amount passed`, async () => {
-			const [dev, property] = await init()
-			const beforeBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
-			const beforeTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
-
-			await dev.dev.deposit(property.address, 10000)
-			let lockedupAllAmount = await dev.lockup.totalLocked().then(toBigNumber)
-			expect(lockedupAllAmount.toFixed()).to.be.equal('10000')
-
-			await dev.lockup.withdraw(property.address, 1000)
-			lockedupAllAmount = await dev.lockup.totalLocked().then(toBigNumber)
-			expect(lockedupAllAmount.toFixed()).to.be.equal('9000')
-			const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
-			const afterTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
-			const reward = toBigNumber(10).times(1e18)
-
-			expect(afterBalance.toFixed()).to.be.equal(
-				beforeBalance.minus(9000).plus(reward).toFixed()
-			)
-			expect(afterTotalSupply.toFixed()).to.be.equal(
-				beforeTotalSupply.plus(reward).toFixed()
-			)
-		})
-		it(`withdraw 0 amount when passed amount is 0 and non-staked user`, async () => {
-			const [dev, property] = await init()
-			const beforeBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
-			const beforeTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
-
-			await dev.lockup.withdraw(property.address, 0)
-
-			const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
-			const afterTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
-
-			expect(afterBalance.toFixed()).to.be.equal(beforeBalance.toFixed())
-			expect(afterTotalSupply.toFixed()).to.be.equal(
-				beforeTotalSupply.toFixed()
-			)
-		})
-		it(`withdraw 0 amount when passed amount is 0 and past staked user`, async () => {
-			const [dev, property] = await init()
-			const beforeBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
-			const beforeTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
-
-			await dev.dev.deposit(property.address, 10000)
-			const lastBlock = await getBlock()
-			await mine(3)
-			await dev.lockup.withdraw(property.address, 10000)
-			const block = await getBlock()
-			const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
-			const afterTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
-			const reward = toBigNumber(10)
-				.times(1e18)
-				.times(block - lastBlock)
-			expect(afterBalance.toFixed()).to.be.equal(
-				beforeBalance.plus(reward).toFixed()
-			)
-			expect(afterTotalSupply.toFixed()).to.be.equal(
-				beforeTotalSupply.plus(reward).toFixed()
-			)
-			await mine(3)
-			await dev.lockup.withdraw(property.address, 0)
-			const afterBalance2 = await dev.dev.balanceOf(deployer).then(toBigNumber)
-			const afterTotalSupply2 = await dev.dev.totalSupply().then(toBigNumber)
-			expect(afterBalance2.toFixed()).to.be.equal(afterBalance.toFixed())
-			expect(afterTotalSupply2.toFixed()).to.be.equal(
-				afterTotalSupply.toFixed()
-			)
-		})
-		it(`withdraw just reward when passed amount is 0`, async () => {
-			const [dev, property] = await init()
-			const beforeBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
-			const beforeTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
-
-			await dev.dev.deposit(property.address, 10000)
-			let lockedupAllAmount = await dev.lockup.totalLocked().then(toBigNumber)
-			expect(lockedupAllAmount.toFixed()).to.be.equal('10000')
-
-			await dev.lockup.withdraw(property.address, 0)
-			lockedupAllAmount = await dev.lockup.totalLocked().then(toBigNumber)
-			expect(lockedupAllAmount.toFixed()).to.be.equal('10000')
-			const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
-			const afterTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
-			const reward = toBigNumber(10).times(1e18)
-
-			expect(afterBalance.toFixed()).to.be.equal(
-				beforeBalance.minus(10000).plus(reward).toFixed()
-			)
-			expect(afterTotalSupply.toFixed()).to.be.equal(
-				beforeTotalSupply.plus(reward).toFixed()
-			)
-		})
-	})
-	describe('Lockup; calculateWithdrawableInterestAmount', () => {
-		type Calculator = (
-			prop: PropertyInstance,
-			account: string,
-			debug?: boolean
-		) => Promise<BigNumber>
-		const createCalculator =
-			(dev: DevProtocolInstance): Calculator =>
-			async (
-				prop: PropertyInstance,
-				account: string,
-				debug = false
-			): Promise<BigNumber> =>
-				Promise.all([
-					dev.lockup.calculateCumulativeRewardPrices().then((x) => x[0]),
-					dev.lockup.calculateCumulativeRewardPrices().then((x) => x[1]),
-					dev.lockup.calculateCumulativeRewardPrices().then((x) => x[2]),
-					dev.lockup.calculateCumulativeRewardPrices().then((x) => x[3]),
-					dev.lockup.lastLockedPrice(prop.address, account),
-					dev.lockup.getValue(prop.address, account),
-					dev.lockup.pendingReward(prop.address, account),
-				]).then((results) => {
-					const [
-						maxRewards,
-						holdersPrice,
-						interestPrice,
-						cCap,
-						lastInterestPrice,
-						lockedUpPerUser,
-						pending,
-					] = results.map(toBigNumber)
-					const interest = interestPrice
-						.minus(lastInterestPrice)
-						.times(lockedUpPerUser)
-					const withdrawable = interest.div(1e18).plus(pending)
-					const res = withdrawable.integerValue(BigNumber.ROUND_DOWN)
-					if (debug) {
-						console.log(results.map(toBigNumber))
-						console.log('maxRewards', maxRewards)
-						console.log('holdersPrice', holdersPrice)
-						console.log('interestPrice', interestPrice.toFixed())
-						console.log('cCap', cCap.toFixed())
-						console.log('lastInterestPrice', lastInterestPrice.toFixed())
-						console.log('lockedUpPerUser', lockedUpPerUser.toFixed())
-						console.log('pending', pending.toFixed())
-						console.log('interest', interest.toFixed())
-						console.log('withdrawable', withdrawable.toFixed())
-						console.log('res', res.toFixed())
-					}
-
-					return res
-				})
-
-		describe('returns correct amount', () => {
-			let dev: DevProtocolInstance
-			let property: PropertyInstance
-			let calc: Calculator
-
-			const alice = deployer
-			const bob = user1
-
-			before(async () => {
-				;[dev, property] = await init()
-				calc = createCalculator(dev)
-				const aliceBalance = await dev.dev.balanceOf(alice).then(toBigNumber)
-				await dev.dev.mint(bob, aliceBalance)
-			})
-
-			/*
-			 * PolicyTestBase returns 100 as rewards
-			 * And stakers share is 10%
-			 */
-			it('Alice has a 100% of interests', async () => {
-				await dev.dev
-					.deposit(property.address, 1000000000000, { from: alice })
-					.then(gasLogger)
-				await mine(1)
-				const result = await dev.lockup
-					.calculateWithdrawableInterestAmount(property.address, alice)
-					.then(toBigNumber)
-				const expected = toBigNumber(10).times(1e18)
-				const calculated = await calc(property, alice)
-
-				expect(result.toFixed()).to.be.equal(expected.toFixed())
-				expect(result.toFixed()).to.be.equal(calculated.toFixed())
-			})
-			it('Alice has a 100% of interests after withdrawal', async () => {
-				await dev.lockup.withdraw(property.address, 0, { from: alice })
-				await mine(1)
-				const result = await dev.lockup
-					.calculateWithdrawableInterestAmount(property.address, alice)
-					.then(toBigNumber)
-				const expected = toBigNumber(10).times(1e18)
-				const calculated = await calc(property, alice)
-
-				expect(result.toFixed()).to.be.equal(expected.toFixed())
-				expect(result.toFixed()).to.be.equal(calculated.toFixed())
-			})
-			it('Alice has a 50% of interests', async () => {
-				await dev.dev
-					.deposit(property.address, 1000000000000, { from: bob })
-					.then(gasLogger)
-				await dev.lockup.withdraw(property.address, 0, { from: alice })
-				await mine(1)
-				const result = await dev.lockup
-					.calculateWithdrawableInterestAmount(property.address, alice)
-					.then(toBigNumber)
-				const expected = toBigNumber(10)
-					.times(1e18)
-					.times(1000000000000 / (1000000000000 * 2))
-				const calculated = await calc(property, alice)
-
-				expect(result.toFixed()).to.be.equal(expected.toFixed())
-				expect(result.toFixed()).to.be.equal(calculated.toFixed())
-			})
-			it('Alice has a 75% of interests', async () => {
-				await dev.dev
-					.deposit(property.address, 1000000000000, { from: alice })
-					.then(gasLogger)
-				await dev.dev
-					.deposit(property.address, 1000000000000, { from: alice })
-					.then(gasLogger)
-				await dev.lockup.withdraw(property.address, 0, { from: alice })
-				await mine(1)
-				const result = await dev.lockup
-					.calculateWithdrawableInterestAmount(property.address, alice)
-					.then(toBigNumber)
-				const expected = toBigNumber(10)
-					.times(1e18)
-					.times(3000000000000 / (1000000000000 * 4))
-				const calculated = await calc(property, alice)
-
-				expect(result.toFixed()).to.be.equal(expected.toFixed())
-				expect(result.toFixed()).to.be.equal(calculated.toFixed())
-			})
-			it('Bob has a 30% of interests before withdrawal', async () => {
-				const result = await dev.lockup
-					.calculateWithdrawableInterestAmount(property.address, bob)
-					.then(toBigNumber)
-				const expected = toBigNumber(10)
-					.times(1e18)
-					.times(
-						toBigNumber(1000000000000).div(toBigNumber(1000000000000).times(2))
-					)
-					.times(3)
-					.plus(
-						toBigNumber(10)
-							.times(1e18)
-							.times(
-								toBigNumber(1000000000000).div(
-									toBigNumber(1000000000000).times(3)
-								)
-							)
-					)
-					.plus(
-						toBigNumber(10)
-							.times(1e18)
-							.times(
-								toBigNumber(1000000000000).div(
-									toBigNumber(1000000000000).times(4)
-								)
-							)
-							.times(2)
-					)
-					.integerValue()
-				const calculated = await calc(property, bob)
-
-				expect(result.toFixed()).to.be.equal(expected.toFixed())
-				expect(result.toFixed()).to.be.equal(calculated.toFixed())
-			})
-			it('Bob has a 25% of interests', async () => {
-				await dev.lockup.withdraw(property.address, 0, { from: bob })
-				await mine(1)
-				const result = await dev.lockup
-					.calculateWithdrawableInterestAmount(property.address, bob)
-					.then(toBigNumber)
-				const expected = toBigNumber(10)
-					.times(1e18)
-					.times(1000000000000 / (1000000000000 * 4))
-				const calculated = await calc(property, bob)
-
-				expect(result.toFixed()).to.be.equal(expected.toFixed())
-				expect(result.toFixed()).to.be.equal(calculated.toFixed())
-			})
-			it('Alice can withdraw 5 blocks', async () => {
-				await dev.lockup.withdraw(property.address, 0, { from: alice })
-				await mine(5)
-				const result = await dev.lockup
-					.calculateWithdrawableInterestAmount(property.address, alice)
-					.then(toBigNumber)
-				const expected = toBigNumber(10)
-					.times(1e18)
-					.times(3000000000000 / (1000000000000 * 4))
-					.times(5)
-				const calculated = await calc(property, alice)
-
-				expect(result.toFixed()).to.be.equal(expected.toFixed())
-				expect(result.toFixed()).to.be.equal(calculated.toFixed())
-			})
-			it('Alice has a 100% of interests', async () => {
-				await dev.lockup.withdraw(
-					property.address,
-					await dev.lockup.getValue(property.address, alice),
-					{ from: alice }
-				)
-				await dev.lockup.withdraw(
-					property.address,
-					await dev.lockup.getValue(property.address, bob),
-					{ from: bob }
-				)
-				await dev.dev
-					.deposit(property.address, 1000000000000, { from: alice })
-					.then(gasLogger)
-				await mine(1)
-				const result = await dev.lockup
-					.calculateWithdrawableInterestAmount(property.address, alice)
-					.then(toBigNumber)
-				const expected = toBigNumber(10).times(1e18)
-				const calculated = await calc(property, alice)
-
-				expect(result.toFixed()).to.be.equal(expected.toFixed())
-				expect(result.toFixed()).to.be.equal(calculated.toFixed())
-			})
-			it('After withdrawn, Alice and Bob has a 0% of interests', async () => {
-				await dev.dev
-					.deposit(property.address, 1000000000000, { from: alice })
-					.then(gasLogger)
-				await dev.dev
-					.deposit(property.address, 1000000000000, { from: bob })
-					.then(gasLogger)
-				await mine(2)
-				await dev.lockup.withdraw(
-					property.address,
-					await dev.lockup.getValue(property.address, alice),
-					{ from: alice }
-				)
-				await dev.lockup.withdraw(
-					property.address,
-					await dev.lockup.getValue(property.address, bob),
-					{ from: bob }
-				)
-				await mine(1)
-				const aliceAmount =
-					await dev.lockup.calculateWithdrawableInterestAmount(
-						property.address,
-						alice
-					)
-				const bobAmount = await dev.lockup.calculateWithdrawableInterestAmount(
-					property.address,
-					bob
-				)
-				const aliceCalculated = await calc(property, alice)
-				const bobCalculated = await calc(property, bob)
-
-				expect(aliceAmount.toString()).to.be.equal('0')
-				expect(bobAmount.toString()).to.be.equal('0')
-				expect(aliceCalculated.toString()).to.be.equal('0')
-				expect(bobCalculated.toString()).to.be.equal('0')
-			})
-			it('Bob has huge staked, Alice has small amount of reward', async () => {
-				const [property2] = await Promise.all([
-					artifacts
-						.require('Property')
-						.at(
-							getPropertyAddress(
-								await dev.propertyFactory.create('test', 'TEST', deployer)
-							)
-						),
-				])
-				await dev.metricsFactory.__setMetricsCountPerProperty(
-					property2.address,
-					1
-				)
-
-				const bobBalance = toBigNumber(10000000).times(1e18)
-				await dev.dev.mint(bob, bobBalance)
-				await dev.dev
-					.deposit(property.address, bobBalance, { from: bob })
-					.then(gasLogger)
-				await mine(10)
-
-				await dev.dev
-					.deposit(property2.address, 10000000, { from: alice })
-					.then(gasLogger)
-				await mine(1)
-				const result = await dev.lockup
-					.calculateWithdrawableInterestAmount(property2.address, alice)
-					.then(toBigNumber)
-				const expected = toBigNumber(10)
-					.times(1e18)
-					.times(
-						toBigNumber(10000000).div(toBigNumber(10000000).plus(bobBalance))
-					)
-				const calculated = await calc(property2, alice)
-
-				expect(result.toFixed()).to.be.equal(expected.toFixed())
-				expect(result.toFixed()).to.be.equal(calculated.toFixed())
-			})
-			it('Property that unauthenticated but already staked before DIP9 has no reward', async () => {
-				const propertyAddress = getPropertyAddress(
-					await dev.propertyFactory.create('test', 'TEST', deployer)
-				)
-				await dev.metricsFactory.__setMetricsCountPerProperty(
-					propertyAddress,
-					1
-				)
-				await dev.dev
-					.deposit(propertyAddress, 1000000000000, { from: alice })
-					.then(gasLogger)
-				await mine(1)
-				await dev.dev
-					.deposit(propertyAddress, 1000000000000, { from: alice })
-					.then(gasLogger)
-				await mine(1)
-				await dev.metricsFactory.__setMetricsCountPerProperty(
-					propertyAddress,
-					0
-				)
-				const result = await dev.lockup
-					.calculateWithdrawableInterestAmount(propertyAddress, alice)
-					.then(toBigNumber)
-				const expected = toBigNumber(0)
-
-				expect(result.toFixed()).to.be.equal(expected.toFixed())
-			})
-		})
-
-		describe('scenario; single lockup', () => {
-			let dev: DevProtocolInstance
-			let property: PropertyInstance
-			let lastBlock: BigNumber
-
-			const alice = deployer
-			const bob = user1
-
-			before(async () => {
-				;[dev, property] = await init()
-				const aliceBalance = await dev.dev.balanceOf(alice).then(toBigNumber)
-				await dev.dev.mint(bob, aliceBalance)
-				await dev.dev
-					.deposit(property.address, 10000, { from: alice })
-					.then(gasLogger)
-				lastBlock = await getBlock().then(toBigNumber)
-			})
-
-			/*
-			 * PolicyTestBase returns 100 as rewards
-			 * And stakers share is 10%
-			 */
-
-			describe('before second run', () => {
-				it(`Alice does staking 100% of the Property's total lockups`, async () => {
-					const total = await dev.lockup
-						.totalLockedForProperty(property.address)
-						.then(toBigNumber)
-					const aliceBalance = await dev.lockup
-						.getValue(property.address, alice)
-						.then(toBigNumber)
-					expect(aliceBalance.toFixed()).to.be.equal(total.toFixed())
-				})
-				it(`Alice's withdrawable interest is 100% of the Property's interest`, async () => {
-					await mine(9)
-					const block = await getBlock().then(toBigNumber)
-					const aliceAmount = await dev.lockup
-						.calculateWithdrawableInterestAmount(property.address, alice)
-						.then(toBigNumber)
-					const expected = toBigNumber(10) // In PolicyTestBase, the max staker reward per block is 10.
-						.times(1e18)
-						.times(block.minus(lastBlock))
-					expect(aliceAmount.toFixed()).to.be.equal(expected.toFixed())
-				})
-			})
-			describe('after second run', () => {
-				before(async () => {
-					await dev.lockup.withdraw(property.address, 0, { from: alice })
-					lastBlock = await getBlock().then(toBigNumber)
-				})
-				it(`Alice's withdrawable interest is 100% of the Property's interest`, async () => {
-					await mine(3)
-					const aliceAmount = await dev.lockup
-						.calculateWithdrawableInterestAmount(property.address, alice)
-						.then(toBigNumber)
-					const expected = toBigNumber(10) // In PolicyTestBase, the max staker reward per block is 10.
-						.times(1e18)
-						.times(3)
-					expect(aliceAmount.toFixed()).to.be.equal(expected.toFixed())
-				})
-			})
-			describe('after additional staking', () => {
-				before(async () => {
-					await dev.dev.deposit(property.address, 10000, { from: alice })
-				})
-				it(`Alice's withdrawable interest is 100% of the Property's interest`, async () => {
-					const block = await getBlock().then(toBigNumber)
-					const aliceAmount = await dev.lockup
-						.calculateWithdrawableInterestAmount(property.address, alice)
-						.then(toBigNumber)
-					const expected = toBigNumber(10) // In PolicyTestBase, the max staker reward per block is 10.
-						.times(1e18)
-						.times(block.minus(lastBlock))
-
-					expect(aliceAmount.toFixed()).to.be.equal(expected.toFixed())
-				})
-			})
-			describe('after withdrawal', () => {
-				let aliceBalance: BigNumber
-				let aliceLocked: BigNumber
-				before(async () => {
-					aliceBalance = await dev.dev.balanceOf(alice).then(toBigNumber)
-					aliceLocked = await dev.lockup
-						.getValue(property.address, alice)
-						.then(toBigNumber)
-					await dev.lockup.withdraw(property.address, aliceLocked, {
-						from: alice,
-					})
-				})
-				it(`Alice's withdrawable interest is 100% of the Property's interest`, async () => {
-					const block = await getBlock().then(toBigNumber)
-					const aliceLockup = await dev.lockup
-						.getValue(property.address, alice)
-						.then(toBigNumber)
-					const aliceAmount = await dev.lockup
-						.calculateWithdrawableInterestAmount(property.address, alice)
-						.then(toBigNumber)
-					const afterAliceBalance = await dev.dev
-						.balanceOf(alice)
-						.then(toBigNumber)
-					const reward = toBigNumber(10) // In PolicyTestBase, the max staker reward per block is 10.
-						.times(1e18)
-						.times(block.minus(lastBlock))
-					expect(aliceAmount.toFixed()).to.be.equal('0')
-					expect(aliceLockup.toFixed()).to.be.equal('0')
-					expect(afterAliceBalance.toFixed()).to.be.equal(
-						aliceBalance.plus(aliceLocked).plus(reward).toFixed()
-					)
-				})
-			})
-		})
-		describe('scenario: multiple lockup', () => {
-			let dev: DevProtocolInstance
-			let property: PropertyInstance
-			let calc: Calculator
-
-			const alice = deployer
-			const bob = user1
-
-			before(async () => {
-				;[dev, property] = await init()
-				calc = createCalculator(dev)
-				const aliceBalance = await dev.dev.balanceOf(alice).then(toBigNumber)
-				await dev.dev.mint(bob, aliceBalance)
-				await dev.dev.deposit(property.address, 10000, { from: alice })
-			})
-
-			describe('before second run', () => {
-				it(`Alice does staking 100% of the Property's total lockups`, async () => {
-					const total = await dev.lockup
-						.totalLockedForProperty(property.address)
-						.then(toBigNumber)
-					const aliceBalance = await dev.lockup
-						.getValue(property.address, alice)
-						.then(toBigNumber)
-					expect(aliceBalance.toFixed()).to.be.equal(total.toFixed())
-				})
-				it(`Bob does staking 25% of the Property's total lockups, Alice's share become 80%`, async () => {
-					await dev.dev.deposit(property.address, 10000 * 0.25, { from: bob })
-					const total = await dev.lockup
-						.totalLockedForProperty(property.address)
-						.then(toBigNumber)
-					const aliceBalance = await dev.lockup
-						.getValue(property.address, alice)
-						.then(toBigNumber)
-					const bobBalance = await dev.lockup
-						.getValue(property.address, bob)
-						.then(toBigNumber)
-
-					expect(aliceBalance.toFixed()).to.be.equal(
-						total.times(0.8).integerValue(BigNumber.ROUND_DOWN).toFixed()
-					)
-					expect(bobBalance.toFixed()).to.be.equal(
-						total.times(0.2).integerValue(BigNumber.ROUND_DOWN).toFixed()
-					)
-				})
-				it(`Alice's withdrawable interest is 100% of between lastBlockNumber and Bob's first deposit block interest and 80% of current interest`, async () => {
-					await mine(3)
-					const aliceAmount = await dev.lockup
-						.calculateWithdrawableInterestAmount(property.address, alice)
-						.then(toBigNumber)
-					const expected = await calc(property, alice)
-					expect(aliceAmount.toFixed()).to.be.equal(expected.toFixed())
-				})
-				it(`Bob's withdrawable interest is 20% of interest since the first deposit`, async () => {
-					await mine(3)
-					const bobAmount = await dev.lockup
-						.calculateWithdrawableInterestAmount(property.address, bob)
-						.then(toBigNumber)
-					const expected = await calc(property, bob)
-					expect(bobAmount.toFixed()).to.be.equal(expected.toFixed())
-				})
-			})
-			describe('after second withdrawal', () => {
-				before(async () => {
-					await dev.lockup.withdraw(property.address, 0, { from: alice })
-					await dev.lockup.withdraw(property.address, 0, { from: bob })
-					await mine(3)
-				})
-				it(`Alice's withdrawable interest is 80% of current interest`, async () => {
-					const aliceAmount = await dev.lockup
-						.calculateWithdrawableInterestAmount(property.address, alice)
-						.then(toBigNumber)
-					const expected = await calc(property, alice)
-
-					expect(aliceAmount.toFixed()).to.be.equal(expected.toFixed())
-				})
-				it(`Bob's withdrawable interest is 20% of current interest`, async () => {
-					const bobAmount = await dev.lockup
-						.calculateWithdrawableInterestAmount(property.address, bob)
-						.then(toBigNumber)
-					const expected = await calc(property, bob)
-
-					expect(bobAmount.toFixed()).to.be.equal(expected.toFixed())
-				})
-			})
-			describe('additional staking', () => {
-				before(async () => {
-					await dev.dev.deposit(property.address, 12500 * 0.3, { from: bob })
-					await mine(3)
-				})
-				it(`Bob does staking 30% of the Property's total lockups, Bob's share become ${
-					625000 / 16250
-				}%, Alice's share become ${1000000 / 16250}%`, async () => {
-					const aliceBalance = await dev.lockup
-						.getValue(property.address, alice)
-						.then(toBigNumber)
-					const bobBalance = await dev.lockup
-						.getValue(property.address, bob)
-						.then(toBigNumber)
-
-					expect(10000).to.be.equal(
-						new BigNumber(16250)
-							.times(new BigNumber(10000).div(16250))
-							.toNumber()
-					)
-					expect(aliceBalance.toFixed()).to.be.equal('10000')
-					expect(6250).to.be.equal(
-						new BigNumber(16250)
-							.times(new BigNumber(6250).div(16250))
-							.toNumber()
-					)
-					expect(bobBalance.toFixed()).to.be.equal('6250')
-				})
-			})
-			describe('after additional staking', () => {
-				it(`Alice's withdrawable interest is 80% of prev interest and ${
-					1000000 / 16250
-				}% of current interest`, async () => {
-					const aliceAmount = await dev.lockup
-						.calculateWithdrawableInterestAmount(property.address, alice)
-						.then(toBigNumber)
-					const expected = await calc(property, alice)
-
-					expect(aliceAmount.toFixed()).to.be.equal(expected.toFixed())
-				})
-				it(`Bob's withdrawable interest is 20% of prev interest and ${
-					625000 / 16250
-				}% of current interest`, async () => {
-					const bobAmount = await dev.lockup
-						.calculateWithdrawableInterestAmount(property.address, bob)
-						.then(toBigNumber)
-					const expected = await calc(property, bob)
-
-					expect(bobAmount.toFixed()).to.be.equal(expected.toFixed())
-				})
-			})
-			describe('after withdrawal', () => {
-				before(async () => {
-					await dev.lockup.withdraw(
-						property.address,
-						await dev.lockup.getValue(property.address, alice),
-						{
-							from: alice,
-						}
-					)
-					await mine(3)
-					await dev.lockup.withdraw(
-						property.address,
-						await dev.lockup.getValue(property.address, bob),
-						{
-							from: bob,
-						}
-					)
-					await mine(3)
-				})
-				it(`Alice's withdrawable interest is 0`, async () => {
-					const aliceAmount = await dev.lockup
-						.calculateWithdrawableInterestAmount(property.address, alice)
-						.then(toBigNumber)
-
-					expect(aliceAmount.toFixed()).to.be.equal('0')
-				})
-				it(`Bob's withdrawable interest is 0`, async () => {
-					const bobAmount = await dev.lockup
-						.calculateWithdrawableInterestAmount(property.address, bob)
-						.then(toBigNumber)
-
-					expect(bobAmount.toFixed()).to.be.equal('0')
-				})
-			})
-		})
-
-		describe('scenario: multiple properties', () => {
-			let dev: DevProtocolInstance
-			let property1: PropertyInstance
-			let property2: PropertyInstance
-			let property3: PropertyInstance
-			let property4: PropertyInstance
-			let calc: Calculator
-
-			const alice = user2
-			const bob = user1
-
-			before(async () => {
-				;[dev, property1] = await init()
-				await dev.dev.mint(alice, new BigNumber(1e18).times(10000000))
-				calc = createCalculator(dev)
-				const aliceBalance = await dev.dev.balanceOf(alice).then(toBigNumber)
-				await dev.dev.mint(bob, aliceBalance)
-				;[property2, property3, property4] = await Promise.all([
-					artifacts
-						.require('Property')
-						.at(
-							getPropertyAddress(
-								await dev.propertyFactory.create('test2', 'TEST2', user3)
-							)
-						),
-					artifacts
-						.require('Property')
-						.at(
-							getPropertyAddress(
-								await dev.propertyFactory.create('test3', 'TEST3', user3)
-							)
-						),
-					artifacts
-						.require('Property')
-						.at(
-							getPropertyAddress(
-								await dev.propertyFactory.create('test4', 'TEST4', user3)
-							)
-						),
-				])
-				await dev.metricsFactory.__setMetricsCountPerProperty(
-					property2.address,
-					1
-				)
-				await dev.metricsFactory.__setMetricsCountPerProperty(
-					property3.address,
-					1
-				)
-				await dev.metricsFactory.__setMetricsCountPerProperty(
-					property4.address,
-					1
-				)
-
-				await dev.dev.deposit(property1.address, 10000, { from: alice })
-				await mine(3)
-			})
-
-			describe('before withdrawal', () => {
-				it('No staked Property is 0 interest', async () => {
-					const result = await dev.lockup
-						.calculateWithdrawableInterestAmount(property4.address, alice)
-						.then(toBigNumber)
-					const expected = await calc(property4, alice)
-					expect(result.toFixed()).to.be.equal(expected.toFixed())
-					expect(expected.toFixed()).to.be.equal('0')
-				})
-				it(`Alice does staking 100% of the Property1 total lockups, Property1 is 100% of the total rewards`, async () => {
-					const total = await dev.lockup
-						.totalLockedForProperty(property1.address)
-						.then(toBigNumber)
-					const aliceBalance = await dev.lockup
-						.getValue(property1.address, alice)
-						.then(toBigNumber)
-					expect(aliceBalance.toFixed()).to.be.equal(total.toFixed())
-				})
-				it(`Bob does staking 100% of the Property2 total lockups, Property2 is 20% of the total rewards`, async () => {
-					await dev.dev.deposit(property2.address, 2500, { from: bob })
-					const total = await dev.lockup.totalLocked().then(toBigNumber)
-					const p1 = await dev.lockup
-						.totalLockedForProperty(property1.address)
-						.then(toBigNumber)
-					const p2 = await dev.lockup
-						.totalLockedForProperty(property2.address)
-						.then(toBigNumber)
-					expect(p1.div(total).toNumber()).to.be.equal(0.8)
-					expect(p2.div(total).toNumber()).to.be.equal(0.2)
-				})
-				it(`Alice's withdrawable interest is 100% of between lastBlockNumber and Bob's first deposit block interest and 80% of current interest`, async () => {
-					await mine(3)
-					const aliceAmount = await dev.lockup
-						.calculateWithdrawableInterestAmount(property1.address, alice)
-						.then(toBigNumber)
-					const expected = await calc(property1, alice)
-					expect(aliceAmount.toFixed()).to.be.equal(expected.toFixed())
-				})
-				it(`Bob's withdrawable interest is 20% of interest since the first deposit`, async () => {
-					await mine(3)
-					const bobAmount = await dev.lockup
-						.calculateWithdrawableInterestAmount(property2.address, bob)
-						.then(toBigNumber)
-					const expected = await calc(property2, bob)
-					expect(bobAmount.toFixed()).to.be.equal(expected.toFixed())
-				})
-			})
-			describe('after withdrawal', () => {
-				before(async () => {
-					await dev.lockup.withdraw(property1.address, 0, { from: alice })
-					await dev.lockup.withdraw(property2.address, 0, { from: bob })
-					await mine(3)
-				})
-				it('No staked Property is 0 interest', async () => {
-					const result = await dev.lockup
-						.calculateWithdrawableInterestAmount(property4.address, alice)
-						.then(toBigNumber)
-					const expected = await calc(property4, alice)
-					expect(result.toFixed()).to.be.equal(expected.toFixed())
-					expect(expected.toFixed()).to.be.equal('0')
-				})
-				it(`Alice's withdrawable interest is 80% of current interest`, async () => {
-					const aliceAmount = await dev.lockup
-						.calculateWithdrawableInterestAmount(property1.address, alice)
-						.then(toBigNumber)
-					const expected = await calc(property1, alice)
-
-					expect(aliceAmount.toFixed()).to.be.equal(expected.toFixed())
-				})
-				it(`Bob's withdrawable interest is 20% of current interest`, async () => {
-					const bobAmount = await dev.lockup
-						.calculateWithdrawableInterestAmount(property2.address, bob)
-						.then(toBigNumber)
-					const expected = await calc(property2, bob)
-
-					expect(bobAmount.toFixed()).to.be.equal(expected.toFixed())
-				})
-			})
-			describe('additional staking', () => {
-				before(async () => {
-					await dev.dev.deposit(property2.address, 12500 * 0.3, { from: bob })
-					await mine(3)
-				})
-				it('No staked Property is 0 interest', async () => {
-					const result = await dev.lockup
-						.calculateWithdrawableInterestAmount(property4.address, alice)
-						.then(toBigNumber)
-					const expected = await calc(property4, alice)
-					expect(result.toFixed()).to.be.equal(expected.toFixed())
-					expect(expected.toFixed()).to.be.equal('0')
-				})
-				it(`Bob does staking 30% of the all Property's total lockups, Bob's share become ${
-					625000 / 16250
-				}%, Alice's share become ${1000000 / 16250}%`, async () => {
-					const aliceBalance = await dev.lockup
-						.getValue(property1.address, alice)
-						.then(toBigNumber)
-					const bobBalance = await dev.lockup
-						.getValue(property2.address, bob)
-						.then(toBigNumber)
-
-					expect(10000).to.be.equal(
-						new BigNumber(16250)
-							.times(new BigNumber(10000).div(16250))
-							.toNumber()
-					)
-					expect(aliceBalance.toFixed()).to.be.equal('10000')
-					expect(6250).to.be.equal(
-						new BigNumber(16250)
-							.times(new BigNumber(6250).div(16250))
-							.toNumber()
-					)
-					expect(bobBalance.toFixed()).to.be.equal('6250')
-				})
-			})
-			describe('after additional staking', () => {
-				it('No staked Property is 0 interest', async () => {
-					const result = await dev.lockup
-						.calculateWithdrawableInterestAmount(property4.address, alice)
-						.then(toBigNumber)
-					const expected = await calc(property4, alice)
-					expect(result.toFixed()).to.be.equal(expected.toFixed())
-					expect(expected.toFixed()).to.be.equal('0')
-				})
-				it(`Alice's withdrawable interest is 80% of prev interest and ${
-					1000000 / 16250
-				}% of current interest`, async () => {
-					const aliceAmount = await dev.lockup
-						.calculateWithdrawableInterestAmount(property1.address, alice)
-						.then(toBigNumber)
-					const expected = await calc(property1, alice)
-
-					expect(aliceAmount.toFixed()).to.be.equal(
-						expected.integerValue(BigNumber.ROUND_DOWN).toFixed()
-					)
-				})
-				it(`Bob's withdrawable interest is 20% of prev interest and ${
-					625000 / 16250
-				}% of current interest`, async () => {
-					const bobAmount = await dev.lockup
-						.calculateWithdrawableInterestAmount(property2.address, bob)
-						.then(toBigNumber)
-					const expected = await calc(property2, bob)
-
-					expect(bobAmount.toFixed()).to.be.equal(
-						expected.integerValue(BigNumber.ROUND_DOWN).toFixed()
-					)
-				})
-			})
-			describe('additional staking', () => {
-				before(async () => {
-					await dev.dev.deposit(property3.address, 16250 * 0.6, { from: alice })
-					await mine(3)
-				})
-				it('No staked Property is 0 interest', async () => {
-					const result = await dev.lockup
-						.calculateWithdrawableInterestAmount(property4.address, alice)
-						.then(toBigNumber)
-					const expected = await calc(property4, alice)
-					expect(result.toFixed()).to.be.equal(expected.toFixed())
-					expect(expected.toFixed()).to.be.equal('0')
-				})
-				it(`Alice does staking 60% of the all Property's total lockups, Alice's share become ${
-					1975000 / 26000
-				}%, Bob's share become ${625000 / 26000}%`, async () => {
-					const aliceBalance = await Promise.all([
-						dev.lockup.getValue(property1.address, alice).then(toBigNumber),
-						dev.lockup.getValue(property3.address, alice).then(toBigNumber),
-					])
-					const bobBalance = await dev.lockup
-						.getValue(property2.address, bob)
-						.then(toBigNumber)
-
-					expect(19750).to.be.equal(
-						toBigNumber(26000).times(toBigNumber(19750).div(26000)).toNumber()
-					)
-					expect(aliceBalance[0].plus(aliceBalance[1]).toFixed()).to.be.equal(
-						'19750'
-					)
-					expect(6250).to.be.equal(
-						toBigNumber(26000).times(toBigNumber(6250).div(26000)).toNumber()
-					)
-					expect(bobBalance.toFixed()).to.be.equal('6250')
-				})
-			})
-			describe('after additional staking', () => {
-				it('No staked Property is 0 interest', async () => {
-					const result = await dev.lockup
-						.calculateWithdrawableInterestAmount(property4.address, alice)
-						.then(toBigNumber)
-					const expected = await calc(property4, alice)
-					expect(result.toFixed()).to.be.equal(expected.toFixed())
-					expect(expected.toFixed()).to.be.equal('0')
-				})
-				it(`Alice's withdrawable interest is 80% of two prev interest and ${
-					1000000 / 16250
-				}% of prev interest and ${
-					1975000 / 26000
-				}% of current interest`, async () => {
-					const aliceAmount = await Promise.all([
-						dev.lockup
-							.calculateWithdrawableInterestAmount(property1.address, alice)
-							.then(toBigNumber),
-						dev.lockup
-							.calculateWithdrawableInterestAmount(property3.address, alice)
-							.then(toBigNumber),
-					])
-					const res1 = await calc(property1, alice)
-					const res2 = await calc(property3, alice)
-
-					expect(aliceAmount[0].plus(aliceAmount[1]).toFixed()).to.be.equal(
-						res1.plus(res2).toFixed()
-					)
-				})
-				it(`Bob's withdrawable interest is 20% of two prev interest and ${
-					625000 / 16250
-				}% of prev interest and ${
-					625000 / 26000
-				}% of current interest`, async () => {
-					const bobAmount = await dev.lockup
-						.calculateWithdrawableInterestAmount(property2.address, bob)
-						.then(toBigNumber)
-					const expected = await calc(property2, bob)
-
-					expect(bobAmount.toFixed()).to.be.equal(expected.toFixed())
-				})
-			})
-			describe('after withdrawal stakes', () => {
-				before(async () => {
-					await dev.lockup.withdraw(
-						property1.address,
-						await dev.lockup.getValue(property1.address, alice),
-						{
-							from: alice,
-						}
-					)
-					await mine(3)
-					await dev.lockup.withdraw(
-						property3.address,
-						await dev.lockup.getValue(property3.address, alice),
-						{
-							from: alice,
-						}
-					)
-					await mine(3)
-					await dev.lockup.withdraw(
-						property2.address,
-						await dev.lockup.getValue(property2.address, bob),
-						{
-							from: bob,
-						}
-					)
-					await mine(3)
-				})
-				it('No staked Property is 0 interest', async () => {
-					const result = await dev.lockup
-						.calculateWithdrawableInterestAmount(property4.address, alice)
-						.then(toBigNumber)
-					const expected = await calc(property4, alice)
-					expect(result.toFixed()).to.be.equal(expected.toFixed())
-					expect(expected.toFixed()).to.be.equal('0')
-				})
-				it(`Alice's withdrawable interest`, async () => {
-					const aliceAmount = await Promise.all([
-						dev.lockup
-							.calculateWithdrawableInterestAmount(property1.address, alice)
-							.then(toBigNumber),
-						dev.lockup
-							.calculateWithdrawableInterestAmount(property3.address, alice)
-							.then(toBigNumber),
-					])
-					const res1 = await calc(property1, alice)
-					const res2 = await calc(property3, alice)
-
-					expect(aliceAmount[0].plus(aliceAmount[1]).toFixed()).to.be.equal(
-						res1.plus(res2).toFixed()
-					)
-				})
-				it(`Bob's withdrawable interest`, async () => {
-					const bobAmount = await dev.lockup
-						.calculateWithdrawableInterestAmount(property2.address, bob)
-						.then(toBigNumber)
-					const expected = await calc(property2, bob)
-
-					expect(bobAmount.toFixed()).to.be.equal(expected.toFixed())
-				})
-			})
-		})
-	})
-	describe('Lockup; calculateRewardAmount', () => {
-		const calculateCap = async (
-			dev: DevProtocolInstance,
-			property: PropertyInstance,
-			holderCap: BigNumber
-		): Promise<BigNumber> => {
-			const initialCap = await dev.lockup
-				.initialCumulativeHoldersRewardCap(property.address)
-				.then(toBigNumber)
-			return holderCap.minus(initialCap)
-		}
-
-		const calculateReword = async (
-			dev: DevProtocolInstance,
-			property: PropertyInstance,
-			holders: BigNumber
-		): Promise<BigNumber> => {
-			const cHoldersReward = await dev.lockup
-				.lastCumulativeHoldersRewardAmountPerProperty(property.address)
-				.then(toBigNumber)
-			const lastReward = await dev.lockup
-				.lastCumulativeHoldersRewardPricePerProperty(property.address)
-				.then(toBigNumber)
-			const enabledStakingValue = await dev.lockup
-				.totalLockedForProperty(property.address)
-				.then(toBigNumber)
-			const additionalHoldersReward = holders
-				.minus(lastReward)
-				.times(enabledStakingValue)
-			return cHoldersReward.plus(additionalHoldersReward)
-		}
-
-		const calculate = async (
-			dev: DevProtocolInstance,
-			property: PropertyInstance
-		): Promise<[BigNumber, BigNumber]> => {
-			const tmp = await dev.lockup.calculateCumulativeRewardPrices()
-			const reward = await calculateReword(dev, property, toBigNumber(tmp[1]))
-			const cap = await calculateCap(dev, property, toBigNumber(tmp[3]))
-			return [reward, cap]
-		}
-
-		it('The reward is calculated and comes back to you.', async () => {
-			const [dev, property] = await init()
-			await dev.dev.deposit(property.address, '10000000000000000000000')
-			await dev.updateCap()
-			const [reword, cap] = await calculate(dev, property)
-			const result = await dev.lockup.calculateRewardAmount(property.address)
-			expect(toBigNumber(result[0]).toFixed()).to.be.equal(reword.toFixed())
-			expect(toBigNumber(result[1]).toFixed()).to.be.equal(cap.toFixed())
-		})
-	})
+	// Describe('Lockup; withdraw', () => {
+	// 	it('should fail to call when tokens are insufficient', async () => {
+	// 		const [dev, property] = await init()
+	// 		const amount = 1000000
+	// 		await dev.dev.deposit(property.address, amount)
+
+	// 		const res = await dev.lockup
+	// 			.withdraw(property.address, amount + 1)
+	// 			.catch(err)
+	// 		validateErrorMessage(res, 'insufficient tokens staked')
+	// 	})
+	// 	it(`withdraw the amount passed`, async () => {
+	// 		const [dev, property] = await init()
+	// 		const beforeBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
+	// 		const beforeTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
+
+	// 		await dev.dev.deposit(property.address, 10000)
+	// 		let lockedupAllAmount = await dev.lockup.totalLocked().then(toBigNumber)
+	// 		expect(lockedupAllAmount.toFixed()).to.be.equal('10000')
+
+	// 		await dev.lockup.withdraw(property.address, 1000)
+	// 		lockedupAllAmount = await dev.lockup.totalLocked().then(toBigNumber)
+	// 		expect(lockedupAllAmount.toFixed()).to.be.equal('9000')
+	// 		const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
+	// 		const afterTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
+	// 		const reward = toBigNumber(10).times(1e18)
+
+	// 		expect(afterBalance.toFixed()).to.be.equal(
+	// 			beforeBalance.minus(9000).plus(reward).toFixed()
+	// 		)
+	// 		expect(afterTotalSupply.toFixed()).to.be.equal(
+	// 			beforeTotalSupply.plus(reward).toFixed()
+	// 		)
+	// 	})
+	// 	it(`withdraw 0 amount when passed amount is 0 and non-staked user`, async () => {
+	// 		const [dev, property] = await init()
+	// 		const beforeBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
+	// 		const beforeTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
+
+	// 		await dev.lockup.withdraw(property.address, 0)
+
+	// 		const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
+	// 		const afterTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
+
+	// 		expect(afterBalance.toFixed()).to.be.equal(beforeBalance.toFixed())
+	// 		expect(afterTotalSupply.toFixed()).to.be.equal(
+	// 			beforeTotalSupply.toFixed()
+	// 		)
+	// 	})
+	// 	it(`withdraw 0 amount when passed amount is 0 and past staked user`, async () => {
+	// 		const [dev, property] = await init()
+	// 		const beforeBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
+	// 		const beforeTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
+
+	// 		await dev.dev.deposit(property.address, 10000)
+	// 		const lastBlock = await getBlock()
+	// 		await mine(3)
+	// 		await dev.lockup.withdraw(property.address, 10000)
+	// 		const block = await getBlock()
+	// 		const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
+	// 		const afterTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
+	// 		const reward = toBigNumber(10)
+	// 			.times(1e18)
+	// 			.times(block - lastBlock)
+	// 		expect(afterBalance.toFixed()).to.be.equal(
+	// 			beforeBalance.plus(reward).toFixed()
+	// 		)
+	// 		expect(afterTotalSupply.toFixed()).to.be.equal(
+	// 			beforeTotalSupply.plus(reward).toFixed()
+	// 		)
+	// 		await mine(3)
+	// 		await dev.lockup.withdraw(property.address, 0)
+	// 		const afterBalance2 = await dev.dev.balanceOf(deployer).then(toBigNumber)
+	// 		const afterTotalSupply2 = await dev.dev.totalSupply().then(toBigNumber)
+	// 		expect(afterBalance2.toFixed()).to.be.equal(afterBalance.toFixed())
+	// 		expect(afterTotalSupply2.toFixed()).to.be.equal(
+	// 			afterTotalSupply.toFixed()
+	// 		)
+	// 	})
+	// 	it(`withdraw just reward when passed amount is 0`, async () => {
+	// 		const [dev, property] = await init()
+	// 		const beforeBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
+	// 		const beforeTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
+
+	// 		await dev.dev.deposit(property.address, 10000)
+	// 		let lockedupAllAmount = await dev.lockup.totalLocked().then(toBigNumber)
+	// 		expect(lockedupAllAmount.toFixed()).to.be.equal('10000')
+
+	// 		await dev.lockup.withdraw(property.address, 0)
+	// 		lockedupAllAmount = await dev.lockup.totalLocked().then(toBigNumber)
+	// 		expect(lockedupAllAmount.toFixed()).to.be.equal('10000')
+	// 		const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
+	// 		const afterTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
+	// 		const reward = toBigNumber(10).times(1e18)
+
+	// 		expect(afterBalance.toFixed()).to.be.equal(
+	// 			beforeBalance.minus(10000).plus(reward).toFixed()
+	// 		)
+	// 		expect(afterTotalSupply.toFixed()).to.be.equal(
+	// 			beforeTotalSupply.plus(reward).toFixed()
+	// 		)
+	// 	})
+	// })
+	// describe('Lockup; calculateWithdrawableInterestAmount', () => {
+	// 	type Calculator = (
+	// 		prop: PropertyInstance,
+	// 		account: string,
+	// 		debug?: boolean
+	// 	) => Promise<BigNumber>
+	// 	const createCalculator =
+	// 		(dev: DevProtocolInstance): Calculator =>
+	// 		async (
+	// 			prop: PropertyInstance,
+	// 			account: string,
+	// 			debug = false
+	// 		): Promise<BigNumber> =>
+	// 			Promise.all([
+	// 				dev.lockup.calculateCumulativeRewardPrices().then((x) => x[0]),
+	// 				dev.lockup.calculateCumulativeRewardPrices().then((x) => x[1]),
+	// 				dev.lockup.calculateCumulativeRewardPrices().then((x) => x[2]),
+	// 				dev.lockup.calculateCumulativeRewardPrices().then((x) => x[3]),
+	// 				dev.lockup.lastLockedPrice(prop.address, account),
+	// 				dev.lockup.getValue(prop.address, account),
+	// 				dev.lockup.pendingReward(prop.address, account),
+	// 			]).then((results) => {
+	// 				const [
+	// 					maxRewards,
+	// 					holdersPrice,
+	// 					interestPrice,
+	// 					cCap,
+	// 					lastInterestPrice,
+	// 					lockedUpPerUser,
+	// 					pending,
+	// 				] = results.map(toBigNumber)
+	// 				const interest = interestPrice
+	// 					.minus(lastInterestPrice)
+	// 					.times(lockedUpPerUser)
+	// 				const withdrawable = interest.div(1e18).plus(pending)
+	// 				const res = withdrawable.integerValue(BigNumber.ROUND_DOWN)
+	// 				if (debug) {
+	// 					console.log(results.map(toBigNumber))
+	// 					console.log('maxRewards', maxRewards)
+	// 					console.log('holdersPrice', holdersPrice)
+	// 					console.log('interestPrice', interestPrice.toFixed())
+	// 					console.log('cCap', cCap.toFixed())
+	// 					console.log('lastInterestPrice', lastInterestPrice.toFixed())
+	// 					console.log('lockedUpPerUser', lockedUpPerUser.toFixed())
+	// 					console.log('pending', pending.toFixed())
+	// 					console.log('interest', interest.toFixed())
+	// 					console.log('withdrawable', withdrawable.toFixed())
+	// 					console.log('res', res.toFixed())
+	// 				}
+
+	// 				return res
+	// 			})
+
+	// 	describe('returns correct amount', () => {
+	// 		let dev: DevProtocolInstance
+	// 		let property: PropertyInstance
+	// 		let calc: Calculator
+
+	// 		const alice = deployer
+	// 		const bob = user1
+
+	// 		before(async () => {
+	// 			;[dev, property] = await init()
+	// 			calc = createCalculator(dev)
+	// 			const aliceBalance = await dev.dev.balanceOf(alice).then(toBigNumber)
+	// 			await dev.dev.mint(bob, aliceBalance)
+	// 		})
+
+	// 		/*
+	// 		 * PolicyTestBase returns 100 as rewards
+	// 		 * And stakers share is 10%
+	// 		 */
+	// 		it('Alice has a 100% of interests', async () => {
+	// 			await dev.dev
+	// 				.deposit(property.address, 1000000000000, { from: alice })
+	// 				.then(gasLogger)
+	// 			await mine(1)
+	// 			const result = await dev.lockup
+	// 				.calculateWithdrawableInterestAmount(property.address, alice)
+	// 				.then(toBigNumber)
+	// 			const expected = toBigNumber(10).times(1e18)
+	// 			const calculated = await calc(property, alice)
+
+	// 			expect(result.toFixed()).to.be.equal(expected.toFixed())
+	// 			expect(result.toFixed()).to.be.equal(calculated.toFixed())
+	// 		})
+	// 		it('Alice has a 100% of interests after withdrawal', async () => {
+	// 			await dev.lockup.withdraw(property.address, 0, { from: alice })
+	// 			await mine(1)
+	// 			const result = await dev.lockup
+	// 				.calculateWithdrawableInterestAmount(property.address, alice)
+	// 				.then(toBigNumber)
+	// 			const expected = toBigNumber(10).times(1e18)
+	// 			const calculated = await calc(property, alice)
+
+	// 			expect(result.toFixed()).to.be.equal(expected.toFixed())
+	// 			expect(result.toFixed()).to.be.equal(calculated.toFixed())
+	// 		})
+	// 		it('Alice has a 50% of interests', async () => {
+	// 			await dev.dev
+	// 				.deposit(property.address, 1000000000000, { from: bob })
+	// 				.then(gasLogger)
+	// 			await dev.lockup.withdraw(property.address, 0, { from: alice })
+	// 			await mine(1)
+	// 			const result = await dev.lockup
+	// 				.calculateWithdrawableInterestAmount(property.address, alice)
+	// 				.then(toBigNumber)
+	// 			const expected = toBigNumber(10)
+	// 				.times(1e18)
+	// 				.times(1000000000000 / (1000000000000 * 2))
+	// 			const calculated = await calc(property, alice)
+
+	// 			expect(result.toFixed()).to.be.equal(expected.toFixed())
+	// 			expect(result.toFixed()).to.be.equal(calculated.toFixed())
+	// 		})
+	// 		it('Alice has a 75% of interests', async () => {
+	// 			await dev.dev
+	// 				.deposit(property.address, 1000000000000, { from: alice })
+	// 				.then(gasLogger)
+	// 			await dev.dev
+	// 				.deposit(property.address, 1000000000000, { from: alice })
+	// 				.then(gasLogger)
+	// 			await dev.lockup.withdraw(property.address, 0, { from: alice })
+	// 			await mine(1)
+	// 			const result = await dev.lockup
+	// 				.calculateWithdrawableInterestAmount(property.address, alice)
+	// 				.then(toBigNumber)
+	// 			const expected = toBigNumber(10)
+	// 				.times(1e18)
+	// 				.times(3000000000000 / (1000000000000 * 4))
+	// 			const calculated = await calc(property, alice)
+
+	// 			expect(result.toFixed()).to.be.equal(expected.toFixed())
+	// 			expect(result.toFixed()).to.be.equal(calculated.toFixed())
+	// 		})
+	// 		it('Bob has a 30% of interests before withdrawal', async () => {
+	// 			const result = await dev.lockup
+	// 				.calculateWithdrawableInterestAmount(property.address, bob)
+	// 				.then(toBigNumber)
+	// 			const expected = toBigNumber(10)
+	// 				.times(1e18)
+	// 				.times(
+	// 					toBigNumber(1000000000000).div(toBigNumber(1000000000000).times(2))
+	// 				)
+	// 				.times(3)
+	// 				.plus(
+	// 					toBigNumber(10)
+	// 						.times(1e18)
+	// 						.times(
+	// 							toBigNumber(1000000000000).div(
+	// 								toBigNumber(1000000000000).times(3)
+	// 							)
+	// 						)
+	// 				)
+	// 				.plus(
+	// 					toBigNumber(10)
+	// 						.times(1e18)
+	// 						.times(
+	// 							toBigNumber(1000000000000).div(
+	// 								toBigNumber(1000000000000).times(4)
+	// 							)
+	// 						)
+	// 						.times(2)
+	// 				)
+	// 				.integerValue()
+	// 			const calculated = await calc(property, bob)
+
+	// 			expect(result.toFixed()).to.be.equal(expected.toFixed())
+	// 			expect(result.toFixed()).to.be.equal(calculated.toFixed())
+	// 		})
+	// 		it('Bob has a 25% of interests', async () => {
+	// 			await dev.lockup.withdraw(property.address, 0, { from: bob })
+	// 			await mine(1)
+	// 			const result = await dev.lockup
+	// 				.calculateWithdrawableInterestAmount(property.address, bob)
+	// 				.then(toBigNumber)
+	// 			const expected = toBigNumber(10)
+	// 				.times(1e18)
+	// 				.times(1000000000000 / (1000000000000 * 4))
+	// 			const calculated = await calc(property, bob)
+
+	// 			expect(result.toFixed()).to.be.equal(expected.toFixed())
+	// 			expect(result.toFixed()).to.be.equal(calculated.toFixed())
+	// 		})
+	// 		it('Alice can withdraw 5 blocks', async () => {
+	// 			await dev.lockup.withdraw(property.address, 0, { from: alice })
+	// 			await mine(5)
+	// 			const result = await dev.lockup
+	// 				.calculateWithdrawableInterestAmount(property.address, alice)
+	// 				.then(toBigNumber)
+	// 			const expected = toBigNumber(10)
+	// 				.times(1e18)
+	// 				.times(3000000000000 / (1000000000000 * 4))
+	// 				.times(5)
+	// 			const calculated = await calc(property, alice)
+
+	// 			expect(result.toFixed()).to.be.equal(expected.toFixed())
+	// 			expect(result.toFixed()).to.be.equal(calculated.toFixed())
+	// 		})
+	// 		it('Alice has a 100% of interests', async () => {
+	// 			await dev.lockup.withdraw(
+	// 				property.address,
+	// 				await dev.lockup.getValue(property.address, alice),
+	// 				{ from: alice }
+	// 			)
+	// 			await dev.lockup.withdraw(
+	// 				property.address,
+	// 				await dev.lockup.getValue(property.address, bob),
+	// 				{ from: bob }
+	// 			)
+	// 			await dev.dev
+	// 				.deposit(property.address, 1000000000000, { from: alice })
+	// 				.then(gasLogger)
+	// 			await mine(1)
+	// 			const result = await dev.lockup
+	// 				.calculateWithdrawableInterestAmount(property.address, alice)
+	// 				.then(toBigNumber)
+	// 			const expected = toBigNumber(10).times(1e18)
+	// 			const calculated = await calc(property, alice)
+
+	// 			expect(result.toFixed()).to.be.equal(expected.toFixed())
+	// 			expect(result.toFixed()).to.be.equal(calculated.toFixed())
+	// 		})
+	// 		it('After withdrawn, Alice and Bob has a 0% of interests', async () => {
+	// 			await dev.dev
+	// 				.deposit(property.address, 1000000000000, { from: alice })
+	// 				.then(gasLogger)
+	// 			await dev.dev
+	// 				.deposit(property.address, 1000000000000, { from: bob })
+	// 				.then(gasLogger)
+	// 			await mine(2)
+	// 			await dev.lockup.withdraw(
+	// 				property.address,
+	// 				await dev.lockup.getValue(property.address, alice),
+	// 				{ from: alice }
+	// 			)
+	// 			await dev.lockup.withdraw(
+	// 				property.address,
+	// 				await dev.lockup.getValue(property.address, bob),
+	// 				{ from: bob }
+	// 			)
+	// 			await mine(1)
+	// 			const aliceAmount =
+	// 				await dev.lockup.calculateWithdrawableInterestAmount(
+	// 					property.address,
+	// 					alice
+	// 				)
+	// 			const bobAmount = await dev.lockup.calculateWithdrawableInterestAmount(
+	// 				property.address,
+	// 				bob
+	// 			)
+	// 			const aliceCalculated = await calc(property, alice)
+	// 			const bobCalculated = await calc(property, bob)
+
+	// 			expect(aliceAmount.toString()).to.be.equal('0')
+	// 			expect(bobAmount.toString()).to.be.equal('0')
+	// 			expect(aliceCalculated.toString()).to.be.equal('0')
+	// 			expect(bobCalculated.toString()).to.be.equal('0')
+	// 		})
+	// 		it('Bob has huge staked, Alice has small amount of reward', async () => {
+	// 			const [property2] = await Promise.all([
+	// 				artifacts
+	// 					.require('Property')
+	// 					.at(
+	// 						getPropertyAddress(
+	// 							await dev.propertyFactory.create('test', 'TEST', deployer)
+	// 						)
+	// 					),
+	// 			])
+	// 			await dev.metricsFactory.__setMetricsCountPerProperty(
+	// 				property2.address,
+	// 				1
+	// 			)
+
+	// 			const bobBalance = toBigNumber(10000000).times(1e18)
+	// 			await dev.dev.mint(bob, bobBalance)
+	// 			await dev.dev
+	// 				.deposit(property.address, bobBalance, { from: bob })
+	// 				.then(gasLogger)
+	// 			await mine(10)
+
+	// 			await dev.dev
+	// 				.deposit(property2.address, 10000000, { from: alice })
+	// 				.then(gasLogger)
+	// 			await mine(1)
+	// 			const result = await dev.lockup
+	// 				.calculateWithdrawableInterestAmount(property2.address, alice)
+	// 				.then(toBigNumber)
+	// 			const expected = toBigNumber(10)
+	// 				.times(1e18)
+	// 				.times(
+	// 					toBigNumber(10000000).div(toBigNumber(10000000).plus(bobBalance))
+	// 				)
+	// 			const calculated = await calc(property2, alice)
+
+	// 			expect(result.toFixed()).to.be.equal(expected.toFixed())
+	// 			expect(result.toFixed()).to.be.equal(calculated.toFixed())
+	// 		})
+	// 		it('Property that unauthenticated but already staked before DIP9 has no reward', async () => {
+	// 			const propertyAddress = getPropertyAddress(
+	// 				await dev.propertyFactory.create('test', 'TEST', deployer)
+	// 			)
+	// 			await dev.metricsFactory.__setMetricsCountPerProperty(
+	// 				propertyAddress,
+	// 				1
+	// 			)
+	// 			await dev.dev
+	// 				.deposit(propertyAddress, 1000000000000, { from: alice })
+	// 				.then(gasLogger)
+	// 			await mine(1)
+	// 			await dev.dev
+	// 				.deposit(propertyAddress, 1000000000000, { from: alice })
+	// 				.then(gasLogger)
+	// 			await mine(1)
+	// 			await dev.metricsFactory.__setMetricsCountPerProperty(
+	// 				propertyAddress,
+	// 				0
+	// 			)
+	// 			const result = await dev.lockup
+	// 				.calculateWithdrawableInterestAmount(propertyAddress, alice)
+	// 				.then(toBigNumber)
+	// 			const expected = toBigNumber(0)
+
+	// 			expect(result.toFixed()).to.be.equal(expected.toFixed())
+	// 		})
+	// 	})
+
+	// 	describe('scenario; single lockup', () => {
+	// 		let dev: DevProtocolInstance
+	// 		let property: PropertyInstance
+	// 		let lastBlock: BigNumber
+
+	// 		const alice = deployer
+	// 		const bob = user1
+
+	// 		before(async () => {
+	// 			;[dev, property] = await init()
+	// 			const aliceBalance = await dev.dev.balanceOf(alice).then(toBigNumber)
+	// 			await dev.dev.mint(bob, aliceBalance)
+	// 			await dev.dev
+	// 				.deposit(property.address, 10000, { from: alice })
+	// 				.then(gasLogger)
+	// 			lastBlock = await getBlock().then(toBigNumber)
+	// 		})
+
+	// 		/*
+	// 		 * PolicyTestBase returns 100 as rewards
+	// 		 * And stakers share is 10%
+	// 		 */
+
+	// 		describe('before second run', () => {
+	// 			it(`Alice does staking 100% of the Property's total lockups`, async () => {
+	// 				const total = await dev.lockup
+	// 					.totalLockedForProperty(property.address)
+	// 					.then(toBigNumber)
+	// 				const aliceBalance = await dev.lockup
+	// 					.getValue(property.address, alice)
+	// 					.then(toBigNumber)
+	// 				expect(aliceBalance.toFixed()).to.be.equal(total.toFixed())
+	// 			})
+	// 			it(`Alice's withdrawable interest is 100% of the Property's interest`, async () => {
+	// 				await mine(9)
+	// 				const block = await getBlock().then(toBigNumber)
+	// 				const aliceAmount = await dev.lockup
+	// 					.calculateWithdrawableInterestAmount(property.address, alice)
+	// 					.then(toBigNumber)
+	// 				const expected = toBigNumber(10) // In PolicyTestBase, the max staker reward per block is 10.
+	// 					.times(1e18)
+	// 					.times(block.minus(lastBlock))
+	// 				expect(aliceAmount.toFixed()).to.be.equal(expected.toFixed())
+	// 			})
+	// 		})
+	// 		describe('after second run', () => {
+	// 			before(async () => {
+	// 				await dev.lockup.withdraw(property.address, 0, { from: alice })
+	// 				lastBlock = await getBlock().then(toBigNumber)
+	// 			})
+	// 			it(`Alice's withdrawable interest is 100% of the Property's interest`, async () => {
+	// 				await mine(3)
+	// 				const aliceAmount = await dev.lockup
+	// 					.calculateWithdrawableInterestAmount(property.address, alice)
+	// 					.then(toBigNumber)
+	// 				const expected = toBigNumber(10) // In PolicyTestBase, the max staker reward per block is 10.
+	// 					.times(1e18)
+	// 					.times(3)
+	// 				expect(aliceAmount.toFixed()).to.be.equal(expected.toFixed())
+	// 			})
+	// 		})
+	// 		describe('after additional staking', () => {
+	// 			before(async () => {
+	// 				await dev.dev.deposit(property.address, 10000, { from: alice })
+	// 			})
+	// 			it(`Alice's withdrawable interest is 100% of the Property's interest`, async () => {
+	// 				const block = await getBlock().then(toBigNumber)
+	// 				const aliceAmount = await dev.lockup
+	// 					.calculateWithdrawableInterestAmount(property.address, alice)
+	// 					.then(toBigNumber)
+	// 				const expected = toBigNumber(10) // In PolicyTestBase, the max staker reward per block is 10.
+	// 					.times(1e18)
+	// 					.times(block.minus(lastBlock))
+
+	// 				expect(aliceAmount.toFixed()).to.be.equal(expected.toFixed())
+	// 			})
+	// 		})
+	// 		describe('after withdrawal', () => {
+	// 			let aliceBalance: BigNumber
+	// 			let aliceLocked: BigNumber
+	// 			before(async () => {
+	// 				aliceBalance = await dev.dev.balanceOf(alice).then(toBigNumber)
+	// 				aliceLocked = await dev.lockup
+	// 					.getValue(property.address, alice)
+	// 					.then(toBigNumber)
+	// 				await dev.lockup.withdraw(property.address, aliceLocked, {
+	// 					from: alice,
+	// 				})
+	// 			})
+	// 			it(`Alice's withdrawable interest is 100% of the Property's interest`, async () => {
+	// 				const block = await getBlock().then(toBigNumber)
+	// 				const aliceLockup = await dev.lockup
+	// 					.getValue(property.address, alice)
+	// 					.then(toBigNumber)
+	// 				const aliceAmount = await dev.lockup
+	// 					.calculateWithdrawableInterestAmount(property.address, alice)
+	// 					.then(toBigNumber)
+	// 				const afterAliceBalance = await dev.dev
+	// 					.balanceOf(alice)
+	// 					.then(toBigNumber)
+	// 				const reward = toBigNumber(10) // In PolicyTestBase, the max staker reward per block is 10.
+	// 					.times(1e18)
+	// 					.times(block.minus(lastBlock))
+	// 				expect(aliceAmount.toFixed()).to.be.equal('0')
+	// 				expect(aliceLockup.toFixed()).to.be.equal('0')
+	// 				expect(afterAliceBalance.toFixed()).to.be.equal(
+	// 					aliceBalance.plus(aliceLocked).plus(reward).toFixed()
+	// 				)
+	// 			})
+	// 		})
+	// 	})
+	// 	describe('scenario: multiple lockup', () => {
+	// 		let dev: DevProtocolInstance
+	// 		let property: PropertyInstance
+	// 		let calc: Calculator
+
+	// 		const alice = deployer
+	// 		const bob = user1
+
+	// 		before(async () => {
+	// 			;[dev, property] = await init()
+	// 			calc = createCalculator(dev)
+	// 			const aliceBalance = await dev.dev.balanceOf(alice).then(toBigNumber)
+	// 			await dev.dev.mint(bob, aliceBalance)
+	// 			await dev.dev.deposit(property.address, 10000, { from: alice })
+	// 		})
+
+	// 		describe('before second run', () => {
+	// 			it(`Alice does staking 100% of the Property's total lockups`, async () => {
+	// 				const total = await dev.lockup
+	// 					.totalLockedForProperty(property.address)
+	// 					.then(toBigNumber)
+	// 				const aliceBalance = await dev.lockup
+	// 					.getValue(property.address, alice)
+	// 					.then(toBigNumber)
+	// 				expect(aliceBalance.toFixed()).to.be.equal(total.toFixed())
+	// 			})
+	// 			it(`Bob does staking 25% of the Property's total lockups, Alice's share become 80%`, async () => {
+	// 				await dev.dev.deposit(property.address, 10000 * 0.25, { from: bob })
+	// 				const total = await dev.lockup
+	// 					.totalLockedForProperty(property.address)
+	// 					.then(toBigNumber)
+	// 				const aliceBalance = await dev.lockup
+	// 					.getValue(property.address, alice)
+	// 					.then(toBigNumber)
+	// 				const bobBalance = await dev.lockup
+	// 					.getValue(property.address, bob)
+	// 					.then(toBigNumber)
+
+	// 				expect(aliceBalance.toFixed()).to.be.equal(
+	// 					total.times(0.8).integerValue(BigNumber.ROUND_DOWN).toFixed()
+	// 				)
+	// 				expect(bobBalance.toFixed()).to.be.equal(
+	// 					total.times(0.2).integerValue(BigNumber.ROUND_DOWN).toFixed()
+	// 				)
+	// 			})
+	// 			it(`Alice's withdrawable interest is 100% of between lastBlockNumber and Bob's first deposit block interest and 80% of current interest`, async () => {
+	// 				await mine(3)
+	// 				const aliceAmount = await dev.lockup
+	// 					.calculateWithdrawableInterestAmount(property.address, alice)
+	// 					.then(toBigNumber)
+	// 				const expected = await calc(property, alice)
+	// 				expect(aliceAmount.toFixed()).to.be.equal(expected.toFixed())
+	// 			})
+	// 			it(`Bob's withdrawable interest is 20% of interest since the first deposit`, async () => {
+	// 				await mine(3)
+	// 				const bobAmount = await dev.lockup
+	// 					.calculateWithdrawableInterestAmount(property.address, bob)
+	// 					.then(toBigNumber)
+	// 				const expected = await calc(property, bob)
+	// 				expect(bobAmount.toFixed()).to.be.equal(expected.toFixed())
+	// 			})
+	// 		})
+	// 		describe('after second withdrawal', () => {
+	// 			before(async () => {
+	// 				await dev.lockup.withdraw(property.address, 0, { from: alice })
+	// 				await dev.lockup.withdraw(property.address, 0, { from: bob })
+	// 				await mine(3)
+	// 			})
+	// 			it(`Alice's withdrawable interest is 80% of current interest`, async () => {
+	// 				const aliceAmount = await dev.lockup
+	// 					.calculateWithdrawableInterestAmount(property.address, alice)
+	// 					.then(toBigNumber)
+	// 				const expected = await calc(property, alice)
+
+	// 				expect(aliceAmount.toFixed()).to.be.equal(expected.toFixed())
+	// 			})
+	// 			it(`Bob's withdrawable interest is 20% of current interest`, async () => {
+	// 				const bobAmount = await dev.lockup
+	// 					.calculateWithdrawableInterestAmount(property.address, bob)
+	// 					.then(toBigNumber)
+	// 				const expected = await calc(property, bob)
+
+	// 				expect(bobAmount.toFixed()).to.be.equal(expected.toFixed())
+	// 			})
+	// 		})
+	// 		describe('additional staking', () => {
+	// 			before(async () => {
+	// 				await dev.dev.deposit(property.address, 12500 * 0.3, { from: bob })
+	// 				await mine(3)
+	// 			})
+	// 			it(`Bob does staking 30% of the Property's total lockups, Bob's share become ${
+	// 				625000 / 16250
+	// 			}%, Alice's share become ${1000000 / 16250}%`, async () => {
+	// 				const aliceBalance = await dev.lockup
+	// 					.getValue(property.address, alice)
+	// 					.then(toBigNumber)
+	// 				const bobBalance = await dev.lockup
+	// 					.getValue(property.address, bob)
+	// 					.then(toBigNumber)
+
+	// 				expect(10000).to.be.equal(
+	// 					new BigNumber(16250)
+	// 						.times(new BigNumber(10000).div(16250))
+	// 						.toNumber()
+	// 				)
+	// 				expect(aliceBalance.toFixed()).to.be.equal('10000')
+	// 				expect(6250).to.be.equal(
+	// 					new BigNumber(16250)
+	// 						.times(new BigNumber(6250).div(16250))
+	// 						.toNumber()
+	// 				)
+	// 				expect(bobBalance.toFixed()).to.be.equal('6250')
+	// 			})
+	// 		})
+	// 		describe('after additional staking', () => {
+	// 			it(`Alice's withdrawable interest is 80% of prev interest and ${
+	// 				1000000 / 16250
+	// 			}% of current interest`, async () => {
+	// 				const aliceAmount = await dev.lockup
+	// 					.calculateWithdrawableInterestAmount(property.address, alice)
+	// 					.then(toBigNumber)
+	// 				const expected = await calc(property, alice)
+
+	// 				expect(aliceAmount.toFixed()).to.be.equal(expected.toFixed())
+	// 			})
+	// 			it(`Bob's withdrawable interest is 20% of prev interest and ${
+	// 				625000 / 16250
+	// 			}% of current interest`, async () => {
+	// 				const bobAmount = await dev.lockup
+	// 					.calculateWithdrawableInterestAmount(property.address, bob)
+	// 					.then(toBigNumber)
+	// 				const expected = await calc(property, bob)
+
+	// 				expect(bobAmount.toFixed()).to.be.equal(expected.toFixed())
+	// 			})
+	// 		})
+	// 		describe('after withdrawal', () => {
+	// 			before(async () => {
+	// 				await dev.lockup.withdraw(
+	// 					property.address,
+	// 					await dev.lockup.getValue(property.address, alice),
+	// 					{
+	// 						from: alice,
+	// 					}
+	// 				)
+	// 				await mine(3)
+	// 				await dev.lockup.withdraw(
+	// 					property.address,
+	// 					await dev.lockup.getValue(property.address, bob),
+	// 					{
+	// 						from: bob,
+	// 					}
+	// 				)
+	// 				await mine(3)
+	// 			})
+	// 			it(`Alice's withdrawable interest is 0`, async () => {
+	// 				const aliceAmount = await dev.lockup
+	// 					.calculateWithdrawableInterestAmount(property.address, alice)
+	// 					.then(toBigNumber)
+
+	// 				expect(aliceAmount.toFixed()).to.be.equal('0')
+	// 			})
+	// 			it(`Bob's withdrawable interest is 0`, async () => {
+	// 				const bobAmount = await dev.lockup
+	// 					.calculateWithdrawableInterestAmount(property.address, bob)
+	// 					.then(toBigNumber)
+
+	// 				expect(bobAmount.toFixed()).to.be.equal('0')
+	// 			})
+	// 		})
+	// 	})
+
+	// 	describe('scenario: multiple properties', () => {
+	// 		let dev: DevProtocolInstance
+	// 		let property1: PropertyInstance
+	// 		let property2: PropertyInstance
+	// 		let property3: PropertyInstance
+	// 		let property4: PropertyInstance
+	// 		let calc: Calculator
+
+	// 		const alice = user2
+	// 		const bob = user1
+
+	// 		before(async () => {
+	// 			;[dev, property1] = await init()
+	// 			await dev.dev.mint(alice, new BigNumber(1e18).times(10000000))
+	// 			calc = createCalculator(dev)
+	// 			const aliceBalance = await dev.dev.balanceOf(alice).then(toBigNumber)
+	// 			await dev.dev.mint(bob, aliceBalance)
+	// 			;[property2, property3, property4] = await Promise.all([
+	// 				artifacts
+	// 					.require('Property')
+	// 					.at(
+	// 						getPropertyAddress(
+	// 							await dev.propertyFactory.create('test2', 'TEST2', user3)
+	// 						)
+	// 					),
+	// 				artifacts
+	// 					.require('Property')
+	// 					.at(
+	// 						getPropertyAddress(
+	// 							await dev.propertyFactory.create('test3', 'TEST3', user3)
+	// 						)
+	// 					),
+	// 				artifacts
+	// 					.require('Property')
+	// 					.at(
+	// 						getPropertyAddress(
+	// 							await dev.propertyFactory.create('test4', 'TEST4', user3)
+	// 						)
+	// 					),
+	// 			])
+	// 			await dev.metricsFactory.__setMetricsCountPerProperty(
+	// 				property2.address,
+	// 				1
+	// 			)
+	// 			await dev.metricsFactory.__setMetricsCountPerProperty(
+	// 				property3.address,
+	// 				1
+	// 			)
+	// 			await dev.metricsFactory.__setMetricsCountPerProperty(
+	// 				property4.address,
+	// 				1
+	// 			)
+
+	// 			await dev.dev.deposit(property1.address, 10000, { from: alice })
+	// 			await mine(3)
+	// 		})
+
+	// 		describe('before withdrawal', () => {
+	// 			it('No staked Property is 0 interest', async () => {
+	// 				const result = await dev.lockup
+	// 					.calculateWithdrawableInterestAmount(property4.address, alice)
+	// 					.then(toBigNumber)
+	// 				const expected = await calc(property4, alice)
+	// 				expect(result.toFixed()).to.be.equal(expected.toFixed())
+	// 				expect(expected.toFixed()).to.be.equal('0')
+	// 			})
+	// 			it(`Alice does staking 100% of the Property1 total lockups, Property1 is 100% of the total rewards`, async () => {
+	// 				const total = await dev.lockup
+	// 					.totalLockedForProperty(property1.address)
+	// 					.then(toBigNumber)
+	// 				const aliceBalance = await dev.lockup
+	// 					.getValue(property1.address, alice)
+	// 					.then(toBigNumber)
+	// 				expect(aliceBalance.toFixed()).to.be.equal(total.toFixed())
+	// 			})
+	// 			it(`Bob does staking 100% of the Property2 total lockups, Property2 is 20% of the total rewards`, async () => {
+	// 				await dev.dev.deposit(property2.address, 2500, { from: bob })
+	// 				const total = await dev.lockup.totalLocked().then(toBigNumber)
+	// 				const p1 = await dev.lockup
+	// 					.totalLockedForProperty(property1.address)
+	// 					.then(toBigNumber)
+	// 				const p2 = await dev.lockup
+	// 					.totalLockedForProperty(property2.address)
+	// 					.then(toBigNumber)
+	// 				expect(p1.div(total).toNumber()).to.be.equal(0.8)
+	// 				expect(p2.div(total).toNumber()).to.be.equal(0.2)
+	// 			})
+	// 			it(`Alice's withdrawable interest is 100% of between lastBlockNumber and Bob's first deposit block interest and 80% of current interest`, async () => {
+	// 				await mine(3)
+	// 				const aliceAmount = await dev.lockup
+	// 					.calculateWithdrawableInterestAmount(property1.address, alice)
+	// 					.then(toBigNumber)
+	// 				const expected = await calc(property1, alice)
+	// 				expect(aliceAmount.toFixed()).to.be.equal(expected.toFixed())
+	// 			})
+	// 			it(`Bob's withdrawable interest is 20% of interest since the first deposit`, async () => {
+	// 				await mine(3)
+	// 				const bobAmount = await dev.lockup
+	// 					.calculateWithdrawableInterestAmount(property2.address, bob)
+	// 					.then(toBigNumber)
+	// 				const expected = await calc(property2, bob)
+	// 				expect(bobAmount.toFixed()).to.be.equal(expected.toFixed())
+	// 			})
+	// 		})
+	// 		describe('after withdrawal', () => {
+	// 			before(async () => {
+	// 				await dev.lockup.withdraw(property1.address, 0, { from: alice })
+	// 				await dev.lockup.withdraw(property2.address, 0, { from: bob })
+	// 				await mine(3)
+	// 			})
+	// 			it('No staked Property is 0 interest', async () => {
+	// 				const result = await dev.lockup
+	// 					.calculateWithdrawableInterestAmount(property4.address, alice)
+	// 					.then(toBigNumber)
+	// 				const expected = await calc(property4, alice)
+	// 				expect(result.toFixed()).to.be.equal(expected.toFixed())
+	// 				expect(expected.toFixed()).to.be.equal('0')
+	// 			})
+	// 			it(`Alice's withdrawable interest is 80% of current interest`, async () => {
+	// 				const aliceAmount = await dev.lockup
+	// 					.calculateWithdrawableInterestAmount(property1.address, alice)
+	// 					.then(toBigNumber)
+	// 				const expected = await calc(property1, alice)
+
+	// 				expect(aliceAmount.toFixed()).to.be.equal(expected.toFixed())
+	// 			})
+	// 			it(`Bob's withdrawable interest is 20% of current interest`, async () => {
+	// 				const bobAmount = await dev.lockup
+	// 					.calculateWithdrawableInterestAmount(property2.address, bob)
+	// 					.then(toBigNumber)
+	// 				const expected = await calc(property2, bob)
+
+	// 				expect(bobAmount.toFixed()).to.be.equal(expected.toFixed())
+	// 			})
+	// 		})
+	// 		describe('additional staking', () => {
+	// 			before(async () => {
+	// 				await dev.dev.deposit(property2.address, 12500 * 0.3, { from: bob })
+	// 				await mine(3)
+	// 			})
+	// 			it('No staked Property is 0 interest', async () => {
+	// 				const result = await dev.lockup
+	// 					.calculateWithdrawableInterestAmount(property4.address, alice)
+	// 					.then(toBigNumber)
+	// 				const expected = await calc(property4, alice)
+	// 				expect(result.toFixed()).to.be.equal(expected.toFixed())
+	// 				expect(expected.toFixed()).to.be.equal('0')
+	// 			})
+	// 			it(`Bob does staking 30% of the all Property's total lockups, Bob's share become ${
+	// 				625000 / 16250
+	// 			}%, Alice's share become ${1000000 / 16250}%`, async () => {
+	// 				const aliceBalance = await dev.lockup
+	// 					.getValue(property1.address, alice)
+	// 					.then(toBigNumber)
+	// 				const bobBalance = await dev.lockup
+	// 					.getValue(property2.address, bob)
+	// 					.then(toBigNumber)
+
+	// 				expect(10000).to.be.equal(
+	// 					new BigNumber(16250)
+	// 						.times(new BigNumber(10000).div(16250))
+	// 						.toNumber()
+	// 				)
+	// 				expect(aliceBalance.toFixed()).to.be.equal('10000')
+	// 				expect(6250).to.be.equal(
+	// 					new BigNumber(16250)
+	// 						.times(new BigNumber(6250).div(16250))
+	// 						.toNumber()
+	// 				)
+	// 				expect(bobBalance.toFixed()).to.be.equal('6250')
+	// 			})
+	// 		})
+	// 		describe('after additional staking', () => {
+	// 			it('No staked Property is 0 interest', async () => {
+	// 				const result = await dev.lockup
+	// 					.calculateWithdrawableInterestAmount(property4.address, alice)
+	// 					.then(toBigNumber)
+	// 				const expected = await calc(property4, alice)
+	// 				expect(result.toFixed()).to.be.equal(expected.toFixed())
+	// 				expect(expected.toFixed()).to.be.equal('0')
+	// 			})
+	// 			it(`Alice's withdrawable interest is 80% of prev interest and ${
+	// 				1000000 / 16250
+	// 			}% of current interest`, async () => {
+	// 				const aliceAmount = await dev.lockup
+	// 					.calculateWithdrawableInterestAmount(property1.address, alice)
+	// 					.then(toBigNumber)
+	// 				const expected = await calc(property1, alice)
+
+	// 				expect(aliceAmount.toFixed()).to.be.equal(
+	// 					expected.integerValue(BigNumber.ROUND_DOWN).toFixed()
+	// 				)
+	// 			})
+	// 			it(`Bob's withdrawable interest is 20% of prev interest and ${
+	// 				625000 / 16250
+	// 			}% of current interest`, async () => {
+	// 				const bobAmount = await dev.lockup
+	// 					.calculateWithdrawableInterestAmount(property2.address, bob)
+	// 					.then(toBigNumber)
+	// 				const expected = await calc(property2, bob)
+
+	// 				expect(bobAmount.toFixed()).to.be.equal(
+	// 					expected.integerValue(BigNumber.ROUND_DOWN).toFixed()
+	// 				)
+	// 			})
+	// 		})
+	// 		describe('additional staking', () => {
+	// 			before(async () => {
+	// 				await dev.dev.deposit(property3.address, 16250 * 0.6, { from: alice })
+	// 				await mine(3)
+	// 			})
+	// 			it('No staked Property is 0 interest', async () => {
+	// 				const result = await dev.lockup
+	// 					.calculateWithdrawableInterestAmount(property4.address, alice)
+	// 					.then(toBigNumber)
+	// 				const expected = await calc(property4, alice)
+	// 				expect(result.toFixed()).to.be.equal(expected.toFixed())
+	// 				expect(expected.toFixed()).to.be.equal('0')
+	// 			})
+	// 			it(`Alice does staking 60% of the all Property's total lockups, Alice's share become ${
+	// 				1975000 / 26000
+	// 			}%, Bob's share become ${625000 / 26000}%`, async () => {
+	// 				const aliceBalance = await Promise.all([
+	// 					dev.lockup.getValue(property1.address, alice).then(toBigNumber),
+	// 					dev.lockup.getValue(property3.address, alice).then(toBigNumber),
+	// 				])
+	// 				const bobBalance = await dev.lockup
+	// 					.getValue(property2.address, bob)
+	// 					.then(toBigNumber)
+
+	// 				expect(19750).to.be.equal(
+	// 					toBigNumber(26000).times(toBigNumber(19750).div(26000)).toNumber()
+	// 				)
+	// 				expect(aliceBalance[0].plus(aliceBalance[1]).toFixed()).to.be.equal(
+	// 					'19750'
+	// 				)
+	// 				expect(6250).to.be.equal(
+	// 					toBigNumber(26000).times(toBigNumber(6250).div(26000)).toNumber()
+	// 				)
+	// 				expect(bobBalance.toFixed()).to.be.equal('6250')
+	// 			})
+	// 		})
+	// 		describe('after additional staking', () => {
+	// 			it('No staked Property is 0 interest', async () => {
+	// 				const result = await dev.lockup
+	// 					.calculateWithdrawableInterestAmount(property4.address, alice)
+	// 					.then(toBigNumber)
+	// 				const expected = await calc(property4, alice)
+	// 				expect(result.toFixed()).to.be.equal(expected.toFixed())
+	// 				expect(expected.toFixed()).to.be.equal('0')
+	// 			})
+	// 			it(`Alice's withdrawable interest is 80% of two prev interest and ${
+	// 				1000000 / 16250
+	// 			}% of prev interest and ${
+	// 				1975000 / 26000
+	// 			}% of current interest`, async () => {
+	// 				const aliceAmount = await Promise.all([
+	// 					dev.lockup
+	// 						.calculateWithdrawableInterestAmount(property1.address, alice)
+	// 						.then(toBigNumber),
+	// 					dev.lockup
+	// 						.calculateWithdrawableInterestAmount(property3.address, alice)
+	// 						.then(toBigNumber),
+	// 				])
+	// 				const res1 = await calc(property1, alice)
+	// 				const res2 = await calc(property3, alice)
+
+	// 				expect(aliceAmount[0].plus(aliceAmount[1]).toFixed()).to.be.equal(
+	// 					res1.plus(res2).toFixed()
+	// 				)
+	// 			})
+	// 			it(`Bob's withdrawable interest is 20% of two prev interest and ${
+	// 				625000 / 16250
+	// 			}% of prev interest and ${
+	// 				625000 / 26000
+	// 			}% of current interest`, async () => {
+	// 				const bobAmount = await dev.lockup
+	// 					.calculateWithdrawableInterestAmount(property2.address, bob)
+	// 					.then(toBigNumber)
+	// 				const expected = await calc(property2, bob)
+
+	// 				expect(bobAmount.toFixed()).to.be.equal(expected.toFixed())
+	// 			})
+	// 		})
+	// 		describe('after withdrawal stakes', () => {
+	// 			before(async () => {
+	// 				await dev.lockup.withdraw(
+	// 					property1.address,
+	// 					await dev.lockup.getValue(property1.address, alice),
+	// 					{
+	// 						from: alice,
+	// 					}
+	// 				)
+	// 				await mine(3)
+	// 				await dev.lockup.withdraw(
+	// 					property3.address,
+	// 					await dev.lockup.getValue(property3.address, alice),
+	// 					{
+	// 						from: alice,
+	// 					}
+	// 				)
+	// 				await mine(3)
+	// 				await dev.lockup.withdraw(
+	// 					property2.address,
+	// 					await dev.lockup.getValue(property2.address, bob),
+	// 					{
+	// 						from: bob,
+	// 					}
+	// 				)
+	// 				await mine(3)
+	// 			})
+	// 			it('No staked Property is 0 interest', async () => {
+	// 				const result = await dev.lockup
+	// 					.calculateWithdrawableInterestAmount(property4.address, alice)
+	// 					.then(toBigNumber)
+	// 				const expected = await calc(property4, alice)
+	// 				expect(result.toFixed()).to.be.equal(expected.toFixed())
+	// 				expect(expected.toFixed()).to.be.equal('0')
+	// 			})
+	// 			it(`Alice's withdrawable interest`, async () => {
+	// 				const aliceAmount = await Promise.all([
+	// 					dev.lockup
+	// 						.calculateWithdrawableInterestAmount(property1.address, alice)
+	// 						.then(toBigNumber),
+	// 					dev.lockup
+	// 						.calculateWithdrawableInterestAmount(property3.address, alice)
+	// 						.then(toBigNumber),
+	// 				])
+	// 				const res1 = await calc(property1, alice)
+	// 				const res2 = await calc(property3, alice)
+
+	// 				expect(aliceAmount[0].plus(aliceAmount[1]).toFixed()).to.be.equal(
+	// 					res1.plus(res2).toFixed()
+	// 				)
+	// 			})
+	// 			it(`Bob's withdrawable interest`, async () => {
+	// 				const bobAmount = await dev.lockup
+	// 					.calculateWithdrawableInterestAmount(property2.address, bob)
+	// 					.then(toBigNumber)
+	// 				const expected = await calc(property2, bob)
+
+	// 				expect(bobAmount.toFixed()).to.be.equal(expected.toFixed())
+	// 			})
+	// 		})
+	// 	})
+	// })
+	// describe('Lockup; calculateRewardAmount', () => {
+	// 	const calculateCap = async (
+	// 		dev: DevProtocolInstance,
+	// 		property: PropertyInstance,
+	// 		holderCap: BigNumber
+	// 	): Promise<BigNumber> => {
+	// 		const initialCap = await dev.lockup
+	// 			.initialCumulativeHoldersRewardCap(property.address)
+	// 			.then(toBigNumber)
+	// 		return holderCap.minus(initialCap)
+	// 	}
+
+	// 	const calculateReword = async (
+	// 		dev: DevProtocolInstance,
+	// 		property: PropertyInstance,
+	// 		holders: BigNumber
+	// 	): Promise<BigNumber> => {
+	// 		const cHoldersReward = await dev.lockup
+	// 			.lastCumulativeHoldersRewardAmountPerProperty(property.address)
+	// 			.then(toBigNumber)
+	// 		const lastReward = await dev.lockup
+	// 			.lastCumulativeHoldersRewardPricePerProperty(property.address)
+	// 			.then(toBigNumber)
+	// 		const enabledStakingValue = await dev.lockup
+	// 			.totalLockedForProperty(property.address)
+	// 			.then(toBigNumber)
+	// 		const additionalHoldersReward = holders
+	// 			.minus(lastReward)
+	// 			.times(enabledStakingValue)
+	// 		return cHoldersReward.plus(additionalHoldersReward)
+	// 	}
+
+	// 	const calculate = async (
+	// 		dev: DevProtocolInstance,
+	// 		property: PropertyInstance
+	// 	): Promise<[BigNumber, BigNumber]> => {
+	// 		const tmp = await dev.lockup.calculateCumulativeRewardPrices()
+	// 		const reward = await calculateReword(dev, property, toBigNumber(tmp[1]))
+	// 		const cap = await calculateCap(dev, property, toBigNumber(tmp[3]))
+	// 		return [reward, cap]
+	// 	}
+
+	// 	it('The reward is calculated and comes back to you.', async () => {
+	// 		const [dev, property] = await init()
+	// 		await dev.dev.deposit(property.address, '10000000000000000000000')
+	// 		await dev.updateCap()
+	// 		const [reword, cap] = await calculate(dev, property)
+	// 		const result = await dev.lockup.calculateRewardAmount(property.address)
+	// 		expect(toBigNumber(result[0]).toFixed()).to.be.equal(reword.toFixed())
+	// 		expect(toBigNumber(result[1]).toFixed()).to.be.equal(cap.toFixed())
+	// 	})
+	// })
 	describe('Lockup; cap, updateCap', () => {
 		const calculateCap = async (
 			dev: DevProtocolInstance,
