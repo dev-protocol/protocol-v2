@@ -84,7 +84,9 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				const position = await dev.sTokenManager.positions(2)
 				expect(position[0]).to.be.equal(property.address)
 				expect(position[1].toNumber()).to.be.equal(200)
-				expect(position[2].toString()).to.be.equal('200000000000000000000000000000000000')
+				expect(position[2].toString()).to.be.equal(
+					'200000000000000000000000000000000000'
+				)
 				expect(position[3].toNumber()).to.be.equal(0)
 				expect(position[4].toNumber()).to.be.equal(0)
 			})
@@ -173,13 +175,11 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				const afterPosition = await dev.sTokenManager.positions(tokenId)
 				expect(afterPosition[0]).to.be.equal(property.address)
 				expect(afterPosition[1].toNumber()).to.be.equal(200)
-				expect(afterPosition[2].toString()).to.be.equal('100000000000000000000000000000000000')
-				expect(afterPosition[3].toString()).to.be.equal(
-					'10000000000000000000'
+				expect(afterPosition[2].toString()).to.be.equal(
+					'100000000000000000000000000000000000'
 				)
-				expect(afterPosition[4].toString()).to.be.equal(
-					'10000000000000000000'
-				)
+				expect(afterPosition[3].toString()).to.be.equal('10000000000000000000')
+				expect(afterPosition[4].toString()).to.be.equal('10000000000000000000')
 			})
 			it('generate event.', async () => {
 				const [dev, property, tokenId] = await init2()
@@ -256,10 +256,10 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				const afterPosition = await dev.sTokenManager.positions(tokenId)
 				expect(afterPosition[0]).to.be.equal(property.address)
 				expect(afterPosition[1].toNumber()).to.be.equal(0)
-				expect(afterPosition[2].toString()).to.be.equal('100000000000000000000000000000000000')
-				expect(afterPosition[3].toString()).to.be.equal(
-					'10000000000000000000'
+				expect(afterPosition[2].toString()).to.be.equal(
+					'100000000000000000000000000000000000'
 				)
+				expect(afterPosition[3].toString()).to.be.equal('10000000000000000000')
 				expect(beforePosition[4].toNumber()).to.be.equal(0)
 			})
 			it('get reward.', async () => {
@@ -606,7 +606,10 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				const propertyAddress = getPropertyAddress(
 					await dev.propertyFactory.create('test', 'TEST', deployer)
 				)
-				await dev.metricsFactory.__setMetricsCountPerProperty(propertyAddress, 1)
+				await dev.metricsFactory.__setMetricsCountPerProperty(
+					propertyAddress,
+					1
+				)
 				await dev.lockup.depositToProperty(propertyAddress, 1000000000000, {
 					from: alice,
 				})
@@ -615,7 +618,10 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 					from: alice,
 				})
 				await mine(1)
-				await dev.metricsFactory.__setMetricsCountPerProperty(propertyAddress, 0)
+				await dev.metricsFactory.__setMetricsCountPerProperty(
+					propertyAddress,
+					0
+				)
 				const result = await dev.lockup
 					.calculateWithdrawableInterestAmountByPosition(aliceFourthTokenId)
 					.then(toBigNumber)
