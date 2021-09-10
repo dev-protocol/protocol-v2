@@ -12,6 +12,7 @@ import {
 	toBigNumber,
 	getBlock,
 	splitValue,
+	getAmountFromPosition,
 } from '../test-lib/utils/common'
 import {
 	getWithdrawHolderAmount,
@@ -113,9 +114,16 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 			before(async () => {
 				;[dev, , property] = await init()
 				await dev.dev.mint(alis, new BigNumber(1e18).times(10000000))
-				await dev.dev.deposit(property.address, '10000000000000000000000', {
+				await dev.dev.approve(dev.lockup.address, '10000000000000000000000', {
 					from: alis,
 				})
+				await dev.lockup.depositToProperty(
+					property.address,
+					'10000000000000000000000',
+					{
+						from: alis,
+					}
+				)
 			})
 
 			it(`withdrawing sender's withdrawable interest full amount`, async () => {
@@ -157,9 +165,16 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 			it('Withdraw mints an ERC20 token specified in the Address Config Contract', async () => {
 				const [dev, , property] = await init()
 				await dev.dev.mint(alis, new BigNumber(1e18).times(10000000))
-				await dev.dev.deposit(property.address, '10000000000000000000000', {
+				await dev.dev.approve(dev.lockup.address, '10000000000000000000000', {
 					from: alis,
 				})
+				await dev.lockup.depositToProperty(
+					property.address,
+					'10000000000000000000000',
+					{
+						from: alis,
+					}
+				)
 				const prev = await dev.dev.totalSupply().then(toBigNumber)
 				const balance = await dev.dev.balanceOf(deployer).then(toBigNumber)
 
@@ -179,9 +194,16 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 		describe('Withdraw; Withdrawable amount', () => {
 			it('The withdrawable amount each holder is the number multiplied the balance of the price per Property Contract and the Property Contract of the sender', async () => {
 				const [dev, , property] = await init()
-				await dev.dev.deposit(property.address, '10000000000000000000000', {
+				await dev.dev.approve(dev.lockup.address, '10000000000000000000000', {
 					from: user3,
 				})
+				await dev.lockup.depositToProperty(
+					property.address,
+					'10000000000000000000000',
+					{
+						from: user3,
+					}
+				)
 				const totalSupply = await property.totalSupply().then(toBigNumber)
 				const oneBlockAmount = toBigNumber(9e19)
 				const user1Share = 20
@@ -216,9 +238,16 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 			})
 			it('The withdrawal amount is always the full amount of the withdrawable amount', async () => {
 				const [dev, , property] = await init()
-				await dev.dev.deposit(property.address, '10000000000000000000000', {
+				await dev.dev.approve(dev.lockup.address, '10000000000000000000000', {
 					from: user3,
 				})
+				await dev.lockup.depositToProperty(
+					property.address,
+					'10000000000000000000000',
+					{
+						from: user3,
+					}
+				)
 				const totalSupply = await property.totalSupply().then(toBigNumber)
 				const prevBalance1 = await dev.dev.balanceOf(deployer).then(toBigNumber)
 				const prevBalance2 = await dev.dev.balanceOf(user1).then(toBigNumber)
@@ -306,9 +335,16 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 						from: alice,
 					}
 				)
-				await dev.dev.deposit(property.address, '10000000000000000000000', {
+				await dev.dev.approve(dev.lockup.address, '10000000000000000000000', {
 					from: user3,
 				})
+				await dev.lockup.depositToProperty(
+					property.address,
+					'10000000000000000000000',
+					{
+						from: user3,
+					}
+				)
 				blockNumber = await getBlock()
 			})
 
@@ -435,9 +471,16 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 						from: alice,
 					}
 				)
-				await dev.dev.deposit(property.address, '10000000000000000000000', {
+				await dev.dev.approve(dev.lockup.address, '10000000000000000000000', {
 					from: user3,
 				})
+				await dev.lockup.depositToProperty(
+					property.address,
+					'10000000000000000000000',
+					{
+						from: user3,
+					}
+				)
 				blockNumber = await getBlock()
 			})
 
@@ -590,6 +633,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 			})
 		})
 	})
+
 	describe('Withdraw; calculateWithdrawableAmount, calculateRewardAmount', () => {
 		type calcResult = {
 			readonly value: BigNumber
@@ -702,6 +746,11 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 				calc = createCalculator(dev)
 				const aliceBalance = await dev.dev.balanceOf(alice).then(toBigNumber)
 				await dev.dev.mint(bob, aliceBalance)
+				await dev.dev.approve(
+					dev.lockup.address,
+					toBigNumber(10000).times(1e18),
+					{ from: bob }
+				)
 			})
 
 			describe('When totally is 0', () => {
@@ -731,7 +780,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 						property2.address,
 						1
 					)
-					await dev.dev.deposit(
+					await dev.lockup.depositToProperty(
 						property2.address,
 						toBigNumber(10000).times(1e18),
 						{ from: bob }
@@ -763,6 +812,11 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 			before(async () => {
 				;[dev, , property] = await init()
 				calc = createCalculator(dev)
+				await dev.dev.approve(
+					dev.lockup.address,
+					toBigNumber(20000).times(1e18),
+					{ from: bob }
+				)
 				await dev.dev.mint(bob, new BigNumber(1e18).times(10000000))
 			})
 
@@ -784,7 +838,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 					property.address,
 					1
 				)
-				await dev.dev.deposit(
+				await dev.lockup.depositToProperty(
 					property.address,
 					toBigNumber(10000).times(1e18),
 					{
@@ -792,7 +846,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 					}
 				)
 				await mine(1)
-				await dev.dev.deposit(
+				await dev.lockup.depositToProperty(
 					property.address,
 					toBigNumber(10000).times(1e18),
 					{
@@ -824,8 +878,13 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 				;[dev, , property] = await init()
 				calc = createCalculator(dev)
 				const aliceBalance = await dev.dev.balanceOf(alice).then(toBigNumber)
+				await dev.dev.approve(
+					dev.lockup.address,
+					toBigNumber(20000).times(1e18),
+					{ from: carol }
+				)
 				await dev.dev.mint(carol, aliceBalance)
-				await dev.dev.deposit(
+				await dev.lockup.depositToProperty(
 					property.address,
 					toBigNumber(10000).times(1e18),
 					{ from: carol }
@@ -873,8 +932,8 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 			})
 			describe('after additional staking', () => {
 				before(async () => {
-					await dev.dev.deposit(
-						property.address,
+					await dev.lockup.depositToPosition(
+						1,
 						toBigNumber(10000).times(1e18),
 						{ from: carol }
 					)
@@ -891,9 +950,10 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 			})
 			describe('after staking withdrawal', () => {
 				before(async () => {
-					await dev.lockup.withdraw(
-						property.address,
-						await dev.lockup.getValue(property.address, carol),
+					await dev.sTokenManager.positions(1)
+					await dev.lockup.withdrawByPosition(
+						1,
+						await getAmountFromPosition(dev, 1),
 						{
 							from: carol,
 						}
@@ -924,6 +984,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 				})
 			})
 		})
+
 		describe('scenario: multiple lockup', () => {
 			let dev: DevProtocolInstance
 			let property: PropertyInstance
@@ -933,6 +994,8 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 			const alice = deployer
 			const bob = user1
 			const carol = user2
+			const bobFirstDepositTokrnid = 1
+			const carolFirstDepositTokrnid = 2
 
 			before(async () => {
 				;[dev, , property] = await init()
@@ -940,11 +1003,21 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 				const aliceBalance = await dev.dev.balanceOf(alice).then(toBigNumber)
 				await dev.dev.mint(bob, aliceBalance)
 				await dev.dev.mint(carol, aliceBalance)
-				await dev.dev.deposit(property.address, '10000000000000000000000', {
+				await dev.dev.approve(dev.lockup.address, '20000000000000000000000', {
 					from: bob,
 				})
+				await dev.dev.approve(dev.lockup.address, '20000000000000000000000', {
+					from: carol,
+				})
+				await dev.lockup.depositToProperty(
+					property.address,
+					'10000000000000000000000',
+					{
+						from: bob,
+					}
+				)
 				blockNumber = await getBlock()
-				await dev.dev.deposit(
+				await dev.lockup.depositToProperty(
 					property.address,
 					toBigNumber('10000000000000000000000').times('0.25'),
 					{
@@ -994,7 +1067,9 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 			})
 			describe('additional staking', () => {
 				before(async () => {
-					await dev.dev.deposit(property.address, 10000, { from: bob })
+					await dev.lockup.depositToPosition(bobFirstDepositTokrnid, 10000, {
+						from: bob,
+					})
 				})
 				it(`Alice's withdrawable holders rewards is correct`, async () => {
 					await mine(3)
@@ -1013,9 +1088,9 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 			})
 			describe('after staking withdrawal', () => {
 				it(`Alice's withdrawable holders rewards is correct when also after withdrawal by Carol`, async () => {
-					await dev.lockup.withdraw(
-						property.address,
-						await dev.lockup.getValue(property.address, carol),
+					await dev.lockup.withdrawByPosition(
+						carolFirstDepositTokrnid,
+						await getAmountFromPosition(dev, carolFirstDepositTokrnid),
 						{
 							from: carol,
 						}
@@ -1035,9 +1110,9 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 					)
 				})
 				it(`Alice's withdrawable holders rewards is correct when also after withdrawal by Bob`, async () => {
-					await dev.lockup.withdraw(
-						property.address,
-						await dev.lockup.getValue(property.address, bob),
+					await dev.lockup.withdrawByPosition(
+						bobFirstDepositTokrnid,
+						await getAmountFromPosition(dev, bobFirstDepositTokrnid),
 						{
 							from: bob,
 						}
@@ -1057,6 +1132,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 				})
 			})
 		})
+
 		describe('scenario: multiple properties', () => {
 			let dev: DevProtocolInstance
 			let property1: PropertyInstance
@@ -1069,6 +1145,10 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 			const bob = user1
 			const carol = user2
 			const dave = user4
+
+			const daveFirstDepositTokenId = 1
+			const daveSecondDepositTokenId = 2
+			const daveThirdDepositTokenId = 3
 
 			before(async () => {
 				;[dev, , property1] = await init()
@@ -1112,10 +1192,16 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 					property4.address,
 					1
 				)
-
-				await dev.dev.deposit(property1.address, '10000000000000000000000', {
+				await dev.dev.approve(dev.lockup.address, '50000000000000000000000', {
 					from: dave,
 				})
+				await dev.lockup.depositToProperty(
+					property1.address,
+					'10000000000000000000000',
+					{
+						from: dave,
+					}
+				)
 				await mine(3)
 			})
 
@@ -1156,9 +1242,13 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 					)
 				})
 				it(`Alice does staking 2500 to Property2, Property2 is 20% of the total rewards`, async () => {
-					await dev.dev.deposit(property2.address, '2500000000000000000000', {
-						from: dave,
-					})
+					await dev.lockup.depositToProperty(
+						property2.address,
+						'2500000000000000000000',
+						{
+							from: dave,
+						}
+					)
 					const total = await dev.lockup.totalLocked().then(toBigNumber)
 					const p1 = await dev.lockup
 						.totalLockedForProperty(property1.address)
@@ -1174,9 +1264,13 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 				}% of the total rewards, Property2 is ${
 					250000 / 16250
 				}% of the total rewards`, async () => {
-					await dev.dev.deposit(property3.address, '3750000000000000000000', {
-						from: dave,
-					})
+					await dev.lockup.depositToProperty(
+						property3.address,
+						'3750000000000000000000',
+						{
+							from: dave,
+						}
+					)
 					const total = await dev.lockup.totalLocked().then(toBigNumber)
 					const p1 = await dev.lockup
 						.totalLockedForProperty(property1.address)
@@ -1269,15 +1363,27 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 			})
 			describe('after additional staking', () => {
 				before(async () => {
-					await dev.dev.deposit(property1.address, '10000000000000000000000', {
-						from: dave,
-					})
-					await dev.dev.deposit(property2.address, '10000000000000000000000', {
-						from: dave,
-					})
-					await dev.dev.deposit(property3.address, '10000000000000000000000', {
-						from: dave,
-					})
+					await dev.lockup.depositToPosition(
+						daveFirstDepositTokenId,
+						'10000000000000000000000',
+						{
+							from: dave,
+						}
+					)
+					await dev.lockup.depositToPosition(
+						daveSecondDepositTokenId,
+						'10000000000000000000000',
+						{
+							from: dave,
+						}
+					)
+					await dev.lockup.depositToPosition(
+						daveThirdDepositTokenId,
+						'10000000000000000000000',
+						{
+							from: dave,
+						}
+					)
 					await mine(3)
 				})
 				it('No staked Property is 0 reward', async () => {
@@ -1350,9 +1456,9 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 					)
 				})
 				it(`Alice's withdrawable holders rewards is correct`, async () => {
-					await dev.lockup.withdraw(
-						property1.address,
-						await dev.lockup.getValue(property1.address, dave),
+					await dev.lockup.withdrawByPosition(
+						daveFirstDepositTokenId,
+						await getAmountFromPosition(dev, daveFirstDepositTokenId),
 						{ from: dave }
 					)
 					await mine(3)
@@ -1369,9 +1475,9 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 					)
 				})
 				it(`Bob's withdrawable holders rewards is correct`, async () => {
-					await dev.lockup.withdraw(
-						property2.address,
-						await dev.lockup.getValue(property2.address, dave),
+					await dev.lockup.withdrawByPosition(
+						daveSecondDepositTokenId,
+						await getAmountFromPosition(dev, daveSecondDepositTokenId),
 						{ from: dave }
 					)
 					await mine(3)
@@ -1388,9 +1494,9 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 					)
 				})
 				it(`Carol's withdrawable holders rewards is correct`, async () => {
-					await dev.lockup.withdraw(
-						property3.address,
-						await dev.lockup.getValue(property3.address, dave),
+					await dev.lockup.withdrawByPosition(
+						daveThirdDepositTokenId,
+						await getAmountFromPosition(dev, daveThirdDepositTokenId),
 						{ from: dave }
 					)
 					await mine(3)
@@ -1475,7 +1581,9 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 			])
 			await market.authenticate(property2.address, 'id2', '', '', '', '')
 			await market.authenticate(property3.address, 'id3', '', '', '', '')
-
+			await dev.dev.approve(dev.lockup.address, 12000000000, {
+				from: alis,
+			})
 			return [dev, [property, property2, property3]]
 		}
 
@@ -1529,28 +1637,40 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 
 		it(`cap`, async () => {
 			const [dev, [property1, property2, property3]] = await prepare()
-			await dev.dev.deposit(property1.address, toBigNumber(1000000000), {
-				from: alis,
-			})
-			await dev.dev.deposit(property2.address, toBigNumber(2000000000), {
-				from: alis,
-			})
-			await dev.dev.deposit(property3.address, toBigNumber(3000000000), {
-				from: alis,
-			})
+			await dev.lockup.depositToProperty(
+				property1.address,
+				toBigNumber(1000000000),
+				{
+					from: alis,
+				}
+			)
+			await dev.lockup.depositToProperty(
+				property2.address,
+				toBigNumber(2000000000),
+				{
+					from: alis,
+				}
+			)
+			await dev.lockup.depositToProperty(
+				property3.address,
+				toBigNumber(3000000000),
+				{
+					from: alis,
+				}
+			)
 
 			const cap = toBigNumber(1817120592)
 			await dev.updateCap(cap.toFixed())
 			await checkAmount(dev, property1, propertyAuthor)
 			await checkAmount(dev, property2, propertyAuthor)
 			await checkAmount(dev, property3, propertyAuthor)
-			await dev.dev.deposit(property1.address, toBigNumber(1000000000), {
+			await dev.lockup.depositToPosition(1, toBigNumber(1000000000), {
 				from: alis,
 			})
-			await dev.dev.deposit(property2.address, toBigNumber(2000000000), {
+			await dev.lockup.depositToPosition(2, toBigNumber(2000000000), {
 				from: alis,
 			})
-			await dev.dev.deposit(property3.address, toBigNumber(3000000000), {
+			await dev.lockup.depositToPosition(3, toBigNumber(3000000000), {
 				from: alis,
 			})
 
@@ -1589,9 +1709,16 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 					from: alice,
 				}
 			)
-			await dev.dev.deposit(property.address, '10000000000000000000000', {
+			await dev.dev.approve(dev.lockup.address, '10000000000000000000000', {
 				from: user3,
 			})
+			await dev.lockup.depositToProperty(
+				property.address,
+				'10000000000000000000000',
+				{
+					from: user3,
+				}
+			)
 			blockNumber = await getBlock()
 		})
 
