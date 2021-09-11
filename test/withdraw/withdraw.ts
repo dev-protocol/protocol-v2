@@ -126,25 +126,25 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 			})
 
 			it(`withdrawing sender's withdrawable interest full amount`, async () => {
+				const t1 = await getBlockTimestamp()
 				const beforeBalance = await dev.dev
 					.balanceOf(deployer)
 					.then(toBigNumber)
 				const beforeTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
 				await forwardBlockTimestamp(10)
-				const [amount] = await Promise.all([
-					dev.withdraw
-						.calculateWithdrawableAmount(property.address, bob)
-						.then(toBigNumber),
-					dev.withdraw.withdraw(property.address, { from: bob }),
-				])
+				const res = await dev.withdraw.withdraw(property.address, { from: bob })
+				const t2 = await getBlockTimestamp(res.receipt.blockNumber)
+				const reward = toBigNumber(9e19)
+					.times(0.95)
+					.times(t2 - t1)
 
 				const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
 				const afterTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
 				expect(afterBalance.toFixed()).to.be.equal(
-					beforeBalance.plus(amount).toFixed()
+					beforeBalance.plus(reward).toFixed()
 				)
 				expect(afterTotalSupply.toFixed()).to.be.equal(
-					beforeTotalSupply.plus(amount).toFixed()
+					beforeTotalSupply.plus(reward).toFixed()
 				)
 			})
 			it('withdrawable interest amount becomes 0 when after withdrawing interest', async () => {
