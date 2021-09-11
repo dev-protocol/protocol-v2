@@ -250,7 +250,9 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 						from: user3,
 					}
 				)
+				const t1 = await getBlockTimestamp()
 				await forwardBlockTimestamp(1)
+
 				const totalSupply = await property.totalSupply().then(toBigNumber)
 				const prevBalance1 = await dev.dev.balanceOf(deployer).then(toBigNumber)
 				const prevBalance2 = await dev.dev.balanceOf(user1).then(toBigNumber)
@@ -259,37 +261,44 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 				await property.transfer(user1, totalSupply.times(rate), {
 					from: deployer,
 				})
+				const t2 = await getBlockTimestamp()
+				await forwardBlockTimestamp(1)
 
-				const amount1 = await dev.withdraw
-					.calculateWithdrawableAmount(property.address, deployer)
-					.then(toBigNumber)
-				await dev.withdraw.withdraw(property.address, {
+				const res1 = await dev.withdraw.withdraw(property.address, {
 					from: deployer,
 				})
-				const realAmount1 = await getWithdrawHolderSplitAmount(
-					dev,
-					amount1,
-					property,
-					deployer
-				)
-				const amount2 = await dev.withdraw
-					.calculateWithdrawableAmount(property.address, user1)
-					.then(toBigNumber)
-				await dev.withdraw.withdraw(property.address, { from: user1 })
-				const realAmount2 = await getWithdrawHolderSplitAmount(
-					dev,
-					amount2,
-					property,
-					user1
-				)
+				const t3 = await getBlockTimestamp(res1.receipt.blockNumber)
+				await forwardBlockTimestamp(1)
+
+				const res2 = await dev.withdraw.withdraw(property.address, {
+					from: user1,
+				})
+				const t4 = await getBlockTimestamp(res2.receipt.blockNumber)
 				const nextBalance1 = await dev.dev.balanceOf(deployer).then(toBigNumber)
 				const nextBalance2 = await dev.dev.balanceOf(user1).then(toBigNumber)
-				expect(prevBalance1.plus(realAmount1).toFixed()).to.be.equal(
-					nextBalance1.toFixed()
-				)
-				expect(prevBalance2.plus(realAmount2).toFixed()).to.be.equal(
-					nextBalance2.toFixed()
-				)
+				expect(
+					prevBalance1
+						.plus(
+							toBigNumber(9e19)
+								.times(0.95)
+								.times(t2 - t1)
+								.plus(
+									toBigNumber(9e19)
+										.times(0.75)
+										.times(t3 - t2)
+								)
+						)
+						.toFixed()
+				).to.be.equal(nextBalance1.toFixed())
+				expect(
+					prevBalance2
+						.plus(
+							toBigNumber(9e19)
+								.times(0.2)
+								.times(t4 - t2)
+						)
+						.toFixed()
+				).to.be.equal(nextBalance2.toFixed())
 			})
 			it('should fail to withdraw when the withdrawable amount is 0', async () => {
 				const [dev, , property] = await init()
