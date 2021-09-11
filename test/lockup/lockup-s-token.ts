@@ -174,22 +174,34 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 		describe('success', () => {
 			it('update nft.', async () => {
 				const [dev, property, tokenId] = await init2()
+				const t1 = await getBlockTimestamp()
 				const beforePosition = await dev.sTokensManager.positions(tokenId)
 				expect(beforePosition[0]).to.be.equal(property.address)
 				expect(beforePosition[1].toNumber()).to.be.equal(100)
 				expect(beforePosition[2].toNumber()).to.be.equal(0)
 				expect(beforePosition[3].toNumber()).to.be.equal(0)
 				expect(beforePosition[4].toNumber()).to.be.equal(0)
-				await forwardBlockTimestamp(1)
+				await forwardBlockTimestamp(2)
 				await dev.lockup.depositToPosition(tokenId, 100)
+				const t2 = await getBlockTimestamp()
 				const afterPosition = await dev.sTokensManager.positions(tokenId)
 				expect(afterPosition[0]).to.be.equal(property.address)
 				expect(afterPosition[1].toNumber()).to.be.equal(200)
 				expect(afterPosition[2].toString()).to.be.equal(
-					'100000000000000000000000000000000000'
+					toBigNumber('100000000000000000000000000000000000')
+						.times(t2 - t1)
+						.toFixed()
 				)
-				expect(afterPosition[3].toString()).to.be.equal('10000000000000000000')
-				expect(afterPosition[4].toString()).to.be.equal('10000000000000000000')
+				expect(afterPosition[3].toString()).to.be.equal(
+					toBigNumber('10000000000000000000')
+						.times(t2 - t1)
+						.toFixed()
+				)
+				expect(afterPosition[4].toString()).to.be.equal(
+					toBigNumber('10000000000000000000')
+						.times(t2 - t1)
+						.toFixed()
+				)
 			})
 			it('generate event.', async () => {
 				const [dev, property, tokenId] = await init2()
