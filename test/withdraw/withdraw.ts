@@ -218,6 +218,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 					oneBlockAmount,
 					SHARE_OF_TREASURY + user1Share
 				)
+				const t3 = await getBlockTimestamp()
 				const amount1 = await dev.withdraw
 					.calculateWithdrawableAmount(property.address, deployer)
 					.then(toBigNumber)
@@ -225,8 +226,9 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 					.calculateWithdrawableAmount(property.address, user1)
 					.then(toBigNumber)
 				expect(
-					deployerSecondShare
-						.plus(deployerFirstShare.times(t2 - t1))
+					deployerFirstShare
+						.times(t2 - t1)
+						.plus(deployerSecondShare.times(t3 - t2))
 						.integerValue(BigNumber.ROUND_DOWN)
 						.toFixed()
 				).to.be.equal(amount1.toFixed())
@@ -234,6 +236,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 					oneBlockAmount
 						.div(100)
 						.times(user1Share)
+						.times(t3 - t2)
 						.integerValue(BigNumber.ROUND_DOWN)
 						.toFixed()
 				).to.be.equal(amount2.toFixed())
