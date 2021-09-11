@@ -122,6 +122,7 @@ types
 # output of tsc
 
 \*.js
+!truffle-config.js
 !truffle-config.arbitrum.js
 
 # use yarn
