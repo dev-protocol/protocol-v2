@@ -3,8 +3,8 @@
 	"version": "0.0.1",
 	"description": "Securitize for Internet assets",
 	"scripts": {
-		"test": "truffle test",
-		"generate": "truffle compile && typechain --target truffle './build/**/*.json'",
+		"test": "yarn test:arb",
+		"generate": "yarn compile && typechain --target truffle './build/**/*.json'",
 		"deploy": "truffle migrate --network",
 		"predeploy": "yarn build",
 		"lint": "yarn lint:eslint && yarn lint:solhint && yarn lint:format",
@@ -14,7 +14,10 @@
 		"prepack": "yarn build",
 		"build": "tsc -p tsconfig.build.json",
 		"prebuild": "del 'migrations/**/*.js' 'scripts/**/*.js' && yarn generate",
-		"prepare": "husky install"
+		"prepare": "husky install",
+		"compile": "truffle compile && yarn compile:arb",
+		"test:arb": "truffle test --config truffle-config.arbitrum.js",
+		"compile:arb": "truffle compile --config truffle-config.arbitrum.js"
 	},
 	"files": [
 		"contracts/interface"
