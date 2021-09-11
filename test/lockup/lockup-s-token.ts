@@ -180,6 +180,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				expect(beforePosition[2].toNumber()).to.be.equal(0)
 				expect(beforePosition[3].toNumber()).to.be.equal(0)
 				expect(beforePosition[4].toNumber()).to.be.equal(0)
+				await forwardBlockTimestamp(1)
 				await dev.lockup.depositToPosition(tokenId, 100)
 				const afterPosition = await dev.sTokensManager.positions(tokenId)
 				expect(afterPosition[0]).to.be.equal(property.address)

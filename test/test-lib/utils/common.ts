@@ -35,8 +35,12 @@ export const forwardBlockTimestamp = async (seconds: number): Promise<void> => {
 	return mine(1)
 }
 
-export const getBlockTimestamp = async (): Promise<number> =>
-	web3.eth.getBlock(await getBlock()).then((x: any) => x.timestamp)
+export const getBlockTimestamp = async (
+	blockNumber?: number
+): Promise<number> =>
+	web3.eth
+		.getBlock(blockNumber ? blockNumber : await getBlock())
+		.then((x: any) => x.timestamp)
 
 export const toBigNumber = (v: string | BigNumber | number): BigNumber =>
 	new BigNumber(v)
