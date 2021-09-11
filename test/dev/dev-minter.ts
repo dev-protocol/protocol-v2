@@ -17,7 +17,7 @@ contract('DevMinter', ([deployer, user1, lockup, withdraw]) => {
 		async (): Promise<DevMinterInstance> => {
 			const contract = artifacts.require
 
-			const addressRegistry = await deployProxy(
+			const [addressRegistry] = await deployProxy(
 				contract('AddressRegistry'),
 				deployer
 			)
@@ -29,7 +29,7 @@ contract('DevMinter', ([deployer, user1, lockup, withdraw]) => {
 			await addressRegistry.setRegistry('Dev', dev.address, {
 				from: deployer,
 			})
-			const devMinter = await deployProxy(contract('DevMinter'), deployer)
+			const [devMinter] = await deployProxy(contract('DevMinter'), deployer)
 			await devMinter.initialize(addressRegistry.address)
 
 			await addressRegistry.setRegistry('Lockup', lockup, {
