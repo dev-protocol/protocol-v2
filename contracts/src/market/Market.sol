@@ -20,7 +20,7 @@ contract Market is UsingRegistry, IMarket {
 	using SafeMath for uint256;
 	bool public override enabled;
 	address public override behavior;
-	uint256 public override votingEndBlockNumber;
+	uint256 public override votingEndTimestamp;
 	uint256 public override issuedMetrics;
 	mapping(bytes32 => bool) private idMap;
 	mapping(address => bytes32) private idHashMetricsMap;
@@ -49,11 +49,11 @@ contract Market is UsingRegistry, IMarket {
 
 		/**
 		 * Sets the period during which voting by voters can be accepted.
-		 * This period is determined by `Policy.marketVotingBlocks`.
+		 * This period is determined by `Policy.marketVotingSeconds`.
 		 */
-		uint256 marketVotingBlocks = IPolicy(registry().registries("Policy"))
-			.marketVotingBlocks();
-		votingEndBlockNumber = block.number.add(marketVotingBlocks);
+		uint256 marketVotingSeconds = IPolicy(registry().registries("Policy"))
+			.marketVotingSeconds();
+		votingEndTimestamp = block.timestamp.add(marketVotingSeconds);
 	}
 
 	/**
@@ -296,6 +296,6 @@ contract Market is UsingRegistry, IMarket {
 	}
 
 	function isDuringVotingPeriod() private view returns (bool) {
-		return block.number < votingEndBlockNumber;
+		return block.timestamp < votingEndTimestamp;
 	}
 }

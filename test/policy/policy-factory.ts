@@ -1,6 +1,10 @@
 import { IPolicyInstance } from '../../types/truffle-contracts'
 import { DevProtocolInstance } from '../test-lib/instance'
-import { collectsEth, getBlock, mine } from '../test-lib/utils/common'
+import {
+	collectsEth,
+	forwardBlockTimestamp,
+	getBlockTimestamp,
+} from '../test-lib/utils/common'
 import {
 	validateNotOwnerErrorMessage,
 	validateAddressErrorMessage,
@@ -54,15 +58,15 @@ contract('PolicyFactory', ([deployer, dummyPolicy, user1, ...accounts]) => {
 		})
 		it('Shoud be updated closeVoteAt', async () => {
 			const [dev, policy] = await init()
-			const policyVotingBlocks = 10 // From PolicyTestForPolicyFactory.sol
+			const policyVotingSeconds = 10 // From PolicyTestForPolicyFactory.sol
 			const before = await dev.policyFactory.closeVoteAt(policy.address)
 			expect(before.toNumber()).to.be.equal(0)
 			await dev.policyFactory.create(policy.address, {
 				from: user1,
 			})
-			const block = await getBlock()
+			const ts = await getBlockTimestamp()
 			const after = await dev.policyFactory.closeVoteAt(policy.address)
-			expect(after.toNumber()).to.be.equal(block + policyVotingBlocks)
+			expect(after.toNumber()).to.be.equal(ts + policyVotingSeconds)
 		})
 	})
 	describe('PolicyFactory; forceAttach', () => {
@@ -95,7 +99,7 @@ contract('PolicyFactory', ([deployer, dummyPolicy, user1, ...accounts]) => {
 				})
 				let curentPolicyAddress = await dev.addressRegistry.registries('Policy')
 				expect(curentPolicyAddress).to.be.equal(policy.address)
-				await mine(10)
+				await forwardBlockTimestamp(10)
 				const result = await dev.policyFactory
 					.forceAttach(secoundPolicy.address)
 					.catch((err: Error) => err)

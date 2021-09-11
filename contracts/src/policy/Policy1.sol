@@ -12,8 +12,8 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
 contract Policy1 is IPolicy, Ownable, Curve, UsingRegistry {
 	using SafeMath for uint256;
-	uint256 public override marketVotingBlocks = 525600;
-	uint256 public override policyVotingBlocks = 525600;
+	uint256 public override marketVotingSeconds = 86400;
+	uint256 public override policyVotingSeconds = 86400;
 	address private treasuryAddress;
 	address private capSetterAddress;
 

@@ -175,16 +175,16 @@ contract('Policy1', ([deployer, treasury, capSetter, user]) => {
 			expect(result.toString()).to.be.equal('0')
 		})
 	})
-	describe('Policy1; marketVotingBlocks', () => {
+	describe('Policy1; marketVotingSeconds', () => {
 		it('Returns the number of the blocks of the voting period for the new Market', async () => {
-			const result = await policy.marketVotingBlocks()
-			expect(result.toString()).to.be.equal('525600')
+			const result = await policy.marketVotingSeconds()
+			expect(result.toString()).to.be.equal('86400')
 		})
 	})
-	describe('Policy1; policyVotingBlocks', () => {
+	describe('Policy1; policyVotingSeconds', () => {
 		it('Returns the number of the blocks of the voting period for the new Policy', async () => {
-			const result = await policy.policyVotingBlocks()
-			expect(result.toString()).to.be.equal('525600')
+			const result = await policy.policyVotingSeconds()
+			expect(result.toString()).to.be.equal('86400')
 		})
 	})
 	describe('Policy1; shareOfTreasury', () => {
