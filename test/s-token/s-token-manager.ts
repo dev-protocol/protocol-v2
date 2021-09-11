@@ -9,7 +9,11 @@ import {
 } from '../test-lib/utils/error'
 import { getEventValue } from '../test-lib/utils/event'
 import { DEFAULT_ADDRESS } from '../test-lib/const'
-import { mine } from '../test-lib/utils/common'
+import {
+	forwardBlockTimestamp,
+	getBlockTimestamp,
+	toBigNumber,
+} from '../test-lib/utils/common'
 
 contract('STokensManager', ([deployer, user]) => {
 	const deployerBalance = new BigNumber(1e18).times(10000000)
@@ -207,6 +211,8 @@ contract('STokensManager', ([deployer, user]) => {
 			it('update data', async () => {
 				const [dev, property] = await init()
 				await dev.lockup.depositToProperty(property.address, '10000')
+				const t1 = await getBlockTimestamp()
+				await forwardBlockTimestamp(2)
 				const latestTokenId = 1
 				const beforePosition = await dev.sTokensManager.positions(latestTokenId)
 				// Console.log(beforePosition)
@@ -216,20 +222,33 @@ contract('STokensManager', ([deployer, user]) => {
 				expect(beforePosition[3].toNumber()).to.equal(0)
 				expect(beforePosition[4].toNumber()).to.equal(0)
 				await dev.lockup.depositToPosition(latestTokenId, '10000')
+				const t2 = await getBlockTimestamp()
 				const afterPosition = await dev.sTokensManager.positions(latestTokenId)
 				// Console.log(afterPosition)
 				expect(afterPosition[0]).to.equal(property.address)
 				expect(afterPosition[1].toNumber()).to.equal(20000)
 				expect(afterPosition[2].toString()).to.equal(
-					'1000000000000000000000000000000000'
+					toBigNumber('1000000000000000000000000000000000')
+						.times(t2 - t1)
+						.toFixed()
 				)
-				expect(afterPosition[3].toString()).to.equal('10000000000000000000')
-				expect(afterPosition[4].toString()).to.equal('10000000000000000000')
+				expect(afterPosition[3].toString()).to.equal(
+					toBigNumber('10000000000000000000')
+						.times(t2 - t1)
+						.toFixed()
+				)
+				expect(afterPosition[4].toString()).to.equal(
+					toBigNumber('10000000000000000000')
+						.times(t2 - t1)
+						.toFixed()
+				)
 			})
 
 			it('generate updated event data', async () => {
 				const [dev, property] = await init()
 				await dev.lockup.depositToProperty(property.address, '10000')
+				const t1 = await getBlockTimestamp()
+				await forwardBlockTimestamp(2)
 				const latestTokenId = 1
 				dev.lockup.depositToPosition(latestTokenId, '10000')
 				const [_tokenId, _amount, _price, _cumulativeReward, _pendingReward] =
@@ -240,11 +259,24 @@ contract('STokensManager', ([deployer, user]) => {
 						getEventValue(dev.sTokensManager)('Updated', 'cumulativeReward'),
 						getEventValue(dev.sTokensManager)('Updated', 'pendingReward'),
 					])
+				const t2 = await getBlockTimestamp()
 				expect(_tokenId).to.equal('1')
 				expect(_amount).to.equal('20000')
-				expect(_price).to.equal('1000000000000000000000000000000000')
-				expect(_cumulativeReward).to.equal('10000000000000000000')
-				expect(_pendingReward).to.equal('10000000000000000000')
+				expect(_price).to.equal(
+					toBigNumber('1000000000000000000000000000000000')
+						.times(t2 - t1)
+						.toFixed()
+				)
+				expect(_cumulativeReward).to.equal(
+					toBigNumber('10000000000000000000')
+						.times(t2 - t1)
+						.toFixed()
+				)
+				expect(_pendingReward).to.equal(
+					toBigNumber('10000000000000000000')
+						.times(t2 - t1)
+						.toFixed()
+				)
 			})
 		})
 		describe('fail', () => {
@@ -285,21 +317,43 @@ contract('STokensManager', ([deployer, user]) => {
 			it('get reward', async () => {
 				const [dev, property] = await init()
 				await dev.lockup.depositToProperty(property.address, '10000')
-				await mine(1)
+				const t1 = await getBlockTimestamp()
+				await forwardBlockTimestamp(1)
 				const position = await dev.sTokensManager.rewards(1)
-				expect(position[0].toString()).to.equal('10000000000000000000')
+				const t2 = await getBlockTimestamp()
+				expect(position[0].toString()).to.equal(
+					toBigNumber('10000000000000000000')
+						.times(t2 - t1)
+						.toFixed()
+				)
 				expect(position[1].toString()).to.equal('0')
 				expect(position[2].toString()).to.equal('10000000000000000000')
 			})
 			it('get updated reward', async () => {
 				const [dev, property] = await init()
 				await dev.lockup.depositToProperty(property.address, '10000')
+				const t1 = await getBlockTimestamp()
+				await forwardBlockTimestamp(1)
+				const t2 = await getBlockTimestamp()
 				await dev.lockup.depositToPosition(1, '10000')
-				await mine(1)
+				await forwardBlockTimestamp(2)
 				const position = await dev.sTokensManager.rewards(1)
-				expect(position[0].toString()).to.equal('30000000000000000000')
-				expect(position[1].toString()).to.equal('10000000000000000000')
-				expect(position[2].toString()).to.equal('20000000000000000000')
+				const t3 = await getBlockTimestamp()
+				expect(position[0].toString()).to.equal(
+					toBigNumber(position[1].toString())
+						.plus(position[2].toString())
+						.toFixed()
+				)
+				expect(position[1].toString()).to.equal(
+					toBigNumber('10000000000000000000')
+						.times(t2 - t1)
+						.toFixed()
+				)
+				expect(position[2].toString()).to.equal(
+					toBigNumber('10000000000000000000')
+						.times(t3 - t2)
+						.toFixed()
+				)
 			})
 		})
 		describe('fail', () => {

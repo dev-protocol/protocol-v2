@@ -20,6 +20,24 @@ export async function mine(count: number): Promise<void> {
 	}
 }
 
+export const forwardBlockTimestamp = async (seconds: number): Promise<void> => {
+	await new Promise((resolve) => {
+		web3.currentProvider.send(
+			{
+				jsonrpc: '2.0',
+				method: 'evm_increaseTime',
+				params: [seconds],
+				id: 0,
+			},
+			resolve
+		)
+	})
+	return mine(1)
+}
+
+export const getBlockTimestamp = async (): Promise<number> =>
+	web3.eth.getBlock(await getBlock()).then((x: any) => x.timestamp)
+
 export const toBigNumber = (v: string | BigNumber | number): BigNumber =>
 	new BigNumber(v)
 

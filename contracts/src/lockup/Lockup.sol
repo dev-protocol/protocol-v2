@@ -63,7 +63,7 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 	uint256 public lastCumulativeRewardPrice; // From [get/set]StorageLastCumulativeInterestPrice
 	uint256 public cumulativeGlobalReward; // From [get/set]StorageCumulativeGlobalRewards
 	uint256 public lastSameGlobalRewardAmount; // From [get/set]StorageLastSameRewardsAmountAndBlock
-	uint256 public lastSameGlobalRewardBlock; // From [get/set]StorageLastSameRewardsAmountAndBlock
+	uint256 public lastSameGlobalRewardTimestamp; // From [get/set]StorageLastSameRewardsAmountAndBlock
 	mapping(address => uint256)
 		public lastCumulativeHoldersRewardPricePerProperty; // {Property: Value} // [get/set]StorageLastCumulativeHoldersRewardPricePerProperty
 	mapping(address => uint256) public initialCumulativeHoldersRewardCap; // {Property: Value} // From [get/set]StorageInitialCumulativeHoldersRewardCap
@@ -492,7 +492,7 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		 */
 		cumulativeGlobalReward = _nextRewards;
 		lastSameGlobalRewardAmount = _amount;
-		lastSameGlobalRewardBlock = block.number;
+		lastSameGlobalRewardTimestamp = block.timestamp;
 	}
 
 	/**
@@ -527,9 +527,9 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		/**
 		 * Gets the maximum mint amount per block, and the last recorded block number from `LastSameRewardsAmountAndBlock` storage.
 		 */
-		(uint256 lastAmount, uint256 lastBlock) = (
+		(uint256 lastAmount, uint256 lastTs) = (
 			lastSameGlobalRewardAmount,
-			lastSameGlobalRewardBlock
+			lastSameGlobalRewardTimestamp
 		);
 
 		/**
@@ -543,12 +543,12 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		/**
 		 * Calculates the difference between the latest block number and the last recorded block number.
 		 */
-		uint256 blocks = lastBlock > 0 ? block.number.sub(lastBlock) : 0;
+		uint256 time = lastTs > 0 ? block.timestamp.sub(lastTs) : 0;
 
 		/**
 		 * Adds the calculated new cumulative maximum mint amount to the recorded cumulative maximum mint amount.
 		 */
-		uint256 additionalRewards = lastMaxRewards.mul(blocks);
+		uint256 additionalRewards = lastMaxRewards.mul(time);
 		uint256 nextRewards = cumulativeGlobalReward.add(additionalRewards);
 
 		/**
