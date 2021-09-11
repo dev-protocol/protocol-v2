@@ -40,7 +40,7 @@ contract PolicyTestBase is IPolicy {
 		return _assets + _propertyLockups + 1;
 	}
 
-	function marketVotingBlocks()
+	function marketVotingSeconds()
 		external
 		view
 		virtual
@@ -50,7 +50,7 @@ contract PolicyTestBase is IPolicy {
 		return 10;
 	}
 
-	function policyVotingBlocks()
+	function policyVotingSeconds()
 		external
 		view
 		virtual

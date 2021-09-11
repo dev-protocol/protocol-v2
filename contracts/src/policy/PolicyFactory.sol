@@ -75,9 +75,9 @@ contract PolicyFactory is
 		isPotentialPolicy[_addr] = true;
 
 		uint256 votingPeriod = IPolicy(registry().registries("Policy"))
-			.policyVotingBlocks();
-		uint256 votingEndBlockNumber = block.number.add(votingPeriod);
-		closeVoteAt[_addr] = votingEndBlockNumber;
+			.policyVotingSeconds();
+		uint256 votingEndTimestamp = block.timestamp.add(votingPeriod);
+		closeVoteAt[_addr] = votingEndTimestamp;
 	}
 
 	function isDuringVotingPeriod(address _policy)
@@ -86,6 +86,6 @@ contract PolicyFactory is
 		override
 		returns (bool)
 	{
-		return block.number < closeVoteAt[_policy];
+		return block.timestamp < closeVoteAt[_policy];
 	}
 }

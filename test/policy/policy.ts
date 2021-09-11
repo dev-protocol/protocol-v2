@@ -22,15 +22,15 @@ contract('Policy', ([account1, account2]) => {
 			expect(result.toNumber()).to.be.equal(1099)
 		})
 	})
-	describe('PolicyTest1; marketVotingBlocks', () => {
+	describe('PolicyTest1; marketVotingSeconds', () => {
 		it('Returns the number of the blocks of the voting period for the new Market', async () => {
-			const result = await policy.marketVotingBlocks()
+			const result = await policy.marketVotingSeconds()
 			expect(result.toNumber()).to.be.equal(10)
 		})
 	})
-	describe('PolicyTest1; policyVotingBlocks', () => {
+	describe('PolicyTest1; policyVotingSeconds', () => {
 		it('Returns the number of the blocks of the voting period for the new Policy', async () => {
-			const result = await policy.policyVotingBlocks()
+			const result = await policy.policyVotingSeconds()
 			expect(result.toNumber()).to.be.equal(20)
 		})
 	})

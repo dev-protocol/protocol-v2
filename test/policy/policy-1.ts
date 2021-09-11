@@ -26,7 +26,7 @@ contract('Policy1', ([deployer, treasury, capSetter, user]) => {
 			const totalSupply = new BigNumber(1e18).times(10000000)
 			const stakingRate = new BigNumber(stake).div(totalSupply)
 			const asset = _asset.times(new BigNumber(1).minus(stakingRate))
-			const max = new BigNumber('132000000000000').times(asset)
+			const max = new BigNumber('132000000000000').div(15).times(asset)
 			const _d = new BigNumber(1).minus(stakingRate)
 			const _p = new BigNumber(12).minus(stakingRate.times(10)).div(2).plus(1)
 			const p = ~~_p.toNumber()
@@ -46,12 +46,12 @@ contract('Policy1', ([deployer, treasury, capSetter, user]) => {
 			const expected = rewards(stake, new BigNumber(1))
 			expect(result.toString()).to.be.equal(expected.toString())
 		})
-		it('Returns 0.000132 when zero staked and one asset', async () => {
+		it('Returns 0.0000088 when zero staked and one asset', async () => {
 			const result = await policy.rewards(0, 1)
-			expect(result.toString()).to.be.equal('132000000000000')
+			expect(result.toString()).to.be.equal('8800000000000')
 			expect(
 				new BigNumber(result.toString()).div(new BigNumber(1e18)).toString()
-			).to.be.equal('0.000132')
+			).to.be.equal('0.0000088')
 		})
 		it('Depends staking rate, decrease the impact of assets', async () => {
 			const assets = new BigNumber(2000)
@@ -63,19 +63,19 @@ contract('Policy1', ([deployer, treasury, capSetter, user]) => {
 			const result2 = await policy.rewards(per2170, assets).then(toBigNumber)
 			const result3 = await policy.rewards(per9560, assets).then(toBigNumber)
 
-			expect(result1.toString()).to.be.equal('119027595398012362')
-			expect(result2.toString()).to.be.equal('48758262710353901')
-			expect(result3.toString()).to.be.equal('17758778695680')
-			expect(natural(result1).toString()).to.be.equal('0.119027595398012362')
-			expect(natural(result2).toString()).to.be.equal('0.048758262710353901')
-			expect(natural(result3).toString()).to.be.equal('0.00001775877869568')
+			expect(result1.toString()).to.be.equal('7935173026534157')
+			expect(result2.toString()).to.be.equal('3250550847356926')
+			expect(result3.toString()).to.be.equal('1183918579712')
+			expect(natural(result1).toString()).to.be.equal('0.007935173026534157')
+			expect(natural(result2).toString()).to.be.equal('0.003250550847356926')
+			expect(natural(result3).toString()).to.be.equal('0.000001183918579712')
 			expect(rewards(per1010, assets).toString()).to.be.equal(
-				'119027595398012362'
+				'7935173026534157'
 			)
 			expect(rewards(per2170, assets).toString()).to.be.equal(
-				'48758262710353901'
+				'3250550847356926'
 			)
-			expect(rewards(per9560, assets).toString()).to.be.equal('17758778695680')
+			expect(rewards(per9560, assets).toString()).to.be.equal('1183918579712')
 		})
 		it('Will be correct curve', async () => {
 			const one = new BigNumber(1)
@@ -87,15 +87,15 @@ contract('Policy1', ([deployer, treasury, capSetter, user]) => {
 			const result2 = await policy.rewards(per200, 1).then(toBigNumber)
 			const result3 = await policy.rewards(per201, 1).then(toBigNumber)
 
-			expect(result1.toString()).to.be.equal('27897751769687')
-			expect(result2.toString()).to.be.equal('27682406400000')
-			expect(result3.toString()).to.be.equal('27475607799544')
-			expect(natural(result1).toString()).to.be.equal('0.000027897751769687')
-			expect(natural(result2).toString()).to.be.equal('0.0000276824064')
-			expect(natural(result3).toString()).to.be.equal('0.000027475607799544')
-			expect(rewards(per199, one).toString()).to.be.equal('27897751769687')
-			expect(rewards(per200, one).toString()).to.be.equal('27682406400000')
-			expect(rewards(per201, one).toString()).to.be.equal('27475607799544')
+			expect(result1.toString()).to.be.equal('1859850117979')
+			expect(result2.toString()).to.be.equal('1845493760000')
+			expect(result3.toString()).to.be.equal('1831707186636')
+			expect(natural(result1).toString()).to.be.equal('0.000001859850117979')
+			expect(natural(result2).toString()).to.be.equal('0.00000184549376')
+			expect(natural(result3).toString()).to.be.equal('0.000001831707186636')
+			expect(rewards(per199, one).toString()).to.be.equal('1859850117979')
+			expect(rewards(per200, one).toString()).to.be.equal('1845493760000')
+			expect(rewards(per201, one).toString()).to.be.equal('1831707186636')
 		})
 		it('When a number of stakes are 0', async () => {
 			const result = await policy.rewards(0, 99999)
@@ -175,16 +175,16 @@ contract('Policy1', ([deployer, treasury, capSetter, user]) => {
 			expect(result.toString()).to.be.equal('0')
 		})
 	})
-	describe('Policy1; marketVotingBlocks', () => {
+	describe('Policy1; marketVotingSeconds', () => {
 		it('Returns the number of the blocks of the voting period for the new Market', async () => {
-			const result = await policy.marketVotingBlocks()
-			expect(result.toString()).to.be.equal('525600')
+			const result = await policy.marketVotingSeconds()
+			expect(result.toString()).to.be.equal('432000')
 		})
 	})
-	describe('Policy1; policyVotingBlocks', () => {
+	describe('Policy1; policyVotingSeconds', () => {
 		it('Returns the number of the blocks of the voting period for the new Policy', async () => {
-			const result = await policy.policyVotingBlocks()
-			expect(result.toString()).to.be.equal('525600')
+			const result = await policy.policyVotingSeconds()
+			expect(result.toString()).to.be.equal('432000')
 		})
 	})
 	describe('Policy1; shareOfTreasury', () => {

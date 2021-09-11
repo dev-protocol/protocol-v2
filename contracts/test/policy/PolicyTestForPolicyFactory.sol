@@ -4,7 +4,7 @@ pragma solidity =0.8.6;
 import {PolicyTestBase} from "contracts/test/policy/PolicyTestBase.sol";
 
 contract PolicyTestForPolicyFactory is PolicyTestBase {
-	function policyVotingBlocks() external view override returns (uint256) {
+	function policyVotingSeconds() external view override returns (uint256) {
 		return 10;
 	}
 }

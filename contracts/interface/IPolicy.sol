@@ -17,9 +17,9 @@ interface IPolicy {
 		view
 		returns (uint256);
 
-	function marketVotingBlocks() external view returns (uint256);
+	function marketVotingSeconds() external view returns (uint256);
 
-	function policyVotingBlocks() external view returns (uint256);
+	function policyVotingSeconds() external view returns (uint256);
 
 	function shareOfTreasury(uint256 _supply) external view returns (uint256);
 

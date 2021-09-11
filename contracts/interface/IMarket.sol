@@ -35,7 +35,7 @@ interface IMarket {
 
 	function enabled() external view returns (bool);
 
-	function votingEndBlockNumber() external view returns (uint256);
+	function votingEndTimestamp() external view returns (uint256);
 
 	function toEnable() external;
 }
