@@ -12,14 +12,14 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
 contract Policy1 is IPolicy, Ownable, Curve, UsingRegistry {
 	using SafeMath for uint256;
-	uint256 public override marketVotingSeconds = 86400;
-	uint256 public override policyVotingSeconds = 86400;
+	uint256 public override marketVotingSeconds = 86400 * 5;
+	uint256 public override policyVotingSeconds = 86400 * 5;
 	address private treasuryAddress;
 	address private capSetterAddress;
 
 	uint256 private constant basis = 10000000000000000000000000;
 	uint256 private constant power_basis = 10000000000;
-	uint256 private constant mint_per_block_and_aseet = 132000000000000;
+	uint256 private constant mint_per_second_and_aseet = 132000000000000 / 15;
 
 	constructor(address _registry) UsingRegistry(_registry) {}
 
@@ -37,7 +37,7 @@ contract Policy1 is IPolicy, Ownable, Curve, UsingRegistry {
 				_lockups,
 				_assets,
 				totalSupply,
-				mint_per_block_and_aseet
+				mint_per_second_and_aseet
 			);
 	}
 
