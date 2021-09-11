@@ -127,5 +127,21 @@ contract('Upgradeability ', ([deployer, address]) => {
 			expect(await contract.dataString()).to.equal('')
 			expect((await contract.dataMapping(address)).toString()).to.equal('0')
 		})
+		it('After revert the order, should data be upgradable', async () => {
+			const newImpl = await artifacts
+				.require('UpgradeabilityDifferentContractName')
+				.new()
+
+			await admin.upgrade(contract.address, newImpl.address)
+
+			expect(
+				(await admin.getProxyImplementation(contract.address)).toString()
+			).to.equal(newImpl.address)
+			expect((await contract.dataUint256()).toString()).to.equal(values[0])
+			expect(await contract.dataString()).to.equal(values[1])
+			expect((await contract.dataMapping(address)).toString()).to.equal(
+				values[2]
+			)
+		})
 	})
 })
