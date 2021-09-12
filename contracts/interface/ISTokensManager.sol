@@ -118,7 +118,7 @@ interface ISTokensManager {
 	 * @param _property property address
 	 * @return uint256[] token id list
 	 */
-	function tokensOfProperty(address _property)
+	function positionsOfProperty(address _property)
 		external
 		view
 		returns (uint256[] memory);
@@ -128,7 +128,7 @@ interface ISTokensManager {
 	 * @param _owner owner address
 	 * @return uint256[] token id list
 	 */
-	function tokenOfOwner(address _owner)
+	function positionsOfOwner(address _owner)
 		external
 		view
 		returns (uint256[] memory);
