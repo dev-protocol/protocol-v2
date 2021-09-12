@@ -51,7 +51,7 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		uint256 interest;
 		uint256 holdersCap;
 	}
-	event Lockedup(address _from, address _property, uint256 _value);
+	event Lockedup(address indexed _from, address indexed _property, uint256 _value);
 	event Withdrew(
 		address indexed _from,
 		address indexed _property,
