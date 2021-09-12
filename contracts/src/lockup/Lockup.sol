@@ -289,7 +289,7 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		updateValues(false, property, _amount, prices);
 		uint256 cumulative = cumulativeReward.add(value);
 
-		emit Withdraw(msg.sender, property, _amount, value);
+		emit Withdrew(msg.sender, property, _amount, value);
 		/**
 		 * update position information
 		 */
