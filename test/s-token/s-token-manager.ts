@@ -366,12 +366,12 @@ contract('STokensManager', ([deployer, user]) => {
 			})
 		})
 	})
-	describe('tokensOfProperty', () => {
+	describe('positionsOfProperty', () => {
 		describe('success', () => {
 			it('get token id', async () => {
 				const [dev, property] = await init()
 				await dev.lockup.depositToProperty(property.address, '10000')
-				const tokenIds = await dev.sTokensManager.tokensOfProperty(
+				const tokenIds = await dev.sTokensManager.positionsOfProperty(
 					property.address
 				)
 				expect(tokenIds.length).to.equal(1)
@@ -392,12 +392,12 @@ contract('STokensManager', ([deployer, user]) => {
 				)
 
 				await dev.lockup.depositToProperty(propertyAddress, '10000')
-				const tokenIds = await dev.sTokensManager.tokensOfProperty(
+				const tokenIds = await dev.sTokensManager.positionsOfProperty(
 					property.address
 				)
 				expect(tokenIds.length).to.equal(1)
 				expect(tokenIds[0].toNumber()).to.equal(1)
-				const tokenIds2 = await dev.sTokensManager.tokensOfProperty(
+				const tokenIds2 = await dev.sTokensManager.positionsOfProperty(
 					propertyAddress
 				)
 				expect(tokenIds2.length).to.equal(1)
@@ -408,7 +408,7 @@ contract('STokensManager', ([deployer, user]) => {
 				await dev.lockup.depositToProperty(property.address, '10000')
 				await dev.lockup.depositToProperty(property.address, '10000')
 
-				const tokenIds = await dev.sTokensManager.tokensOfProperty(
+				const tokenIds = await dev.sTokensManager.positionsOfProperty(
 					property.address
 				)
 				expect(tokenIds.length).to.equal(2)
@@ -417,19 +417,19 @@ contract('STokensManager', ([deployer, user]) => {
 			})
 			it('return empty array', async () => {
 				const [dev] = await init()
-				const tokenIds = await dev.sTokensManager.tokensOfProperty(
+				const tokenIds = await dev.sTokensManager.positionsOfProperty(
 					DEFAULT_ADDRESS
 				)
 				expect(tokenIds.length).to.equal(0)
 			})
 		})
 	})
-	describe('tokenOfOwner', () => {
+	describe('positionsOfOwner', () => {
 		describe('success', () => {
 			it('get token id', async () => {
 				const [dev, property] = await init()
 				await dev.lockup.depositToProperty(property.address, '10000')
-				const tokenIds = await dev.sTokensManager.tokenOfOwner(deployer)
+				const tokenIds = await dev.sTokensManager.positionsOfOwner(deployer)
 				expect(tokenIds.length).to.equal(1)
 				expect(tokenIds[0].toNumber()).to.equal(1)
 			})
@@ -441,10 +441,10 @@ contract('STokensManager', ([deployer, user]) => {
 				await dev.lockup.depositToProperty(property.address, '10000', {
 					from: user,
 				})
-				const tokenIds = await dev.sTokensManager.tokenOfOwner(deployer)
+				const tokenIds = await dev.sTokensManager.positionsOfOwner(deployer)
 				expect(tokenIds.length).to.equal(1)
 				expect(tokenIds[0].toNumber()).to.equal(1)
-				const tokenIds2 = await dev.sTokensManager.tokenOfOwner(user)
+				const tokenIds2 = await dev.sTokensManager.positionsOfOwner(user)
 				expect(tokenIds2.length).to.equal(1)
 				expect(tokenIds2[0].toNumber()).to.equal(2)
 			})
@@ -452,14 +452,16 @@ contract('STokensManager', ([deployer, user]) => {
 				const [dev, property] = await init()
 				await dev.lockup.depositToProperty(property.address, '10000')
 				await dev.lockup.depositToProperty(property.address, '10000')
-				const tokenIds = await dev.sTokensManager.tokenOfOwner(deployer)
+				const tokenIds = await dev.sTokensManager.positionsOfOwner(deployer)
 				expect(tokenIds.length).to.equal(2)
 				expect(tokenIds[0].toNumber()).to.equal(1)
 				expect(tokenIds[1].toNumber()).to.equal(2)
 			})
 			it('return empty array', async () => {
 				const [dev] = await init()
-				const tokenIds = await dev.sTokensManager.tokenOfOwner(DEFAULT_ADDRESS)
+				const tokenIds = await dev.sTokensManager.positionsOfOwner(
+					DEFAULT_ADDRESS
+				)
 				expect(tokenIds.length).to.equal(0)
 			})
 		})

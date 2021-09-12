@@ -22,7 +22,7 @@ contract STokensManager is
 	using SafeMath for uint256;
 	Counters.Counter private _tokenIds;
 	mapping(bytes32 => bytes) private bytesStorage;
-	mapping(address => uint256[]) private tokenIdsMap;
+	mapping(address => uint256[]) private tokenIdsMapOfProperty;
 
 	modifier onlyLockup() {
 		require(
@@ -64,7 +64,7 @@ contract STokensManager is
 			0
 		);
 		setStoragePositionsV1(newTokenId, newPosition);
-		tokenIdsMap[_property].push(newTokenId);
+		tokenIdsMapOfProperty[_property].push(newTokenId);
 		return newTokenId;
 	}
 
@@ -138,16 +138,16 @@ contract STokensManager is
 		return (entireReward, cumulativeReward, withdrawableReward);
 	}
 
-	function tokensOfProperty(address _property)
+	function positionsOfProperty(address _property)
 		external
 		view
 		override
 		returns (uint256[] memory)
 	{
-		return tokenIdsMap[_property];
+		return tokenIdsMapOfProperty[_property];
 	}
 
-	function tokenOfOwner(address _owner)
+	function positionsOfOwner(address _owner)
 		external
 		view
 		override

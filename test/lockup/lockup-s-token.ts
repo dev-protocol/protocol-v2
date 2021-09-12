@@ -55,7 +55,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 		const [dev, property] = await init()
 		await dev.dev.approve(dev.lockup.address, 500)
 		await dev.lockup.depositToProperty(property.address, 100)
-		const tokenIds = await dev.sTokensManager.tokenOfOwner(deployer)
+		const tokenIds = await dev.sTokensManager.positionsOfOwner(deployer)
 
 		return [dev, property, tokenIds[0].toNumber()]
 	}
