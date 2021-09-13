@@ -51,7 +51,7 @@ contract MetricsFactory is InitializableUsingRegistry, IMetricsFactory {
 		address metricsAddress = address(newMetrics);
 		_addMetrics(metricsAddress);
 
-		emit Create(msg.sender, metricsAddress);
+		emit Create(msg.sender, _property, metricsAddress);
 		return metricsAddress;
 	}
 

@@ -2,7 +2,7 @@
 pragma solidity =0.8.6;
 
 interface IMetricsFactory {
-	event Create(address indexed _from, address _metrics);
+	event Create(address indexed _market, address indexed _property, address _metrics);
 	event Destroy(address indexed _from, address _metrics);
 
 	function create(address _property) external returns (address);
