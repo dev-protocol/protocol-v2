@@ -1,6 +1,6 @@
 import { DevProtocolInstance } from '../test-lib/instance'
 import { getMetricsAddress } from '../test-lib/utils/log'
-import { watch } from '../test-lib/utils/event'
+import { watch, getEventValue } from '../test-lib/utils/event'
 import {
 	validateErrorMessage,
 	validateAddressErrorMessage,
@@ -28,13 +28,16 @@ contract(
 						from: market,
 					})
 					.catch(console.error)
-				const [from, metrics] = await new Promise<string[]>((resolve) => {
-					watch(dev.metricsFactory)('Create', (_, values) => {
-						const { _from, _metrics } = values
-						resolve([_from, _metrics])
-					})
-				})
+				const [from, property, metrics] = await new Promise<string[]>(
+					(resolve) => {
+						watch(dev.metricsFactory)('Create', (_, values) => {
+							const { _market, _property, _metrics } = values
+							resolve([_market, _property, _metrics])
+						})
+					}
+				)
 				expect(market).to.be.equal(from)
+				expect(property).to.be.equal(property1)
 				const result = await dev.metricsFactory.isMetrics(metrics)
 				expect(result).to.be.equal(true)
 			})
