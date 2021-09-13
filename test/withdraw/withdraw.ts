@@ -87,7 +87,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 		return [dev, metrics, property, policy, market]
 	}
 
-	describe.only('Withdraw; withdraw', () => {
+	describe('Withdraw; withdraw', () => {
 		it('should fail to call when passed address is not property contract', async () => {
 			const [dev] = await init()
 
