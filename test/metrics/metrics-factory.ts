@@ -1,6 +1,6 @@
 import { DevProtocolInstance } from '../test-lib/instance'
 import { getMetricsAddress } from '../test-lib/utils/log'
-import { watch, getEventValue } from '../test-lib/utils/event'
+import { watch } from '../test-lib/utils/event'
 import {
 	validateErrorMessage,
 	validateAddressErrorMessage,
