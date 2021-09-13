@@ -2,7 +2,7 @@
 pragma solidity =0.8.6;
 
 interface IMarketFactory {
-	event Create(address indexed _from, address _market);
+	event Create(address indexed _market, address _from);
 
 	function marketsCount() external returns (uint256);
 
