@@ -4,11 +4,7 @@ pragma solidity =0.8.6;
 interface IMarketBehavior {
 	function authenticate(
 		address _prop,
-		string calldata _args1,
-		string calldata _args2,
-		string calldata _args3,
-		string calldata _args4,
-		string calldata _args5,
+		string[] memory _args,
 		address market,
 		address account
 	) external returns (bool);

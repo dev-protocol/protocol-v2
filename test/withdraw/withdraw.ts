@@ -74,9 +74,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 		const [market] = await Promise.all([
 			artifacts.require('Market').at(marketAddress),
 		])
-		market
-			.authenticate(property.address, 'id1', '', '', '', '')
-			.catch(console.error)
+		market.authenticate(property.address, ['id1']).catch(console.error)
 		const metricsAddress = await (async () =>
 			getEventValue(dev.metricsFactory)('Create', '_metrics'))()
 		const [metrics] = await Promise.all([
@@ -1679,8 +1677,8 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 			const [property3] = await Promise.all([
 				artifacts.require('Property').at(propertyAddress3),
 			])
-			await market.authenticate(property2.address, 'id2', '', '', '', '')
-			await market.authenticate(property3.address, 'id3', '', '', '', '')
+			await market.authenticate(property2.address, ['id2'])
+			await market.authenticate(property3.address, ['id3'])
 			await dev.dev.approve(dev.lockup.address, 12000000000, {
 				from: alis,
 			})

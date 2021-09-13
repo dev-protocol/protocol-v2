@@ -100,24 +100,13 @@ contract Market is UsingRegistry, IMarket {
 	/**
 	 * Authenticates the new asset and proves that the Property author is the owner of the asset.
 	 */
-	function authenticate(
-		address _prop,
-		string memory _args1,
-		string memory _args2,
-		string memory _args3,
-		string memory _args4,
-		string memory _args5
-	) public override onlyPropertyAuthor(_prop) returns (bool) {
-		return
-			_authenticate(
-				_prop,
-				msg.sender,
-				_args1,
-				_args2,
-				_args3,
-				_args4,
-				_args5
-			);
+	function authenticate(address _prop, string[] memory _args)
+		public
+		override
+		onlyPropertyAuthor(_prop)
+		returns (bool)
+	{
+		return _authenticate(_prop, msg.sender, _args);
 	}
 
 	/**
@@ -126,11 +115,7 @@ contract Market is UsingRegistry, IMarket {
 	function authenticateFromPropertyFactory(
 		address _prop,
 		address _author,
-		string calldata _args1,
-		string calldata _args2,
-		string calldata _args3,
-		string calldata _args4,
-		string calldata _args5
+		string[] memory _args
 	) external override returns (bool) {
 		/**
 		 * Validates the sender is PropertyFactory.
@@ -145,16 +130,7 @@ contract Market is UsingRegistry, IMarket {
 		 */
 		require(enabled, "market is not enabled");
 
-		return
-			_authenticate(
-				_prop,
-				_author,
-				_args1,
-				_args2,
-				_args3,
-				_args4,
-				_args5
-			);
+		return _authenticate(_prop, _author, _args);
 	}
 
 	/**
@@ -164,20 +140,12 @@ contract Market is UsingRegistry, IMarket {
 	function _authenticate(
 		address _prop,
 		address _author,
-		string memory _args1,
-		string memory _args2,
-		string memory _args3,
-		string memory _args4,
-		string memory _args5
+		string[] memory _args
 	) private returns (bool) {
 		return
 			IMarketBehavior(behavior).authenticate(
 				_prop,
-				_args1,
-				_args2,
-				_args3,
-				_args4,
-				_args5,
+				_args,
 				address(this),
 				_author
 			);
