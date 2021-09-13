@@ -293,6 +293,26 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				)
 				expect(beforePosition[4].toNumber()).to.be.equal(0)
 			})
+			it('generate event.', async () => {
+				const [dev, property, tokenId] = await init2()
+				const t1 = await getBlockTimestamp()
+				await forwardBlockTimestamp(1)
+				dev.lockup.withdrawByPosition(tokenId, 100)
+				const [_from, _property, _value, _reward] = await Promise.all([
+					getEventValue(dev.lockup)('Withdrew', '_from'),
+					getEventValue(dev.lockup)('Withdrew', '_property'),
+					getEventValue(dev.lockup)('Withdrew', '_value'),
+					getEventValue(dev.lockup)('Withdrew', '_reward'),
+				])
+				expect(_from).to.be.equal(deployer)
+				expect(_property).to.be.equal(property.address)
+				expect(_value).to.be.equal('100')
+				const t2 = await getBlockTimestamp()
+				const reward = toBigNumber('10000000000000000000')
+					.times(t2 - t1)
+					.toFixed()
+				expect(_reward).to.be.equal(reward)
+			})
 			it('get reward.', async () => {
 				const [dev, , tokenId] = await init2()
 				const t1 = await getBlockTimestamp()

@@ -52,6 +52,12 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		uint256 holdersCap;
 	}
 	event Lockedup(address _from, address _property, uint256 _value);
+	event Withdrew(
+		address indexed _from,
+		address indexed _property,
+		uint256 _value,
+		uint256 _reward
+	);
 	event UpdateCap(uint256 _cap);
 
 	uint256 public override cap; // From [get/set]StorageCap
@@ -282,6 +288,8 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		 */
 		updateValues(false, property, _amount, prices);
 		uint256 cumulative = cumulativeReward.add(value);
+
+		emit Withdrew(msg.sender, property, _amount, value);
 		/**
 		 * update position information
 		 */
