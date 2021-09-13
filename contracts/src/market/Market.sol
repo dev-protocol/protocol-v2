@@ -100,16 +100,13 @@ contract Market is UsingRegistry, IMarket {
 	/**
 	 * Authenticates the new asset and proves that the Property author is the owner of the asset.
 	 */
-	function authenticate(
-		address _prop,
-		string[] memory _args
-	) public override onlyPropertyAuthor(_prop) returns (bool) {
-		return
-			_authenticate(
-				_prop,
-				msg.sender,
-				_args
-			);
+	function authenticate(address _prop, string[] memory _args)
+		public
+		override
+		onlyPropertyAuthor(_prop)
+		returns (bool)
+	{
+		return _authenticate(_prop, msg.sender, _args);
 	}
 
 	/**
@@ -133,12 +130,7 @@ contract Market is UsingRegistry, IMarket {
 		 */
 		require(enabled, "market is not enabled");
 
-		return
-			_authenticate(
-				_prop,
-				_author,
-				_args
-			);
+		return _authenticate(_prop, _author, _args);
 	}
 
 	/**

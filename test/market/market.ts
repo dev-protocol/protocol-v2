@@ -172,11 +172,9 @@ contract(
 			it(`The sender's address is passed to Market Behavior.`, async () => {
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const marketInstance = await marketContract.at(marketAddress1)
-				await marketInstance.authenticate(
-					propertyAddress,
-					['id-key'],
-					{ from: propertyAuther }
-				)
+				await marketInstance.authenticate(propertyAddress, ['id-key'], {
+					from: propertyAuther,
+				})
 				const marketTest3 = artifacts.require('MarketTest3')
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const marketTest3Instance = await marketTest3.at(
@@ -207,11 +205,9 @@ contract(
 			it('Should fail to run when the passed ID is already authenticated.', async () => {
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const marketInstance = await marketContract.at(marketAddress1)
-				await marketInstance.authenticate(
-					propertyAddress,
-					['id-key'],
-					{ from: propertyAuther }
-				)
+				await marketInstance.authenticate(propertyAddress, ['id-key'], {
+					from: propertyAuther,
+				})
 				const result = await marketInstance
 					.authenticate(propertyAddress, ['id-key'], {
 						from: propertyAuther,
@@ -416,31 +412,22 @@ contract(
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const marketInstance = await marketContract.at(marketAddress1)
 				const result = await marketInstance
-					.authenticateFromPropertyFactory(
-						propertyAddress,
-						propertyAuther,
-						['id-key'],
-					)
+					.authenticateFromPropertyFactory(propertyAddress, propertyAuther, [
+						'id-key',
+					])
 					.catch((err: Error) => err)
 				validateAddressErrorMessage(result)
 			})
 			it('Should fail to run when the passed ID is already authenticated.', async () => {
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const marketInstance = await marketContract.at(marketAddress1)
-				await marketInstance.authenticate(
-					propertyAddress,
-					['id-key'],
-					{ from: propertyAuther }
-				)
+				await marketInstance.authenticate(propertyAddress, ['id-key'], {
+					from: propertyAuther,
+				})
 				const result = await marketInstance
-					.authenticateFromPropertyFactory(
-						propertyAddress,
-						user,
-						['id-key'],
-						{
-							from: propertyFactory,
-						}
-					)
+					.authenticateFromPropertyFactory(propertyAddress, user, ['id-key'], {
+						from: propertyFactory,
+					})
 					.catch((err: Error) => err)
 				validateErrorMessage(result, 'id is duplicated')
 			})

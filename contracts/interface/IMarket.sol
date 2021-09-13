@@ -2,10 +2,9 @@
 pragma solidity =0.8.6;
 
 interface IMarket {
-	function authenticate(
-		address _prop,
-		string[] memory _args
-	) external returns (bool);
+	function authenticate(address _prop, string[] memory _args)
+		external
+		returns (bool);
 
 	function authenticateFromPropertyFactory(
 		address _prop,

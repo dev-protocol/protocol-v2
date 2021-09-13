@@ -87,13 +87,9 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 
 		it('Create a new Property and authenticate at the same time', async () => {
 			void dev.propertyFactory
-				.createAndAuthenticate(
-					'example',
-					'EXAMPLE',
-					marketAddress,
-					['test'],
-					{ from: user }
-				)
+				.createAndAuthenticate('example', 'EXAMPLE', marketAddress, ['test'], {
+					from: user,
+				})
 				.catch(console.error)
 			const [propertyCreator, property, market, metrics] = await Promise.all([
 				getEventValue(dev.propertyFactory)('Create', '_from'),
