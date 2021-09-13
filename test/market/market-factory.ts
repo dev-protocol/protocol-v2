@@ -29,7 +29,7 @@ contract('MarketFactoryTest', ([deployer, user, dummyMarketAddress]) => {
 		const eventMarket = result.logs.filter((log) => log.event === 'Create')[0]
 			.args._market
 		const marketAddress = getMarketAddress(result)
-		return [dev, marketAddress, marketBehaviorAddress, [eventFrom, eventMarket]]
+		return [dev, marketAddress, marketBehaviorAddress, [eventMarket, eventFrom]]
 	}
 
 	describe('MarketFactory; create', () => {
@@ -53,7 +53,7 @@ contract('MarketFactoryTest', ([deployer, user, dummyMarketAddress]) => {
 			expect(await deployedMarket.enabled()).to.be.equal(true)
 		})
 		it('generate create event', async () => {
-			const [, market, , [fromAddress, marketAddress]] = await init()
+			const [, market, , [marketAddress, fromAddress]] = await init()
 			expect(fromAddress).to.be.equal(user)
 			expect(marketAddress).to.be.equal(market)
 		})
