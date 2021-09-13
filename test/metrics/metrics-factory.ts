@@ -158,12 +158,14 @@ contract(
 						from: market,
 					})
 					.catch(console.error)
-				const [from, property, metrics] = await new Promise<string[]>((resolve) => {
-					watch(dev.metricsFactory)('Destroy', (_, values) => {
-						const {_market, _property, _metrics} = values
-						resolve([_market, _property, _metrics])
-					})
-				})
+				const [from, property, metrics] = await new Promise<string[]>(
+					(resolve) => {
+						watch(dev.metricsFactory)('Destroy', (_, values) => {
+							const { _market, _property, _metrics } = values
+							resolve([_market, _property, _metrics])
+						})
+					}
+				)
 				result = await dev.metricsFactory.isMetrics(m1)
 				expect(result).to.be.equal(false)
 				expect(market).to.be.equal(from)
