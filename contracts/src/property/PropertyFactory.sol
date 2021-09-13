@@ -41,28 +41,20 @@ contract PropertyFactory is InitializableUsingRegistry, IPropertyFactory {
 	 * @param _name Name of the new Property.
 	 * @param _symbol Symbol of the new Property.
 	 * @param _market Address of a Market.
-	 * @param _args1 First argument to pass through to Market.
-	 * @param _args2 Second argument to pass through to Market.
-	 * @param _args3 Third argument to pass through to Market.
+	 * @param _args arguments to pass through to Market.
 	 * @return The transaction fail/success.
 	 */
 	function createAndAuthenticate(
 		string calldata _name,
 		string calldata _symbol,
 		address _market,
-		string calldata _args1,
-		string calldata _args2,
-		string calldata _args3
+		string[] memory _args
 	) external override returns (bool) {
 		return
 			IMarket(_market).authenticateFromPropertyFactory(
 				_create(_name, _symbol, msg.sender),
 				msg.sender,
-				_args1,
-				_args2,
-				_args3,
-				"",
-				""
+				_args
 			);
 	}
 

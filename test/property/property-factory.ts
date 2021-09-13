@@ -91,9 +91,7 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 					'example',
 					'EXAMPLE',
 					marketAddress,
-					'test',
-					'',
-					'',
+					['test'],
 					{ from: user }
 				)
 				.catch(console.error)

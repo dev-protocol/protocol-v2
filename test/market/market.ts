@@ -146,7 +146,7 @@ contract(
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const marketInstance = await marketContract.at(marketAddress1)
 				marketInstance
-					.authenticate(propertyAddress, 'id-key', '', '', '', '', {
+					.authenticate(propertyAddress, ['id-key'], {
 						from: propertyAuther,
 					})
 					.catch(console.error)
@@ -174,11 +174,7 @@ contract(
 				const marketInstance = await marketContract.at(marketAddress1)
 				await marketInstance.authenticate(
 					propertyAddress,
-					'id-key',
-					'',
-					'',
-					'',
-					'',
+					['id-key'],
 					{ from: propertyAuther }
 				)
 				const marketTest3 = artifacts.require('MarketTest3')
@@ -194,7 +190,7 @@ contract(
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const marketInstance = await marketContract.at(marketAddress2)
 				const result = await marketInstance
-					.authenticate(propertyAddress, 'id-key', '', '', '', '', {
+					.authenticate(propertyAddress, ['id-key'], {
 						from: propertyAuther,
 					})
 					.catch((err: Error) => err)
@@ -204,7 +200,7 @@ contract(
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const marketInstance = await marketContract.at(marketAddress1)
 				const result = await marketInstance
-					.authenticate(propertyAddress, 'id-key', '', '', '', '')
+					.authenticate(propertyAddress, ['id-key'])
 					.catch((err: Error) => err)
 				validateAddressErrorMessage(result)
 			})
@@ -213,15 +209,11 @@ contract(
 				const marketInstance = await marketContract.at(marketAddress1)
 				await marketInstance.authenticate(
 					propertyAddress,
-					'id-key',
-					'',
-					'',
-					'',
-					'',
+					['id-key'],
 					{ from: propertyAuther }
 				)
 				const result = await marketInstance
-					.authenticate(propertyAddress, 'id-key', '', '', '', '', {
+					.authenticate(propertyAddress, ['id-key'], {
 						from: propertyAuther,
 					})
 					.catch((err: Error) => err)
@@ -232,7 +224,7 @@ contract(
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const marketInstance = await marketContract.at(marketAddress1)
 				marketInstance
-					.authenticate(propertyAddress, 'id-key', '', '', '', '', {
+					.authenticate(propertyAddress, ['id-key'], {
 						from: propertyAuther,
 					})
 					.catch(console.error)
@@ -250,7 +242,7 @@ contract(
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const marketInstance = await marketContract.at(marketAddress1)
 				marketInstance
-					.authenticate(propertyAddress, 'id-key', '', '', '', '', {
+					.authenticate(propertyAddress, ['id-key'], {
 						from: propertyAuther,
 					})
 					.catch(console.error)
@@ -281,7 +273,7 @@ contract(
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const marketInstance = await marketContract.at(marketAddress1)
 				marketInstance
-					.authenticate(propertyAddress, 'id-key', '', '', '', '', {
+					.authenticate(propertyAddress, ['id-key'], {
 						from: propertyAuther,
 					})
 					.catch(console.error)
@@ -363,11 +355,7 @@ contract(
 				void marketInstance.authenticateFromPropertyFactory(
 					propertyAddress,
 					propertyAuther,
-					'id-key',
-					'',
-					'',
-					'',
-					'',
+					['id-key'],
 					{
 						from: propertyFactory,
 					}
@@ -397,11 +385,7 @@ contract(
 				await marketInstance.authenticateFromPropertyFactory(
 					propertyAddress,
 					propertyAuther,
-					'id-key',
-					'',
-					'',
-					'',
-					'',
+					['id-key'],
 					{ from: propertyFactory }
 				)
 				const marketTest3 = artifacts.require('MarketTest3')
@@ -420,11 +404,7 @@ contract(
 					.authenticateFromPropertyFactory(
 						propertyAddress,
 						propertyAuther,
-						'id-key',
-						'',
-						'',
-						'',
-						'',
+						['id-key'],
 						{
 							from: propertyFactory,
 						}
@@ -439,11 +419,7 @@ contract(
 					.authenticateFromPropertyFactory(
 						propertyAddress,
 						propertyAuther,
-						'id-key',
-						'',
-						'',
-						'',
-						''
+						['id-key'],
 					)
 					.catch((err: Error) => err)
 				validateAddressErrorMessage(result)
@@ -453,22 +429,14 @@ contract(
 				const marketInstance = await marketContract.at(marketAddress1)
 				await marketInstance.authenticate(
 					propertyAddress,
-					'id-key',
-					'',
-					'',
-					'',
-					'',
+					['id-key'],
 					{ from: propertyAuther }
 				)
 				const result = await marketInstance
 					.authenticateFromPropertyFactory(
 						propertyAddress,
 						user,
-						'id-key',
-						'',
-						'',
-						'',
-						'',
+						['id-key'],
 						{
 							from: propertyFactory,
 						}

@@ -17,20 +17,16 @@ contract MarketTest3 is Ownable, IMarketBehavior, UsingRegistry {
 
 	function authenticate(
 		address _prop,
-		string memory _args1,
-		string memory,
-		string memory,
-		string memory,
-		string memory,
+		string[] memory _args,
 		address market,
 		address account
 	) external override returns (bool) {
 		require(msg.sender == associatedMarket, "Invalid sender");
 
-		bytes32 idHash = keccak256(abi.encodePacked(_args1));
+		bytes32 idHash = keccak256(abi.encodePacked(_args[0]));
 		address _metrics = IMarket(market).authenticatedCallback(_prop, idHash);
-		keys[_metrics] = _args1;
-		addresses[_args1] = _metrics;
+		keys[_metrics] = _args[0];
+		addresses[_args[0]] = _metrics;
 		currentAuthinticateAccount = account;
 		return true;
 	}

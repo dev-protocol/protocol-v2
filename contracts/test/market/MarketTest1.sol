@@ -19,11 +19,7 @@ contract MarketTest1 is Ownable, IMarketBehavior, UsingRegistry {
 
 	function authenticate(
 		address _prop,
-		string memory _args1,
-		string memory,
-		string memory,
-		string memory,
-		string memory,
+		string[] memory _args,
 		address market,
 		address
 	) external override returns (bool) {
@@ -34,10 +30,10 @@ contract MarketTest1 is Ownable, IMarketBehavior, UsingRegistry {
 		{
 			address _metrics = IMarket(market).authenticatedCallback(
 				_prop,
-				keccak256(abi.encodePacked(_args1))
+				keccak256(abi.encodePacked(_args[0]))
 			);
-			keys[_metrics] = _args1;
-			addresses[_args1] = _metrics;
+			keys[_metrics] = _args[0];
+			addresses[_args[0]] = _metrics;
 		}
 		return true;
 	}

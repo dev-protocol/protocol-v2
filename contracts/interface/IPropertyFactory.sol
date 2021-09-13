@@ -14,9 +14,7 @@ interface IPropertyFactory {
 		string calldata _name,
 		string calldata _symbol,
 		address _market,
-		string calldata _args1,
-		string calldata _args2,
-		string calldata _args3
+		string[] memory _args
 	) external returns (bool);
 
 	function isProperty(address _addr) external view returns (bool);
