@@ -86,7 +86,7 @@ contract MetricsFactory is InitializableUsingRegistry, IMetricsFactory {
 		 * Logical deletions a Metrics contract.
 		 */
 		_removeMetrics(_metrics);
-		emit Destroy(msg.sender, _metrics);
+		emit Destroy(msg.sender, IMetrics(_metrics).property(), _metrics);
 	}
 
 	function _addMetrics(address _addr) internal {

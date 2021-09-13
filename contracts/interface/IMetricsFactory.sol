@@ -7,7 +7,11 @@ interface IMetricsFactory {
 		address indexed _property,
 		address _metrics
 	);
-	event Destroy(address indexed _from, address _metrics);
+	event Destroy(
+		address indexed _market,
+		address indexed _property,
+		address _metrics
+	);
 
 	function create(address _property) external returns (address);
 
