@@ -158,15 +158,16 @@ contract(
 						from: market,
 					})
 					.catch(console.error)
-				const [from, metrics] = await new Promise<string[]>((resolve) => {
+				const [from, property, metrics] = await new Promise<string[]>((resolve) => {
 					watch(dev.metricsFactory)('Destroy', (_, values) => {
-						const { _from, _metrics } = values
-						resolve([_from, _metrics])
+						const {_market, _property, _metrics} = values
+						resolve([_market, _property, _metrics])
 					})
 				})
 				result = await dev.metricsFactory.isMetrics(m1)
 				expect(result).to.be.equal(false)
 				expect(market).to.be.equal(from)
+				expect(property1).to.be.equal(property)
 				expect(m1).to.be.equal(metrics)
 			})
 			it('can not also run the destroy method in owner.', async () => {
