@@ -54,15 +54,13 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 	event Lockedup(
 		address indexed _from,
 		address indexed _property,
-		uint256 _value,
-		uint256 _tokenId
+		uint256 _value
 	);
 	event Withdrew(
 		address indexed _from,
 		address indexed _property,
 		uint256 _value,
-		uint256 _reward,
-		uint256 _tokenId
+		uint256 _reward
 	);
 	event UpdateCap(uint256 _cap);
 
@@ -169,7 +167,7 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		uint256 tokenId = ISTokensManager(
 			registry().registries("STokensManager")
 		).mint(msg.sender, _property, _amount, interest);
-		emit Lockedup(msg.sender, _property, _amount, tokenId);
+		emit Lockedup(msg.sender, _property, _amount);
 		return tokenId;
 	}
 
@@ -243,7 +241,7 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		/**
 		 * generate events
 		 */
-		emit Lockedup(msg.sender, property, _amount, _tokenId);
+		emit Lockedup(msg.sender, property, _amount);
 		return true;
 	}
 
@@ -295,7 +293,7 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		updateValues(false, property, _amount, prices);
 		uint256 cumulative = cumulativeReward.add(value);
 
-		emit Withdrew(msg.sender, property, _amount, value, _tokenId);
+		emit Withdrew(msg.sender, property, _amount, value);
 		/**
 		 * update position information
 		 */
