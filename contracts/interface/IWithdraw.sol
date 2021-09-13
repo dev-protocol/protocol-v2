@@ -10,22 +10,7 @@ interface IWithdraw {
 
 	function withdraw(address _property) external;
 
-	// Is there a need for a declaration?
-	// function getRewardsAmount(address _property)
-	// 	external
-	// 	view
-	// 	returns (uint256);
-
 	function beforeBalanceChange(address _from, address _to) external;
-
-	/**
-	 * caution!!!this function is deprecated!!!
-	 * use calculateRewardAmount
-	 */
-	function calculateWithdrawableAmount(address _property, address _user)
-		external
-		view
-		returns (uint256);
 
 	function calculateRewardAmount(address _property, address _user)
 		external

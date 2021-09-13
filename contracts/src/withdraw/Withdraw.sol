@@ -274,21 +274,6 @@ contract Withdraw is IWithdraw, InitializableUsingRegistry {
 	}
 
 	/**
-	 * Returns the total rewards currently available for withdrawal. (For calling from external of the contract)
-	 * caution!!!this function is deprecated!!!
-	 * use calculateRewardAmount
-	 */
-	function calculateWithdrawableAmount(address _property, address _user)
-		external
-		view
-		override
-		returns (uint256)
-	{
-		(uint256 value, , , ) = _calculateWithdrawableAmount(_property, _user);
-		return value;
-	}
-
-	/**
 	 * Returns the rewards amount
 	 */
 	function calculateRewardAmount(address _property, address _user)
