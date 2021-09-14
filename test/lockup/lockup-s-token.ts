@@ -91,7 +91,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				const position = await dev.sTokensManager.positions(2)
 				expect(position.property).to.be.equal(property.address)
 				expect(toBigNumber(position.amount).toNumber()).to.be.equal(200)
-				expect(toBigNumber(position.price).toString()).to.be.equal(
+				expect(toBigNumber(position.price).toFixed()).to.be.equal(
 					toBigNumber('100000000000000000000000000000000000')
 						.times(t2 - t1)
 						.toFixed()
@@ -193,19 +193,19 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				const afterPosition = await dev.sTokensManager.positions(tokenId)
 				expect(afterPosition.property).to.be.equal(property.address)
 				expect(toBigNumber(afterPosition.amount).toNumber()).to.be.equal(200)
-				expect(toBigNumber(afterPosition.price).toString()).to.be.equal(
+				expect(toBigNumber(afterPosition.price).toFixed()).to.be.equal(
 					toBigNumber('100000000000000000000000000000000000')
 						.times(t2 - t1)
 						.toFixed()
 				)
 				expect(
-					toBigNumber(afterPosition.cumulativeReward).toString()
+					toBigNumber(afterPosition.cumulativeReward).toFixed()
 				).to.be.equal(
 					toBigNumber('10000000000000000000')
 						.times(t2 - t1)
 						.toFixed()
 				)
-				expect(toBigNumber(afterPosition.pendingReward).toString()).to.be.equal(
+				expect(toBigNumber(afterPosition.pendingReward).toFixed()).to.be.equal(
 					toBigNumber('10000000000000000000')
 						.times(t2 - t1)
 						.toFixed()
@@ -295,13 +295,13 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				const afterPosition = await dev.sTokensManager.positions(tokenId)
 				expect(afterPosition.property).to.be.equal(property.address)
 				expect(toBigNumber(afterPosition.amount).toNumber()).to.be.equal(0)
-				expect(toBigNumber(afterPosition.price).toString()).to.be.equal(
+				expect(toBigNumber(afterPosition.price).toFixed()).to.be.equal(
 					toBigNumber('100000000000000000000000000000000000')
 						.times(t2 - t1)
 						.toFixed()
 				)
 				expect(
-					toBigNumber(afterPosition.cumulativeReward).toString()
+					toBigNumber(afterPosition.cumulativeReward).toFixed()
 				).to.be.equal(
 					toBigNumber('10000000000000000000')
 						.times(t2 - t1)
