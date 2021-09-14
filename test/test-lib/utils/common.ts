@@ -95,5 +95,5 @@ export async function getAmountFromPosition(
 	tokenId: number
 ): Promise<BigNumber> {
 	const position = await dev.sTokensManager.positions(tokenId)
-	return toBigNumber(position[1])
+	return toBigNumber(position.amount)
 }
