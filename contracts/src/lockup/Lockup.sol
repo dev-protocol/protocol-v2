@@ -191,10 +191,7 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 			uint256 withdrawable,
 			RewardPrices memory prices
 		) = _calculateWithdrawableInterestAmount(
-				positions.property,
-				positions.amount,
-				positions.price,
-				positions.pendingReward
+				positions
 			);
 		/**
 		 * Saves variables that should change due to the addition of staking.
@@ -255,10 +252,7 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		 * Withdraws the staking reward
 		 */
 		(uint256 value, RewardPrices memory prices) = _withdrawInterest(
-			positions.property,
-			positions.amount,
-			positions.price,
-			positions.pendingReward
+			positions
 		);
 		/**
 		 * Transfer the staked amount to the sender.
@@ -587,17 +581,14 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 	 * Returns the total rewards currently available for withdrawal. (For calling from inside the contract)
 	 */
 	function _calculateWithdrawableInterestAmount(
-		address _property,
-		uint256 _amount,
-		uint256 _price,
-		uint256 _pendingReward
+		ISTokensManager.StakingPositions memory positions
 	) private view returns (uint256 amount_, RewardPrices memory prices_) {
 		/**
 		 * If the passed Property has not authenticated, returns always 0.
 		 */
 		if (
 			IMetricsFactory(registry().registries("MetricsFactory")).hasAssets(
-				_property
+				positions.property
 			) == false
 		) {
 			return (0, RewardPrices(0, 0, 0, 0));
@@ -610,12 +601,12 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 			uint256 amount,
 			,
 			RewardPrices memory prices
-		) = _calculateInterestAmount(_amount, _price);
+		) = _calculateInterestAmount(positions.amount, positions.price);
 
 		/**
 		 * Returns the sum of all values.
 		 */
-		uint256 withdrawableAmount = amount.add(_pendingReward);
+		uint256 withdrawableAmount = amount.add(positions.pendingReward);
 		return (withdrawableAmount, prices);
 	}
 
@@ -634,10 +625,7 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		ISTokensManager.StakingPositions
 			memory positions = sTokensManagerInstance.positions(_tokenId);
 		(uint256 result, ) = _calculateWithdrawableInterestAmount(
-			positions.property,
-			positions.amount,
-			positions.price,
-			positions.pendingReward
+			positions
 		);
 		return result;
 	}
@@ -646,10 +634,7 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 	 * Withdraws staking reward as an interest.
 	 */
 	function _withdrawInterest(
-		address _property,
-		uint256 _amount,
-		uint256 _price,
-		uint256 _pendingReward
+		ISTokensManager.StakingPositions memory positions
 	) private returns (uint256 value_, RewardPrices memory prices_) {
 		/**
 		 * Gets the withdrawable amount.
@@ -658,10 +643,7 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 			uint256 value,
 			RewardPrices memory prices
 		) = _calculateWithdrawableInterestAmount(
-				_property,
-				_amount,
-				_price,
-				_pendingReward
+				positions
 			);
 
 		/**
