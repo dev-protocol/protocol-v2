@@ -58,7 +58,7 @@ contract MarketFactory is
 			_enable(marketAddr);
 		}
 
-		emit Create(msg.sender, marketAddr);
+		emit Create(marketAddr, msg.sender);
 		return marketAddr;
 	}
 
