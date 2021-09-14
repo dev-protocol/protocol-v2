@@ -91,7 +91,7 @@ contract(
 				expect(await market.schema()).to.be.equal('[]')
 			})
 		})
-		describe.only('Market; authenticate, authenticatedCallback', () => {
+		describe('Market; authenticate, authenticatedCallback', () => {
 			const dev = new DevProtocolInstance(deployer)
 			let marketAddress1: string
 			let marketAddress2: string
