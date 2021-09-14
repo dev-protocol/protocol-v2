@@ -91,7 +91,7 @@ contract(
 				expect(await market.schema()).to.be.equal('[]')
 			})
 		})
-		describe('Market; authenticate, authenticatedCallback', () => {
+		describe.only('Market; authenticate, authenticatedCallback', () => {
 			const dev = new DevProtocolInstance(deployer)
 			let marketAddress1: string
 			let marketAddress2: string
@@ -254,15 +254,15 @@ contract(
 						from: propertyAuther,
 					})
 					.catch(console.error)
-				const [_from, _metrics] = await new Promise<string[]>((resolve) => {
+				const [_market, _metrics] = await new Promise<string[]>((resolve) => {
 					watch(dev.metricsFactory)('Destroy', (_, values) => {
-						const { _from, _metrics } = values
-						resolve([_from, _metrics])
+						const { _market, _metrics } = values
+						resolve([_market, _metrics])
 					})
 				})
 				count = await marketInstance.issuedMetrics()
 				expect(count.toNumber()).to.be.equal(0)
-				expect(_from).to.be.equal(marketAddress1)
+				expect(_market).to.be.equal(marketAddress1)
 				expect(_metrics).to.be.equal(metricsAddress)
 			})
 			it('Should fail to deauthenticate when passed already deauthenticated metrics.', async () => {
