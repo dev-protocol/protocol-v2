@@ -1,5 +1,5 @@
 {
-	"name": "@devprotocol/protocol-optimism",
+	"name": "@devprotocol/protocol-l2",
 	"version": "0.0.1",
 	"description": "Securitize for Internet assets",
 	"scripts": {
