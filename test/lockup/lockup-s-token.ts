@@ -181,8 +181,12 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				expect(beforePosition.property).to.be.equal(property.address)
 				expect(toBigNumber(beforePosition.amount).toNumber()).to.be.equal(100)
 				expect(toBigNumber(beforePosition.price).toNumber()).to.be.equal(0)
-				expect(toBigNumber(beforePosition.cumulativeReward).toNumber()).to.be.equal(0)
-				expect(toBigNumber(beforePosition.pendingReward).toNumber()).to.be.equal(0)
+				expect(
+					toBigNumber(beforePosition.cumulativeReward).toNumber()
+				).to.be.equal(0)
+				expect(
+					toBigNumber(beforePosition.pendingReward).toNumber()
+				).to.be.equal(0)
 				await forwardBlockTimestamp(2)
 				await dev.lockup.depositToPosition(tokenId, 100)
 				const t2 = await getBlockTimestamp()
@@ -194,7 +198,9 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 						.times(t2 - t1)
 						.toFixed()
 				)
-				expect(toBigNumber(afterPosition.cumulativeReward).toString()).to.be.equal(
+				expect(
+					toBigNumber(afterPosition.cumulativeReward).toString()
+				).to.be.equal(
 					toBigNumber('10000000000000000000')
 						.times(t2 - t1)
 						.toFixed()
@@ -278,8 +284,12 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				expect(beforePosition.property).to.be.equal(property.address)
 				expect(toBigNumber(beforePosition.amount).toNumber()).to.be.equal(100)
 				expect(toBigNumber(beforePosition.price).toNumber()).to.be.equal(0)
-				expect(toBigNumber(beforePosition.cumulativeReward).toNumber()).to.be.equal(0)
-				expect(toBigNumber(beforePosition.pendingReward).toNumber()).to.be.equal(0)
+				expect(
+					toBigNumber(beforePosition.cumulativeReward).toNumber()
+				).to.be.equal(0)
+				expect(
+					toBigNumber(beforePosition.pendingReward).toNumber()
+				).to.be.equal(0)
 				await dev.lockup.withdrawByPosition(tokenId, 100)
 				const t2 = await getBlockTimestamp()
 				const afterPosition = await dev.sTokensManager.positions(tokenId)
@@ -290,12 +300,16 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 						.times(t2 - t1)
 						.toFixed()
 				)
-				expect(toBigNumber(afterPosition.cumulativeReward).toString()).to.be.equal(
+				expect(
+					toBigNumber(afterPosition.cumulativeReward).toString()
+				).to.be.equal(
 					toBigNumber('10000000000000000000')
 						.times(t2 - t1)
 						.toFixed()
 				)
-				expect(toBigNumber(beforePosition.pendingReward).toNumber()).to.be.equal(0)
+				expect(
+					toBigNumber(beforePosition.pendingReward).toNumber()
+				).to.be.equal(0)
 			})
 			it('generate event.', async () => {
 				const [dev, property, tokenId] = await init2()

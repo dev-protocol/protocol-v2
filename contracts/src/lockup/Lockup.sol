@@ -190,9 +190,7 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		(
 			uint256 withdrawable,
 			RewardPrices memory prices
-		) = _calculateWithdrawableInterestAmount(
-				positions
-			);
+		) = _calculateWithdrawableInterestAmount(positions);
 		/**
 		 * Saves variables that should change due to the addition of staking.
 		 */
@@ -624,9 +622,7 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		);
 		ISTokensManager.StakingPositions
 			memory positions = sTokensManagerInstance.positions(_tokenId);
-		(uint256 result, ) = _calculateWithdrawableInterestAmount(
-			positions
-		);
+		(uint256 result, ) = _calculateWithdrawableInterestAmount(positions);
 		return result;
 	}
 
@@ -642,9 +638,7 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		(
 			uint256 value,
 			RewardPrices memory prices
-		) = _calculateWithdrawableInterestAmount(
-				positions
-			);
+		) = _calculateWithdrawableInterestAmount(positions);
 
 		/**
 		 * Mints the reward.
