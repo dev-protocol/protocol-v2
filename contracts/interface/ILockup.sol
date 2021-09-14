@@ -2,6 +2,20 @@
 pragma solidity =0.8.6;
 
 interface ILockup {
+	event Lockedup(
+		address indexed _from,
+		address indexed _property,
+		uint256 _value,
+		uint256 _tokenId
+	);
+	event Withdrew(
+		address indexed _from,
+		address indexed _property,
+		uint256 _value,
+		uint256 _reward,
+		uint256 _tokenId
+	);
+
 	function depositToProperty(address _property, uint256 _amount)
 		external
 		returns (uint256);

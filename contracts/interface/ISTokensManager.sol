@@ -3,6 +3,36 @@ pragma solidity =0.8.6;
 
 interface ISTokensManager {
 	/*
+	 * @dev Struct to declares a staking position.
+	 * @param owner The address of the owner of the new staking position
+	 * @param property The address of the Property as the staking destination
+	 * @param amount The amount of the new staking position
+	 * @param price The latest unit price of the cumulative staking reward
+	 * @param cumulativeReward The cumulative withdrawn reward amount
+	 * @param pendingReward The pending withdrawal reward amount amount
+	 */
+	struct StakingPositions {
+		address property;
+		uint256 amount;
+		uint256 price;
+		uint256 cumulativeReward;
+		uint256 pendingReward;
+	}
+
+	/*
+	 * @dev Struct to declares staking rewards.
+	 * @param entireReward The reward amount of adding the cumulative withdrawn amount
+	 to the withdrawable amount
+	 * @param cumulativeReward The cumulative withdrawn reward amount
+	 * @param withdrawableReward The withdrawable reward amount
+	 */
+	struct Rewards {
+		uint256 entireReward;
+		uint256 cumulativeReward;
+		uint256 withdrawableReward;
+	}
+
+	/*
 	 * @dev The event fired when a token is minted.
 	 * @param tokenId The ID of the created new staking position
 	 * @param owner The address of the owner of the new staking position
@@ -79,39 +109,19 @@ interface ISTokensManager {
 	/*
 	 * @dev Gets the existing staking position.
 	 * @param _tokenId The ID of the staking position
-	 * @return address The address of the Property as the staking destination
-	 * @return uint256 The amount of the new staking position
-	 * @return uint256 The latest unit price of the cumulative staking reward
-	 * @return uint256 The cumulative withdrawn reward amount
-	 * @return uint256 The pending withdrawal reward amount amount
+	 * @return StakingPositions staking positions
 	 */
 	function positions(uint256 _tokenId)
 		external
 		view
-		returns (
-			address,
-			uint256,
-			uint256,
-			uint256,
-			uint256
-		);
+		returns (StakingPositions memory);
 
 	/*
 	 * @dev Gets the reward status of the staking position.
 	 * @param _tokenId The ID of the staking position
-	 * @return uint256 The reward amount of adding the cumulative withdrawn amount
-	 to the withdrawable amount
-	 * @return uint256 The cumulative withdrawn reward amount
-	 * @return uint256 The withdrawable reward amount
+	 * @return Rewards reward information
 	 */
-	function rewards(uint256 _tokenId)
-		external
-		view
-		returns (
-			uint256,
-			uint256,
-			uint256
-		);
+	function rewards(uint256 _tokenId) external view returns (Rewards memory);
 
 	/*
 	 * @dev get token ids by property

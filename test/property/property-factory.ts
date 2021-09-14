@@ -86,7 +86,7 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 		})
 
 		it('Create a new Property and authenticate at the same time', async () => {
-			void dev.propertyFactory
+			dev.propertyFactory
 				.createAndAuthenticate('example', 'EXAMPLE', marketAddress, ['test'], {
 					from: user,
 				})
@@ -94,7 +94,7 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 			const [propertyCreator, property, market, metrics] = await Promise.all([
 				getEventValue(dev.propertyFactory)('Create', '_from'),
 				getEventValue(dev.propertyFactory)('Create', '_property'),
-				getEventValue(dev.metricsFactory)('Create', '_from'),
+				getEventValue(dev.metricsFactory)('Create', '_market'),
 				getEventValue(dev.metricsFactory)('Create', '_metrics'),
 			])
 			const linkedProperty = await Promise.all([

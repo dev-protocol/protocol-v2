@@ -6,13 +6,11 @@ import {Counters} from "@openzeppelin/contracts/utils/Counters.sol";
 import {SafeMath} from "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import {InitializableUsingRegistry} from "contracts/src/common/registry/InitializableUsingRegistry.sol";
 import {STokensDescriptor} from "contracts/src/s-token/STokensDescriptor.sol";
-import {IStakingPosition} from "contracts/interface/IStakingPosition.sol";
 import {ISTokensManager} from "contracts/interface//ISTokensManager.sol";
 import {IAddressRegistry} from "contracts/interface/IAddressRegistry.sol";
 import {ILockup} from "contracts/interface/ILockup.sol";
 
 contract STokensManager is
-	IStakingPosition,
 	ISTokensManager,
 	STokensDescriptor,
 	ERC721EnumerableUpgradeable,
@@ -43,7 +41,13 @@ contract STokensManager is
 		override
 		returns (string memory)
 	{
-		return getTokenURI(getStoragePositionsV1(_tokenId));
+		StakingPositions memory positons = getStoragePositions(_tokenId);
+		return
+			getTokenURI(
+				positons.property,
+				positons.amount,
+				positons.cumulativeReward
+			);
 	}
 
 	function mint(
@@ -56,14 +60,14 @@ contract STokensManager is
 		uint256 newTokenId = _tokenIds.current();
 		_safeMint(_owner, newTokenId);
 		emit Minted(newTokenId, _owner, _property, _amount, _price);
-		StakingPositionV1 memory newPosition = StakingPositionV1(
+		StakingPositions memory newPosition = StakingPositions(
 			_property,
 			_amount,
 			_price,
 			0,
 			0
 		);
-		setStoragePositionsV1(newTokenId, newPosition);
+		setStoragePositions(newTokenId, newPosition);
 		tokenIdsMapOfProperty[_property].push(newTokenId);
 		return newTokenId;
 	}
@@ -75,14 +79,12 @@ contract STokensManager is
 		uint256 _cumulativeReward,
 		uint256 _pendingReward
 	) external override onlyLockup returns (bool) {
-		StakingPositionV1 memory currentPosition = getStoragePositionsV1(
-			_tokenId
-		);
+		StakingPositions memory currentPosition = getStoragePositions(_tokenId);
 		currentPosition.amount = _amount;
 		currentPosition.price = _price;
 		currentPosition.cumulativeReward = _cumulativeReward;
 		currentPosition.pendingReward = _pendingReward;
-		setStoragePositionsV1(_tokenId, currentPosition);
+		setStoragePositions(_tokenId, currentPosition);
 		emit Updated(
 			_tokenId,
 			_amount,
@@ -97,45 +99,25 @@ contract STokensManager is
 		external
 		view
 		override
-		returns (
-			address property_,
-			uint256 amount_,
-			uint256 price_,
-			uint256 cumulativeReward_,
-			uint256 pendingReward_
-		)
+		returns (StakingPositions memory)
 	{
-		StakingPositionV1 memory currentPosition = getStoragePositionsV1(
-			_tokenId
-		);
-		return (
-			currentPosition.property,
-			currentPosition.amount,
-			currentPosition.price,
-			currentPosition.cumulativeReward,
-			currentPosition.pendingReward
-		);
+		StakingPositions memory currentPosition = getStoragePositions(_tokenId);
+		return currentPosition;
 	}
 
 	function rewards(uint256 _tokenId)
 		external
 		view
 		override
-		returns (
-			uint256 entireReward_,
-			uint256 cumulativeReward_,
-			uint256 withdrawableReward_
-		)
+		returns (Rewards memory)
 	{
 		uint256 withdrawableReward = ILockup(registry().registries("Lockup"))
 			.calculateWithdrawableInterestAmountByPosition(_tokenId);
-		StakingPositionV1 memory currentPosition = getStoragePositionsV1(
-			_tokenId
-		);
+		StakingPositions memory currentPosition = getStoragePositions(_tokenId);
 		uint256 cumulativeReward = currentPosition.cumulativeReward;
 		uint256 entireReward = cumulativeReward.add(withdrawableReward);
 
-		return (entireReward, cumulativeReward, withdrawableReward);
+		return Rewards(entireReward, cumulativeReward, withdrawableReward);
 	}
 
 	function positionsOfProperty(address _property)
@@ -165,30 +147,30 @@ contract STokensManager is
 		return tokenIds;
 	}
 
-	function getStoragePositionsV1(uint256 _tokenId)
+	function getStoragePositions(uint256 _tokenId)
 		private
 		view
-		returns (StakingPositionV1 memory)
+		returns (StakingPositions memory)
 	{
-		bytes32 key = getStoragePositionsV1Key(_tokenId);
+		bytes32 key = getStoragePositionsKey(_tokenId);
 		bytes memory tmp = bytesStorage[key];
-		return abi.decode(tmp, (StakingPositionV1));
+		return abi.decode(tmp, (StakingPositions));
 	}
 
-	function setStoragePositionsV1(
+	function setStoragePositions(
 		uint256 _tokenId,
-		StakingPositionV1 memory _position
+		StakingPositions memory _position
 	) private {
-		bytes32 key = getStoragePositionsV1Key(_tokenId);
+		bytes32 key = getStoragePositionsKey(_tokenId);
 		bytes memory tmp = abi.encode(_position);
 		bytesStorage[key] = tmp;
 	}
 
-	function getStoragePositionsV1Key(uint256 _tokenId)
+	function getStoragePositionsKey(uint256 _tokenId)
 		private
 		pure
 		returns (bytes32)
 	{
-		return keccak256(abi.encodePacked("_positionsV1", _tokenId));
+		return keccak256(abi.encodePacked("_positions", _tokenId));
 	}
 }

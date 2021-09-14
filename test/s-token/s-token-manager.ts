@@ -215,29 +215,27 @@ contract('STokensManager', ([deployer, user]) => {
 				await forwardBlockTimestamp(2)
 				const latestTokenId = 1
 				const beforePosition = await dev.sTokensManager.positions(latestTokenId)
-				// Console.log(beforePosition)
-				expect(beforePosition[0]).to.equal(property.address)
-				expect(beforePosition[1].toNumber()).to.equal(10000)
-				expect(beforePosition[2].toNumber()).to.equal(0)
-				expect(beforePosition[3].toNumber()).to.equal(0)
-				expect(beforePosition[4].toNumber()).to.equal(0)
+				expect(beforePosition.property).to.equal(property.address)
+				expect(beforePosition.amount.toNumber()).to.equal(10000)
+				expect(beforePosition.price.toNumber()).to.equal(0)
+				expect(beforePosition.cumulativeReward.toNumber()).to.equal(0)
+				expect(beforePosition.pendingReward.toNumber()).to.equal(0)
 				await dev.lockup.depositToPosition(latestTokenId, '10000')
 				const t2 = await getBlockTimestamp()
 				const afterPosition = await dev.sTokensManager.positions(latestTokenId)
-				// Console.log(afterPosition)
-				expect(afterPosition[0]).to.equal(property.address)
-				expect(afterPosition[1].toNumber()).to.equal(20000)
-				expect(afterPosition[2].toString()).to.equal(
+				expect(afterPosition.property).to.equal(property.address)
+				expect(afterPosition.amount.toNumber()).to.equal(20000)
+				expect(afterPosition.price.toString()).to.equal(
 					toBigNumber('1000000000000000000000000000000000')
 						.times(t2 - t1)
 						.toFixed()
 				)
-				expect(afterPosition[3].toString()).to.equal(
+				expect(afterPosition.cumulativeReward.toString()).to.equal(
 					toBigNumber('10000000000000000000')
 						.times(t2 - t1)
 						.toFixed()
 				)
-				expect(afterPosition[4].toString()).to.equal(
+				expect(afterPosition.pendingReward.toString()).to.equal(
 					toBigNumber('10000000000000000000')
 						.times(t2 - t1)
 						.toFixed()
@@ -295,11 +293,11 @@ contract('STokensManager', ([deployer, user]) => {
 				const [dev, property] = await init()
 				await dev.lockup.depositToProperty(property.address, '10000')
 				const position = await dev.sTokensManager.positions(1)
-				expect(position[0]).to.equal(property.address)
-				expect(position[1].toNumber()).to.equal(10000)
-				expect(position[2].toNumber()).to.equal(0)
-				expect(position[3].toNumber()).to.equal(0)
-				expect(position[4].toNumber()).to.equal(0)
+				expect(position.property).to.equal(property.address)
+				expect(position.amount.toNumber()).to.equal(10000)
+				expect(position.price.toNumber()).to.equal(0)
+				expect(position.cumulativeReward.toNumber()).to.equal(0)
+				expect(position.pendingReward.toNumber()).to.equal(0)
 			})
 		})
 		describe('fail', () => {
@@ -321,13 +319,15 @@ contract('STokensManager', ([deployer, user]) => {
 				await forwardBlockTimestamp(1)
 				const position = await dev.sTokensManager.rewards(1)
 				const t2 = await getBlockTimestamp()
-				expect(position[0].toString()).to.equal(
+				expect(position.entireReward.toString()).to.equal(
 					toBigNumber('10000000000000000000')
 						.times(t2 - t1)
 						.toFixed()
 				)
-				expect(position[1].toString()).to.equal('0')
-				expect(position[2].toString()).to.equal('10000000000000000000')
+				expect(position.cumulativeReward.toString()).to.equal('0')
+				expect(position.withdrawableReward.toString()).to.equal(
+					'10000000000000000000'
+				)
 			})
 			it('get updated reward', async () => {
 				const [dev, property] = await init()
@@ -339,17 +339,17 @@ contract('STokensManager', ([deployer, user]) => {
 				await forwardBlockTimestamp(2)
 				const position = await dev.sTokensManager.rewards(1)
 				const t3 = await getBlockTimestamp()
-				expect(position[0].toString()).to.equal(
-					toBigNumber(position[1].toString())
-						.plus(position[2].toString())
+				expect(position.entireReward.toString()).to.equal(
+					toBigNumber(position.cumulativeReward.toString())
+						.plus(position.withdrawableReward.toString())
 						.toFixed()
 				)
-				expect(position[1].toString()).to.equal(
+				expect(position.cumulativeReward.toString()).to.equal(
 					toBigNumber('10000000000000000000')
 						.times(t2 - t1)
 						.toFixed()
 				)
-				expect(position[2].toString()).to.equal(
+				expect(position.withdrawableReward.toString()).to.equal(
 					toBigNumber('10000000000000000000')
 						.times(t3 - t2)
 						.toFixed()
