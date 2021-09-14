@@ -51,17 +51,6 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		uint256 interest;
 		uint256 holdersCap;
 	}
-	event Lockedup(
-		address indexed _from,
-		address indexed _property,
-		uint256 _value
-	);
-	event Withdrew(
-		address indexed _from,
-		address indexed _property,
-		uint256 _value,
-		uint256 _reward
-	);
 	event UpdateCap(uint256 _cap);
 
 	uint256 public override cap; // From [get/set]StorageCap
@@ -167,7 +156,7 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		uint256 tokenId = ISTokensManager(
 			registry().registries("STokensManager")
 		).mint(msg.sender, _property, _amount, interest);
-		emit Lockedup(msg.sender, _property, _amount);
+		emit Lockedup(msg.sender, _property, _amount, tokenId);
 		return tokenId;
 	}
 
@@ -193,13 +182,8 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		/**
 		 * get position information
 		 */
-		(
-			address property,
-			uint256 amount,
-			uint256 price,
-			uint256 cumulativeReward,
-			uint256 pendingReward
-		) = sTokensManagerInstance.positions(_tokenId);
+		ISTokensManager.StakingPositions
+			memory positions = sTokensManagerInstance.positions(_tokenId);
 		/**
 		 * Gets the withdrawable amount.
 		 */
@@ -207,22 +191,22 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 			uint256 withdrawable,
 			RewardPrices memory prices
 		) = _calculateWithdrawableInterestAmount(
-				property,
-				amount,
-				price,
-				pendingReward
+				positions.property,
+				positions.amount,
+				positions.price,
+				positions.pendingReward
 			);
 		/**
 		 * Saves variables that should change due to the addition of staking.
 		 */
-		updateValues(true, property, _amount, prices);
+		updateValues(true, positions.property, _amount, prices);
 		/**
 		 * transfer dev tokens
 		 */
 		require(
 			IERC20(registry().registries("Dev")).transferFrom(
 				msg.sender,
-				property,
+				positions.property,
 				_amount
 			),
 			"dev transfer failed"
@@ -232,16 +216,16 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		 */
 		bool result = sTokensManagerInstance.update(
 			_tokenId,
-			amount.add(_amount),
+			positions.amount.add(_amount),
 			prices.interest,
-			cumulativeReward.add(withdrawable),
-			pendingReward.add(withdrawable)
+			positions.cumulativeReward.add(withdrawable),
+			positions.pendingReward.add(withdrawable)
 		);
 		require(result, "failed to update");
 		/**
 		 * generate events
 		 */
-		emit Lockedup(msg.sender, property, _amount);
+		emit Lockedup(msg.sender, positions.property, _amount, _tokenId);
 		return true;
 	}
 
@@ -261,46 +245,41 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		/**
 		 * get position information
 		 */
-		(
-			address property,
-			uint256 amount,
-			uint256 price,
-			uint256 cumulativeReward,
-			uint256 pendingReward
-		) = sTokensManagerInstance.positions(_tokenId);
+		ISTokensManager.StakingPositions
+			memory positions = sTokensManagerInstance.positions(_tokenId);
 		/**
 		 * If the balance of the withdrawal request is bigger than the balance you are staking
 		 */
-		require(amount >= _amount, "insufficient tokens staked");
+		require(positions.amount >= _amount, "insufficient tokens staked");
 		/**
 		 * Withdraws the staking reward
 		 */
 		(uint256 value, RewardPrices memory prices) = _withdrawInterest(
-			property,
-			amount,
-			price,
-			pendingReward
+			positions.property,
+			positions.amount,
+			positions.price,
+			positions.pendingReward
 		);
 		/**
 		 * Transfer the staked amount to the sender.
 		 */
 		if (_amount != 0) {
-			IProperty(property).withdraw(msg.sender, _amount);
+			IProperty(positions.property).withdraw(msg.sender, _amount);
 		}
 		/**
 		 * Saves variables that should change due to the canceling staking..
 		 */
-		updateValues(false, property, _amount, prices);
-		uint256 cumulative = cumulativeReward.add(value);
+		updateValues(false, positions.property, _amount, prices);
+		uint256 cumulative = positions.cumulativeReward.add(value);
 
-		emit Withdrew(msg.sender, property, _amount, value);
+		emit Withdrew(msg.sender, positions.property, _amount, value, _tokenId);
 		/**
 		 * update position information
 		 */
 		return
 			sTokensManagerInstance.update(
 				_tokenId,
-				amount.sub(_amount),
+				positions.amount.sub(_amount),
 				prices.interest,
 				cumulative,
 				0
@@ -652,18 +631,13 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		ISTokensManager sTokensManagerInstance = ISTokensManager(
 			registry().registries("STokensManager")
 		);
-		(
-			address property,
-			uint256 amount,
-			uint256 price,
-			,
-			uint256 pendingReward
-		) = sTokensManagerInstance.positions(_tokenId);
+		ISTokensManager.StakingPositions
+			memory positions = sTokensManagerInstance.positions(_tokenId);
 		(uint256 result, ) = _calculateWithdrawableInterestAmount(
-			property,
-			amount,
-			price,
-			pendingReward
+			positions.property,
+			positions.amount,
+			positions.price,
+			positions.pendingReward
 		);
 		return result;
 	}
