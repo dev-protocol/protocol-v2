@@ -93,7 +93,7 @@ contract(
 		})
 		describe('Market; name', () => {
 			const dev = new DevProtocolInstance(deployer)
-			it('Get Schema of mapped Behavior Contract', async () => {
+			it('Get name Behavior Contract', async () => {
 				await dev.generateAddressRegistry()
 				await Promise.all([dev.generatePolicyFactory()])
 				await dev.addressRegistry.setRegistry('MarketFactory', marketFactory)
@@ -106,6 +106,23 @@ contract(
 					{ from: marketFactory }
 				)
 				expect(await market.name()).to.be.equal('MarketTest1')
+			})
+		})
+		describe.only('Market; associatedMarket', () => {
+			const dev = new DevProtocolInstance(deployer)
+			it('Get associatedMarket Behavior Contract', async () => {
+				await dev.generateAddressRegistry()
+				await dev.generatePolicyFactory()
+				await dev.generateLockup()
+				await dev.generateMarketFactory()
+				await dev.generateMetricsFactory()
+				await dev.generatePolicy('PolicyTest1')
+				const behavior = await dev.getMarket('MarketTest3', user)
+				const createMarketResult = await dev.marketFactory.create(
+					behavior.address
+				)
+				const marketAddress = getMarketAddress(createMarketResult)
+				expect(await behavior.associatedMarket()).to.be.equal(marketAddress)
 			})
 		})
 		describe('Market; authenticate, authenticatedCallback', () => {

@@ -7,7 +7,7 @@ import {
 	MarketFactoryTestInstance,
 	MetricsFactoryTestInstance,
 	IPolicyInstance,
-	IMarketInstance,
+	IMarketBehaviorInstance,
 	WithdrawTestInstance,
 	MetricsInstance,
 	TreasuryTestInstance,
@@ -266,7 +266,7 @@ export class DevProtocolInstance {
 	public async getMarket(
 		contractName: string,
 		user: string
-	): Promise<IMarketInstance> {
+	): Promise<IMarketBehaviorInstance> {
 		const tmp = await contract(contractName).new(this.addressRegistry.address, {
 			from: user,
 		})
