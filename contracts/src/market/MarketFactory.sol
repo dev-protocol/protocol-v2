@@ -5,6 +5,7 @@ import {InitializableUsingRegistry} from "contracts/src/common/registry/Initiali
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {Market} from "contracts/src/market/Market.sol";
 import {IMarket} from "contracts/interface/IMarket.sol";
+import {IMarketBehavior} from "contracts/interface/IMarketBehavior.sol";
 import {IMarketFactory} from "contracts/interface/IMarketFactory.sol";
 import {SafeMath} from "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
@@ -49,6 +50,11 @@ contract MarketFactory is
 		 */
 		address marketAddr = address(market);
 		isPotentialMarket[marketAddr] = true;
+
+		/**
+		 * set associated market address to behavior
+		 */
+		IMarketBehavior(_addr).setAssociatedMarket(marketAddr);
 
 		/**
 		 * For the first Market contract, it will be activated immediately.

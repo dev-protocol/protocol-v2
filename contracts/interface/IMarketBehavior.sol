@@ -6,9 +6,12 @@ interface IMarketBehavior {
 	function authenticate(
 		address _prop,
 		string[] memory _args,
-		address market,
 		address account
 	) external returns (bool);
+
+	function setAssociatedMarket(address _market) external;
+
+	function associatedMarket() external view returns (address);
 
 	function name() external view returns (string memory);
 

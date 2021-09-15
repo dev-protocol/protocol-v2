@@ -133,14 +133,8 @@ contract(
 					behavior1.address
 				)
 				marketAddress1 = getMarketAddress(createMarketResult)
-				await (behavior1 as any).setAssociatedMarket(marketAddress1, {
-					from: user,
-				})
 				createMarketResult = await dev.marketFactory.create(behavior2.address)
 				marketAddress2 = getMarketAddress(createMarketResult)
-				await (behavior2 as any).setAssociatedMarket(marketAddress2, {
-					from: user,
-				})
 				const createPropertyResult = await dev.propertyFactory.create(
 					'test',
 					'TEST',
@@ -332,14 +326,8 @@ contract(
 					behavior1.address
 				)
 				marketAddress1 = getMarketAddress(createMarketResult)
-				await (behavior1 as any).setAssociatedMarket(marketAddress1, {
-					from: user,
-				})
 				createMarketResult = await dev.marketFactory.create(behavior2.address)
 				marketAddress2 = getMarketAddress(createMarketResult)
-				await (behavior2 as any).setAssociatedMarket(marketAddress2, {
-					from: user,
-				})
 				const createPropertyResult = await dev.propertyFactory.create(
 					'test',
 					'TEST',
