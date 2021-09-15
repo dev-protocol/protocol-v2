@@ -1,4 +1,5 @@
 build
+types
 contracts/modules
 *.js
 !truffle-config.js
