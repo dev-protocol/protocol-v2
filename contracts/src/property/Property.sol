@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MPL-2.0
-pragma solidity =0.8.6;
+pragma solidity =0.8.7;
 
 import {SafeMath} from "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";

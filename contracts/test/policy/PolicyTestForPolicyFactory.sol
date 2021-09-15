@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MPL-2.0
-pragma solidity =0.8.6;
+pragma solidity =0.8.7;
 
 import {PolicyTestBase} from "contracts/test/policy/PolicyTestBase.sol";
 
 contract PolicyTestForPolicyFactory is PolicyTestBase {
-	function policyVotingSeconds() external view override returns (uint256) {
+	function policyVotingSeconds() external pure override returns (uint256) {
 		return 10;
 	}
 }

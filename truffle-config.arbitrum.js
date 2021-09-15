@@ -9,7 +9,7 @@ module.exports = {
 	contracts_build_directory: './build/arbitrum-contracts',
 	compilers: {
 		solc: {
-			version: '0.8.6',
+			version: '0.8.7',
 			settings: {
 				optimizer: {
 					enabled: true,
