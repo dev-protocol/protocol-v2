@@ -4,7 +4,7 @@
 	"description": "Securitize for Internet assets",
 	"scripts": {
 		"test": "yarn test:arb",
-		"generate": "yarn compile && typechain --target truffle './build/**/*.json'",
+		"generate": "yarn compile && typechain --target truffle-v5 './build/**/*.json'",
 		"deploy": "truffle migrate --network",
 		"predeploy": "yarn build",
 		"lint": "yarn lint:eslint && yarn lint:solhint && yarn lint:format",
@@ -27,6 +27,7 @@
 	"devDependencies": {
 		"@devprotocol/util-ts": "2.2.1",
 		"@truffle/hdwallet-provider": "1.5.0",
+		"@typechain/truffle-v5": "^5.1.0",
 		"@types/bent": "7.3.2",
 		"@types/dotenv": "8.2.0",
 		"@types/node": "14.17.16",
@@ -51,7 +52,6 @@
 		"ts-generator": "0.1.1",
 		"ts-node": "10.2.1",
 		"typechain": "5.1.2",
-		"typechain-target-truffle": "1.0.2",
 		"typescript": "4.4.3",
 		"web3": "1.5.2"
 	},

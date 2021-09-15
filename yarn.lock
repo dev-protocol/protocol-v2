@@ -2607,6 +2607,13 @@
   dependencies:
     ethers "^5.0.2"
 
+"@typechain/truffle-v5@^5.1.0":
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/@typechain/truffle-v5/-/truffle-v5-5.1.0.tgz#fa7f4b66a1074b3af3034941abe3776d9561d373"
+  integrity sha512-Q+MHDK3L8ney3xvh1JxAzVDS9emeeQI9ozBc+KhZzgzBNZBf7MPyab0oJqX1AVH6ycMGJxe2q8OUyx1HT/7aaQ==
+  dependencies:
+    lodash "^4.17.15"
+
 "@types/accepts@*", "@types/accepts@^1.3.5":
   version "1.3.5"
   resolved "https://registry.yarnpkg.com/@types/accepts/-/accepts-1.3.5.tgz#c34bec115cfc746e04fe5a059df4ce7e7b391575"
@@ -14461,13 +14468,6 @@ type@^2.0.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/type/-/type-2.1.0.tgz#9bdc22c648cf8cf86dd23d32336a41cfb6475e3f"
   integrity sha512-G9absDWvhAWCV2gmF1zKud3OyC61nZDwWvBL2DApaVFogI07CprggiQAOOjvp2NRjYWFzPyu7vwtDrQFq8jeSA==
-
-typechain-target-truffle@1.0.2:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/typechain-target-truffle/-/typechain-target-truffle-1.0.2.tgz#52ecbd8b7a854960567ad223660d60fcb42eaa17"
-  integrity sha512-XF3Iq2IzR+Pqvx6fcKIKGXNEk3lEcY24vYv9VqoVPfPB6vUM09PRLJCeLm1/ag6Pr2PICKUA0f4Es+YTR3ESKA==
-  dependencies:
-    lodash "^4.17.15"
 
 typechain@5.1.2:
   version "5.1.2"
