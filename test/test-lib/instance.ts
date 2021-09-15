@@ -250,11 +250,12 @@ export class DevProtocolInstance {
 	}
 
 	public async generateTreasury(): Promise<void> {
-		// TODO
-		// proxy
-		this._treasury = await contract('TreasuryTest').new(
-			this.addressRegistry.address
+		const [proxfied] = await deployProxy(
+			contract('TreasuryTest'),
+			this._deployer
 		)
+		await proxfied.initialize(this._addressRegistry.address)
+		this._treasury = proxfied
 		await this.addressRegistry.setRegistry(
 			'Treasury',
 			this._treasury.address,
