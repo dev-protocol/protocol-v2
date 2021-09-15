@@ -108,7 +108,7 @@ contract(
 				expect(await market.name()).to.be.equal('MarketTest1')
 			})
 		})
-		describe.only('Market; associatedMarket', () => {
+		describe('Market; associatedMarket', () => {
 			const dev = new DevProtocolInstance(deployer)
 			it('Get associatedMarket Behavior Contract', async () => {
 				await dev.generateAddressRegistry()

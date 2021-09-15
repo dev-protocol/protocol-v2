@@ -16,6 +16,8 @@ contract('MarketFactoryTest', ([deployer, user, dummyMarketAddress]) => {
 		await Promise.all([
 			dev.generatePolicyFactory(),
 			dev.generateMarketFactory(),
+			dev.generateLockup(),
+			dev.generateMetricsFactory(),
 		])
 		const policy = await dev.getPolicy('PolicyTest1', user)
 		await dev.policyFactory.create(policy.address, { from: user })
@@ -146,7 +148,8 @@ contract('MarketFactoryTest', ([deployer, user, dummyMarketAddress]) => {
 		})
 		it('Should be increased the number when a new Market is enabled', async () => {
 			const [dev] = await init()
-			const created = await dev.marketFactory.create(dummyMarketAddress)
+			const behavior = await dev.getMarket('MarketTest3', user)
+			const created = await dev.marketFactory.create(behavior.address)
 			const secoundMarketAddress = getMarketAddress(created)
 			await dev.marketFactory.enable(secoundMarketAddress)
 			const result = await dev.marketFactory.marketsCount()
