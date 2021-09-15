@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MPL-2.0
-pragma solidity =0.8.6;
+pragma solidity =0.8.7;
 
 import {PolicyTestBase} from "contracts/test/policy/PolicyTestBase.sol";
 
 contract PolicyTestForAllocator is PolicyTestBase {
 	function rewards(uint256 _lockups, uint256 _assets)
 		external
-		view
+		pure
 		override
 		returns (uint256)
 	{

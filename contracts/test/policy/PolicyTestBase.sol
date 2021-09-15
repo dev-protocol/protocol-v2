@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MPL-2.0
-pragma solidity =0.8.6;
+pragma solidity =0.8.7;
 
 import {SafeMath} from "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import {IPolicy} from "contracts/interface/IPolicy.sol";
@@ -9,8 +9,7 @@ contract PolicyTestBase is IPolicy {
 	address public override treasury;
 	address public override capSetter;
 
-	// solhint-disable-next-line no-unused-vars
-	function rewards(uint256 _lockups, uint256 _assets)
+	function rewards(uint256, uint256)
 		external
 		view
 		virtual
