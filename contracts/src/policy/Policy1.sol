@@ -1,5 +1,3 @@
-/* solhint-disable const-name-snakecase */
-/* solhint-disable var-name-mixedcase */
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity =0.8.7;
 
@@ -17,9 +15,7 @@ contract Policy1 is IPolicy, Ownable, Curve, UsingRegistry {
 	address private treasuryAddress;
 	address private capSetterAddress;
 
-	uint256 private constant basis = 10000000000000000000000000;
-	uint256 private constant power_basis = 10000000000;
-	uint256 private constant mint_per_second_and_aseet = 132000000000000 / 15;
+	uint256 private constant MINT_PER_SECOND_AND_ASSET = 132000000000000 / 15;
 
 	constructor(address _registry) UsingRegistry(_registry) {}
 
@@ -37,7 +33,7 @@ contract Policy1 is IPolicy, Ownable, Curve, UsingRegistry {
 				_lockups,
 				_assets,
 				totalSupply,
-				mint_per_second_and_aseet
+				MINT_PER_SECOND_AND_ASSET
 			);
 	}
 
@@ -51,15 +47,15 @@ contract Policy1 is IPolicy, Ownable, Curve, UsingRegistry {
 		return _lockups > 0 ? (_reward.mul(51)).div(100) : _reward;
 	}
 
-	function authenticationFee(uint256 total_assets, uint256 property_lockups)
+	function authenticationFee(uint256 _assets, uint256 _propertyAssets)
 		external
 		view
 		virtual
 		override
 		returns (uint256)
 	{
-		uint256 a = total_assets.div(10000);
-		uint256 b = property_lockups.div(100000000000000000000000);
+		uint256 a = _assets.div(10000);
+		uint256 b = _propertyAssets.div(100000000000000000000000);
 		if (a <= b) {
 			return 0;
 		}

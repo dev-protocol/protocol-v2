@@ -8,7 +8,6 @@ import {IAddressRegistry} from "contracts/interface/IAddressRegistry.sol";
  * A registry contract to hold the latest contract addresses.
  * Dev Protocol will be upgradeable by this contract.
  */
-/* solhint-disable max-states-count */
 contract AddressRegistry is OwnableUpgradeable, IAddressRegistry {
 	mapping(string => address) private reg;
 
