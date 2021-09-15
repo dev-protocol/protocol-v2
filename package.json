@@ -1,6 +1,6 @@
 {
 	"name": "@devprotocol/protocol-l2",
-	"version": "0.0.2",
+	"version": "0.1.0",
 	"description": "Securitize for Internet assets",
 	"scripts": {
 		"test": "yarn test:arb",
