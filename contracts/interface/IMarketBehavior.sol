@@ -10,6 +10,8 @@ interface IMarketBehavior {
 		address account
 	) external returns (bool);
 
+	function name() external view returns (string memory);
+
 	function schema() external view returns (string memory);
 
 	function getId(address _metrics) external view returns (string memory);
