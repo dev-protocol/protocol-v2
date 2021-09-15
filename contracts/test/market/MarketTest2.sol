@@ -8,7 +8,7 @@ import {IMarket} from "contracts/interface/IMarket.sol";
 
 contract MarketTest2 is Ownable, IMarketBehavior, UsingRegistry {
 	string public override schema = "[]";
-	address private associatedMarket;
+	address public override associatedMarket;
 	mapping(address => string) internal keys;
 	mapping(string => address) private addresses;
 
@@ -21,13 +21,15 @@ contract MarketTest2 is Ownable, IMarketBehavior, UsingRegistry {
 	function authenticate(
 		address _prop,
 		string[] memory _args,
-		address market,
 		address
 	) external override returns (bool) {
 		require(msg.sender == associatedMarket, "Invalid sender");
 
 		bytes32 idHash = keccak256(abi.encodePacked(_args[0]));
-		address _metrics = IMarket(market).authenticatedCallback(_prop, idHash);
+		address _metrics = IMarket(msg.sender).authenticatedCallback(
+			_prop,
+			idHash
+		);
 		keys[_metrics] = _args[0];
 		addresses[_args[0]] = _metrics;
 		return true;
@@ -51,7 +53,9 @@ contract MarketTest2 is Ownable, IMarketBehavior, UsingRegistry {
 		return addresses[_id];
 	}
 
-	function setAssociatedMarket(address _associatedMarket) external onlyOwner {
+	function setAssociatedMarket(address _associatedMarket) external override {
+		address marketFactory = registry().registries("MarketFactory");
+		require(marketFactory == msg.sender, "illegal sender");
 		associatedMarket = _associatedMarket;
 	}
 }

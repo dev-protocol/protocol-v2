@@ -142,13 +142,7 @@ contract Market is UsingRegistry, IMarket {
 		address _author,
 		string[] memory _args
 	) private returns (bool) {
-		return
-			IMarketBehavior(behavior).authenticate(
-				_prop,
-				_args,
-				address(this),
-				_author
-			);
+		return IMarketBehavior(behavior).authenticate(_prop, _args, _author);
 	}
 
 	/**

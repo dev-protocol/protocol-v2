@@ -93,7 +93,7 @@ contract(
 		})
 		describe('Market; name', () => {
 			const dev = new DevProtocolInstance(deployer)
-			it('Get Schema of mapped Behavior Contract', async () => {
+			it('Get name Behavior Contract', async () => {
 				await dev.generateAddressRegistry()
 				await Promise.all([dev.generatePolicyFactory()])
 				await dev.addressRegistry.setRegistry('MarketFactory', marketFactory)
@@ -106,6 +106,23 @@ contract(
 					{ from: marketFactory }
 				)
 				expect(await market.name()).to.be.equal('MarketTest1')
+			})
+		})
+		describe('Market; associatedMarket', () => {
+			const dev = new DevProtocolInstance(deployer)
+			it('Get associatedMarket Behavior Contract', async () => {
+				await dev.generateAddressRegistry()
+				await dev.generatePolicyFactory()
+				await dev.generateLockup()
+				await dev.generateMarketFactory()
+				await dev.generateMetricsFactory()
+				await dev.generatePolicy('PolicyTest1')
+				const behavior = await dev.getMarket('MarketTest3', user)
+				const createMarketResult = await dev.marketFactory.create(
+					behavior.address
+				)
+				const marketAddress = getMarketAddress(createMarketResult)
+				expect(await behavior.associatedMarket()).to.be.equal(marketAddress)
 			})
 		})
 		describe('Market; authenticate, authenticatedCallback', () => {
@@ -133,14 +150,8 @@ contract(
 					behavior1.address
 				)
 				marketAddress1 = getMarketAddress(createMarketResult)
-				await (behavior1 as any).setAssociatedMarket(marketAddress1, {
-					from: user,
-				})
 				createMarketResult = await dev.marketFactory.create(behavior2.address)
 				marketAddress2 = getMarketAddress(createMarketResult)
-				await (behavior2 as any).setAssociatedMarket(marketAddress2, {
-					from: user,
-				})
 				const createPropertyResult = await dev.propertyFactory.create(
 					'test',
 					'TEST',
@@ -332,14 +343,8 @@ contract(
 					behavior1.address
 				)
 				marketAddress1 = getMarketAddress(createMarketResult)
-				await (behavior1 as any).setAssociatedMarket(marketAddress1, {
-					from: user,
-				})
 				createMarketResult = await dev.marketFactory.create(behavior2.address)
 				marketAddress2 = getMarketAddress(createMarketResult)
-				await (behavior2 as any).setAssociatedMarket(marketAddress2, {
-					from: user,
-				})
 				const createPropertyResult = await dev.propertyFactory.create(
 					'test',
 					'TEST',
