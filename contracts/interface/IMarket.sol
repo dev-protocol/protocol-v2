@@ -19,6 +19,8 @@ interface IMarket {
 
 	function deauthenticate(address _metrics) external;
 
+	function name() external view returns (string memory);
+
 	function schema() external view returns (string memory);
 
 	function behavior() external view returns (address);

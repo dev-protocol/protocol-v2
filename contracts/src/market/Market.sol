@@ -257,6 +257,13 @@ contract Market is UsingRegistry, IMarket {
 	}
 
 	/**
+	 * Bypass to IMarketBehavior.name.
+	 */
+	function name() external view override returns (string memory) {
+		return IMarketBehavior(behavior).name();
+	}
+
+	/**
 	 * Bypass to IMarketBehavior.schema.
 	 */
 	function schema() external view override returns (string memory) {

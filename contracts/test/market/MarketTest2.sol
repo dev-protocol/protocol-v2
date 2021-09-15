@@ -14,6 +14,10 @@ contract MarketTest2 is Ownable, IMarketBehavior, UsingRegistry {
 
 	constructor(address _registry) UsingRegistry(_registry) {}
 
+	function name() external pure override returns (string memory) {
+		return "MarketTest2";
+	}
+
 	function authenticate(
 		address _prop,
 		string[] memory _args,
