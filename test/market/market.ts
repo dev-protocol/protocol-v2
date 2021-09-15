@@ -117,6 +117,9 @@ contract(
 				await dev.generateMarketFactory()
 				await dev.generateMetricsFactory()
 				await dev.generatePolicy('PolicyTest1')
+				await dev.generateTreasury()
+				await dev.setCapSetter()
+				await dev.updateCap()
 				const behavior = await dev.getMarket('MarketTest3', user)
 				const createMarketResult = await dev.marketFactory.create(
 					behavior.address
@@ -146,6 +149,9 @@ contract(
 				const behavior1 = await dev.getMarket('MarketTest3', user)
 				const behavior2 = await dev.getMarket('MarketTest3', user)
 				await dev.generatePolicy('PolicyTest1')
+				await dev.generateTreasury()
+				await dev.setCapSetter()
+				await dev.updateCap()
 				let createMarketResult = await dev.marketFactory.create(
 					behavior1.address
 				)
@@ -339,6 +345,9 @@ contract(
 				const behavior1 = await dev.getMarket('MarketTest3', user)
 				const behavior2 = await dev.getMarket('MarketTest3', user)
 				await dev.generatePolicy('PolicyTest1')
+				await dev.generateTreasury()
+				await dev.setCapSetter()
+				await dev.updateCap()
 				let createMarketResult = await dev.marketFactory.create(
 					behavior1.address
 				)

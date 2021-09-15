@@ -18,6 +18,9 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 				dev.generateLockup(),
 			])
 			await dev.generatePolicy()
+			await dev.generateTreasury()
+			await dev.setCapSetter()
+			await dev.updateCap()
 			await dev.addressRegistry.setRegistry('MarketFactory', marketFactory)
 			const propertyAddress = await dev.propertyFactory
 				.create('sample', 'SAMPLE', user, {
@@ -73,6 +76,9 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 				dev.generateWithdraw(),
 			])
 			await dev.generatePolicy('PolicyTest1')
+			await dev.generateTreasury()
+			await dev.setCapSetter()
+			await dev.updateCap()
 			const market = await dev.getMarket('MarketTest1', user)
 			marketAddress = await dev.marketFactory
 				.create(market.address, {

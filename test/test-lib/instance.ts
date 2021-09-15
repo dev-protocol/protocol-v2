@@ -245,9 +245,13 @@ export class DevProtocolInstance {
 		policyContractName = 'PolicyTestBase'
 	): Promise<string> {
 		const policy = await contract(policyContractName).new()
+		await this._policyFactory.create(policy.address)
+		return policy.address
+	}
+
+	public async generateTreasury(): Promise<void> {
 		// TODO
-		// 別関数にする
-		// proxyにする
+		// proxy
 		this._treasury = await contract('TreasuryTest').new(
 			this.addressRegistry.address
 		)
@@ -256,16 +260,18 @@ export class DevProtocolInstance {
 			this._treasury.address,
 			this.fromDeployer
 		)
-		await this._policyFactory.create(policy.address)
-		// TODO
-		// 別関数にする
+	}
+
+	public async setCapSetter(_capSetter = ''): Promise<void> {
+		if (_capSetter === '') {
+			_capSetter = this._deployer
+		}
+
 		await this.addressRegistry.setRegistry(
 			'CapSetter',
 			this._deployer,
 			this.fromDeployer
 		)
-		await this.updateCap()
-		return policy.address
 	}
 
 	public async getPolicy(

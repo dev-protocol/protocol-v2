@@ -23,6 +23,9 @@ contract(
 				await dev.generateLockup()
 				await dev.generateMetricsFactory()
 				await dev.generatePolicy()
+				await dev.generateTreasury()
+				await dev.setCapSetter()
+				await dev.updateCap()
 			})
 			it('Cannot be created from other than factory', async () => {
 				const result = await propertyContract
@@ -79,6 +82,9 @@ contract(
 				await dev.generateLockup()
 				await dev.generateMetricsFactory()
 				await dev.generatePolicy()
+				await dev.generateTreasury()
+				await dev.setCapSetter()
+				await dev.updateCap()
 			})
 			it('Executing a changeAuthor function with a non-Author.', async () => {
 				await dev.addressRegistry.setRegistry(
@@ -148,6 +154,9 @@ contract(
 				await dev.generatePolicyFactory()
 				await dev.generateMetricsFactory()
 				await dev.generatePolicy()
+				await dev.generateTreasury()
+				await dev.setCapSetter()
+				await dev.updateCap()
 			})
 			it('Should fail to call when the sender is not author', async () => {
 				await dev.addressRegistry.setRegistry(
@@ -217,6 +226,9 @@ contract(
 				await dev.generatePolicyFactory()
 				await dev.generateMetricsFactory()
 				await dev.generatePolicy()
+				await dev.generateTreasury()
+				await dev.setCapSetter()
+				await dev.updateCap()
 			})
 			it('Should fail to call when the sender is not author', async () => {
 				await dev.addressRegistry.setRegistry(
@@ -290,6 +302,9 @@ contract(
 					dev.generateMetricsFactory(),
 				])
 				await dev.generatePolicy()
+				await dev.generateTreasury()
+				await dev.setCapSetter()
+				await dev.updateCap()
 				const result = await dev.propertyFactory.create(
 					'sample',
 					'SAMPLE',
@@ -338,6 +353,9 @@ contract(
 					dev.generateMetricsFactory(),
 				])
 				await dev.generatePolicy('PolicyTestForProperty')
+				await dev.generateTreasury()
+				await dev.setCapSetter()
+				await dev.updateCap()
 				const result = await dev.propertyFactory.create(
 					'sample',
 					'SAMPLE',
@@ -385,6 +403,9 @@ contract(
 					dev.generateMetricsFactory(),
 				])
 				await dev.generatePolicy('PolicyTestForProperty')
+				await dev.generateTreasury()
+				await dev.setCapSetter()
+				await dev.updateCap()
 				const result = await dev.propertyFactory.create(
 					'sample',
 					'SAMPLE',
