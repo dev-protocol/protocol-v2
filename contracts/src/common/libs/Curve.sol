@@ -1,4 +1,3 @@
-/* solhint-disable const-name-snakecase */
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity =0.8.7;
 
@@ -6,8 +5,8 @@ import {SafeMath} from "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 contract Curve {
 	using SafeMath for uint256;
-	uint256 private constant basis = 10000000000000000000000000;
-	uint256 private constant power_basis = 10000000000;
+	uint256 private constant BASIS = 10000000000000000000000000;
+	uint256 private constant POWER_BASIS = 10000000000;
 
 	/**
 	 * @dev From the passed variables, calculate the amount of reward reduced along the curve.
@@ -24,28 +23,28 @@ contract Curve {
 		uint256 _mintPerBlockAndAseet
 	) internal pure returns (uint256) {
 		uint256 t = _totalSupply;
-		uint256 s = (_lockups.mul(basis)).div(t);
-		uint256 assets = _assets.mul(basis.sub(s));
+		uint256 s = (_lockups.mul(BASIS)).div(t);
+		uint256 assets = _assets.mul(BASIS.sub(s));
 		uint256 max = assets.mul(_mintPerBlockAndAseet);
-		uint256 _d = basis.sub(s);
+		uint256 _d = BASIS.sub(s);
 		uint256 _p = (
-			(power_basis.mul(12)).sub(s.div((basis.div((power_basis.mul(10))))))
+			(POWER_BASIS.mul(12)).sub(s.div((BASIS.div((POWER_BASIS.mul(10))))))
 		).div(2);
-		uint256 p = _p.div(power_basis);
+		uint256 p = _p.div(POWER_BASIS);
 		uint256 rp = p.add(1);
-		uint256 f = _p.sub(p.mul(power_basis));
+		uint256 f = _p.sub(p.mul(POWER_BASIS));
 		uint256 d1 = _d;
 		uint256 d2 = _d;
 		for (uint256 i = 0; i < p; i++) {
-			d1 = (d1.mul(_d)).div(basis);
+			d1 = (d1.mul(_d)).div(BASIS);
 		}
 		for (uint256 i = 0; i < rp; i++) {
-			d2 = (d2.mul(_d)).div(basis);
+			d2 = (d2.mul(_d)).div(BASIS);
 		}
-		uint256 g = ((d1.sub(d2)).mul(f)).div(power_basis);
+		uint256 g = ((d1.sub(d2)).mul(f)).div(POWER_BASIS);
 		uint256 d = d1.sub(g);
 		uint256 mint = max.mul(d);
-		mint = mint.div(basis).div(basis);
+		mint = mint.div(BASIS).div(BASIS);
 		return mint;
 	}
 }
