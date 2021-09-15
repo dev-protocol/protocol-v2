@@ -34,6 +34,9 @@ contract('STokensManager', ([deployer, user]) => {
 		await dev.dev.mint(deployer, deployerBalance)
 		await dev.dev.approve(dev.lockup.address, '100000')
 		await dev.generatePolicy('PolicyTestBase')
+		await dev.generateTreasury()
+		await dev.setCapSetter()
+		await dev.updateCap()
 		const propertyAddress = getPropertyAddress(
 			await dev.propertyFactory.create('test', 'TEST', user, {
 				from: user,

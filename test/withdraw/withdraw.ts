@@ -13,10 +13,6 @@ import {
 	forwardBlockTimestamp,
 	getBlockTimestamp,
 } from '../test-lib/utils/common'
-import {
-	getWithdrawHolderAmount,
-	getWithdrawHolderSplitAmount,
-} from '../test-lib/utils/mint-amount'
 import { getPropertyAddress, getMarketAddress } from '../test-lib/utils/log'
 import { SHARE_OF_TREASURY } from '../test-lib/const'
 import { getEventValue } from '../test-lib/utils/event'
@@ -53,6 +49,9 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 		await dev.dev.mint(user3, new BigNumber(1e18).times(10000000))
 
 		const policyAddress = await dev.generatePolicy('PolicyTestForWithdraw')
+		await dev.generateTreasury()
+		await dev.setCapSetter()
+		await dev.updateCap()
 		// eslint-disable-next-line @typescript-eslint/await-thenable
 		const policy = await artifacts
 			.require('PolicyTestForWithdraw')

@@ -12,8 +12,6 @@ contract Policy1 is IPolicy, Ownable, Curve, UsingRegistry {
 	using SafeMath for uint256;
 	uint256 public override marketVotingSeconds = 86400 * 5;
 	uint256 public override policyVotingSeconds = 86400 * 5;
-	address private treasuryAddress;
-	address private capSetterAddress;
 
 	uint256 private constant MINT_PER_SECOND_AND_ASSET = 132000000000000 / 15;
 
@@ -69,21 +67,5 @@ contract Policy1 is IPolicy, Ownable, Curve, UsingRegistry {
 		returns (uint256)
 	{
 		return _supply.div(100).mul(5);
-	}
-
-	function treasury() external view override returns (address) {
-		return treasuryAddress;
-	}
-
-	function setTreasury(address _treasury) external onlyOwner {
-		treasuryAddress = _treasury;
-	}
-
-	function capSetter() external view virtual override returns (address) {
-		return capSetterAddress;
-	}
-
-	function setCapSetter(address _setter) external onlyOwner {
-		capSetterAddress = _setter;
 	}
 }

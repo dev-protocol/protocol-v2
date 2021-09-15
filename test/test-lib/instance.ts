@@ -245,14 +245,33 @@ export class DevProtocolInstance {
 		policyContractName = 'PolicyTestBase'
 	): Promise<string> {
 		const policy = await contract(policyContractName).new()
+		await this._policyFactory.create(policy.address)
+		return policy.address
+	}
+
+	public async generateTreasury(): Promise<void> {
+		// TODO
+		// proxy
 		this._treasury = await contract('TreasuryTest').new(
 			this.addressRegistry.address
 		)
-		await policy.setTreasury(this._treasury.address)
-		await this._policyFactory.create(policy.address)
-		await policy.setCapSetter(this._deployer)
-		await this.updateCap()
-		return policy.address
+		await this.addressRegistry.setRegistry(
+			'Treasury',
+			this._treasury.address,
+			this.fromDeployer
+		)
+	}
+
+	public async setCapSetter(_capSetter = ''): Promise<void> {
+		if (_capSetter === '') {
+			_capSetter = this._deployer
+		}
+
+		await this.addressRegistry.setRegistry(
+			'CapSetter',
+			this._deployer,
+			this.fromDeployer
+		)
 	}
 
 	public async getPolicy(

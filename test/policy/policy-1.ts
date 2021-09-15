@@ -1,11 +1,9 @@
 import { Policy1Instance } from '../../types/truffle-contracts'
 import { DevProtocolInstance } from '../test-lib/instance'
 import { toBigNumber } from '../test-lib/utils/common'
-import { DEFAULT_ADDRESS } from '../test-lib/const'
 import BigNumber from 'bignumber.js'
-import { validateNotOwnerErrorMessage } from '../test-lib/utils/error'
 
-contract('Policy1', ([deployer, treasury, capSetter, user]) => {
+contract('Policy1', ([deployer]) => {
 	let policy: Policy1Instance
 	let dev: DevProtocolInstance
 
@@ -198,50 +196,6 @@ contract('Policy1', ([deployer, treasury, capSetter, user]) => {
 		it('Return 0 when 0 is specified', async () => {
 			const result = await policy.shareOfTreasury(0)
 			expect(result.toString()).to.be.equal('0')
-		})
-	})
-	describe('Policy1; treasury', () => {
-		it('returns the treasury address.', async () => {
-			await policy.setTreasury(treasury)
-			const result = await policy.treasury()
-			expect(result).to.be.equal(treasury)
-		})
-		it('the default value is 0 address.', async () => {
-			const tmp = await artifacts
-				.require('Policy1')
-				.new(dev.addressRegistry.address)
-			const result = await tmp.treasury()
-			expect(result).to.be.equal(DEFAULT_ADDRESS)
-		})
-		it('No one but the owner can set the address.', async () => {
-			const result = await policy
-				.setTreasury(treasury, {
-					from: user,
-				})
-				.catch((err: Error) => err)
-			validateNotOwnerErrorMessage(result)
-		})
-	})
-	describe('Policy1; capSetter', () => {
-		it('returns the setter address.', async () => {
-			await policy.setCapSetter(capSetter)
-			const result = await policy.capSetter()
-			expect(result).to.be.equal(capSetter)
-		})
-		it('the default value is 0 address.', async () => {
-			const tmp = await artifacts
-				.require('Policy1')
-				.new(dev.addressRegistry.address)
-			const result = await tmp.capSetter()
-			expect(result).to.be.equal(DEFAULT_ADDRESS)
-		})
-		it('No one but the owner can set the address.', async () => {
-			const result = await policy
-				.setCapSetter(capSetter, {
-					from: user,
-				})
-				.catch((err: Error) => err)
-			validateNotOwnerErrorMessage(result)
 		})
 	})
 })

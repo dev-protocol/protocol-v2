@@ -6,8 +6,6 @@ import {IPolicy} from "contracts/interface/IPolicy.sol";
 
 contract PolicyTestBase is IPolicy {
 	using SafeMath for uint256;
-	address public override treasury;
-	address public override capSetter;
 
 	function rewards(uint256, uint256)
 		external
@@ -67,13 +65,5 @@ contract PolicyTestBase is IPolicy {
 		returns (uint256)
 	{
 		return _supply.div(100).mul(5);
-	}
-
-	function setTreasury(address _treasury) external {
-		treasury = _treasury;
-	}
-
-	function setCapSetter(address _capSetter) external {
-		capSetter = _capSetter;
 	}
 }

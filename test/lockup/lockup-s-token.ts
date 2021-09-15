@@ -29,6 +29,9 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 		])
 		await dev.dev.mint(deployer, deployerBalance)
 		await dev.generatePolicy('PolicyTestBase')
+		await dev.generateTreasury()
+		await dev.setCapSetter()
+		await dev.updateCap()
 		const propertyAddress = getPropertyAddress(
 			await dev.propertyFactory.create('test', 'TEST', user2, {
 				from: user2,
