@@ -13,10 +13,6 @@ import {
 	forwardBlockTimestamp,
 	getBlockTimestamp,
 } from '../test-lib/utils/common'
-import {
-	getWithdrawHolderAmount,
-	getWithdrawHolderSplitAmount,
-} from '../test-lib/utils/mint-amount'
 import { getPropertyAddress, getMarketAddress } from '../test-lib/utils/log'
 import { SHARE_OF_TREASURY } from '../test-lib/const'
 import { getEventValue } from '../test-lib/utils/event'

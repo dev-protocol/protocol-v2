@@ -282,7 +282,7 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 	 * set cap
 	 */
 	function updateCap(uint256 _cap) external override {
-		address setter = IPolicy(registry().registries("Policy")).capSetter();
+		address setter = registry().registries("CapSetter");
 		require(setter == msg.sender, "illegal access");
 
 		/**

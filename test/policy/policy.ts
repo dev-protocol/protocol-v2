@@ -40,18 +40,4 @@ contract('Policy', ([account1, account2]) => {
 			expect(result.toNumber()).to.be.equal(5)
 		})
 	})
-	describe('PolicyTest1; setTreasury', () => {
-		it('get the set treasury address', async () => {
-			await policy.setTreasury(account1)
-			const tmp: string = await policy.treasury()
-			expect(tmp).to.be.equal(account1)
-		})
-	})
-	describe('PolicyTest1; setCapSetter', () => {
-		it('get the set cap setter address', async () => {
-			await policy.setCapSetter(account2)
-			const tmp: string = await policy.capSetter()
-			expect(tmp).to.be.equal(account2)
-		})
-	})
 })

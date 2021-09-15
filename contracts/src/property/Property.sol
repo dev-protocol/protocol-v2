@@ -63,7 +63,7 @@ contract Property is ERC20, UsingRegistry, IProperty {
 		uint256 toAuthor = SUPPLY.sub(toTreasury);
 		require(toAuthor != 0, "share of author is 0");
 		_mint(__author, toAuthor);
-		_mint(policy.treasury(), toTreasury);
+		_mint(registry().registries("Treasury"), toTreasury);
 	}
 
 	/**
