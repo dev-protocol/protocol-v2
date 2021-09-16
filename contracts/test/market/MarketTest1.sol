@@ -22,7 +22,7 @@ contract MarketTest1 is
 	/**
 	 * Initialize the passed address as AddressRegistry address.
 	 */
-	function initialize(address _registry) external override initializer {
+	function initialize(address _registry) external initializer {
 		__Ownable_init();
 		__UsingRegistry_init(_registry);
 	}
