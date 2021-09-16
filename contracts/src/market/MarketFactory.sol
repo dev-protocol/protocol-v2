@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity =0.8.7;
 
-import {InitializableUsingRegistry} from "contracts/src/common/registry/InitializableUsingRegistry.sol";
+import {SafeMath} from "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import {InitializableUsingRegistry} from "contracts/src/common/registry/InitializableUsingRegistry.sol";
 import {Market} from "contracts/src/market/Market.sol";
 import {IMarket} from "contracts/interface/IMarket.sol";
 import {IMarketBehavior} from "contracts/interface/IMarketBehavior.sol";
 import {IMarketFactory} from "contracts/interface/IMarketFactory.sol";
-import {SafeMath} from "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 /**
  * A factory contract that creates a new Market contract.
@@ -26,7 +26,7 @@ contract MarketFactory is
 	/**
 	 * Initialize the passed address as AddressRegistry address.
 	 */
-	function initialize(address _registry) external initializer {
+	function initialize(address _registry) external override initializer {
 		__Ownable_init();
 		__UsingRegistry_init(_registry);
 	}

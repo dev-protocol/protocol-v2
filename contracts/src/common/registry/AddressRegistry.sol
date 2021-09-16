@@ -11,7 +11,7 @@ import {IAddressRegistry} from "contracts/interface/IAddressRegistry.sol";
 contract AddressRegistry is OwnableUpgradeable, IAddressRegistry {
 	mapping(string => address) private reg;
 
-	function initialize() external initializer {
+	function initialize() external override initializer {
 		__Ownable_init();
 	}
 

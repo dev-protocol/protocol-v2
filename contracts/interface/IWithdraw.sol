@@ -9,6 +9,8 @@ interface IWithdraw {
 		address _to
 	);
 
+	function initialize(address _registry) external;
+
 	function withdraw(address _property) external;
 
 	function beforeBalanceChange(address _from, address _to) external;

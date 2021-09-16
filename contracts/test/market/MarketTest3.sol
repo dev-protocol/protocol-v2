@@ -13,6 +13,9 @@ contract MarketTest3 is Ownable, IMarketBehavior, UsingRegistry {
 	mapping(string => address) private addresses;
 	address public currentAuthinticateAccount;
 
+	/**
+	 * Initialize the passed address as AddressRegistry address.
+	 */
 	constructor(address _registry) UsingRegistry(_registry) {}
 
 	function name() external pure override returns (string memory) {
