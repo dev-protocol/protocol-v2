@@ -135,10 +135,9 @@ export class DevProtocolInstance {
 	}
 
 	public async generateDev(): Promise<void> {
-		this._dev = await contract('Dev').new(
-			this.addressRegistry.address,
-			this.fromDeployer
-		)
+		const [proxfied] = await deployProxy(contract('Dev'), this._deployer)
+		await proxfied.initialize(this._addressRegistry.address)
+		this._dev = proxfied
 		await this.addressRegistry.setRegistry(
 			'Dev',
 			this._dev.address,

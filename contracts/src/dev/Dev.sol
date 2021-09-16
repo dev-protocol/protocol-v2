@@ -2,9 +2,8 @@
 pragma solidity =0.8.7;
 
 // prettier-ignore
-import {ERC20PresetMinterPauser} from "@openzeppelin/contracts/token/ERC20/presets/ERC20PresetMinterPauser.sol";
-import {UsingRegistry} from "contracts/src/common/registry/UsingRegistry.sol";
-import {ILockup} from "contracts/interface/ILockup.sol";
+import {ERC20PresetMinterPauserUpgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/presets/ERC20PresetMinterPauserUpgradeable.sol";
+import {InitializableUsingRegistry} from "contracts/src/common/registry/InitializableUsingRegistry.sol";
 import {IDev} from "contracts/interface/IDev.sol";
 import {IMarketFactory} from "contracts/interface/IMarketFactory.sol";
 
@@ -15,15 +14,19 @@ import {IMarketFactory} from "contracts/interface/IMarketFactory.sol";
  * Also, mint will be performed based on the Allocator contract.
  * When authenticated a new asset by the Market contracts, DEV token is burned as fees.
  */
-contract Dev is ERC20PresetMinterPauser, UsingRegistry, IDev {
+contract Dev is
+	ERC20PresetMinterPauserUpgradeable,
+	InitializableUsingRegistry,
+	IDev
+{
 	/**
 	 * Initialize the passed address as AddressRegistry address.
 	 * The token name is `Dev`, the token symbol is `DEV`, and the decimals is 18.
 	 */
-	constructor(address _registry)
-		ERC20PresetMinterPauser("Dev", "DEV")
-		UsingRegistry(_registry)
-	{}
+	function initialize(address _registry) external override initializer {
+		__ERC20PresetMinterPauser_init("Dev", "DEV");
+		__UsingRegistry_init(_registry);
+	}
 
 	/**
 	 * Burn the DEV tokens as an authentication fee.

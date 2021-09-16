@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity =0.8.7;
 
+import {SafeMath} from "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import {InitializableUsingRegistry} from "contracts/src/common/registry/InitializableUsingRegistry.sol";
 import {Metrics} from "contracts/src/metrics/Metrics.sol";
 import {IMetrics} from "contracts/interface/IMetrics.sol";
 import {IMetricsFactory} from "contracts/interface/IMetricsFactory.sol";
 import {IMarketFactory} from "contracts/interface/IMarketFactory.sol";
-import {SafeMath} from "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 /**
  * A factory contract for creating new Metrics contracts and logical deletion of Metrics contracts.
@@ -22,7 +22,7 @@ contract MetricsFactory is InitializableUsingRegistry, IMetricsFactory {
 	/**
 	 * Initialize the passed address as AddressRegistry address.
 	 */
-	function initialize(address _registry) external initializer {
+	function initialize(address _registry) external override initializer {
 		__UsingRegistry_init(_registry);
 	}
 

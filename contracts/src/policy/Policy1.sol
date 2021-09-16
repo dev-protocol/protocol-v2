@@ -2,11 +2,11 @@
 pragma solidity =0.8.7;
 
 import {SafeMath} from "@openzeppelin/contracts/utils/math/SafeMath.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {Curve} from "contracts/src/common/libs/Curve.sol";
 import {UsingRegistry} from "contracts/src/common/registry/UsingRegistry.sol";
 import {IPolicy} from "contracts/interface/IPolicy.sol";
-import {Curve} from "contracts/src/common/libs/Curve.sol";
-import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
 contract Policy1 is IPolicy, Ownable, Curve, UsingRegistry {
 	using SafeMath for uint256;
