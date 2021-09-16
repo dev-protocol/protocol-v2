@@ -22,7 +22,7 @@ contract MetricsFactory is InitializableUsingRegistry, IMetricsFactory {
 	/**
 	 * Initialize the passed address as AddressRegistry address.
 	 */
-	function initialize(address _registry) external initializer {
+	function initialize(address _registry) external override initializer {
 		__UsingRegistry_init(_registry);
 	}
 

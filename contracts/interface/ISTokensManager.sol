@@ -68,9 +68,9 @@ interface ISTokensManager {
 
 	/*
 	 * @dev perform the initial setup
-	 * @param _config AddressConfig
+	 * @param _registry AddressRegistry
 	 */
-	function initialize(address _config) external;
+	function initialize(address _registry) external;
 
 	/*
 	 * @dev Creates the new staking position for the caller.

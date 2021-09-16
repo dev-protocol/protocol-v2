@@ -5,6 +5,8 @@ pragma solidity ^0.8.0;
 interface IPolicyFactory {
 	event Create(address indexed _from, address _policy);
 
+	function initialize(address _registry) external;
+
 	function create(address _newPolicyAddress) external;
 
 	function forceAttach(address _policy) external;

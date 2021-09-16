@@ -13,7 +13,7 @@ contract DevMinter is
 	OwnableUpgradeable,
 	IDevMinter
 {
-	function initialize(address _registry) external initializer {
+	function initialize(address _registry) external override initializer {
 		__Ownable_init();
 		__UsingRegistry_init(_registry);
 	}

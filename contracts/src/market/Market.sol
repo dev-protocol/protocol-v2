@@ -2,7 +2,7 @@
 pragma solidity =0.8.7;
 
 import {SafeMath} from "@openzeppelin/contracts/utils/math/SafeMath.sol";
-import {UsingRegistry} from "contracts/src/common/registry/UsingRegistry.sol";
+import {InitializableUsingRegistry} from "contracts/src/common/registry/InitializableUsingRegistry.sol";
 import {IProperty} from "contracts/interface/IProperty.sol";
 import {IMarket} from "contracts/interface/IMarket.sol";
 import {IMarketBehavior} from "contracts/interface/IMarketBehavior.sol";
@@ -16,7 +16,7 @@ import {IDev} from "contracts/interface/IDev.sol";
  * A user-proposable contract for authenticating and associating assets with Property.
  * A user deploys a contract that inherits IMarketBehavior and creates this Market contract with the MarketFactory contract.
  */
-contract Market is UsingRegistry, IMarket {
+contract Market is InitializableUsingRegistry, IMarket {
 	using SafeMath for uint256;
 	bool public override enabled;
 	address public override behavior;
@@ -28,7 +28,12 @@ contract Market is UsingRegistry, IMarket {
 	/**
 	 * Initialize the passed address as AddressRegistry address and user-proposed contract.
 	 */
-	constructor(address _registry, address _behavior) UsingRegistry(_registry) {
+	function initialize(address _registry, address _behavior)
+		external
+		override
+		initializer
+	{
+		__UsingRegistry_init(_registry);
 		/**
 		 * Validates the sender is MarketFactory contract.
 		 */
