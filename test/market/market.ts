@@ -20,7 +20,7 @@ contract(
 			it('Cannot be created from other than market factory', async () => {
 				await dev.addressRegistry.setRegistry('MarketFactory', marketFactory)
 				const result = await marketContract
-					.new(dev.addressRegistry.address, behavuor, { from: deployer })
+				.new(dev.addressRegistry.address, behavuor, { from: deployer })
 					.catch((err: Error) => err)
 				validateAddressErrorMessage(result)
 			})

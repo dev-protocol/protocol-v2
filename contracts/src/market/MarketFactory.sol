@@ -4,8 +4,6 @@ pragma solidity =0.8.7;
 import {InitializableUsingRegistry} from "contracts/src/common/registry/InitializableUsingRegistry.sol";
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {SafeMath} from "@openzeppelin/contracts/utils/math/SafeMath.sol";
-import {Admin} from "contracts/src/common/proxy/Admin.sol";
-import {Proxy} from "contracts/src/common/proxy/Proxy.sol";
 import {Market} from "contracts/src/market/Market.sol";
 import {IMarket} from "contracts/interface/IMarket.sol";
 import {IMarketBehavior} from "contracts/interface/IMarketBehavior.sol";
@@ -45,32 +43,29 @@ contract MarketFactory is
 		/**
 		 * Creates a new Market contract with the passed address as the IMarketBehavior.
 		 */
-		Admin admin = new Admin();
-		Market market = new Market();
-		Proxy proxy = new Proxy(address(market), address(admin), new bytes(0));
-		IMarket marketProxy = IMarket(address(proxy));
-		marketProxy.initialize(address(registry()), _addr);
+		Market market = new Market(address(registry()), _addr);
 
 		/**
 		 * Adds the created Market contract to the Market address set.
 		 */
-		isPotentialMarket[address(proxy)] = true;
+		address marketAddr = address(market);
+		isPotentialMarket[marketAddr] = true;
 
 		/**
 		 * set associated market address to behavior
 		 */
-		IMarketBehavior(_addr).setAssociatedMarket(address(proxy));
+		IMarketBehavior(_addr).setAssociatedMarket(marketAddr);
 
 		/**
 		 * For the first Market contract, it will be activated immediately.
 		 * If not, the Market contract will be activated after a vote by the voters.
 		 */
 		if (marketsCount == 0) {
-			_enable(address(proxy));
+			_enable(marketAddr);
 		}
 
-		emit Create(address(proxy), msg.sender);
-		return address(proxy);
+		emit Create(marketAddr, msg.sender);
+		return marketAddr;
 	}
 
 	/**

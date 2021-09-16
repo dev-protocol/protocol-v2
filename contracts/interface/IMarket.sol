@@ -3,8 +3,6 @@
 pragma solidity ^0.8.0;
 
 interface IMarket {
-	function initialize(address _registry, address _behavior) external;
-
 	function authenticate(address _prop, string[] memory _args)
 		external
 		returns (bool);
