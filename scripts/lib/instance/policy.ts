@@ -1,17 +1,23 @@
-// /* eslint-disable @typescript-eslint/await-thenable */
-// import { IPolicyInstance } from '../../../types/truffle-contracts'
-// import { DevCommonInstance } from './common'
+import {
+	AddressRegistryInstance,
+	IPolicyInstance,
+} from '../../../types/truffle-contracts'
 
-// export class Policy {
-// 	private readonly _dev: DevCommonInstance
-// 	constructor(dev: DevCommonInstance) {
-// 		this._dev = dev
-// 	}
+export const generatePolicyInstance = async (
+	addressRegistry: AddressRegistryInstance,
+	policyName: string
+): Promise<IPolicyInstance> => {
+	const policy: IPolicyInstance = await artifacts
+		.require(policyName)
+		.new(addressRegistry.address)
+	console.log(`new Plocy:${policy.address} name:${policyName}`)
+	return policy
+}
 
-// 	public async load(): Promise<IPolicyInstance> {
-// 		const address = await this._dev.addressConfig.policy()
-// 		const policy = await this._dev.artifacts.require('IPolicy').at(address)
-// 		console.log('load Policy contract', policy.address)
-// 		return policy
-// 	}
-// }
+export const setPolicyAddressToRegistry = async (
+	addressRegistry: AddressRegistryInstance,
+	policyInstances: IPolicyInstance
+): Promise<void> => {
+	await addressRegistry.setRegistry('Policy', policyInstances.address)
+	console.log(`set policy to registory:${policyInstances.address}`)
+}

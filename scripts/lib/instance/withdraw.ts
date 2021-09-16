@@ -1,55 +1,31 @@
-// /* eslint-disable @typescript-eslint/await-thenable */
-// import {
-// 	WithdrawInstance,
-// 	WithdrawStorageInstance,
-// } from '../../../types/truffle-contracts'
-// import { DevCommonInstance } from './common'
+import {
+	AddressRegistryInstance,
+	WithdrawInstance,
+} from '../../../types/truffle-contracts'
 
-// type InstanceOfWithdraw = WithdrawInstance
+export const generateWithdrawInstances =
+	async (): Promise<WithdrawInstance> => {
+		const withdraw = await artifacts.require('Withdraw').new()
+		console.log(`new Withdraw Logic:${withdraw.address}`)
+		const admin = await artifacts.require('Admin').new()
+		console.log(`new Withdraw Admin:${admin.address}`)
+		const tmp = web3.utils.hexToBytes('0x')
+		const proxy = await artifacts
+			.require('Proxy')
+			.new(withdraw.address, admin.address, tmp)
+		console.log(`new Withdraw proxy:${proxy.address}`)
+		const withdrawContract = artifacts.require('Withdraw')
+		// eslint-disable-next-line @typescript-eslint/await-thenable
+		const withdrawProxy = await withdrawContract.at(proxy.address)
+		return withdrawProxy
+	}
 
-// export class Withdraw {
-// 	private readonly _dev: DevCommonInstance
-// 	constructor(dev: DevCommonInstance) {
-// 		this._dev = dev
-// 	}
-
-// 	public async load(): Promise<WithdrawInstance> {
-// 		const address = await this._dev.addressConfig.withdraw()
-// 		const withdraw = await this._dev.artifacts.require('Withdraw').at(address)
-// 		console.log('load Withdraw contract', withdraw.address)
-// 		return withdraw
-// 	}
-
-// 	public async create(devMinter = ''): Promise<WithdrawInstance> {
-// 		if (devMinter === '') {
-// 			const tmp = await this.load()
-// 			devMinter = await tmp.devMinter()
-// 		}
-
-// 		const withdraw = await this._dev.artifacts
-// 			.require('Withdraw')
-// 			.new(this._dev.addressConfig.address, devMinter, await this._dev.gasInfo)
-// 		console.log('new Withdraw contract', withdraw.address)
-// 		return withdraw
-// 	}
-
-// 	public async set(withdraw: InstanceOfWithdraw): Promise<void> {
-// 		await this._dev.addressConfig.setWithdraw(
-// 			withdraw.address,
-// 			await this._dev.gasInfo
-// 		)
-// 		console.log('set Withdraw contract', withdraw.address)
-// 	}
-
-// 	public async changeOwner(
-// 		before: WithdrawStorageInstance | InstanceOfWithdraw,
-// 		after: InstanceOfWithdraw
-// 	): Promise<void> {
-// 		const storageAddress = await before.getStorageAddress()
-// 		console.log(`storage address ${storageAddress}`)
-// 		await after.setStorage(storageAddress, await this._dev.gasInfo)
-// 		await before.changeOwner(after.address, await this._dev.gasInfo)
-
-// 		console.log(`change owner from ${before.address} to ${after.address}`)
-// 	}
-// }
+export const setWithdrawAddressToRegistry = async (
+	addressRegistry: AddressRegistryInstance,
+	withdrawProxyInstances: WithdrawInstance
+): Promise<void> => {
+	await addressRegistry.setRegistry('Withdraw', withdrawProxyInstances.address)
+	console.log(
+		`set Withdraw proxy to registory:${withdrawProxyInstances.address}`
+	)
+}

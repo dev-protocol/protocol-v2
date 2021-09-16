@@ -1,35 +1,34 @@
-// /* eslint-disable @typescript-eslint/await-thenable */
-// import { MetricsFactoryInstance } from '../../../types/truffle-contracts'
-// import { DevCommonInstance } from './common'
+import {
+	AddressRegistryInstance,
+	MetricsFactoryInstance,
+} from '../../../types/truffle-contracts'
 
-// export class MetricsFactory {
-// 	private readonly _dev: DevCommonInstance
-// 	constructor(dev: DevCommonInstance) {
-// 		this._dev = dev
-// 	}
+export const generateMetricsFactoryInstances =
+	async (): Promise<MetricsFactoryInstance> => {
+		const metricsFactory = await artifacts.require('MetricsFactory').new()
+		console.log(`new Metrics Factory Logic:${metricsFactory.address}`)
+		const admin = await artifacts.require('Admin').new()
+		console.log(`new Metrics Factory Admin:${admin.address}`)
+		const tmp = web3.utils.hexToBytes('0x')
+		const proxy = await artifacts
+			.require('Proxy')
+			.new(metricsFactory.address, admin.address, tmp)
+		console.log(`new Metrics Factory proxy:${proxy.address}`)
+		const metricsFactoryContract = artifacts.require('MetricsFactory')
+		// eslint-disable-next-line @typescript-eslint/await-thenable
+		const metricsFactoryProxy = await metricsFactoryContract.at(proxy.address)
+		return metricsFactoryProxy
+	}
 
-// 	public async load(): Promise<MetricsFactoryInstance> {
-// 		const address = await this._dev.addressConfig.metricsFactory()
-// 		const metricsFactory = await this._dev.artifacts
-// 			.require('MetricsFactory')
-// 			.at(address)
-// 		console.log('load MetricsFactory contract', metricsFactory.address)
-// 		return metricsFactory
-// 	}
-
-// 	public async create(): Promise<MetricsFactoryInstance> {
-// 		const metricsFactory = await this._dev.artifacts
-// 			.require('MetricsFactory')
-// 			.new(this._dev.addressConfig.address, await this._dev.gasInfo)
-// 		console.log('new MetricsFactory contract', metricsFactory.address)
-// 		return metricsFactory
-// 	}
-
-// 	public async set(metricsFactory: MetricsFactoryInstance): Promise<void> {
-// 		await this._dev.addressConfig.setMetricsFactory(
-// 			metricsFactory.address,
-// 			await this._dev.gasInfo
-// 		)
-// 		console.log('set MetricsFactory contract', metricsFactory.address)
-// 	}
-// }
+export const setMetricsFactoryAddressToRegistry = async (
+	addressRegistry: AddressRegistryInstance,
+	metricsFactoryProxyInstances: MetricsFactoryInstance
+): Promise<void> => {
+	await addressRegistry.setRegistry(
+		'MetricsFactory',
+		metricsFactoryProxyInstances.address
+	)
+	console.log(
+		`set Metrics Factory proxy to registory:${metricsFactoryProxyInstances.address}`
+	)
+}

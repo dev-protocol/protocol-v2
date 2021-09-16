@@ -1,35 +1,34 @@
-// /* eslint-disable @typescript-eslint/await-thenable */
-// import { MarketFactoryInstance } from '../../../types/truffle-contracts'
-// import { DevCommonInstance } from './common'
+import {
+	AddressRegistryInstance,
+	MarketFactoryInstance,
+} from '../../../types/truffle-contracts'
 
-// export class MarketFactry {
-// 	private readonly _dev: DevCommonInstance
-// 	constructor(dev: DevCommonInstance) {
-// 		this._dev = dev
-// 	}
+export const generateMarketFactoryInstances =
+	async (): Promise<MarketFactoryInstance> => {
+		const marketFactory = await artifacts.require('MarketFactory').new()
+		console.log(`new Market Factory Logic:${marketFactory.address}`)
+		const admin = await artifacts.require('Admin').new()
+		console.log(`new Market Factory Admin:${admin.address}`)
+		const tmp = web3.utils.hexToBytes('0x')
+		const proxy = await artifacts
+			.require('Proxy')
+			.new(marketFactory.address, admin.address, tmp)
+		console.log(`new Market Factory proxy:${proxy.address}`)
+		const marketFactoryContract = artifacts.require('MarketFactory')
+		// eslint-disable-next-line @typescript-eslint/await-thenable
+		const marketFactoryProxy = await marketFactoryContract.at(proxy.address)
+		return marketFactoryProxy
+	}
 
-// 	public async load(): Promise<MarketFactoryInstance> {
-// 		const address = await this._dev.addressConfig.marketFactory()
-// 		const marketFactory = await this._dev.artifacts
-// 			.require('MarketFactory')
-// 			.at(address)
-// 		console.log('load MarketFactory contract', marketFactory.address)
-// 		return marketFactory
-// 	}
-
-// 	public async create(): Promise<MarketFactoryInstance> {
-// 		const marketFactory = await this._dev.artifacts
-// 			.require('MarketFactory')
-// 			.new(this._dev.addressConfig.address, await this._dev.gasInfo)
-// 		console.log('new MarketFactory contract', marketFactory.address)
-// 		return marketFactory
-// 	}
-
-// 	public async set(marketFactory: MarketFactoryInstance): Promise<void> {
-// 		await this._dev.addressConfig.setMarketFactory(
-// 			marketFactory.address,
-// 			await this._dev.gasInfo
-// 		)
-// 		console.log('set MarketFactory contract', marketFactory.address)
-// 	}
-// }
+export const setMarketFactoryAddressToRegistry = async (
+	addressRegistry: AddressRegistryInstance,
+	marketFactoryProxyInstances: MarketFactoryInstance
+): Promise<void> => {
+	await addressRegistry.setRegistry(
+		'MarketFactory',
+		marketFactoryProxyInstances.address
+	)
+	console.log(
+		`set Market Factory proxy to registory:${marketFactoryProxyInstances.address}`
+	)
+}

@@ -1,65 +1,28 @@
-// /* eslint-disable @typescript-eslint/await-thenable */
-// import { LockupInstance } from '../../../types/truffle-contracts'
-// import { DevCommonInstance } from './common'
+import {
+	AddressRegistryInstance,
+	LockupInstance,
+} from '../../../types/truffle-contracts'
 
-// type InstanceOfLockup = LockupInstance
+export const generateLockupInstances = async (): Promise<LockupInstance> => {
+	const lockup = await artifacts.require('Lockup').new()
+	console.log(`new Lockup Logic:${lockup.address}`)
+	const admin = await artifacts.require('Admin').new()
+	console.log(`new Lockup Admin:${admin.address}`)
+	const tmp = web3.utils.hexToBytes('0x')
+	const proxy = await artifacts
+		.require('Proxy')
+		.new(lockup.address, admin.address, tmp)
+	console.log(`new Lockup proxy:${proxy.address}`)
+	const lockupContract = artifacts.require('Lockup')
+	// eslint-disable-next-line @typescript-eslint/await-thenable
+	const lockupProxy = await lockupContract.at(proxy.address)
+	return lockupProxy
+}
 
-// export class Lockup {
-// 	private readonly _dev: DevCommonInstance
-// 	constructor(dev: DevCommonInstance) {
-// 		this._dev = dev
-// 	}
-
-// 	public async load(): Promise<LockupInstance> {
-// 		const address = await this._dev.addressConfig.lockup()
-// 		const lockup = await this._dev.artifacts.require('Lockup').at(address)
-// 		console.log('load Lockup contract', lockup.address)
-// 		return lockup
-// 	}
-
-// 	public async create(
-// 		devMinter = '',
-// 		sTokenManager = ''
-// 	): Promise<LockupInstance> {
-// 		if (devMinter === '') {
-// 			const tmp = await this.load()
-// 			devMinter = await tmp.devMinter()
-// 		}
-
-// 		if (sTokenManager === '') {
-// 			const tmp = await this.load()
-// 			sTokenManager = await tmp.sTokensManager()
-// 		}
-
-// 		const lockup = await this._dev.artifacts
-// 			.require('Lockup')
-// 			.new(
-// 				this._dev.addressConfig.address,
-// 				devMinter,
-// 				sTokenManager,
-// 				await this._dev.gasInfo
-// 			)
-// 		console.log('new Lockup contract', lockup.address)
-// 		return lockup
-// 	}
-
-// 	public async set(lockup: InstanceOfLockup): Promise<void> {
-// 		await this._dev.addressConfig.setLockup(
-// 			lockup.address,
-// 			await this._dev.gasInfo
-// 		)
-// 		console.log('set Lockup contract', lockup.address)
-// 	}
-
-// 	public async changeOwner(
-// 		before: InstanceOfLockup,
-// 		after: InstanceOfLockup
-// 	): Promise<void> {
-// 		const storageAddress = await before.getStorageAddress()
-// 		console.log(`storage address ${storageAddress}`)
-// 		await after.setStorage(storageAddress, await this._dev.gasInfo)
-// 		await before.changeOwner(after.address, await this._dev.gasInfo)
-
-// 		console.log(`change owner from ${before.address} to ${after.address}`)
-// 	}
-// }
+export const setLockupAddressToRegistry = async (
+	addressRegistry: AddressRegistryInstance,
+	lockupProxyInstances: LockupInstance
+): Promise<void> => {
+	await addressRegistry.setRegistry('Lockup', lockupProxyInstances.address)
+	console.log(`set Lockup proxy to registory:${lockupProxyInstances.address}`)
+}

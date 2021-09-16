@@ -1,35 +1,34 @@
-// /* eslint-disable @typescript-eslint/await-thenable */
-// import { PropertyFactoryInstance } from '../../../types/truffle-contracts'
-// import { DevCommonInstance } from './common'
+import {
+	AddressRegistryInstance,
+	PropertyFactoryInstance,
+} from '../../../types/truffle-contracts'
 
-// export class PropertyFactory {
-// 	private readonly _dev: DevCommonInstance
-// 	constructor(dev: DevCommonInstance) {
-// 		this._dev = dev
-// 	}
+export const generatePropertyFactoryInstances =
+	async (): Promise<PropertyFactoryInstance> => {
+		const propertyFactory = await artifacts.require('PropertyFactory').new()
+		console.log(`new Property Factory Logic:${propertyFactory.address}`)
+		const admin = await artifacts.require('Admin').new()
+		console.log(`new Property Factory Admin:${admin.address}`)
+		const tmp = web3.utils.hexToBytes('0x')
+		const proxy = await artifacts
+			.require('Proxy')
+			.new(propertyFactory.address, admin.address, tmp)
+		console.log(`new Property Factory proxy:${proxy.address}`)
+		const propertyFactoryContract = artifacts.require('PropertyFactory')
+		// eslint-disable-next-line @typescript-eslint/await-thenable
+		const propertyFactoryProxy = await propertyFactoryContract.at(proxy.address)
+		return propertyFactoryProxy
+	}
 
-// 	public async load(): Promise<PropertyFactoryInstance> {
-// 		const address = await this._dev.addressConfig.propertyFactory()
-// 		const propertyFactory = await this._dev.artifacts
-// 			.require('PropertyFactory')
-// 			.at(address)
-// 		console.log('load PropertyFactory contract', propertyFactory.address)
-// 		return propertyFactory
-// 	}
-
-// 	public async create(): Promise<PropertyFactoryInstance> {
-// 		const propertyFactory = await this._dev.artifacts
-// 			.require('PropertyFactory')
-// 			.new(this._dev.addressConfig.address, await this._dev.gasInfo)
-// 		console.log('new PropertyFactory contract', propertyFactory.address)
-// 		return propertyFactory
-// 	}
-
-// 	public async set(propertyFactory: PropertyFactoryInstance): Promise<void> {
-// 		await this._dev.addressConfig.setPropertyFactory(
-// 			propertyFactory.address,
-// 			await this._dev.gasInfo
-// 		)
-// 		console.log('set PropertyFactory contract', propertyFactory.address)
-// 	}
-// }
+export const setPropertyFactoryAddressToRegistry = async (
+	addressRegistry: AddressRegistryInstance,
+	propertyFactoryProxyInstances: PropertyFactoryInstance
+): Promise<void> => {
+	await addressRegistry.setRegistry(
+		'PropertyFactory',
+		propertyFactoryProxyInstances.address
+	)
+	console.log(
+		`set Property Factory proxy to registory:${propertyFactoryProxyInstances.address}`
+	)
+}

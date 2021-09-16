@@ -1,35 +1,34 @@
-// /* eslint-disable @typescript-eslint/await-thenable */
-// import { PolicyFactoryInstance } from '../../../types/truffle-contracts'
-// import { DevCommonInstance } from './common'
+import {
+	AddressRegistryInstance,
+	PolicyFactoryInstance,
+} from '../../../types/truffle-contracts'
 
-// export class PolicyFactory {
-// 	private readonly _dev: DevCommonInstance
-// 	constructor(dev: DevCommonInstance) {
-// 		this._dev = dev
-// 	}
+export const generatePolicyFactoryInstances =
+	async (): Promise<PolicyFactoryInstance> => {
+		const policyFactory = await artifacts.require('PolicyFactory').new()
+		console.log(`new Policy Factory Logic:${policyFactory.address}`)
+		const admin = await artifacts.require('Admin').new()
+		console.log(`new Policy Factory Admin:${admin.address}`)
+		const tmp = web3.utils.hexToBytes('0x')
+		const proxy = await artifacts
+			.require('Proxy')
+			.new(policyFactory.address, admin.address, tmp)
+		console.log(`new Policy Factory proxy:${proxy.address}`)
+		const policyFactoryContract = artifacts.require('PolicyFactory')
+		// eslint-disable-next-line @typescript-eslint/await-thenable
+		const policyFactoryProxy = await policyFactoryContract.at(proxy.address)
+		return policyFactoryProxy
+	}
 
-// 	public async load(): Promise<PolicyFactoryInstance> {
-// 		const address = await this._dev.addressConfig.policyFactory()
-// 		const policyFactory = await this._dev.artifacts
-// 			.require('PolicyFactory')
-// 			.at(address)
-// 		console.log('load PolicyFactory contract', policyFactory.address)
-// 		return policyFactory
-// 	}
-
-// 	public async create(): Promise<PolicyFactoryInstance> {
-// 		const policyFactory = await this._dev.artifacts
-// 			.require('PolicyFactory')
-// 			.new(this._dev.addressConfig.address, await this._dev.gasInfo)
-// 		console.log('new PolicyFactory contract', policyFactory.address)
-// 		return policyFactory
-// 	}
-
-// 	public async set(policyFactory: PolicyFactoryInstance): Promise<void> {
-// 		await this._dev.addressConfig.setPolicyFactory(
-// 			policyFactory.address,
-// 			await this._dev.gasInfo
-// 		)
-// 		console.log('set PolicyFactory contract', policyFactory.address)
-// 	}
-// }
+export const setPolicyFactoryAddressToRegistry = async (
+	addressRegistry: AddressRegistryInstance,
+	policyFactoryProxyInstances: PolicyFactoryInstance
+): Promise<void> => {
+	await addressRegistry.setRegistry(
+		'PolicyFactory',
+		policyFactoryProxyInstances.address
+	)
+	console.log(
+		`set Policy Factory proxy to registory:${policyFactoryProxyInstances.address}`
+	)
+}
