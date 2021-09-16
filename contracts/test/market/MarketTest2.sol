@@ -1,18 +1,28 @@
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity =0.8.7;
 
-import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
-import {UsingRegistry} from "contracts/src/common/registry/UsingRegistry.sol";
+import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import {InitializableUsingRegistry} from "contracts/src/common/registry/InitializableUsingRegistry.sol";
 import {IMarketBehavior} from "contracts/interface/IMarketBehavior.sol";
 import {IMarket} from "contracts/interface/IMarket.sol";
 
-contract MarketTest2 is Ownable, IMarketBehavior, UsingRegistry {
+contract MarketTest2 is
+	OwnableUpgradeable,
+	InitializableUsingRegistry,
+	IMarketBehavior
+{
 	string public override schema = "[]";
 	address public override associatedMarket;
 	mapping(address => string) internal keys;
 	mapping(string => address) private addresses;
 
-	constructor(address _registry) UsingRegistry(_registry) {}
+	/**
+	 * Initialize the passed address as AddressRegistry address.
+	 */
+	function initialize(address _registry) external override initializer {
+		__Ownable_init();
+		__UsingRegistry_init(_registry);
+	}
 
 	function name() external pure override returns (string memory) {
 		return "MarketTest2";

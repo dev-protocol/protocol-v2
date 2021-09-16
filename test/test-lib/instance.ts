@@ -284,12 +284,15 @@ export class DevProtocolInstance {
 
 	public async getMarket(
 		contractName: string,
-		user: string
+		user = ''
 	): Promise<IMarketBehaviorInstance> {
-		const tmp = await contract(contractName).new(this.addressRegistry.address, {
-			from: user,
-		})
-		return tmp
+		if (user === '') {
+			user = this._deployer
+		}
+
+		const [proxfied] = await deployProxy(contract(contractName), user)
+		await proxfied.initialize(this.addressRegistry.address)
+		return proxfied
 	}
 
 	public async createMetrics(

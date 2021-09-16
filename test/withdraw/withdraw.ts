@@ -63,9 +63,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 			artifacts.require('Property').at(propertyAddress),
 		])
 		await dev.metricsFactory.__setMetricsCountPerProperty(property.address, 1)
-		const marketBehavior = await artifacts
-			.require('MarketTest1')
-			.new(dev.addressRegistry.address)
+		const marketBehavior = await dev.getMarket('MarketTest1')
 		const marketAddress = getMarketAddress(
 			await dev.marketFactory.create(marketBehavior.address)
 		)

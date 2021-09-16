@@ -3,6 +3,8 @@
 pragma solidity ^0.8.0;
 
 interface IMarketBehavior {
+	function initialize(address _registry) external;
+
 	function authenticate(
 		address _prop,
 		string[] memory _args,
