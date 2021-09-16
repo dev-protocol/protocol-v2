@@ -6,9 +6,7 @@ import {UsingRegistry} from "contracts/src/common/registry/UsingRegistry.sol";
 import {IMarketBehavior} from "contracts/interface/IMarketBehavior.sol";
 import {IMarket} from "contracts/interface/IMarket.sol";
 
-contract MarketTest2 is
-	Ownable, IMarketBehavior, UsingRegistry
-{
+contract MarketTest2 is Ownable, IMarketBehavior, UsingRegistry {
 	string public override schema = "[]";
 	address public override associatedMarket;
 	mapping(address => string) internal keys;
