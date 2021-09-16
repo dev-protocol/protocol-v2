@@ -18,9 +18,9 @@ import {IDev} from "contracts/interface/IDev.sol";
  */
 contract Market is UsingRegistry, IMarket {
 	using SafeMath for uint256;
-	bool public override enabled = false;
+	bool public override enabled;
 	address public override behavior;
-	uint256 public override votingEndTimestamp = 0;
+	uint256 public override votingEndTimestamp;
 	uint256 public override issuedMetrics;
 	mapping(bytes32 => bool) private idMap;
 	mapping(address => bytes32) private idHashMetricsMap;

@@ -2,9 +2,9 @@
 pragma solidity =0.8.7;
 
 // prettier-ignore
+import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {ERC20PresetMinterPauser} from "@openzeppelin/contracts/token/ERC20/presets/ERC20PresetMinterPauser.sol";
 import {InitializableUsingRegistry} from "contracts/src/common/registry/InitializableUsingRegistry.sol";
-import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {IAddressRegistry} from "contracts/interface/IAddressRegistry.sol";
 import {IDevMinter} from "contracts/interface/IDevMinter.sol";
 
