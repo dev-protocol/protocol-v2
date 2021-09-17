@@ -221,6 +221,10 @@ contract Property is ERC20, UsingRegistry, IProperty {
 		 * Reduces the allowance amount.
 		 */
 		uint256 allowanceAmount = allowance(_from, msg.sender);
+		require(
+			_value <= allowanceAmount,
+			"ERC20: transfer amount exceeds allowance"
+		);
 		_approve(_from, msg.sender, allowanceAmount - _value);
 		return true;
 	}
