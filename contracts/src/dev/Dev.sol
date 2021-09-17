@@ -23,7 +23,7 @@ contract Dev is
 	 * Initialize the passed address as AddressRegistry address.
 	 * The token name is `Dev`, the token symbol is `DEV`, and the decimals is 18.
 	 */
-	function initialize(address _registry) external override initializer {
+	function initializeDev(address _registry) external initializer {
 		__ERC20PresetMinterPauser_init("Dev", "DEV");
 		__UsingRegistry_init(_registry);
 	}

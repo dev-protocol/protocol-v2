@@ -5,8 +5,6 @@ pragma solidity ^0.8.0;
 interface IPropertyFactory {
 	event Create(address indexed _from, address _property);
 
-	function initialize(address _registry) external;
-
 	function create(
 		string calldata _name,
 		string calldata _symbol,

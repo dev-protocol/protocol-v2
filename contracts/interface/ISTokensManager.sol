@@ -67,12 +67,6 @@ interface ISTokensManager {
 	);
 
 	/*
-	 * @dev perform the initial setup
-	 * @param _registry AddressRegistry
-	 */
-	function initialize(address _registry) external;
-
-	/*
 	 * @dev Creates the new staking position for the caller.
 	 * Mint must be called from the Lockup contract.
 	 * @param _owner The address of the owner of the new staking position

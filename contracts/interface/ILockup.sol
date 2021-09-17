@@ -17,8 +17,6 @@ interface ILockup {
 		uint256 _tokenId
 	);
 
-	function initialize(address _registry) external;
-
 	function depositToProperty(address _property, uint256 _amount)
 		external
 		returns (uint256);

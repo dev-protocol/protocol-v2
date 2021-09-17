@@ -14,8 +14,6 @@ interface IMetricsFactory {
 		address _metrics
 	);
 
-	function initialize(address _registry) external;
-
 	function create(address _property) external returns (address);
 
 	function destroy(address _metrics) external;
