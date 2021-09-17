@@ -2,7 +2,6 @@
 pragma solidity =0.8.7;
 
 import {Counters} from "@openzeppelin/contracts/utils/Counters.sol";
-import {SafeMath} from "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import {ERC721EnumerableUpgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol";
 import {InitializableUsingRegistry} from "contracts/src/common/registry/InitializableUsingRegistry.sol";
 import {STokensDescriptor} from "contracts/src/s-token/STokensDescriptor.sol";
@@ -17,7 +16,6 @@ contract STokensManager is
 	InitializableUsingRegistry
 {
 	using Counters for Counters.Counter;
-	using SafeMath for uint256;
 	Counters.Counter private _tokenIds;
 	mapping(bytes32 => bytes) private bytesStorage;
 	mapping(address => uint256[]) private tokenIdsMapOfProperty;
@@ -115,7 +113,7 @@ contract STokensManager is
 			.calculateWithdrawableInterestAmountByPosition(_tokenId);
 		StakingPositions memory currentPosition = getStoragePositions(_tokenId);
 		uint256 cumulativeReward = currentPosition.cumulativeReward;
-		uint256 entireReward = cumulativeReward.add(withdrawableReward);
+		uint256 entireReward = cumulativeReward + withdrawableReward;
 
 		return Rewards(entireReward, cumulativeReward, withdrawableReward);
 	}

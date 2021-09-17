@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity =0.8.7;
 
-import {SafeMath} from "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {InitializableUsingRegistry} from "contracts/src/common/registry/InitializableUsingRegistry.sol";
 import {IPolicy} from "contracts/interface/IPolicy.sol";
@@ -15,8 +14,6 @@ contract PolicyFactory is
 	OwnableUpgradeable,
 	IPolicyFactory
 {
-	using SafeMath for uint256;
-
 	mapping(address => bool) public override isPotentialPolicy;
 	mapping(address => uint256) public override closeVoteAt;
 
@@ -76,7 +73,7 @@ contract PolicyFactory is
 
 		uint256 votingPeriod = IPolicy(registry().registries("Policy"))
 			.policyVotingSeconds();
-		uint256 votingEndTimestamp = block.timestamp.add(votingPeriod);
+		uint256 votingEndTimestamp = block.timestamp + votingPeriod;
 		closeVoteAt[_addr] = votingEndTimestamp;
 	}
 

@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity =0.8.7;
 
-import {SafeMath} from "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import {UsingRegistry} from "contracts/src/common/registry/UsingRegistry.sol";
 import {IProperty} from "contracts/interface/IProperty.sol";
 import {IMarket} from "contracts/interface/IMarket.sol";
@@ -17,7 +16,6 @@ import {IDev} from "contracts/interface/IDev.sol";
  * A user deploys a contract that inherits IMarketBehavior and creates this Market contract with the MarketFactory contract.
  */
 contract Market is UsingRegistry, IMarket {
-	using SafeMath for uint256;
 	bool public override enabled;
 	address public override behavior;
 	uint256 public override votingEndTimestamp;
@@ -53,7 +51,7 @@ contract Market is UsingRegistry, IMarket {
 		 */
 		uint256 marketVotingSeconds = IPolicy(registry().registries("Policy"))
 			.marketVotingSeconds();
-		votingEndTimestamp = block.timestamp.add(marketVotingSeconds);
+		votingEndTimestamp = block.timestamp + marketVotingSeconds;
 	}
 
 	/**
@@ -212,7 +210,7 @@ contract Market is UsingRegistry, IMarket {
 		/**
 		 * Adds the number of authenticated assets in this Market.
 		 */
-		issuedMetrics = issuedMetrics.add(1);
+		issuedMetrics = issuedMetrics + 1;
 		return metrics;
 	}
 
@@ -247,7 +245,7 @@ contract Market is UsingRegistry, IMarket {
 		/**
 		 * Subtracts the number of authenticated assets in this Market.
 		 */
-		issuedMetrics = issuedMetrics.sub(1);
+		issuedMetrics = issuedMetrics - 1;
 	}
 
 	/**
