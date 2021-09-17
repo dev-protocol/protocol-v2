@@ -4,6 +4,10 @@ import {
 	setDevAddressToRegistry,
 } from './lib/instance/dev'
 import {
+	generateSTokensManagerInstances,
+	setSTokensManagerAddressToRegistry,
+} from './lib/instance/s-tokens-manager'
+import {
 	generateLockupInstances,
 	setLockupAddressToRegistry,
 } from './lib/instance/lockup'
@@ -39,31 +43,37 @@ const handler = async (
 	const addressRegistry = await generateAddressRegistryInstances()
 
 	// Dev
-	const dev = await generateDevInstances()
+	const dev = await generateDevInstances(addressRegistry)
 	await setDevAddressToRegistry(addressRegistry, dev)
 
+	// STokensManager
+	const sTokensManager = await generateSTokensManagerInstances(addressRegistry)
+	await setSTokensManagerAddressToRegistry(addressRegistry, sTokensManager)
+
 	// Lockup
-	const lockup = await generateLockupInstances()
+	const lockup = await generateLockupInstances(addressRegistry)
 	await setLockupAddressToRegistry(addressRegistry, lockup)
 
 	// Market Factory
-	const marketFactory = await generateMarketFactoryInstances()
+	const marketFactory = await generateMarketFactoryInstances(addressRegistry)
 	await setMarketFactoryAddressToRegistry(addressRegistry, marketFactory)
 
 	// Metrics Factory
-	const metricsFactory = await generateMetricsFactoryInstances()
+	const metricsFactory = await generateMetricsFactoryInstances(addressRegistry)
 	await setMetricsFactoryAddressToRegistry(addressRegistry, metricsFactory)
 
 	// Policy Factory
-	const policyFactory = await generatePolicyFactoryInstances()
+	const policyFactory = await generatePolicyFactoryInstances(addressRegistry)
 	await setPolicyFactoryAddressToRegistry(addressRegistry, policyFactory)
 
 	// Property Factory
-	const propertyFactory = await generatePropertyFactoryInstances()
+	const propertyFactory = await generatePropertyFactoryInstances(
+		addressRegistry
+	)
 	await setPropertyFactoryAddressToRegistry(addressRegistry, propertyFactory)
 
 	// Withdraw
-	const withdraw = await generateWithdrawInstances()
+	const withdraw = await generateWithdrawInstances(addressRegistry)
 	await setWithdrawAddressToRegistry(addressRegistry, withdraw)
 
 	// Policy

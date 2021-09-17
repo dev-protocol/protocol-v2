@@ -5,8 +5,6 @@ pragma solidity ^0.8.0;
 interface IMarketFactory {
 	event Create(address indexed _market, address _from);
 
-	function initialize(address _registry) external;
-
 	function marketsCount() external returns (uint256);
 
 	function create(address _addr) external returns (address);

@@ -30,7 +30,7 @@ contract STokensManager is
 		_;
 	}
 
-	function initialize(address _registry) external override initializer {
+	function initialize(address _registry) external initializer {
 		__ERC721_init("Dev Protocol sTokens V1", "DEV-STOKENS-V1");
 		__UsingRegistry_init(_registry);
 	}

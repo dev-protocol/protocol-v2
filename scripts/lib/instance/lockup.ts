@@ -3,7 +3,9 @@ import {
 	LockupInstance,
 } from '../../../types/truffle-contracts'
 
-export const generateLockupInstances = async (): Promise<LockupInstance> => {
+export const generateLockupInstances = async (
+	addressRegistry: AddressRegistryInstance
+): Promise<LockupInstance> => {
 	const lockup = await artifacts.require('Lockup').new()
 	console.log(`new Lockup Logic:${lockup.address}`)
 	const admin = await artifacts.require('Admin').new()
@@ -16,6 +18,7 @@ export const generateLockupInstances = async (): Promise<LockupInstance> => {
 	const lockupContract = artifacts.require('Lockup')
 	// eslint-disable-next-line @typescript-eslint/await-thenable
 	const lockupProxy = await lockupContract.at(proxy.address)
+	await lockupProxy.initialize(addressRegistry.address)
 	return lockupProxy
 }
 

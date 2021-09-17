@@ -121,7 +121,7 @@ types
 
 # output of tsc
 
-\*.js
+*.js
 !truffle-config.js
 !truffle-config.arbitrum.js
 
