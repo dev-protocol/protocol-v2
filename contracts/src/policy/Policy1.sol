@@ -10,7 +10,6 @@ import {IPolicy} from "contracts/interface/IPolicy.sol";
 contract Policy1 is IPolicy, Ownable, Curve, UsingRegistry {
 	uint256 public override marketVotingSeconds = 86400 * 5;
 	uint256 public override policyVotingSeconds = 86400 * 5;
-
 	uint256 private constant MINT_PER_SECOND_AND_ASSET = 132000000000000 / 15;
 
 	constructor(address _registry) UsingRegistry(_registry) {}

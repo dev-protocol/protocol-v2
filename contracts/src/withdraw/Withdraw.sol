@@ -14,14 +14,13 @@ import {IPropertyFactory} from "contracts/interface/IPropertyFactory.sol";
  * A contract that manages the withdrawal of holder rewards for Property holders.
  */
 contract Withdraw is IWithdraw, InitializableUsingRegistry {
-	using Decimals for uint256;
-
 	mapping(address => mapping(address => uint256))
 		public lastWithdrawnRewardPrice; // {Property: {User: Value}} // From [get/set]StorageLastWithdrawnReward
 	mapping(address => mapping(address => uint256))
 		public lastWithdrawnRewardCapPrice; // {Property: {User: Value}} // From [get/set]PendingWithdrawal
 	mapping(address => mapping(address => uint256)) public pendingWithdrawal; // {Property: {User: Value}}
 	mapping(address => uint256) public cumulativeWithdrawnReward; // {Property: Value} // From [get/set]RewardsAmount
+	using Decimals for uint256;
 
 	/**
 	 * Initialize the passed address as AddressRegistry address.

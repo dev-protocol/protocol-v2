@@ -19,7 +19,6 @@ contract STokensManager is
 	Counters.Counter private _tokenIds;
 	mapping(bytes32 => bytes) private bytesStorage;
 	mapping(address => uint256[]) private tokenIdsMapOfProperty;
-
 	modifier onlyLockup() {
 		require(
 			registry().registries("Lockup") == _msgSender(),

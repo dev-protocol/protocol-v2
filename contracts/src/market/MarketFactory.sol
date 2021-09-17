@@ -16,9 +16,9 @@ contract MarketFactory is
 	OwnableUpgradeable,
 	IMarketFactory
 {
+	uint256 public override marketsCount;
 	mapping(address => bool) public override isMarket;
 	mapping(address => bool) public override isPotentialMarket;
-	uint256 public override marketsCount;
 
 	/**
 	 * Initialize the passed address as AddressRegistry address.

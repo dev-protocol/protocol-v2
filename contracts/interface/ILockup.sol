@@ -3,6 +3,13 @@
 pragma solidity ^0.8.0;
 
 interface ILockup {
+	struct RewardPrices {
+		uint256 reward;
+		uint256 holders;
+		uint256 interest;
+		uint256 holdersCap;
+	}
+
 	event Lockedup(
 		address indexed _from,
 		address indexed _property,
@@ -16,6 +23,8 @@ interface ILockup {
 		uint256 _reward,
 		uint256 _tokenId
 	);
+
+	event UpdateCap(uint256 _cap);
 
 	function depositToProperty(address _property, uint256 _amount)
 		external

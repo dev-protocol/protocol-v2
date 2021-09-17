@@ -11,10 +11,10 @@ import {IMarketFactory} from "contracts/interface/IMarketFactory.sol";
  * A factory contract for creating new Metrics contracts and logical deletion of Metrics contracts.
  */
 contract MetricsFactory is InitializableUsingRegistry, IMetricsFactory {
-	mapping(address => bool) public override isMetrics;
-	mapping(address => uint256) public override metricsCountPerProperty;
 	uint256 public override metricsCount;
 	uint256 public override authenticatedPropertiesCount;
+	mapping(address => bool) public override isMetrics;
+	mapping(address => uint256) public override metricsCountPerProperty;
 
 	/**
 	 * Initialize the passed address as AddressRegistry address.
