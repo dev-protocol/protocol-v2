@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity =0.8.7;
 
-import {SafeMath} from "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {UsingRegistry} from "contracts/src/common/registry/UsingRegistry.sol";
 import {IWithdraw} from "contracts/interface/IWithdraw.sol";
@@ -15,7 +14,6 @@ import {IPolicy} from "contracts/interface/IPolicy.sol";
  * Holders of Property contracts(tokens) receive holder rewards according to their share.
  */
 contract Property is ERC20, UsingRegistry, IProperty {
-	using SafeMath for uint256;
 	uint8 private constant PROPERTY_DECIMALS = 18;
 	uint256 private constant SUPPLY = 10000000000000000000000000;
 	address private __author;
@@ -60,7 +58,7 @@ contract Property is ERC20, UsingRegistry, IProperty {
 		 */
 		IPolicy policy = IPolicy(registry().registries("Policy"));
 		uint256 toTreasury = policy.shareOfTreasury(SUPPLY);
-		uint256 toAuthor = SUPPLY.sub(toTreasury);
+		uint256 toAuthor = SUPPLY - toTreasury;
 		require(toAuthor != 0, "share of author is 0");
 		_mint(__author, toAuthor);
 		_mint(registry().registries("Treasury"), toTreasury);
@@ -223,14 +221,7 @@ contract Property is ERC20, UsingRegistry, IProperty {
 		 * Reduces the allowance amount.
 		 */
 		uint256 allowanceAmount = allowance(_from, msg.sender);
-		_approve(
-			_from,
-			msg.sender,
-			allowanceAmount.sub(
-				_value,
-				"ERC20: transfer amount exceeds allowance"
-			)
-		);
+		_approve(_from, msg.sender, allowanceAmount - _value);
 		return true;
 	}
 

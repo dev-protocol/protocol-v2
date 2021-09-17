@@ -444,7 +444,11 @@ contract(
 						from: author,
 					})
 					.catch((err: Error) => err)
-				validateErrorMessage(result, 'ERC20: transfer amount exceeds allowance')
+				validateErrorMessage(
+					result,
+					'Returned error: VM Exception while processing transaction: revert',
+					false
+				)
 			})
 			it('transfer success', async () => {
 				const property = await propertyContract.at(propertyAddress)

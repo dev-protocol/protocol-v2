@@ -2,7 +2,6 @@
 pragma solidity =0.8.7;
 
 // prettier-ignore
-import {SafeMath} from "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {Decimals} from "contracts/src/common/libs/Decimals.sol";
@@ -43,7 +42,6 @@ import {ISTokensManager} from "contracts/interface/ISTokensManager.sol";
  * - After 10 blocks, Alice withdraws Property-A staking reward. The reward at this time is 5000 DEV (10 blocks * 500 DEV) + 3125 DEV (10 blocks * 62.5% * 500 DEV) + 2500 DEV (10 blocks * 50% * 500 DEV).
  */
 contract Lockup is ILockup, InitializableUsingRegistry {
-	using SafeMath for uint256;
 	using Decimals for uint256;
 	struct RewardPrices {
 		uint256 reward;
@@ -211,10 +209,10 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		 */
 		bool result = sTokensManagerInstance.update(
 			_tokenId,
-			positions.amount.add(_amount),
+			positions.amount + _amount,
 			prices.interest,
-			positions.cumulativeReward.add(withdrawable),
-			positions.pendingReward.add(withdrawable)
+			positions.cumulativeReward + withdrawable,
+			positions.pendingReward + withdrawable
 		);
 		require(result, "failed to update");
 		/**
@@ -262,7 +260,7 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		 * Saves variables that should change due to the canceling staking..
 		 */
 		updateValues(false, positions.property, _amount, prices);
-		uint256 cumulative = positions.cumulativeReward.add(value);
+		uint256 cumulative = positions.cumulativeReward + value;
 
 		emit Withdrew(msg.sender, positions.property, _amount, value, _tokenId);
 		/**
@@ -271,7 +269,7 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		return
 			sTokensManagerInstance.update(
 				_tokenId,
-				positions.amount.sub(_amount),
+				positions.amount - _amount,
 				prices.interest,
 				cumulative,
 				0
@@ -312,8 +310,8 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 	{
 		uint256 cCap = cumulativeHoldersRewardCap;
 		uint256 lastHoldersPrice = lastCumulativeHoldersPriceCap;
-		uint256 additionalCap = _holdersPrice.sub(lastHoldersPrice).mul(cap);
-		return cCap.add(additionalCap);
+		uint256 additionalCap = (_holdersPrice - lastHoldersPrice) * cap;
+		return cCap + additionalCap;
 	}
 
 	/**
@@ -386,9 +384,7 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		 * Calculates reward unit price per staking.
 		 * Later, the last cumulative sum of the reward amount is subtracted because to add the last recorded holder/staking reward.
 		 */
-		uint256 price = allStakes > 0
-			? mReward.sub(lastReward).div(allStakes)
-			: 0;
+		uint256 price = allStakes > 0 ? (mReward - lastReward) / allStakes : 0;
 
 		/**
 		 * Calculates the holders reward out of the total reward amount.
@@ -399,8 +395,8 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		/**
 		 * Calculates and returns each reward.
 		 */
-		uint256 holdersPrice = holdersShare.add(lastHoldersPrice);
-		uint256 interestPrice = price.sub(holdersShare).add(lastInterestPrice);
+		uint256 holdersPrice = holdersShare + lastHoldersPrice;
+		uint256 interestPrice = price - holdersShare + lastInterestPrice;
 		uint256 cCap = _calculateLatestCap(holdersPrice);
 		return (mReward, holdersPrice, interestPrice, cCap);
 	}
@@ -421,14 +417,13 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		/**
 		 * `cHoldersReward` contains the calculation of `lastReward`, so subtract it here.
 		 */
-		uint256 additionalHoldersReward = _holdersPrice.sub(lastReward).mul(
-			totalLockedForProperty[_property]
-		);
+		uint256 additionalHoldersReward = (_holdersPrice - lastReward) *
+			totalLockedForProperty[_property];
 
 		/**
 		 * Calculates and returns the cumulative sum of the holder reward by adds the last recorded holder reward and the latest holder reward.
 		 */
-		return cHoldersReward.add(additionalHoldersReward);
+		return cHoldersReward + additionalHoldersReward;
 	}
 
 	/**
@@ -451,7 +446,7 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		/**
 		 * Calculates the cap
 		 */
-		uint256 capValue = holdersCap.sub(initialCap);
+		uint256 capValue = holdersCap - initialCap;
 		return (
 			_calculateCumulativeHoldersRewardAmount(holders, _property),
 			capValue
@@ -526,13 +521,13 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		/**
 		 * Calculates the difference between the latest block number and the last recorded block number.
 		 */
-		uint256 time = lastTs > 0 ? block.timestamp.sub(lastTs) : 0;
+		uint256 time = lastTs > 0 ? block.timestamp - lastTs : 0;
 
 		/**
 		 * Adds the calculated new cumulative maximum mint amount to the recorded cumulative maximum mint amount.
 		 */
-		uint256 additionalRewards = lastMaxRewards.mul(time);
-		uint256 nextRewards = cumulativeGlobalReward.add(additionalRewards);
+		uint256 additionalRewards = lastMaxRewards * time;
+		uint256 nextRewards = cumulativeGlobalReward + additionalRewards;
 
 		/**
 		 * Returns the latest theoretical cumulative sum of maximum mint amount and maximum mint amount per block.
@@ -566,7 +561,7 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		 * Calculates and returns the latest withdrawable reward amount from the difference.
 		 */
 		uint256 result = interest >= _price
-			? interest.sub(_price).mul(_amount).divBasis()
+			? ((interest - _price) * _amount).divBasis()
 			: 0;
 		return (
 			result,
@@ -604,7 +599,7 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		/**
 		 * Returns the sum of all values.
 		 */
-		uint256 withdrawableAmount = amount.add(positions.pendingReward);
+		uint256 withdrawableAmount = amount + positions.pendingReward;
 		return (withdrawableAmount, prices);
 	}
 
@@ -709,7 +704,7 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 	 */
 	function addAllValue(uint256 _value) private {
 		uint256 value = totalLocked;
-		value = value.add(_value);
+		value = value + _value;
 		totalLocked = value;
 	}
 
@@ -718,7 +713,7 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 	 */
 	function subAllValue(uint256 _value) private {
 		uint256 value = totalLocked;
-		value = value.sub(_value);
+		value = value - _value;
 		totalLocked = value;
 	}
 
@@ -727,7 +722,7 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 	 */
 	function addPropertyValue(address _property, uint256 _value) private {
 		uint256 value = totalLockedForProperty[_property];
-		value = value.add(_value);
+		value = value + _value;
 		totalLockedForProperty[_property] = value;
 	}
 
@@ -736,7 +731,7 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 	 */
 	function subPropertyValue(address _property, uint256 _value) private {
 		uint256 value = totalLockedForProperty[_property];
-		uint256 nextValue = value.sub(_value);
+		uint256 nextValue = value - _value;
 		totalLockedForProperty[_property] = nextValue;
 	}
 }

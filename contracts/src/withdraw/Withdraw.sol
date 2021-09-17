@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity =0.8.7;
 
-import {SafeMath} from "@openzeppelin/contracts/utils/math/SafeMath.sol";
 // prettier-ignore
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {Decimals} from "contracts/src/common/libs/Decimals.sol";
@@ -16,7 +15,6 @@ import {IPropertyFactory} from "contracts/interface/IPropertyFactory.sol";
  * A contract that manages the withdrawal of holder rewards for Property holders.
  */
 contract Withdraw is IWithdraw, InitializableUsingRegistry {
-	using SafeMath for uint256;
 	using Decimals for uint256;
 
 	mapping(address => mapping(address => uint256))
@@ -94,9 +92,9 @@ contract Withdraw is IWithdraw, InitializableUsingRegistry {
 		/**
 		 * Adds the reward amount already withdrawn in the passed Property.
 		 */
-		cumulativeWithdrawnReward[_property] = cumulativeWithdrawnReward[
-			_property
-		].add(value);
+		cumulativeWithdrawnReward[_property] =
+			cumulativeWithdrawnReward[_property] +
+			value;
 	}
 
 	/**
@@ -151,8 +149,8 @@ contract Withdraw is IWithdraw, InitializableUsingRegistry {
 		/**
 		 * Adds the undrawn reward amount of the transfer source and destination.
 		 */
-		pendingWithdrawal[msg.sender][_from] = pendFrom.add(amountFrom);
-		pendingWithdrawal[msg.sender][_to] = pendTo.add(amountTo);
+		pendingWithdrawal[msg.sender][_from] = pendFrom + amountFrom;
+		pendingWithdrawal[msg.sender][_to] = pendTo + amountTo;
 
 		emit PropertyTransfer(msg.sender, _from, _to);
 	}
@@ -207,8 +205,8 @@ contract Withdraw is IWithdraw, InitializableUsingRegistry {
 		IERC20 property = IERC20(_property);
 		uint256 balance = property.balanceOf(_user);
 		uint256 totalSupply = property.totalSupply();
-		uint256 unitPriceCap = _cap.sub(_lastRewardCap).div(totalSupply);
-		return unitPriceCap.mul(balance).divBasis();
+		uint256 unitPriceCap = (_cap - _lastRewardCap) / totalSupply;
+		return (unitPriceCap * balance).divBasis();
 	}
 
 	/**
@@ -226,10 +224,8 @@ contract Withdraw is IWithdraw, InitializableUsingRegistry {
 		IERC20 property = IERC20(_property);
 		uint256 balance = property.balanceOf(_user);
 		uint256 totalSupply = property.totalSupply();
-		uint256 unitPrice = _reward.sub(_lastReward).mulBasis().div(
-			totalSupply
-		);
-		return unitPrice.mul(balance).divBasis().divBasis();
+		uint256 unitPrice = ((_reward - _lastReward).mulBasis()) / totalSupply;
+		return (unitPrice * balance).divBasis().divBasis();
 	}
 
 	/**
@@ -269,7 +265,7 @@ contract Withdraw is IWithdraw, InitializableUsingRegistry {
 		/**
 		 * Gets the reward amount in saved without withdrawal and returns the sum of all values.
 		 */
-		uint256 value = _value.add(pendingWithdrawal[_property][_user]);
+		uint256 value = _value + pendingWithdrawal[_property][_user];
 		return (value, price, cap, allReward);
 	}
 

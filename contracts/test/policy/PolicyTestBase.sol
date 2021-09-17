@@ -1,12 +1,9 @@
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity =0.8.7;
 
-import {SafeMath} from "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import {IPolicy} from "contracts/interface/IPolicy.sol";
 
 contract PolicyTestBase is IPolicy {
-	using SafeMath for uint256;
-
 	function rewards(uint256, uint256)
 		external
 		view
@@ -64,6 +61,6 @@ contract PolicyTestBase is IPolicy {
 		override
 		returns (uint256)
 	{
-		return _supply.div(100).mul(5);
+		return (_supply / 100) * 5;
 	}
 }

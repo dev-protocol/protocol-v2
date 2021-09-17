@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity =0.8.7;
 
-import {SafeMath} from "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {InitializableUsingRegistry} from "contracts/src/common/registry/InitializableUsingRegistry.sol";
 import {Market} from "contracts/src/market/Market.sol";
@@ -17,8 +16,6 @@ contract MarketFactory is
 	OwnableUpgradeable,
 	IMarketFactory
 {
-	using SafeMath for uint256;
-
 	mapping(address => bool) public override isMarket;
 	mapping(address => bool) public override isPotentialMarket;
 	uint256 public override marketsCount;
@@ -98,6 +95,6 @@ contract MarketFactory is
 	}
 
 	function _addCount() internal {
-		marketsCount = marketsCount.add(1);
+		marketsCount = marketsCount + 1;
 	}
 }

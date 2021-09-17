@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity =0.8.7;
 
-import {SafeMath} from "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import {InitializableUsingRegistry} from "contracts/src/common/registry/InitializableUsingRegistry.sol";
 import {Metrics} from "contracts/src/metrics/Metrics.sol";
 import {IMetrics} from "contracts/interface/IMetrics.sol";
@@ -12,8 +11,6 @@ import {IMarketFactory} from "contracts/interface/IMarketFactory.sol";
  * A factory contract for creating new Metrics contracts and logical deletion of Metrics contracts.
  */
 contract MetricsFactory is InitializableUsingRegistry, IMetricsFactory {
-	using SafeMath for uint256;
-
 	mapping(address => bool) public override isMetrics;
 	mapping(address => uint256) public override metricsCountPerProperty;
 	uint256 public override metricsCount;
@@ -94,10 +91,10 @@ contract MetricsFactory is InitializableUsingRegistry, IMetricsFactory {
 		address property = IMetrics(_addr).property();
 		uint256 countPerProperty = metricsCountPerProperty[property];
 		if (countPerProperty == 0) {
-			authenticatedPropertiesCount = authenticatedPropertiesCount.add(1);
+			authenticatedPropertiesCount = authenticatedPropertiesCount + 1;
 		}
-		metricsCount = metricsCount.add(1);
-		metricsCountPerProperty[property] = countPerProperty.add(1);
+		metricsCount = metricsCount + 1;
+		metricsCountPerProperty[property] = countPerProperty + 1;
 	}
 
 	function _removeMetrics(address _addr) internal {
@@ -105,10 +102,10 @@ contract MetricsFactory is InitializableUsingRegistry, IMetricsFactory {
 		address property = IMetrics(_addr).property();
 		uint256 countPerProperty = metricsCountPerProperty[property];
 		if (countPerProperty == 1) {
-			authenticatedPropertiesCount = authenticatedPropertiesCount.sub(1);
+			authenticatedPropertiesCount = authenticatedPropertiesCount - 1;
 		}
-		metricsCount = metricsCount.sub(1);
-		metricsCountPerProperty[property] = countPerProperty.sub(1);
+		metricsCount = metricsCount - 1;
+		metricsCountPerProperty[property] = countPerProperty - 1;
 	}
 
 	function hasAssets(address _property)

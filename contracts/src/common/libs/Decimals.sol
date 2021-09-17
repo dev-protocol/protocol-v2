@@ -1,14 +1,11 @@
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity =0.8.7;
 
-import {SafeMath} from "@openzeppelin/contracts/utils/math/SafeMath.sol";
-
 /**
  * Library for emulating calculations involving decimals.
  */
 library Decimals {
-	using SafeMath for uint256;
-	uint120 private constant BASIS_VAKUE = 1000000000000000000;
+	uint120 private constant BASIS_VALUE = 1000000000000000000;
 
 	/**
 	 * @dev Returns the ratio of the first argument to the second argument.
@@ -24,11 +21,11 @@ library Decimals {
 		if (_a == 0) {
 			return 0;
 		}
-		uint256 a = _a.mul(BASIS_VAKUE);
+		uint256 a = _a * BASIS_VALUE;
 		if (a < _b) {
 			return 0;
 		}
-		return (a.div(_b));
+		return a / _b;
 	}
 
 	/**
@@ -37,7 +34,7 @@ library Decimals {
 	 * @return Multiplied value.
 	 */
 	function mulBasis(uint256 _a) internal pure returns (uint256) {
-		return _a.mul(BASIS_VAKUE);
+		return _a * BASIS_VALUE;
 	}
 
 	/**
@@ -47,6 +44,6 @@ library Decimals {
 	 * @return Divisioned value.
 	 */
 	function divBasis(uint256 _a) internal pure returns (uint256) {
-		return _a.div(BASIS_VAKUE);
+		return _a / BASIS_VALUE;
 	}
 }
