@@ -15,11 +15,11 @@ import {IPolicy} from "contracts/interface/IPolicy.sol";
  */
 contract Property is ERC20, UsingRegistry, IProperty {
 	uint8 private constant PROPERTY_DECIMALS = 18;
+	uint8 private __decimals;
 	uint256 private constant SUPPLY = 10000000000000000000000000;
 	address private __author;
 	string private __name;
 	string private __symbol;
-	uint8 private __decimals;
 
 	/**
 	 * @dev Initializes the passed value as AddressRegistry address, author address, token name, and token symbol.
