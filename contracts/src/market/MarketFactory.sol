@@ -2,11 +2,11 @@
 pragma solidity =0.8.7;
 
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import {InitializableUsingRegistry} from "contracts/src/common/registry/InitializableUsingRegistry.sol";
-import {Market} from "contracts/src/market/Market.sol";
-import {IMarket} from "contracts/interface/IMarket.sol";
-import {IMarketBehavior} from "contracts/interface/IMarketBehavior.sol";
-import {IMarketFactory} from "contracts/interface/IMarketFactory.sol";
+import {InitializableUsingRegistry} from "../../src/common/registry/InitializableUsingRegistry.sol";
+import {Market} from "../../src/market/Market.sol";
+import {IMarket} from "../../interface/IMarket.sol";
+import {IMarketBehavior} from "../../interface/IMarketBehavior.sol";
+import {IMarketFactory} from "../../interface/IMarketFactory.sol";
 
 /**
  * A factory contract that creates a new Market contract.

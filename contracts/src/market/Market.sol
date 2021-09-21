@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity =0.8.7;
 
-import {UsingRegistry} from "contracts/src/common/registry/UsingRegistry.sol";
-import {IProperty} from "contracts/interface/IProperty.sol";
-import {IMarket} from "contracts/interface/IMarket.sol";
-import {IMarketBehavior} from "contracts/interface/IMarketBehavior.sol";
-import {IPolicy} from "contracts/interface/IPolicy.sol";
-import {IMetrics} from "contracts/interface/IMetrics.sol";
-import {IMetricsFactory} from "contracts/interface/IMetricsFactory.sol";
-import {ILockup} from "contracts/interface/ILockup.sol";
-import {IDev} from "contracts/interface/IDev.sol";
+import {UsingRegistry} from "../../src/common/registry/UsingRegistry.sol";
+import {IProperty} from "../../interface/IProperty.sol";
+import {IMarket} from "../../interface/IMarket.sol";
+import {IMarketBehavior} from "../../interface/IMarketBehavior.sol";
+import {IPolicy} from "../../interface/IPolicy.sol";
+import {IMetrics} from "../../interface/IMetrics.sol";
+import {IMetricsFactory} from "../../interface/IMetricsFactory.sol";
+import {ILockup} from "../../interface/ILockup.sol";
+import {IDev} from "../../interface/IDev.sol";
 
 /**
  * A user-proposable contract for authenticating and associating assets with Property.

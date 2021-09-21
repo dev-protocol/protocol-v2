@@ -2,13 +2,13 @@
 pragma solidity =0.8.7;
 
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {Decimals} from "contracts/src/common/libs/Decimals.sol";
-import {InitializableUsingRegistry} from "contracts/src/common/registry/InitializableUsingRegistry.sol";
-import {IDevMinter} from "contracts/interface/IDevMinter.sol";
-import {IWithdraw} from "contracts/interface/IWithdraw.sol";
-import {ILockup} from "contracts/interface/ILockup.sol";
-import {IMetricsFactory} from "contracts/interface/IMetricsFactory.sol";
-import {IPropertyFactory} from "contracts/interface/IPropertyFactory.sol";
+import {Decimals} from "../../src/common/libs/Decimals.sol";
+import {InitializableUsingRegistry} from "../../src/common/registry/InitializableUsingRegistry.sol";
+import {IDevMinter} from "../../interface/IDevMinter.sol";
+import {IWithdraw} from "../../interface/IWithdraw.sol";
+import {ILockup} from "../../interface/ILockup.sol";
+import {IMetricsFactory} from "../../interface/IMetricsFactory.sol";
+import {IPropertyFactory} from "../../interface/IPropertyFactory.sol";
 
 /**
  * A contract that manages the withdrawal of holder rewards for Property holders.

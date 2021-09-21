@@ -2,9 +2,9 @@
 pragma solidity =0.8.7;
 
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import {InitializableUsingRegistry} from "contracts/src/common/registry/InitializableUsingRegistry.sol";
-import {IPolicy} from "contracts/interface/IPolicy.sol";
-import {IPolicyFactory} from "contracts/interface/IPolicyFactory.sol";
+import {InitializableUsingRegistry} from "../../src/common/registry/InitializableUsingRegistry.sol";
+import {IPolicy} from "../../interface/IPolicy.sol";
+import {IPolicyFactory} from "../../interface/IPolicyFactory.sol";
 
 /**
  * A factory contract that creates a new Policy contract.

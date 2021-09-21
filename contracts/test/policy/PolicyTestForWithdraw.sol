@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity =0.8.7;
 
-import {PolicyTestBase} from "contracts/test/policy/PolicyTestBase.sol";
+import {PolicyTestBase} from "./PolicyTestBase.sol";
 
 contract PolicyTestForWithdraw is PolicyTestBase {
 	function rewards(uint256 _lockups, uint256)

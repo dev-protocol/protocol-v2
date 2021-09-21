@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity =0.8.7;
 
-import {InitializableUsingRegistry} from "contracts/src/common/registry/InitializableUsingRegistry.sol";
+import {InitializableUsingRegistry} from "../../src/common/registry/InitializableUsingRegistry.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {IWithdraw} from "contracts/interface/IWithdraw.sol";
-import {IAddressRegistry} from "contracts/interface/IAddressRegistry.sol";
+import {IWithdraw} from "../../interface/IWithdraw.sol";
+import {IAddressRegistry} from "../../interface/IAddressRegistry.sol";
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 contract TreasuryTest is OwnableUpgradeable, InitializableUsingRegistry {

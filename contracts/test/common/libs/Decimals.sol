@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity =0.8.7;
 
-import {Decimals} from "contracts/src/common/libs/Decimals.sol";
+import {Decimals} from "../../../src/common/libs/Decimals.sol";
 
 contract DecimalsTest {
 	using Decimals for uint256;

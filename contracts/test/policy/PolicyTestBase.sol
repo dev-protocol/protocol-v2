@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity =0.8.7;
 
-import {IPolicy} from "contracts/interface/IPolicy.sol";
+import {IPolicy} from "../../interface/IPolicy.sol";
 
 contract PolicyTestBase is IPolicy {
 	function rewards(uint256, uint256)

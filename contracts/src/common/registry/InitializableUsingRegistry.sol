@@ -2,7 +2,7 @@
 pragma solidity =0.8.7;
 
 import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import {IAddressRegistry} from "contracts/interface/IAddressRegistry.sol";
+import {IAddressRegistry} from "../../../interface/IAddressRegistry.sol";
 
 /**
  * Module for using AddressRegistry contracts.

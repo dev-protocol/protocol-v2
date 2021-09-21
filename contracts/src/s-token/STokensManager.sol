@@ -2,11 +2,11 @@
 pragma solidity =0.8.7;
 
 import {ERC721EnumerableUpgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol";
-import {InitializableUsingRegistry} from "contracts/src/common/registry/InitializableUsingRegistry.sol";
-import {STokensDescriptor} from "contracts/src/s-token/STokensDescriptor.sol";
-import {ISTokensManager} from "contracts/interface//ISTokensManager.sol";
-import {IAddressRegistry} from "contracts/interface/IAddressRegistry.sol";
-import {ILockup} from "contracts/interface/ILockup.sol";
+import {InitializableUsingRegistry} from "../../src/common/registry/InitializableUsingRegistry.sol";
+import {STokensDescriptor} from "../../src/s-token/STokensDescriptor.sol";
+import {ISTokensManager} from "../../interface//ISTokensManager.sol";
+import {IAddressRegistry} from "../../interface/IAddressRegistry.sol";
+import {ILockup} from "../../interface/ILockup.sol";
 
 contract STokensManager is
 	ISTokensManager,

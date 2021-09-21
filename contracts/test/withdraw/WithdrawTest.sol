@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity =0.8.7;
 
-import {Withdraw} from "contracts/src/withdraw/Withdraw.sol";
+import {Withdraw} from "../../src/withdraw/Withdraw.sol";
 
 contract WithdrawTest is Withdraw {
 	constructor() Withdraw() {}

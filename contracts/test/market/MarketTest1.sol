@@ -2,9 +2,9 @@
 pragma solidity =0.8.7;
 
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
-import {UsingRegistry} from "contracts/src/common/registry/UsingRegistry.sol";
-import {IMarketBehavior} from "contracts/interface/IMarketBehavior.sol";
-import {IMarket} from "contracts/interface/IMarket.sol";
+import {UsingRegistry} from "../../src/common/registry/UsingRegistry.sol";
+import {IMarketBehavior} from "../../interface/IMarketBehavior.sol";
+import {IMarket} from "../../interface/IMarket.sol";
 
 contract MarketTest1 is Ownable, IMarketBehavior, UsingRegistry {
 	string public override schema = "[]";

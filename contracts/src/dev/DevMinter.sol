@@ -3,9 +3,9 @@ pragma solidity =0.8.7;
 
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {ERC20PresetMinterPauser} from "@openzeppelin/contracts/token/ERC20/presets/ERC20PresetMinterPauser.sol";
-import {InitializableUsingRegistry} from "contracts/src/common/registry/InitializableUsingRegistry.sol";
-import {IAddressRegistry} from "contracts/interface/IAddressRegistry.sol";
-import {IDevMinter} from "contracts/interface/IDevMinter.sol";
+import {InitializableUsingRegistry} from "../../src/common/registry/InitializableUsingRegistry.sol";
+import {IAddressRegistry} from "../../interface/IAddressRegistry.sol";
+import {IDevMinter} from "../../interface/IDevMinter.sol";
 
 contract DevMinter is
 	InitializableUsingRegistry,
