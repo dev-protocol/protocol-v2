@@ -2,7 +2,7 @@
 pragma solidity =0.8.7;
 
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import {InitializableUsingRegistry} from "../../src/common/registry/InitializableUsingRegistry.sol";
+import {InitializableUsingRegistry} from "../common/registry/InitializableUsingRegistry.sol";
 import {IPolicy} from "../../interface/IPolicy.sol";
 import {IPolicyFactory} from "../../interface/IPolicyFactory.sol";
 

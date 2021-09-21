@@ -3,8 +3,8 @@ pragma solidity =0.8.7;
 
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {Curve} from "../../src/common/libs/Curve.sol";
-import {UsingRegistry} from "../../src/common/registry/UsingRegistry.sol";
+import {Curve} from "../common/libs/Curve.sol";
+import {UsingRegistry} from "../common/registry/UsingRegistry.sol";
 import {IPolicy} from "../../interface/IPolicy.sol";
 
 contract Policy1 is IPolicy, Ownable, Curve, UsingRegistry {

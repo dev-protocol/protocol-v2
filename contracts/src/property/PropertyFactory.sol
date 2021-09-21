@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity =0.8.7;
 
-import {InitializableUsingRegistry} from "../../src/common/registry/InitializableUsingRegistry.sol";
-import {Property} from "../../src/property/Property.sol";
+import {InitializableUsingRegistry} from "../common/registry/InitializableUsingRegistry.sol";
+import {Property} from "./Property.sol";
 import {IPropertyFactory} from "../../interface/IPropertyFactory.sol";
 import {IMarket} from "../../interface/IMarket.sol";
 

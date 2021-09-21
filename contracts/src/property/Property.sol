@@ -2,7 +2,7 @@
 pragma solidity =0.8.7;
 
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import {UsingRegistry} from "../../src/common/registry/UsingRegistry.sol";
+import {UsingRegistry} from "../common/registry/UsingRegistry.sol";
 import {IWithdraw} from "../../interface/IWithdraw.sol";
 import {IProperty} from "../../interface/IProperty.sol";
 import {IPropertyFactory} from "../../interface/IPropertyFactory.sol";

@@ -2,7 +2,7 @@
 pragma solidity =0.8.7;
 
 import {ERC20PresetMinterPauserUpgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/presets/ERC20PresetMinterPauserUpgradeable.sol";
-import {InitializableUsingRegistry} from "../../src/common/registry/InitializableUsingRegistry.sol";
+import {InitializableUsingRegistry} from "../common/registry/InitializableUsingRegistry.sol";
 import {IDev} from "../../interface/IDev.sol";
 import {IMarketFactory} from "../../interface/IMarketFactory.sol";
 

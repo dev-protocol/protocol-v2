@@ -2,8 +2,8 @@
 pragma solidity =0.8.7;
 
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {Decimals} from "../../src/common/libs/Decimals.sol";
-import {InitializableUsingRegistry} from "../../src/common/registry/InitializableUsingRegistry.sol";
+import {Decimals} from "../common/libs/Decimals.sol";
+import {InitializableUsingRegistry} from "../common/registry/InitializableUsingRegistry.sol";
 import {IDevMinter} from "../../interface/IDevMinter.sol";
 import {IWithdraw} from "../../interface/IWithdraw.sol";
 import {ILockup} from "../../interface/ILockup.sol";
