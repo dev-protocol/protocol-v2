@@ -317,7 +317,7 @@ contract('STokensManager', ([deployer, user]) => {
 	})
 	describe('rewards', () => {
 		describe('success', () => {
-			it('get reward', async () => {
+			it.only('get reward', async () => {
 				const [dev, property] = await init()
 				await dev.lockup.depositToProperty(property.address, '10000')
 				const t1 = await getBlockTimestamp()
@@ -330,8 +330,10 @@ contract('STokensManager', ([deployer, user]) => {
 						.toFixed()
 				)
 				expect(position.cumulativeReward.toString()).to.equal('0')
+				const tmp =
+					await dev.lockup.calculateWithdrawableInterestAmountByPosition(1)
 				expect(position.withdrawableReward.toString()).to.equal(
-					'10000000000000000000'
+					toBigNumber(tmp).toFixed()
 				)
 			})
 			it('get updated reward', async () => {
