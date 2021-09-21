@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity =0.8.7;
 
-import {Counters} from "@openzeppelin/contracts/utils/Counters.sol";
 import {ERC721EnumerableUpgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol";
 import {InitializableUsingRegistry} from "contracts/src/common/registry/InitializableUsingRegistry.sol";
 import {STokensDescriptor} from "contracts/src/s-token/STokensDescriptor.sol";
@@ -15,8 +14,7 @@ contract STokensManager is
 	ERC721EnumerableUpgradeable,
 	InitializableUsingRegistry
 {
-	using Counters for Counters.Counter;
-	Counters.Counter private _tokenIds;
+	uint256 public tokenId;
 	mapping(bytes32 => bytes) private bytesStorage;
 	mapping(address => uint256[]) private tokenIdsMapOfProperty;
 	modifier onlyLockup() {
@@ -53,10 +51,9 @@ contract STokensManager is
 		uint256 _amount,
 		uint256 _price
 	) external override onlyLockup returns (uint256 tokenId_) {
-		_tokenIds.increment();
-		uint256 newTokenId = _tokenIds.current();
-		_safeMint(_owner, newTokenId);
-		emit Minted(newTokenId, _owner, _property, _amount, _price);
+		tokenId += 1;
+		_safeMint(_owner, tokenId);
+		emit Minted(tokenId, _owner, _property, _amount, _price);
 		StakingPositions memory newPosition = StakingPositions(
 			_property,
 			_amount,
@@ -64,9 +61,9 @@ contract STokensManager is
 			0,
 			0
 		);
-		setStoragePositions(newTokenId, newPosition);
-		tokenIdsMapOfProperty[_property].push(newTokenId);
-		return newTokenId;
+		setStoragePositions(tokenId, newPosition);
+		tokenIdsMapOfProperty[_property].push(tokenId);
+		return tokenId;
 	}
 
 	function update(
