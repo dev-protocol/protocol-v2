@@ -317,7 +317,7 @@ contract('STokensManager', ([deployer, user]) => {
 	})
 	describe('rewards', () => {
 		describe('success', () => {
-			it.only('get reward', async () => {
+			it('get reward', async () => {
 				const [dev, property] = await init()
 				await dev.lockup.depositToProperty(property.address, '10000')
 				const t1 = await getBlockTimestamp()
