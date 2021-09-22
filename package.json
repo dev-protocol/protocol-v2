@@ -58,7 +58,8 @@
 	"dependencies": {
 		"@devprotocol/util-contracts": "3.3.0",
 		"@openzeppelin/contracts": "4.3.2",
-		"@openzeppelin/contracts-upgradeable": "4.3.2"
+		"@openzeppelin/contracts-upgradeable": "4.3.2",
+		"arb-ethers-web3-bridge": "^0.7.3"
 	},
 	"directories": {
 		"doc": "docs",

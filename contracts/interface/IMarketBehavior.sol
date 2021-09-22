@@ -19,5 +19,5 @@ interface IMarketBehavior {
 
 	function getId(address _metrics) external view returns (string memory);
 
-	function getMetrics(string calldata _id) external view returns (address);
+	function getMetrics(string memory _id) external view returns (address);
 }

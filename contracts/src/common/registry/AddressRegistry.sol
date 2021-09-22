@@ -15,10 +15,7 @@ contract AddressRegistry is OwnableUpgradeable, IAddressRegistry {
 		__Ownable_init();
 	}
 
-	function setRegistry(string calldata _key, address _addr)
-		external
-		override
-	{
+	function setRegistry(string memory _key, address _addr) external override {
 		address sender;
 		if (
 			keccak256(abi.encodePacked(_key)) ==
@@ -32,7 +29,7 @@ contract AddressRegistry is OwnableUpgradeable, IAddressRegistry {
 		reg[_key] = _addr;
 	}
 
-	function registries(string calldata _key)
+	function registries(string memory _key)
 		external
 		view
 		override
