@@ -49,7 +49,7 @@ contract MarketTest3 is Ownable, IMarketBehavior, UsingRegistry {
 		return keys[_metrics];
 	}
 
-	function getMetrics(string calldata _id)
+	function getMetrics(string memory _id)
 		external
 		view
 		override

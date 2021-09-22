@@ -133,7 +133,7 @@ contract Property is ERC20, UsingRegistry, IProperty {
 	 * @dev Changes the name.
 	 * @param _name The new name.
 	 */
-	function changeName(string calldata _name) external override onlyAuthor {
+	function changeName(string memory _name) external override onlyAuthor {
 		emit ChangeName(__name, _name);
 
 		__name = _name;
@@ -143,11 +143,7 @@ contract Property is ERC20, UsingRegistry, IProperty {
 	 * @dev Changes the symbol.
 	 * @param _symbol The new symbol.
 	 */
-	function changeSymbol(string calldata _symbol)
-		external
-		override
-		onlyAuthor
-	{
+	function changeSymbol(string memory _symbol) external override onlyAuthor {
 		emit ChangeSymbol(__symbol, _symbol);
 
 		__symbol = _symbol;
