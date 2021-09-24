@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 require('ts-node/register')
 require('dotenv').config()
+const wrapProvider = require('arb-ethers-web3-bridge').wrapProvider
 const HDWalletProvider = require('@truffle/hdwallet-provider')
 const { INFURA_KEY, MNEMONIC } = process.env
 
@@ -13,6 +14,7 @@ module.exports = {
 			settings: {
 				optimizer: {
 					enabled: true,
+					runs: 1500
 				},
 			},
 		},
@@ -35,17 +37,15 @@ module.exports = {
 		},
 		arbitrum_testnet: {
 			network_id: 421611,
+			chain_id: 421611,
+			gas: 287853530,
 			provider: function () {
-				return new HDWalletProvider({
-					mnemonic: {
-						phrase: MNEMONIC,
-					},
-					providerOrUrl: 'https://arbitrum-rinkeby.infura.io/v3/' + INFURA_KEY,
-					addressIndex: 0,
-					numberOfAddresses: 1,
-					network_id: 421611,
-					chainId: 421611,
-				})
+				return wrapProvider(
+					new HDWalletProvider(
+						MNEMONIC,
+						'https://arbitrum-rinkeby.infura.io/v3/' + INFURA_KEY
+					)
+				)
 			},
 		},
 		arbitrum_mainnet: {

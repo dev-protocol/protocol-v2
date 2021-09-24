@@ -28,8 +28,8 @@ contract PropertyFactory is InitializableUsingRegistry, IPropertyFactory {
 	 * @return Address of the new Property.
 	 */
 	function create(
-		string calldata _name,
-		string calldata _symbol,
+		string memory _name,
+		string memory _symbol,
 		address _author
 	) external override returns (address) {
 		return _create(_name, _symbol, _author);
@@ -45,8 +45,8 @@ contract PropertyFactory is InitializableUsingRegistry, IPropertyFactory {
 	 * @return The transaction fail/success.
 	 */
 	function createAndAuthenticate(
-		string calldata _name,
-		string calldata _symbol,
+		string memory _name,
+		string memory _symbol,
 		address _market,
 		string[] memory _args
 	) external override returns (bool) {
