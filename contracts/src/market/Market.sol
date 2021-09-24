@@ -10,6 +10,7 @@ import {IMetrics} from "contracts/interface/IMetrics.sol";
 import {IMetricsFactory} from "contracts/interface/IMetricsFactory.sol";
 import {ILockup} from "contracts/interface/ILockup.sol";
 import {IDev} from "contracts/interface/IDev.sol";
+import {IDevBridge} from "contracts/interface/IDevBridge.sol";
 
 /**
  * A user-proposable contract for authenticating and associating assets with Property.
@@ -203,7 +204,7 @@ contract Market is UsingRegistry, IMarket {
 		 */
 		uint256 authenticationFee = getAuthenticationFee(_property);
 		require(
-			IDev(registry().registries("Dev")).fee(sender, authenticationFee),
+			IDevBridge(registry().registries("DevBridge")).burn(sender, authenticationFee),
 			"dev fee failed"
 		);
 

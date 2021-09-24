@@ -5,7 +5,7 @@ import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {Decimals} from "contracts/src/common/libs/Decimals.sol";
 import {InitializableUsingRegistry} from "contracts/src/common/registry/InitializableUsingRegistry.sol";
-import {IDevMinter} from "contracts/interface/IDevMinter.sol";
+import {IDevBridge} from "contracts/interface/IDevBridge.sol";
 import {IProperty} from "contracts/interface/IProperty.sol";
 import {IPolicy} from "contracts/interface/IPolicy.sol";
 import {ILockup} from "contracts/interface/ILockup.sol";
@@ -631,7 +631,7 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		 * Mints the reward.
 		 */
 		require(
-			IDevMinter(registry().registries("DevMinter")).mint(
+			IDevBridge(registry().registries("DevBridge")).mint(
 				msg.sender,
 				value
 			),

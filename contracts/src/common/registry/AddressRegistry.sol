@@ -9,7 +9,7 @@ import {IAddressRegistry} from "contracts/interface/IAddressRegistry.sol";
  * Dev Protocol will be upgradeable by this contract.
  */
 contract AddressRegistry is OwnableUpgradeable, IAddressRegistry {
-	mapping(string => address) private reg;
+	mapping(bytes32 => address) private reg;
 
 	function initialize() external initializer {
 		__Ownable_init();
@@ -17,16 +17,18 @@ contract AddressRegistry is OwnableUpgradeable, IAddressRegistry {
 
 	function setRegistry(string memory _key, address _addr) external override {
 		address sender;
-		if (
-			keccak256(abi.encodePacked(_key)) ==
-			keccak256(abi.encodePacked("Policy"))
-		) {
-			sender = reg["PolicyFactory"];
+		bytes32 key = keccak256(abi.encodePacked(_key));
+		bytes32 poliscyKey = keccak256(abi.encodePacked("Policy"));
+		if (key == poliscyKey) {
+			bytes32 poliscyFactoryKey = keccak256(
+				abi.encodePacked("PolicyFactory")
+			);
+			sender = reg[poliscyFactoryKey];
 		} else {
 			sender = owner();
 		}
 		require(msg.sender == sender, "this is illegal address");
-		reg[_key] = _addr;
+		reg[key] = _addr;
 	}
 
 	function registries(string memory _key)
@@ -35,6 +37,7 @@ contract AddressRegistry is OwnableUpgradeable, IAddressRegistry {
 		override
 		returns (address)
 	{
-		return reg[_key];
+		bytes32 key = keccak256(abi.encodePacked(_key));
+		return reg[key];
 	}
 }

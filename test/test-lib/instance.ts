@@ -127,6 +127,10 @@ export class DevProtocolInstance {
 			web3.utils.keccak256('MINTER_ROLE'),
 			this._devMinter.address
 		)
+		await this._dev.grantRole(
+			web3.utils.keccak256('BURNER_ROLE'),
+			this._devMinter.address
+		)
 		await this.addressRegistry.setRegistry(
 			'DevMinter',
 			this._devMinter.address,

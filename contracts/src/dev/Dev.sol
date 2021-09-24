@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity =0.8.7;
 
-import {ERC20PresetMinterPauserUpgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/presets/ERC20PresetMinterPauserUpgradeable.sol";
+import {ERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
+import {AccessControlEnumerableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/AccessControlEnumerableUpgradeable.sol";
 import {InitializableUsingRegistry} from "contracts/src/common/registry/InitializableUsingRegistry.sol";
 import {IDev} from "contracts/interface/IDev.sol";
-import {IMarketFactory} from "contracts/interface/IMarketFactory.sol";
 
 /**
  * The contract used as the DEV token.
@@ -14,35 +14,33 @@ import {IMarketFactory} from "contracts/interface/IMarketFactory.sol";
  * When authenticated a new asset by the Market contracts, DEV token is burned as fees.
  */
 contract Dev is
-	ERC20PresetMinterPauserUpgradeable,
+	ERC20Upgradeable,
+	AccessControlEnumerableUpgradeable,
 	InitializableUsingRegistry,
 	IDev
 {
+	bytes32 public override constant BURNER_ROLE = keccak256("BURNER_ROLE");
+	bytes32 public override constant MINTER_ROLE = keccak256("MINTER_ROLE");
 	/**
 	 * Initialize the passed address as AddressRegistry address.
 	 * The token name is `Dev`, the token symbol is `DEV`, and the decimals is 18.
 	 */
 	function initializeDev(address _registry) external initializer {
-		__ERC20PresetMinterPauser_init("Dev", "DEV");
+		__ERC20_init("Dev", "DEV");
+		__AccessControlEnumerable_init();
 		__UsingRegistry_init(_registry);
+		_setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
+		_setupRole(BURNER_ROLE, _msgSender());
+		_setupRole(MINTER_ROLE, _msgSender());
 	}
 
-	/**
-	 * Burn the DEV tokens as an authentication fee.
-	 * Only Market contracts can execute this function.
-	 */
-	function fee(address _from, uint256 _amount)
-		external
-		override
-		returns (bool)
-	{
-		require(
-			IMarketFactory(registry().registries("MarketFactory")).isMarket(
-				msg.sender
-			),
-			"this is illegal address"
-		);
-		_burn(_from, _amount);
-		return true;
-	}
+    function burn(address _account, uint256 _amount) external override {
+        require(hasRole(BURNER_ROLE, _msgSender()), "must have burner role to burn");
+        _burn(_account, _amount);
+    }
+
+    function mint(address _account, uint256 _amount) public override {
+        require(hasRole(MINTER_ROLE, _msgSender()), "must have minter role to mint");
+        _mint(_account, _amount);
+    }
 }
