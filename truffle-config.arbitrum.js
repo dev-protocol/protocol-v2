@@ -14,7 +14,7 @@ module.exports = {
 			settings: {
 				optimizer: {
 					enabled: true,
-					runs: 1500
+					runs: 200,
 				},
 			},
 		},
@@ -63,7 +63,7 @@ module.exports = {
 	},
 
 	mocha: {
-		timeout: 100000,
+		timeout: 200000,
 	},
 	db: {
 		enabled: false,
