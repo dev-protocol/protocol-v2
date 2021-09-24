@@ -61,7 +61,9 @@ contract DevBridge is
 	function renounceMinter() external override onlyOwner {
 		address token = registry().registries("Dev");
 		IDev dev = IDev(token);
-		IAccessControlUpgradeable accessControl = IAccessControlUpgradeable(token);
+		IAccessControlUpgradeable accessControl = IAccessControlUpgradeable(
+			token
+		);
 		accessControl.renounceRole(dev.MINTER_ROLE(), address(this));
 	}
 
@@ -71,7 +73,9 @@ contract DevBridge is
 	function renounceBurner() external override onlyOwner {
 		address token = registry().registries("Dev");
 		IDev dev = IDev(token);
-		IAccessControlUpgradeable accessControl = IAccessControlUpgradeable(token);
+		IAccessControlUpgradeable accessControl = IAccessControlUpgradeable(
+			token
+		);
 		accessControl.renounceRole(dev.BURNER_ROLE(), address(this));
 	}
 }

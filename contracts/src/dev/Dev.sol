@@ -19,8 +19,9 @@ contract Dev is
 	InitializableUsingRegistry,
 	IDev
 {
-	bytes32 public override constant BURNER_ROLE = keccak256("BURNER_ROLE");
-	bytes32 public override constant MINTER_ROLE = keccak256("MINTER_ROLE");
+	bytes32 public constant override BURNER_ROLE = keccak256("BURNER_ROLE");
+	bytes32 public constant override MINTER_ROLE = keccak256("MINTER_ROLE");
+
 	/**
 	 * Initialize the passed address as AddressRegistry address.
 	 * The token name is `Dev`, the token symbol is `DEV`, and the decimals is 18.
@@ -34,13 +35,19 @@ contract Dev is
 		_setupRole(MINTER_ROLE, _msgSender());
 	}
 
-    function burn(address _account, uint256 _amount) external override {
-        require(hasRole(BURNER_ROLE, _msgSender()), "must have burner role to burn");
-        _burn(_account, _amount);
-    }
+	function burn(address _account, uint256 _amount) external override {
+		require(
+			hasRole(BURNER_ROLE, _msgSender()),
+			"must have burner role to burn"
+		);
+		_burn(_account, _amount);
+	}
 
-    function mint(address _account, uint256 _amount) public override {
-        require(hasRole(MINTER_ROLE, _msgSender()), "must have minter role to mint");
-        _mint(_account, _amount);
-    }
+	function mint(address _account, uint256 _amount) public override {
+		require(
+			hasRole(MINTER_ROLE, _msgSender()),
+			"must have minter role to mint"
+		);
+		_mint(_account, _amount);
+	}
 }

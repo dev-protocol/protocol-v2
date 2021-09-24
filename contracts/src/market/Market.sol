@@ -204,7 +204,10 @@ contract Market is UsingRegistry, IMarket {
 		 */
 		uint256 authenticationFee = getAuthenticationFee(_property);
 		require(
-			IDevBridge(registry().registries("DevBridge")).burn(sender, authenticationFee),
+			IDevBridge(registry().registries("DevBridge")).burn(
+				sender,
+				authenticationFee
+			),
 			"dev fee failed"
 		);
 
