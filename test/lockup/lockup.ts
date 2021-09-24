@@ -17,7 +17,7 @@ contract('LockupTest', ([deployer, user1, user2]) => {
 		const dev = new DevProtocolInstance(deployer)
 		await dev.generateAddressRegistry()
 		await dev.generateDev()
-		await dev.generateDevMinter()
+		await dev.generateDevBridge()
 		await dev.generateSTokensManager()
 		await Promise.all([
 			dev.generateMarketFactory(),

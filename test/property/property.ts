@@ -17,7 +17,7 @@ contract(
 			before(async () => {
 				await dev.generateAddressRegistry()
 				await dev.generateDev()
-				await dev.generateDevMinter()
+				await dev.generateDevBridge()
 				await dev.generateSTokensManager()
 				await dev.generatePolicyFactory()
 				await dev.generateLockup()
@@ -76,7 +76,7 @@ contract(
 			before(async () => {
 				await dev.generateAddressRegistry()
 				await dev.generateDev()
-				await dev.generateDevMinter()
+				await dev.generateDevBridge()
 				await dev.generateSTokensManager()
 				await dev.generatePolicyFactory()
 				await dev.generateLockup()
@@ -148,7 +148,7 @@ contract(
 			before(async () => {
 				await dev.generateAddressRegistry()
 				await dev.generateDev()
-				await dev.generateDevMinter()
+				await dev.generateDevBridge()
 				await dev.generateSTokensManager()
 				await dev.generateLockup()
 				await dev.generatePolicyFactory()
@@ -220,7 +220,7 @@ contract(
 			before(async () => {
 				await dev.generateAddressRegistry()
 				await dev.generateDev()
-				await dev.generateDevMinter()
+				await dev.generateDevBridge()
 				await dev.generateSTokensManager()
 				await dev.generateLockup()
 				await dev.generatePolicyFactory()
@@ -293,7 +293,7 @@ contract(
 			beforeEach(async () => {
 				await dev.generateAddressRegistry()
 				await dev.generateDev()
-				await dev.generateDevMinter()
+				await dev.generateDevBridge()
 				await dev.generateSTokensManager()
 				await Promise.all([
 					dev.generatePropertyFactory(),
@@ -343,7 +343,7 @@ contract(
 			beforeEach(async () => {
 				await dev.generateAddressRegistry()
 				await dev.generateDev()
-				await dev.generateDevMinter()
+				await dev.generateDevBridge()
 				await dev.generateSTokensManager()
 				await Promise.all([
 					dev.generateWithdraw(),
@@ -393,7 +393,7 @@ contract(
 			beforeEach(async () => {
 				await dev.generateAddressRegistry()
 				await dev.generateDev()
-				await dev.generateDevMinter()
+				await dev.generateDevBridge()
 				await dev.generateSTokensManager()
 				await Promise.all([
 					dev.generateWithdraw(),

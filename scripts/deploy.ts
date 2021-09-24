@@ -43,7 +43,7 @@ const handler = async (
 	const addressRegistry = await generateAddressRegistryInstances()
 
 	// Dev
-	const dev = await generateDevInstances(addressRegistry)
+	const dev = await generateDevInstances('0xhogehoge')
 	await setDevAddressToRegistry(addressRegistry, dev)
 
 	// STokensManager

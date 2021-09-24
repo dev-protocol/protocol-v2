@@ -4,7 +4,7 @@ import {
 } from '../../../types/truffle-contracts'
 
 export const generateDevInstances = async (
-	addressRegistry: AddressRegistryInstance
+	l1DevAddress: string
 ): Promise<DevInstance> => {
 	const dev = await artifacts.require('Dev').new()
 	console.log(`new Dev Logic:${dev.address}`)
@@ -18,7 +18,7 @@ export const generateDevInstances = async (
 	const devContract = artifacts.require('Dev')
 	// eslint-disable-next-line @typescript-eslint/await-thenable
 	const devProxy = await devContract.at(proxy.address)
-	await devProxy.initializeDev(addressRegistry.address)
+	await devProxy.initialize(l1DevAddress)
 	return devProxy
 }
 
