@@ -24,11 +24,15 @@ contract Dev is
 	address public override l1Address;
 	bytes32 public constant override BURNER_ROLE = keccak256("BURNER_ROLE");
 	bytes32 public constant override MINTER_ROLE = keccak256("MINTER_ROLE");
+
 	/**
 	 * Initialize the passed address as AddressRegistry address.
 	 * The token name is `Dev`, the token symbol is `DEV`, and the decimals is 18.
 	 */
-	function initialize(address _registry, address _l1DevAddress) external initializer {
+	function initialize(address _registry, address _l1DevAddress)
+		external
+		initializer
+	{
 		__ERC20_init("Dev", "DEV");
 		__AccessControlEnumerable_init();
 		__UsingRegistry_init(_registry);
