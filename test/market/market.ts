@@ -136,7 +136,7 @@ contract(
 			beforeEach(async () => {
 				await dev.generateAddressRegistry()
 				await dev.generateDev()
-				await dev.generateDevMinter()
+				await dev.generateDevBridge()
 				await dev.generateSTokensManager()
 				await Promise.all([
 					dev.generateMarketFactory(),
@@ -332,7 +332,7 @@ contract(
 			beforeEach(async () => {
 				await dev.generateAddressRegistry()
 				await dev.generateDev()
-				await dev.generateDevMinter()
+				await dev.generateDevBridge()
 				await dev.generateSTokensManager()
 				await Promise.all([
 					dev.generateMarketFactory(),

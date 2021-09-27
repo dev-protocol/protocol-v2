@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity =0.8.7;
 
-import {ERC20PresetMinterPauserUpgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/presets/ERC20PresetMinterPauserUpgradeable.sol";
-import {InitializableUsingRegistry} from "contracts/src/common/registry/InitializableUsingRegistry.sol";
+import {ERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
+import {AccessControlEnumerableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/AccessControlEnumerableUpgradeable.sol";
 import {IDev} from "contracts/interface/IDev.sol";
-import {IMarketFactory} from "contracts/interface/IMarketFactory.sol";
+import {IArbToken} from "contracts/interface/IArbToken.sol";
 
 /**
  * The contract used as the DEV token.
@@ -14,35 +14,49 @@ import {IMarketFactory} from "contracts/interface/IMarketFactory.sol";
  * When authenticated a new asset by the Market contracts, DEV token is burned as fees.
  */
 contract Dev is
-	ERC20PresetMinterPauserUpgradeable,
-	InitializableUsingRegistry,
+	ERC20Upgradeable,
+	AccessControlEnumerableUpgradeable,
+	IArbToken,
 	IDev
 {
+	address public override l1Address;
+	bytes32 public constant override BURNER_ROLE = keccak256("BURNER_ROLE");
+	bytes32 public constant override MINTER_ROLE = keccak256("MINTER_ROLE");
+
 	/**
 	 * Initialize the passed address as AddressRegistry address.
 	 * The token name is `Dev`, the token symbol is `DEV`, and the decimals is 18.
 	 */
-	function initializeDev(address _registry) external initializer {
-		__ERC20PresetMinterPauser_init("Dev", "DEV");
-		__UsingRegistry_init(_registry);
+	function initialize(address _l1DevAddress) external initializer {
+		__ERC20_init("Dev", "DEV");
+		__AccessControlEnumerable_init();
+		_setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
+		_setupRole(BURNER_ROLE, _msgSender());
+		_setupRole(MINTER_ROLE, _msgSender());
+		l1Address = _l1DevAddress;
 	}
 
-	/**
-	 * Burn the DEV tokens as an authentication fee.
-	 * Only Market contracts can execute this function.
-	 */
-	function fee(address _from, uint256 _amount)
-		external
-		override
-		returns (bool)
-	{
+	function bridgeMint(address account, uint256 amount) external override {
+		mint(account, amount);
+	}
+
+	function bridgeBurn(address account, uint256 amount) external override {
+		burn(account, amount);
+	}
+
+	function mint(address _account, uint256 _amount) public override {
 		require(
-			IMarketFactory(registry().registries("MarketFactory")).isMarket(
-				msg.sender
-			),
-			"this is illegal address"
+			hasRole(MINTER_ROLE, _msgSender()),
+			"must have minter role to mint"
 		);
-		_burn(_from, _amount);
-		return true;
+		_mint(_account, _amount);
+	}
+
+	function burn(address _account, uint256 _amount) public override {
+		require(
+			hasRole(BURNER_ROLE, _msgSender()),
+			"must have burner role to burn"
+		);
+		_burn(_account, _amount);
 	}
 }

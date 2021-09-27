@@ -9,7 +9,7 @@ contract('InitializableUsingRegistry', ([deployer]) => {
 	before(async () => {
 		await dev.generateAddressRegistry()
 		await dev.generateDev()
-		await dev.generateDevMinter()
+		await dev.generateDevBridge()
 	})
 	describe('InitializableUsingRegistry; __UsingRegistry_init', () => {
 		it('Set the AddressRegistry address with __UsingRegistry_init', async () => {

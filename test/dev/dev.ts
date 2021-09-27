@@ -1,139 +1,232 @@
-import { DevProtocolInstance } from '../test-lib/instance'
+/* eslint-disable new-cap */
 import { DevInstance } from '../../types/truffle-contracts'
+import { DevProtocolInstance } from '../test-lib/instance'
+import { validateErrorMessage } from '../test-lib/utils/error'
 
 contract('Dev', ([deployer, user1, user2, dummyMarket]) => {
-	const createDev = async (): Promise<DevInstance> => {
+	const createDev = async (): Promise<DevProtocolInstance> => {
 		const dev = new DevProtocolInstance(deployer)
 		await dev.generateAddressRegistry()
 		await dev.generateDev()
-		await dev.generateDevMinter()
-		return dev.dev
+		await dev.generateDevBridge()
+		return dev
 	}
 
-	describe('Dev; detail', () => {
+	const err = (error: Error): Error => error
+	describe('Dev; initialize', () => {
+		it('set l1 dev address', async () => {
+			const dev = await createDev()
+			expect(dev.l1DevAddress).to.equal(await dev.dev.l1Address())
+		})
 		it('the name is Dev', async () => {
 			const dev = await createDev()
-			expect(await dev.name()).to.equal('Dev')
+			expect(await dev.dev.name()).to.equal('Dev')
 		})
 
 		it('the symbol is DEV', async () => {
 			const dev = await createDev()
-			expect(await dev.symbol()).to.equal('DEV')
+			expect(await dev.dev.symbol()).to.equal('DEV')
 		})
 
 		it('the decimals is 18', async () => {
 			const dev = await createDev()
-			expect((await dev.decimals()).toNumber()).to.equal(18)
+			expect((await dev.dev.decimals()).toNumber()).to.equal(18)
+		})
+		it('deployer has admin role', async () => {
+			const dev = await createDev()
+			expect(
+				await dev.dev.hasRole(await dev.dev.DEFAULT_ADMIN_ROLE(), deployer)
+			).to.equal(true)
+		})
+		it('deployer has burner role', async () => {
+			const dev = await createDev()
+			expect(
+				await dev.dev.hasRole(await dev.dev.BURNER_ROLE(), deployer)
+			).to.equal(true)
+		})
+		it('deployer has minter role', async () => {
+			const dev = await createDev()
+			expect(
+				await dev.dev.hasRole(await dev.dev.MINTER_ROLE(), deployer)
+			).to.equal(true)
 		})
 	})
 	describe('Dev; mint', () => {
 		it('the initial balance is 0', async () => {
 			const dev = await createDev()
-			expect((await dev.totalSupply()).toNumber()).to.equal(0)
+			expect((await dev.dev.totalSupply()).toNumber()).to.equal(0)
 		})
 		it('increase the balance by running the mint', async () => {
 			const dev = await createDev()
-			await dev.mint(deployer, 100)
-			expect((await dev.totalSupply()).toNumber()).to.equal(100)
-			expect((await dev.balanceOf(deployer)).toNumber()).to.equal(100)
+			await dev.dev.mint(deployer, 100)
+			expect((await dev.dev.totalSupply()).toNumber()).to.equal(100)
+			expect((await dev.dev.balanceOf(deployer)).toNumber()).to.equal(100)
 		})
 		it('running with 0', async () => {
 			const dev = await createDev()
-			await dev.mint(deployer, 100)
-			expect((await dev.totalSupply()).toNumber()).to.equal(100)
-			expect((await dev.balanceOf(deployer)).toNumber()).to.equal(100)
+			await dev.dev.mint(deployer, 100)
+			expect((await dev.dev.totalSupply()).toNumber()).to.equal(100)
+			expect((await dev.dev.balanceOf(deployer)).toNumber()).to.equal(100)
 
-			await dev.mint(deployer, 0)
-			expect((await dev.totalSupply()).toNumber()).to.equal(100)
-			expect((await dev.balanceOf(deployer)).toNumber()).to.equal(100)
+			await dev.dev.mint(deployer, 0)
+			expect((await dev.dev.totalSupply()).toNumber()).to.equal(100)
+			expect((await dev.dev.balanceOf(deployer)).toNumber()).to.equal(100)
 		})
 		it('should fail to run mint when sent from other than minter', async () => {
 			const dev = await createDev()
-			await dev.mint(deployer, 100, { from: user1 }).catch((err: Error) => err)
-			expect((await dev.totalSupply()).toNumber()).to.equal(0)
-			expect((await dev.balanceOf(deployer)).toNumber()).to.equal(0)
+			const res = await dev.dev.mint(deployer, 100, { from: user1 }).catch(err)
+			validateErrorMessage(res, 'must have minter role to mint')
+			expect((await dev.dev.totalSupply()).toNumber()).to.equal(0)
+			expect((await dev.dev.balanceOf(deployer)).toNumber()).to.equal(0)
 		})
 		it('if the sender has role of granting roles, can add a new minter', async () => {
 			const dev = await createDev()
-			const role = web3.utils.keccak256('MINTER_ROLE')
-			await dev.grantRole(role, user1)
-			expect(await dev.hasRole(role, user1)).to.equal(true)
-			await dev.grantRole('0x00', user1) // '0x00' is the value of DEFAULT_ADMIN_ROLE defined by the AccessControl
+			const mintRoleKey = await dev.dev.MINTER_ROLE()
+			await dev.dev.grantRole(mintRoleKey, user1)
+			expect(await dev.dev.hasRole(mintRoleKey, user1)).to.equal(true)
+			await dev.dev.grantRole('0x00', user1) // '0x00' is the value of DEFAULT_ADMIN_ROLE defined by the AccessControl
 
-			await dev.grantRole(role, user2, { from: user1 })
-			expect(await dev.hasRole(role, user2)).to.equal(true)
+			await dev.dev.grantRole(mintRoleKey, user2, { from: user1 })
+			expect(await dev.dev.hasRole(mintRoleKey, user2)).to.equal(true)
 		})
 		it('renounce minter by running renounceRole', async () => {
 			const dev = await createDev()
-			const role = web3.utils.keccak256('MINTER_ROLE')
-			await dev.grantRole(role, user1)
-			expect(await dev.hasRole(role, user1)).to.equal(true)
-			await dev.renounceRole(role, user1, { from: user1 })
-			expect(await dev.hasRole(role, user1)).to.equal(false)
+			const mintRoleKey = await dev.dev.MINTER_ROLE()
+			await dev.dev.grantRole(mintRoleKey, user1)
+			expect(await dev.dev.hasRole(mintRoleKey, user1)).to.equal(true)
+			await dev.dev.renounceRole(mintRoleKey, user1, { from: user1 })
+			expect(await dev.dev.hasRole(mintRoleKey, user1)).to.equal(false)
+		})
+	})
+	describe('Dev; bridgeMint', () => {
+		it('the initial balance is 0', async () => {
+			const dev = await createDev()
+			expect((await dev.dev.totalSupply()).toNumber()).to.equal(0)
+		})
+		it('increase the balance by running the mint', async () => {
+			const dev = await createDev()
+			await dev.dev.bridgeMint(deployer, 100)
+			expect((await dev.dev.totalSupply()).toNumber()).to.equal(100)
+			expect((await dev.dev.balanceOf(deployer)).toNumber()).to.equal(100)
+		})
+		it('running with 0', async () => {
+			const dev = await createDev()
+			await dev.dev.bridgeMint(deployer, 100)
+			expect((await dev.dev.totalSupply()).toNumber()).to.equal(100)
+			expect((await dev.dev.balanceOf(deployer)).toNumber()).to.equal(100)
+
+			await dev.dev.bridgeMint(deployer, 0)
+			expect((await dev.dev.totalSupply()).toNumber()).to.equal(100)
+			expect((await dev.dev.balanceOf(deployer)).toNumber()).to.equal(100)
+		})
+		it('should fail to run mint when sent from other than minter', async () => {
+			const dev = await createDev()
+			await dev.dev
+				.bridgeMint(deployer, 100, { from: user1 })
+				.catch((err: Error) => err)
+			expect((await dev.dev.totalSupply()).toNumber()).to.equal(0)
+			expect((await dev.dev.balanceOf(deployer)).toNumber()).to.equal(0)
 		})
 	})
 	describe('Dev; burn', () => {
 		it('decrease the balance by running the burn', async () => {
 			const dev = await createDev()
-			await dev.mint(deployer, 100)
-			expect((await dev.totalSupply()).toNumber()).to.equal(100)
-			expect((await dev.balanceOf(deployer)).toNumber()).to.equal(100)
+			await dev.dev.mint(deployer, 100)
+			expect((await dev.dev.totalSupply()).toNumber()).to.equal(100)
+			expect((await dev.dev.balanceOf(deployer)).toNumber()).to.equal(100)
 
-			await dev.burn(50)
-			expect((await dev.totalSupply()).toNumber()).to.equal(50)
-			expect((await dev.balanceOf(deployer)).toNumber()).to.equal(50)
+			await dev.dev.burn(deployer, 50)
+			expect((await dev.dev.totalSupply()).toNumber()).to.equal(50)
+			expect((await dev.dev.balanceOf(deployer)).toNumber()).to.equal(50)
 		})
 		it('running with 0', async () => {
 			const dev = await createDev()
-			await dev.mint(deployer, 100)
-			expect((await dev.totalSupply()).toNumber()).to.equal(100)
-			expect((await dev.balanceOf(deployer)).toNumber()).to.equal(100)
+			await dev.dev.mint(deployer, 100)
+			expect((await dev.dev.totalSupply()).toNumber()).to.equal(100)
+			expect((await dev.dev.balanceOf(deployer)).toNumber()).to.equal(100)
 
-			await dev.burn(0)
-			expect((await dev.totalSupply()).toNumber()).to.equal(100)
-			expect((await dev.balanceOf(deployer)).toNumber()).to.equal(100)
+			await dev.dev.burn(deployer, 0)
+			expect((await dev.dev.totalSupply()).toNumber()).to.equal(100)
+			expect((await dev.dev.balanceOf(deployer)).toNumber()).to.equal(100)
 		})
 		it('should fail to decrease the balance when sent from no balance account', async () => {
 			const dev = await createDev()
-			await dev.mint(deployer, 100)
-			expect((await dev.totalSupply()).toNumber()).to.equal(100)
-			expect((await dev.balanceOf(deployer)).toNumber()).to.equal(100)
+			await dev.dev.mint(deployer, 100)
+			expect((await dev.dev.totalSupply()).toNumber()).to.equal(100)
+			expect((await dev.dev.balanceOf(deployer)).toNumber()).to.equal(100)
 
-			const res = await dev.burn(50, { from: user1 }).catch((err: Error) => err)
-			expect((await dev.totalSupply()).toNumber()).to.equal(100)
-			expect(res).to.be.an.instanceof(Error)
-		})
-		it('decrease the balance by running the burnFrom from another account after approved', async () => {
-			const dev = await createDev()
-			await dev.mint(deployer, 100)
-			expect((await dev.totalSupply()).toNumber()).to.equal(100)
-			expect((await dev.balanceOf(deployer)).toNumber()).to.equal(100)
-
-			await dev.approve(user1, 50)
-			await dev.burnFrom(deployer, 50, { from: user1 })
-			expect((await dev.totalSupply()).toNumber()).to.equal(50)
-			expect((await dev.balanceOf(deployer)).toNumber()).to.equal(50)
+			const res = await dev.dev.burn(deployer, 50, { from: user1 }).catch(err)
+			expect((await dev.dev.totalSupply()).toNumber()).to.equal(100)
+			validateErrorMessage(res, 'must have burner role to burn')
 		})
 		it('should fail to if over decrease the balance by running the burnFrom from another account after approved', async () => {
 			const dev = await createDev()
-			await dev.mint(deployer, 100)
-			expect((await dev.totalSupply()).toNumber()).to.equal(100)
-			expect((await dev.balanceOf(deployer)).toNumber()).to.equal(100)
+			await dev.dev.mint(deployer, 100)
+			expect((await dev.dev.totalSupply()).toNumber()).to.equal(100)
+			expect((await dev.dev.balanceOf(deployer)).toNumber()).to.equal(100)
 
-			await dev.approve(user1, 50)
-			const res = await dev
-				.burnFrom(deployer, 51, { from: user1 })
+			await dev.dev.approve(user1, 50)
+			const res = await dev.dev
+				.burn(deployer, 51, { from: user1 })
 				.catch((err: Error) => err)
-			expect((await dev.totalSupply()).toNumber()).to.equal(100)
-			expect((await dev.balanceOf(deployer)).toNumber()).to.equal(100)
+			expect((await dev.dev.totalSupply()).toNumber()).to.equal(100)
+			expect((await dev.dev.balanceOf(deployer)).toNumber()).to.equal(100)
+			expect(res).to.be.an.instanceof(Error)
+		})
+	})
+	describe('Dev; bridgeBurn', () => {
+		it('decrease the balance by running the burn', async () => {
+			const dev = await createDev()
+			await dev.dev.mint(deployer, 100)
+			expect((await dev.dev.totalSupply()).toNumber()).to.equal(100)
+			expect((await dev.dev.balanceOf(deployer)).toNumber()).to.equal(100)
+
+			await dev.dev.bridgeBurn(deployer, 50)
+			expect((await dev.dev.totalSupply()).toNumber()).to.equal(50)
+			expect((await dev.dev.balanceOf(deployer)).toNumber()).to.equal(50)
+		})
+		it('running with 0', async () => {
+			const dev = await createDev()
+			await dev.dev.mint(deployer, 100)
+			expect((await dev.dev.totalSupply()).toNumber()).to.equal(100)
+			expect((await dev.dev.balanceOf(deployer)).toNumber()).to.equal(100)
+
+			await dev.dev.bridgeBurn(deployer, 0)
+			expect((await dev.dev.totalSupply()).toNumber()).to.equal(100)
+			expect((await dev.dev.balanceOf(deployer)).toNumber()).to.equal(100)
+		})
+		it('should fail to decrease the balance when sent from no balance account', async () => {
+			const dev = await createDev()
+			await dev.dev.mint(deployer, 100)
+			expect((await dev.dev.totalSupply()).toNumber()).to.equal(100)
+			expect((await dev.dev.balanceOf(deployer)).toNumber()).to.equal(100)
+
+			const res = await dev.dev
+				.bridgeBurn(deployer, 50, { from: user1 })
+				.catch(err)
+			expect((await dev.dev.totalSupply()).toNumber()).to.equal(100)
+			validateErrorMessage(res, 'must have burner role to burn')
+		})
+		it('should fail to if over decrease the balance by running the burnFrom from another account after approved', async () => {
+			const dev = await createDev()
+			await dev.dev.mint(deployer, 100)
+			expect((await dev.dev.totalSupply()).toNumber()).to.equal(100)
+			expect((await dev.dev.balanceOf(deployer)).toNumber()).to.equal(100)
+
+			await dev.dev.approve(user1, 50)
+			const res = await dev.dev
+				.bridgeBurn(deployer, 51, { from: user1 })
+				.catch((err: Error) => err)
+			expect((await dev.dev.totalSupply()).toNumber()).to.equal(100)
+			expect((await dev.dev.balanceOf(deployer)).toNumber()).to.equal(100)
 			expect(res).to.be.an.instanceof(Error)
 		})
 	})
 	describe('Dev; transfer', () => {
 		const createMintedDev = async (): Promise<DevInstance> => {
 			const dev = await createDev()
-			await dev.mint(deployer, 100)
-			return dev
+			await dev.dev.mint(deployer, 100)
+			return dev.dev
 		}
 
 		it('transfer token from user-to-user', async () => {
@@ -230,62 +323,6 @@ contract('Dev', ([deployer, user1, user2, dummyMarket]) => {
 			expect((await dev.balanceOf(deployer)).toNumber()).to.equal(100)
 			expect((await dev.balanceOf(user2)).toNumber()).to.equal(0)
 			expect(res).to.be.an.instanceof(Error)
-		})
-	})
-	describe('Dev; fee', () => {
-		const generateEnv = async (): Promise<[DevProtocolInstance, string]> => {
-			const dev = new DevProtocolInstance(deployer)
-			await dev.generateAddressRegistry()
-			await dev.generateDev()
-			await dev.generateDevMinter()
-			await dev.generateMarketFactory()
-			await dev.marketFactory.__addMarket(dummyMarket)
-
-			return [dev, dummyMarket]
-		}
-
-		it('burn token as a fee', async () => {
-			const [dev, market] = await generateEnv()
-			await dev.dev.mint(user1, 100).catch(console.error)
-			await dev.dev.fee(user1, 1, { from: market })
-			const balance = await dev.dev.balanceOf(user1)
-			expect(balance.toNumber()).to.be.equal(99)
-		})
-		it('burn 0 tokens as a fee', async () => {
-			const [dev, market] = await generateEnv()
-			await dev.dev.mint(user1, 100)
-			await dev.dev.fee(user1, 0, { from: market })
-			const balance = await dev.dev.balanceOf(user1)
-			expect(balance.toNumber()).to.be.equal(100)
-		})
-		it('should fail to burn when sent from no balance account', async () => {
-			const [dev, market] = await generateEnv()
-			const balance = await dev.dev.balanceOf(user1)
-			const res = await dev.dev
-				.fee(user1, 1, { from: market })
-				.catch((err: Error) => err)
-			expect(balance.toNumber()).to.be.equal(0)
-			expect(res).to.be.an.instanceOf(Error)
-		})
-		it('should fail to burn when sent from an insufficient balance account', async () => {
-			const [dev, market] = await generateEnv()
-			await dev.dev.mint(user1, 100)
-			const res = await dev.dev
-				.fee(user1, 101, { from: market })
-				.catch((err: Error) => err)
-			const balance = await dev.dev.balanceOf(user1)
-			expect(balance.toNumber()).to.be.equal(100)
-			expect(res).to.be.an.instanceOf(Error)
-		})
-		it('should fail to burn when sent from other than market contract', async () => {
-			const [dev, market] = await generateEnv()
-			await dev.dev.mint(user1, 100)
-			const res = await dev.dev
-				.fee(user1, 1, { from: user2 })
-				.catch((err: Error) => err)
-			const balance = await dev.dev.balanceOf(user1)
-			expect(balance.toNumber()).to.be.equal(100)
-			expect(res).to.be.an.instanceOf(Error)
 		})
 	})
 })

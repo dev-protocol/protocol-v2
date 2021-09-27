@@ -1,3 +1,4 @@
+/* eslint-disable new-cap */
 import {
 	AddressRegistryInstance,
 	DevInstance,
@@ -11,9 +12,8 @@ import {
 	WithdrawTestInstance,
 	MetricsInstance,
 	TreasuryTestInstance,
-	IPolicyContract,
 	STokensManagerInstance,
-	DevMinterInstance,
+	DevBridgeInstance,
 	AdminInstance,
 } from '../../types/truffle-contracts'
 
@@ -54,9 +54,9 @@ export class DevProtocolInstance {
 	private _metricsFactory!: MetricsFactoryTestInstance
 	private _withdraw!: WithdrawTestInstance
 	private _treasury!: TreasuryTestInstance
-	private _devMinter!: DevMinterInstance
+	private _devBridge!: DevBridgeInstance
 	private _sTokensManager!: STokensManagerInstance
-	private readonly _policy!: IPolicyContract
+	private _l1DevAddress!: string
 
 	constructor(deployer: string) {
 		this._deployer = deployer
@@ -70,8 +70,8 @@ export class DevProtocolInstance {
 		return this._addressRegistry
 	}
 
-	public get devMinter(): DevMinterInstance {
-		return this._devMinter
+	public get devBridge(): DevBridgeInstance {
+		return this._devBridge
 	}
 
 	public get dev(): DevInstance {
@@ -110,6 +110,10 @@ export class DevProtocolInstance {
 		return this._sTokensManager
 	}
 
+	public get l1DevAddress(): string {
+		return this._l1DevAddress
+	}
+
 	public async generateAddressRegistry(): Promise<void> {
 		const [proxfied] = await deployProxy(
 			contract('AddressRegistry'),
@@ -119,24 +123,29 @@ export class DevProtocolInstance {
 		this._addressRegistry = proxfied
 	}
 
-	public async generateDevMinter(): Promise<void> {
-		const [proxfied] = await deployProxy(contract('DevMinter'), this._deployer)
+	public async generateDevBridge(): Promise<void> {
+		const [proxfied] = await deployProxy(contract('DevBridge'), this._deployer)
 		await proxfied.initialize(this._addressRegistry.address)
-		this._devMinter = proxfied
+		this._devBridge = proxfied
 		await this._dev.grantRole(
-			web3.utils.keccak256('MINTER_ROLE'),
-			this._devMinter.address
+			await this._dev.MINTER_ROLE(),
+			this._devBridge.address
+		)
+		await this._dev.grantRole(
+			await this._dev.BURNER_ROLE(),
+			this._devBridge.address
 		)
 		await this.addressRegistry.setRegistry(
-			'DevMinter',
-			this._devMinter.address,
+			'DevBridge',
+			this._devBridge.address,
 			this.fromDeployer
 		)
 	}
 
 	public async generateDev(): Promise<void> {
 		const [proxfied] = await deployProxy(contract('Dev'), this._deployer)
-		await proxfied.initializeDev(this._addressRegistry.address)
+		this._l1DevAddress = web3.eth.accounts.create().address
+		await proxfied.initialize(this._l1DevAddress)
 		this._dev = proxfied
 		await this.addressRegistry.setRegistry(
 			'Dev',
