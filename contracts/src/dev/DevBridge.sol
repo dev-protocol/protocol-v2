@@ -49,7 +49,7 @@ contract DevBridge is
 			IMarketFactory(registry().registries("MarketFactory")).isMarket(
 				msg.sender
 			),
-			"this is illegal address"
+			"illegal access"
 		);
 		IDev(registry().registries("Dev")).burn(_account, _amount);
 		return true;
