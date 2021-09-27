@@ -18,12 +18,12 @@ contract AddressRegistry is OwnableUpgradeable, IAddressRegistry {
 	function setRegistry(string memory _key, address _addr) external override {
 		address sender;
 		bytes32 key = keccak256(abi.encodePacked(_key));
-		bytes32 poliscyKey = keccak256(abi.encodePacked("Policy"));
-		if (key == poliscyKey) {
-			bytes32 poliscyFactoryKey = keccak256(
+		bytes32 policyKey = keccak256(abi.encodePacked("Policy"));
+		if (key == policyKey) {
+			bytes32 policyFactoryKey = keccak256(
 				abi.encodePacked("PolicyFactory")
 			);
-			sender = reg[poliscyFactoryKey];
+			sender = reg[policyFactoryKey];
 		} else {
 			sender = owner();
 		}
