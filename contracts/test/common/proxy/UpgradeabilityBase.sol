@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MPL-2.0
-pragma solidity =0.8.7;
+pragma solidity =0.8.8;
 
 contract UpgradeabilityBase {
 	uint256 public dataUint256;

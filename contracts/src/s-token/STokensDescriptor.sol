@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MPL-2.0
-pragma solidity =0.8.7;
+pragma solidity =0.8.8;
 
 import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 import {AddressLib} from "@devprotocol/util-contracts/contracts/utils/AddressLib.sol";
