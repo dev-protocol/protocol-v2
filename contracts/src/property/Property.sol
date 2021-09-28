@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MPL-2.0
-pragma solidity =0.8.7;
+pragma solidity =0.8.8;
 
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {UsingRegistry} from "contracts/src/common/registry/UsingRegistry.sol";
