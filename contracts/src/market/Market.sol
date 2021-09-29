@@ -20,7 +20,7 @@ contract Market is UsingRegistry, IMarket {
 	bool public override enabled;
 	address public override behavior;
 	uint256 public override votingEndTimestamp;
-	uint256 public override issuedMetrics;
+	address[] public authenticatedProperties;
 	mapping(bytes32 => bool) private idMap;
 	mapping(address => bytes32) private idHashMetricsMap;
 
@@ -214,7 +214,7 @@ contract Market is UsingRegistry, IMarket {
 		/**
 		 * Adds the number of authenticated assets in this Market.
 		 */
-		issuedMetrics = issuedMetrics + 1;
+		authenticatedProperties.push(_property);
 		return metrics;
 	}
 
@@ -249,7 +249,8 @@ contract Market is UsingRegistry, IMarket {
 		/**
 		 * Subtracts the number of authenticated assets in this Market.
 		 */
-		issuedMetrics = issuedMetrics - 1;
+		address property = IMetrics(_metrics).property();
+		deleteAuthenticatedProperty(property);
 	}
 
 	/**
@@ -266,7 +267,31 @@ contract Market is UsingRegistry, IMarket {
 		return IMarketBehavior(behavior).schema();
 	}
 
+	function issuedMetrics() external view returns (uint256) {
+		return authenticatedProperties.length;
+	}
+
 	function isDuringVotingPeriod() private view returns (bool) {
 		return block.timestamp < votingEndTimestamp;
+	}
+
+	function deleteAuthenticatedProperty(address _property) private {
+		uint256 propertyCount = authenticatedProperties.length;
+		address[] memory properties = new address[](propertyCount - 1);
+		uint256 counter = 0;
+		bool deleteFlg = false;
+		for (uint256 i = 0; i < propertyCount; i++) {
+			address property = authenticatedProperties[i];
+			if (_property != property) {
+				properties[counter] = property;
+				counter += 1;
+			} else {
+				deleteFlg = true;
+			}
+		}
+		if (deleteFlg == false) {
+			revert("illegal property");
+		}
+		authenticatedProperties = properties;
 	}
 }

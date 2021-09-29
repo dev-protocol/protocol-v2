@@ -17,6 +17,7 @@ contract MarketFactory is
 	IMarketFactory
 {
 	uint256 public override marketsCount;
+	address[] public enabledMarkets;
 	mapping(address => bool) public override isMarket;
 	mapping(address => bool) public override isPotentialMarket;
 
@@ -72,6 +73,10 @@ contract MarketFactory is
 		_enable(_addr);
 	}
 
+	function enableMarketList() external view returns (address[] memory) {
+		return enabledMarkets;
+	}
+
 	function _enable(address _addr) internal {
 		/**
 		 * Validates the passed address is not 0 address.
@@ -87,6 +92,7 @@ contract MarketFactory is
 		require(market.enabled() == false, "already enabled");
 
 		market.toEnable();
+		enabledMarkets.push(_addr);
 	}
 
 	function _addMarket(address _addr) internal {

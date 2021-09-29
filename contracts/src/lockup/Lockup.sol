@@ -51,6 +51,7 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 	uint256 public cumulativeGlobalReward; // From [get/set]StorageCumulativeGlobalRewards
 	uint256 public lastSameGlobalRewardAmount; // From [get/set]StorageLastSameRewardsAmountAndBlock
 	uint256 public lastSameGlobalRewardTimestamp; // From [get/set]StorageLastSameRewardsAmountAndBlock
+	address[] public lockedupProperties;
 	mapping(address => uint256)
 		public lastCumulativeHoldersRewardPricePerProperty; // {Property: Value} // [get/set]StorageLastCumulativeHoldersRewardPricePerProperty
 	mapping(address => uint256) public initialCumulativeHoldersRewardCap; // {Property: Value} // From [get/set]StorageInitialCumulativeHoldersRewardCap
@@ -143,10 +144,20 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		/**
 		 * mint s tokens
 		 */
-		uint256 tokenId = ISTokensManager(
+		ISTokensManager sTokenManager = ISTokensManager(
 			registry().registries("STokensManager")
-		).mint(msg.sender, _property, _amount, interest);
+		);
+		if (sTokenManager.positionsOfProperty(_property).length == 0) {
+			lockedupProperties.push(_property);
+		}
+		uint256 tokenId = sTokenManager.mint(
+			msg.sender,
+			_property,
+			_amount,
+			interest
+		);
 		emit Lockedup(msg.sender, _property, _amount, tokenId);
+
 		return tokenId;
 	}
 
@@ -166,14 +177,14 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		 * Validates _amount is not 0.
 		 */
 		require(_amount != 0, "illegal deposit amount");
-		ISTokensManager sTokensManagerInstance = ISTokensManager(
+		ISTokensManager sTokenManager = ISTokensManager(
 			registry().registries("STokensManager")
 		);
 		/**
 		 * get position information
 		 */
-		ISTokensManager.StakingPositions
-			memory positions = sTokensManagerInstance.positions(_tokenId);
+		ISTokensManager.StakingPositions memory positions = sTokenManager
+			.positions(_tokenId);
 		/**
 		 * Gets the withdrawable amount.
 		 */
@@ -199,7 +210,7 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		/**
 		 * update position information
 		 */
-		bool result = sTokensManagerInstance.update(
+		bool result = sTokenManager.update(
 			_tokenId,
 			positions.amount + _amount,
 			prices.interest,
@@ -224,14 +235,14 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		onlyPositionOwner(_tokenId)
 		returns (bool)
 	{
-		ISTokensManager sTokensManagerInstance = ISTokensManager(
+		ISTokensManager sTokenManager = ISTokensManager(
 			registry().registries("STokensManager")
 		);
 		/**
 		 * get position information
 		 */
-		ISTokensManager.StakingPositions
-			memory positions = sTokensManagerInstance.positions(_tokenId);
+		ISTokensManager.StakingPositions memory positions = sTokenManager
+			.positions(_tokenId);
 		/**
 		 * If the balance of the withdrawal request is bigger than the balance you are staking
 		 */
@@ -254,18 +265,46 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		updateValues(false, positions.property, _amount, prices);
 		uint256 cumulative = positions.cumulativeReward + value;
 
+		/**
+		 * update position information
+		 */
+		bool result = sTokenManager.update(
+			_tokenId,
+			positions.amount - _amount,
+			prices.interest,
+			cumulative,
+			0
+		);
+		if (totalLockedForProperty[positions.property] == 0) {
+			deleteUnlockedPropertyInfo(positions.property);
+		}
+
 		emit Withdrew(msg.sender, positions.property, _amount, value, _tokenId);
 		/**
 		 * update position information
 		 */
-		return
-			sTokensManagerInstance.update(
-				_tokenId,
-				positions.amount - _amount,
-				prices.interest,
-				cumulative,
-				0
-			);
+		return result;
+	}
+
+	/**
+	 * get lockup info
+	 */
+	function getLockedupProperties()
+		external
+		view
+		override
+		returns (LockedupProperty[] memory)
+	{
+		uint256 propertyCount = lockedupProperties.length;
+		LockedupProperty[] memory results = new LockedupProperty[](
+			propertyCount
+		);
+		for (uint256 i = 0; i < propertyCount; i++) {
+			address property = lockedupProperties[i];
+			uint256 value = totalLockedForProperty[property];
+			results[i] = LockedupProperty(property, value);
+		}
+		return results;
 	}
 
 	/**
@@ -725,5 +764,28 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		uint256 value = totalLockedForProperty[_property];
 		uint256 nextValue = value - _value;
 		totalLockedForProperty[_property] = nextValue;
+	}
+
+	/**
+	 * delete unlocked property address info
+	 */
+	function deleteUnlockedPropertyInfo(address _property) private {
+		uint256 propertyCount = lockedupProperties.length;
+		address[] memory properties = new address[](propertyCount - 1);
+		uint256 counter = 0;
+		bool deleteFlg = false;
+		for (uint256 i = 0; i < propertyCount; i++) {
+			address property = lockedupProperties[i];
+			if (_property != property) {
+				properties[counter] = property;
+				counter += 1;
+			} else {
+				deleteFlg = true;
+			}
+		}
+		if (deleteFlg == false) {
+			revert("illegal token id");
+		}
+		lockedupProperties = properties;
 	}
 }
