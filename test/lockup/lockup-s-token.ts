@@ -681,12 +681,12 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 					await dev.lockup.calculateWithdrawableInterestAmountByPosition(
 						aliceSecoundTokenId
 					)
-					console.log(9)
+				console.log(9)
 				const bobAmount =
 					await dev.lockup.calculateWithdrawableInterestAmountByPosition(
 						bobSecoundTokenId
 					)
-					console.log(10)
+				console.log(10)
 				const aliceCalculated = await calc(aliceSecoundTokenId)
 				console.log(11)
 				const bobCalculated = await calc(bobSecoundTokenId)
