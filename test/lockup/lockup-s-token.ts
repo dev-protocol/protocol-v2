@@ -420,7 +420,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 					.toFixed(0, BigNumber.ROUND_DOWN)
 			}
 
-		describe('returns correct amount', () => {
+		describe.only('returns correct amount', () => {
 			let dev: DevProtocolInstance
 			let property: PropertyInstance
 			let calc: Calculator
@@ -644,41 +644,53 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				expect(result.toFixed()).to.be.equal(calculated)
 			})
 			it('After withdrawn, Alice and Bob has a 0% of interests', async () => {
+				console.log(0)
 				await dev.lockup.depositToPosition(aliceSecoundTokenId, 1000000000000, {
 					from: alice,
 				})
+				console.log(1)
 				await dev.lockup.depositToProperty(property.address, 1000000000000, {
 					from: bob,
 				})
+				console.log(2)
 				await forwardBlockTimestamp(2)
+				console.log(3)
 				const alicePosition = await dev.sTokensManager.positions(
 					aliceSecoundTokenId
 				)
+				console.log(4)
 				await dev.lockup.withdrawByPosition(
 					aliceSecoundTokenId,
 					alicePosition.amount.toString(),
 					{ from: alice }
 				)
+				console.log(5)
 				const bobPosition = await dev.sTokensManager.positions(
 					bobSecoundTokenId
 				)
+				console.log(6)
 				await dev.lockup.withdrawByPosition(
 					bobSecoundTokenId,
 					bobPosition.amount.toString(),
 					{ from: bob }
 				)
+				console.log(7)
 				await forwardBlockTimestamp(1)
+				console.log(8)
 				const aliceAmount =
 					await dev.lockup.calculateWithdrawableInterestAmountByPosition(
 						aliceSecoundTokenId
 					)
+					console.log(9)
 				const bobAmount =
 					await dev.lockup.calculateWithdrawableInterestAmountByPosition(
 						bobSecoundTokenId
 					)
+					console.log(10)
 				const aliceCalculated = await calc(aliceSecoundTokenId)
+				console.log(11)
 				const bobCalculated = await calc(bobSecoundTokenId)
-
+				console.log(12)
 				expect(aliceAmount.toString()).to.be.equal('0')
 				expect(bobAmount.toString()).to.be.equal('0')
 				expect(aliceCalculated.toString()).to.be.equal('0')
