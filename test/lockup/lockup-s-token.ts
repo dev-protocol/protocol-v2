@@ -420,7 +420,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 					.toFixed(0, BigNumber.ROUND_DOWN)
 			}
 
-		describe.only('returns correct amount', () => {
+		describe('returns correct amount', () => {
 			let dev: DevProtocolInstance
 			let property: PropertyInstance
 			let calc: Calculator
