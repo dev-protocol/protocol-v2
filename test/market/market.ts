@@ -464,7 +464,9 @@ contract(
 			})
 		})
 		describe('Market; getAuthenticatedProperties', () => {
-			const init = async () :Promise<[DevProtocolInstance, MarketInstance, string]>=> {
+			const init = async (): Promise<
+				[DevProtocolInstance, MarketInstance, string]
+			> => {
 				const dev = new DevProtocolInstance(deployer)
 				await dev.generateAddressRegistry()
 				await dev.generateDev()
@@ -502,85 +504,83 @@ contract(
 			it('If none of the properties are authenticated, an empty array will be returned.', async () => {
 				const [, marketInstance] = await init()
 				const properties = await marketInstance.getAuthenticatedProperties()
-				expect(
-					properties.length
-				).to.be.equal(0)
+				expect(properties.length).to.be.equal(0)
 			})
 			it('An array of authenticated properties will be returned.', async () => {
 				const [, marketInstance, propertyAddress] = await init()
-				await marketInstance.authenticate(propertyAddress, ['test'], {from: propertyAuther})
+				await marketInstance.authenticate(propertyAddress, ['test'], {
+					from: propertyAuther,
+				})
 				const properties = await marketInstance.getAuthenticatedProperties()
-				expect(
-					properties.length
-				).to.be.equal(1)
-				expect(
-					properties[0]
-				).to.be.equal(propertyAddress)
+				expect(properties.length).to.be.equal(1)
+				expect(properties[0]).to.be.equal(propertyAddress)
 			})
 			it('An array of multiple authenticated properties will be returned.', async () => {
 				const [dev, marketInstance, propertyAddress] = await init()
-				await marketInstance.authenticate(propertyAddress, ['test'], {from: propertyAuther})
+				await marketInstance.authenticate(propertyAddress, ['test'], {
+					from: propertyAuther,
+				})
 				const createPropertyResult = await dev.propertyFactory.create(
 					'test2',
 					'TEST2',
 					propertyAuther
 				)
 				const propertyAddress2 = getPropertyAddress(createPropertyResult)
-				await marketInstance.authenticate(propertyAddress2, ['test2'], {from: propertyAuther})
+				await marketInstance.authenticate(propertyAddress2, ['test2'], {
+					from: propertyAuther,
+				})
 				const properties = await marketInstance.getAuthenticatedProperties()
-				expect(
-					properties.length
-				).to.be.equal(2)
-				expect(
-					properties[0]
-				).to.be.equal(propertyAddress)
-				expect(
-					properties[1]
-				).to.be.equal(propertyAddress2)
+				expect(properties.length).to.be.equal(2)
+				expect(properties[0]).to.be.equal(propertyAddress)
+				expect(properties[1]).to.be.equal(propertyAddress2)
 			})
 			it('If property is deauthenticated', async () => {
 				const [, marketInstance, propertyAddress] = await init()
-				await marketInstance.authenticate(propertyAddress, ['test'], {from: propertyAuther})
+				await marketInstance.authenticate(propertyAddress, ['test'], {
+					from: propertyAuther,
+				})
 				const behaviorAddress = await marketInstance.behavior()
 				const marketTest1Contract = artifacts.require('MarketTest1')
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const market1Instance = await marketTest1Contract.at(behaviorAddress)
 				const metricsAddress = await market1Instance.getMetrics('test')
-				await marketInstance.deauthenticate(metricsAddress, {from: propertyAuther})
+				await marketInstance.deauthenticate(metricsAddress, {
+					from: propertyAuther,
+				})
 				const properties = await marketInstance.getAuthenticatedProperties()
-				expect(
-					properties.length
-				).to.be.equal(0)
+				expect(properties.length).to.be.equal(0)
 			})
 			it('When multiple properties have been deauthenticated', async () => {
 				const [dev, marketInstance, propertyAddress] = await init()
-				await marketInstance.authenticate(propertyAddress, ['test'], {from: propertyAuther})
+				await marketInstance.authenticate(propertyAddress, ['test'], {
+					from: propertyAuther,
+				})
 				const createPropertyResult = await dev.propertyFactory.create(
 					'test2',
 					'TEST2',
 					propertyAuther
 				)
 				const propertyAddress2 = getPropertyAddress(createPropertyResult)
-				await marketInstance.authenticate(propertyAddress2, ['test2'], {from: propertyAuther})
+				await marketInstance.authenticate(propertyAddress2, ['test2'], {
+					from: propertyAuther,
+				})
 				const behaviorAddress = await marketInstance.behavior()
 				const marketTest1Contract = artifacts.require('MarketTest1')
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const market1Instance = await marketTest1Contract.at(behaviorAddress)
 				const metricsAddress2 = await market1Instance.getMetrics('test2')
-				await marketInstance.deauthenticate(metricsAddress2, {from: propertyAuther})
+				await marketInstance.deauthenticate(metricsAddress2, {
+					from: propertyAuther,
+				})
 				const properties = await marketInstance.getAuthenticatedProperties()
-				expect(
-					properties.length
-				).to.be.equal(1)
-				expect(
-					properties[0]
-				).to.be.equal(propertyAddress)
+				expect(properties.length).to.be.equal(1)
+				expect(properties[0]).to.be.equal(propertyAddress)
 				const metricsAddress = await market1Instance.getMetrics('test')
-				await marketInstance.deauthenticate(metricsAddress, {from: propertyAuther})
+				await marketInstance.deauthenticate(metricsAddress, {
+					from: propertyAuther,
+				})
 				const propertiesNext = await marketInstance.getAuthenticatedProperties()
-				expect(
-					propertiesNext.length
-				).to.be.equal(0)
+				expect(propertiesNext.length).to.be.equal(0)
 			})
 		})
 	}
