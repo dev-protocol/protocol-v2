@@ -31,5 +31,7 @@ interface IMarket {
 
 	function votingEndTimestamp() external view returns (uint256);
 
+	function getAuthenticatedProperties() external view returns (address[] memory);
+
 	function toEnable() external;
 }

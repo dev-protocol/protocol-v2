@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity =0.8.9;
 
+import {EnumerableSet} from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import {UsingRegistry} from "contracts/src/common/registry/UsingRegistry.sol";
 import {IProperty} from "contracts/interface/IProperty.sol";
 import {IMarket} from "contracts/interface/IMarket.sol";
@@ -17,10 +18,11 @@ import {IDevBridge} from "contracts/interface/IDevBridge.sol";
  * A user deploys a contract that inherits IMarketBehavior and creates this Market contract with the MarketFactory contract.
  */
 contract Market is UsingRegistry, IMarket {
+	using EnumerableSet for EnumerableSet.AddressSet;
+	EnumerableSet.AddressSet private authenticatedProperties;
 	bool public override enabled;
 	address public override behavior;
 	uint256 public override votingEndTimestamp;
-	address[] public authenticatedProperties;
 	mapping(bytes32 => bool) private idMap;
 	mapping(address => bytes32) private idHashMetricsMap;
 
@@ -214,7 +216,7 @@ contract Market is UsingRegistry, IMarket {
 		/**
 		 * Adds the number of authenticated assets in this Market.
 		 */
-		authenticatedProperties.push(_property);
+		authenticatedProperties.add(_property);
 		return metrics;
 	}
 
@@ -250,7 +252,7 @@ contract Market is UsingRegistry, IMarket {
 		 * Subtracts the number of authenticated assets in this Market.
 		 */
 		address property = IMetrics(_metrics).property();
-		deleteAuthenticatedProperty(property);
+		authenticatedProperties.remove(property);
 	}
 
 	/**
@@ -267,31 +269,21 @@ contract Market is UsingRegistry, IMarket {
 		return IMarketBehavior(behavior).schema();
 	}
 
+	/**
+	 * get issued metrics count
+	 */
 	function issuedMetrics() external view returns (uint256) {
-		return authenticatedProperties.length;
+		return authenticatedProperties.length();
+	}
+
+	/**
+	 * get authentivated properties
+	 */
+	function getAuthenticatedProperties() external view returns (address[] memory) {
+		return authenticatedProperties.values();
 	}
 
 	function isDuringVotingPeriod() private view returns (bool) {
 		return block.timestamp < votingEndTimestamp;
-	}
-
-	function deleteAuthenticatedProperty(address _property) private {
-		uint256 propertyCount = authenticatedProperties.length;
-		address[] memory properties = new address[](propertyCount - 1);
-		uint256 counter = 0;
-		bool deleteFlg = false;
-		for (uint256 i = 0; i < propertyCount; i++) {
-			address property = authenticatedProperties[i];
-			if (_property != property) {
-				properties[counter] = property;
-				counter += 1;
-			} else {
-				deleteFlg = true;
-			}
-		}
-		if (deleteFlg == false) {
-			revert("illegal property");
-		}
-		authenticatedProperties = properties;
 	}
 }
