@@ -20,6 +20,7 @@ contract Withdraw is IWithdraw, InitializableUsingRegistry {
 		public lastWithdrawnRewardCapPrice; // {Property: {User: Value}} // From [get/set]PendingWithdrawal
 	mapping(address => mapping(address => uint256)) public pendingWithdrawal; // {Property: {User: Value}}
 	mapping(address => uint256) public cumulativeWithdrawnReward; // {Property: Value} // From [get/set]RewardsAmount
+
 	using Decimals for uint256;
 
 	/**

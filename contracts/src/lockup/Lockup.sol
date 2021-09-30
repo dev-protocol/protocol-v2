@@ -42,7 +42,6 @@ import {ISTokensManager} from "contracts/interface/ISTokensManager.sol";
  * - After 10 blocks, Alice withdraws Property-A staking reward. The reward at this time is 5000 DEV (10 blocks * 500 DEV) + 3125 DEV (10 blocks * 62.5% * 500 DEV) + 2500 DEV (10 blocks * 50% * 500 DEV).
  */
 contract Lockup is ILockup, InitializableUsingRegistry {
-	using EnumerableSet for EnumerableSet.AddressSet;
 	uint256 public override cap; // From [get/set]StorageCap
 	uint256 public override totalLocked; // From [get/set]StorageAllValue
 	uint256 public cumulativeHoldersRewardCap; // From [get/set]StorageCumulativeHoldersRewardCap
@@ -62,6 +61,7 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		public lastCumulativeHoldersRewardAmountPerProperty; // {Property: Value} // From [get/set]StorageLastCumulativeHoldersRewardAmountPerProperty
 
 	using Decimals for uint256;
+	using EnumerableSet for EnumerableSet.AddressSet;
 
 	/**
 	 * Initialize the passed address as AddressRegistry address.

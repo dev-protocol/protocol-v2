@@ -10,6 +10,7 @@ import {
 import { getPropertyAddress } from '../test-lib/utils/log'
 import { getEventValue } from '../test-lib/utils/event'
 import { validateErrorMessage } from '../test-lib/utils/error'
+import { isString } from 'util'
 
 contract('LockupTest', ([deployer, user1, user2, user3]) => {
 	const deployerBalance = new BigNumber(1e18).times(10000000)
@@ -56,7 +57,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 		[DevProtocolInstance, PropertyInstance, number]
 	> => {
 		const [dev, property] = await init()
-		await dev.dev.approve(dev.lockup.address, 500)
+		await dev.dev.approve(dev.lockup.address, 600)
 		await dev.lockup.depositToProperty(property.address, 100)
 		const tokenIds = await dev.sTokensManager.positionsOfOwner(deployer)
 
@@ -65,7 +66,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 
 	const err = (error: Error): Error => error
 
-	describe('Lockup; depositToProperty', () => {
+	describe('Lockup; depositToProperty, getLockedupProperties', () => {
 		describe('success', () => {
 			it('get nft token.', async () => {
 				const [dev, property] = await init()
@@ -101,6 +102,52 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				)
 				expect(toBigNumber(position.cumulativeReward).toNumber()).to.be.equal(0)
 				expect(toBigNumber(position.pendingReward).toNumber()).to.be.equal(0)
+			})
+			it('get lockup info.', async () => {
+				const [dev, property] = await init()
+				let info = await dev.lockup.getLockedupProperties()
+				expect(info.length).to.be.equal(0)
+				await dev.dev.approve(dev.lockup.address, 100)
+				await dev.lockup.depositToProperty(property.address, 100)
+				info = await dev.lockup.getLockedupProperties()
+				expect(info.length).to.be.equal(1)
+				expect(info[0].property).to.be.equal(property.address)
+				expect(toBigNumber(info[0].value).toNumber()).to.be.equal(100)
+			})
+			it('get lockup info plus value.', async () => {
+				const [dev, property] = await init()
+				await dev.dev.approve(dev.lockup.address, 300)
+				await dev.lockup.depositToProperty(property.address, 100)
+				await dev.lockup.depositToProperty(property.address, 200)
+				const info = await dev.lockup.getLockedupProperties()
+				expect(info.length).to.be.equal(1)
+				expect(info[0].property).to.be.equal(property.address)
+				expect(toBigNumber(info[0].value).toNumber()).to.be.equal(300)
+			})
+			it('get lockup info maltible value.', async () => {
+				const [dev, property] = await init()
+				const propertyAddress = getPropertyAddress(
+					await dev.propertyFactory.create('test2', 'TEST2', user2, {
+						from: user2,
+					})
+				)
+				await dev.metricsFactory.__addMetrics(
+					(
+						await dev.createMetrics(deployer, propertyAddress)
+					).address
+				)
+				await dev.dev.approve(dev.lockup.address, 300)
+				await dev.lockup.depositToProperty(property.address, 100)
+				await dev.lockup.depositToProperty(propertyAddress, 200)
+				const info = await dev.lockup.getLockedupProperties()
+				expect(info.length).to.be.equal(2)
+				for (const lockupInfo of info) {
+					if (lockupInfo.property === property.address) {
+						expect(toBigNumber(lockupInfo.value).toNumber()).to.be.equal(100)
+					} else if (lockupInfo.property === propertyAddress) {
+						expect(toBigNumber(lockupInfo.value).toNumber()).to.be.equal(200)
+					}
+				}
 			})
 			it('generate event.', async () => {
 				const [dev, property] = await init()
@@ -256,6 +303,47 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				)
 				expect(afterPropertyBalance.toString()).to.be.equal('400')
 			})
+			it('get lockup info.', async () => {
+				const [dev, property, tokenId] = await init2()
+				await dev.lockup.depositToPosition(tokenId, 300)
+				const info = await dev.lockup.getLockedupProperties()
+				expect(info.length).to.be.equal(1)
+				expect(info[0].property).to.be.equal(property.address)
+				expect(toBigNumber(info[0].value).toNumber()).to.be.equal(400)
+			})
+			it('get lockup info plus value.', async () => {
+				const [dev, property, tokenId] = await init2()
+				await dev.lockup.depositToPosition(tokenId, 300)
+				await dev.lockup.depositToPosition(tokenId, 200)
+				const info = await dev.lockup.getLockedupProperties()
+				expect(info.length).to.be.equal(1)
+				expect(info[0].property).to.be.equal(property.address)
+				expect(toBigNumber(info[0].value).toNumber()).to.be.equal(600)
+			})
+			it('get lockup info maltible value.', async () => {
+				const [dev, property, tokenId] = await init2()
+				await dev.lockup.depositToPosition(tokenId, 300)
+				const propertyAddress = getPropertyAddress(
+					await dev.propertyFactory.create('test2', 'TEST2', user2, {
+						from: user2,
+					})
+				)
+				await dev.metricsFactory.__addMetrics(
+					(
+						await dev.createMetrics(deployer, propertyAddress)
+					).address
+				)
+				await dev.lockup.depositToProperty(propertyAddress, 200)
+				const info = await dev.lockup.getLockedupProperties()
+				expect(info.length).to.be.equal(2)
+				for (const lockupInfo of info) {
+					if (lockupInfo.property === property.address) {
+						expect(toBigNumber(lockupInfo.value).toNumber()).to.be.equal(400)
+					} else if (lockupInfo.property === propertyAddress) {
+						expect(toBigNumber(lockupInfo.value).toNumber()).to.be.equal(200)
+					}
+				}
+			})
 		})
 		describe('fail', () => {
 			it('Cannot update position if sender and owner are different.', async () => {
@@ -382,6 +470,39 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 					property.address
 				)
 				expect(propertyValue.toString()).to.be.equal('0')
+			})
+			it('get lockup info.', async () => {
+				const [dev, , tokenId] = await init2()
+				await dev.lockup.withdrawByPosition(tokenId, 100)
+				const info = await dev.lockup.getLockedupProperties()
+				expect(info.length).to.be.equal(0)
+			})
+			it('get lockup info(minus).', async () => {
+				const [dev, property, tokenId] = await init2()
+				await dev.lockup.withdrawByPosition(tokenId, 50)
+				const info = await dev.lockup.getLockedupProperties()
+				expect(info.length).to.be.equal(1)
+				expect(info[0].property).to.be.equal(property.address)
+				expect(toBigNumber(info[0].value).toNumber()).to.be.equal(50)
+			})
+			it('get lockup info maltible value.', async () => {
+				const [dev, property, tokenId] = await init2()
+				const propertyAddress = getPropertyAddress(
+					await dev.propertyFactory.create('test2', 'TEST2', user2, {
+						from: user2,
+					})
+				)
+				await dev.metricsFactory.__addMetrics(
+					(
+						await dev.createMetrics(deployer, propertyAddress)
+					).address
+				)
+				await dev.lockup.depositToProperty(propertyAddress, 200)
+				await dev.lockup.withdrawByPosition(tokenId, 100)
+				const info = await dev.lockup.getLockedupProperties()
+				expect(info.length).to.be.equal(1)
+				expect(info[0].property).to.be.equal(propertyAddress)
+				expect(toBigNumber(info[0].value).toNumber()).to.be.equal(200)
 			})
 		})
 		describe('fail', () => {
@@ -644,53 +765,40 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				expect(result.toFixed()).to.be.equal(calculated)
 			})
 			it('After withdrawn, Alice and Bob has a 0% of interests', async () => {
-				console.log(0)
 				await dev.lockup.depositToPosition(aliceSecoundTokenId, 1000000000000, {
 					from: alice,
 				})
-				console.log(1)
 				await dev.lockup.depositToProperty(property.address, 1000000000000, {
 					from: bob,
 				})
-				console.log(2)
 				await forwardBlockTimestamp(2)
-				console.log(3)
 				const alicePosition = await dev.sTokensManager.positions(
 					aliceSecoundTokenId
 				)
-				console.log(4)
 				await dev.lockup.withdrawByPosition(
 					aliceSecoundTokenId,
 					alicePosition.amount.toString(),
 					{ from: alice }
 				)
-				console.log(5)
 				const bobPosition = await dev.sTokensManager.positions(
 					bobSecoundTokenId
 				)
-				console.log(6)
 				await dev.lockup.withdrawByPosition(
 					bobSecoundTokenId,
 					bobPosition.amount.toString(),
 					{ from: bob }
 				)
-				console.log(7)
 				await forwardBlockTimestamp(1)
-				console.log(8)
 				const aliceAmount =
 					await dev.lockup.calculateWithdrawableInterestAmountByPosition(
 						aliceSecoundTokenId
 					)
-				console.log(9)
 				const bobAmount =
 					await dev.lockup.calculateWithdrawableInterestAmountByPosition(
 						bobSecoundTokenId
 					)
-				console.log(10)
 				const aliceCalculated = await calc(aliceSecoundTokenId)
-				console.log(11)
 				const bobCalculated = await calc(bobSecoundTokenId)
-				console.log(12)
 				expect(aliceAmount.toString()).to.be.equal('0')
 				expect(bobAmount.toString()).to.be.equal('0')
 				expect(aliceCalculated.toString()).to.be.equal('0')

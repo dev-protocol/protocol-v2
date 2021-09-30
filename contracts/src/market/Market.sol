@@ -18,13 +18,14 @@ import {IDevBridge} from "contracts/interface/IDevBridge.sol";
  * A user deploys a contract that inherits IMarketBehavior and creates this Market contract with the MarketFactory contract.
  */
 contract Market is UsingRegistry, IMarket {
-	using EnumerableSet for EnumerableSet.AddressSet;
 	EnumerableSet.AddressSet private authenticatedProperties;
 	bool public override enabled;
 	address public override behavior;
 	uint256 public override votingEndTimestamp;
 	mapping(bytes32 => bool) private idMap;
 	mapping(address => bytes32) private idHashMetricsMap;
+
+	using EnumerableSet for EnumerableSet.AddressSet;
 
 	/**
 	 * Initialize the passed address as AddressRegistry address and user-proposed contract.
