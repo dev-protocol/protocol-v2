@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MPL-2.0
-pragma solidity =0.8.8;
+pragma solidity =0.8.9;
 
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {UsingRegistry} from "contracts/src/common/registry/UsingRegistry.sol";

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MPL-2.0
-pragma solidity =0.8.8;
+pragma solidity =0.8.9;
 
 contract Curve {
 	uint256 private constant BASIS = 10000000000000000000000000;
