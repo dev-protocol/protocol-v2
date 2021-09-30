@@ -1,5 +1,5 @@
 import { DevProtocolInstance } from '../test-lib/instance'
-import { forwardBlockTimestamp, mine } from '../test-lib/utils/common'
+import { forwardBlockTimestamp } from '../test-lib/utils/common'
 import { MarketInstance } from '../../types/truffle-contracts'
 import { getPropertyAddress, getMarketAddress } from '../test-lib/utils/log'
 import { watch } from '../test-lib/utils/event'

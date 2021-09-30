@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity =0.8.9;
 
+import {EnumerableSet} from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {Decimals} from "contracts/src/common/libs/Decimals.sol";
@@ -41,6 +42,7 @@ import {ISTokensManager} from "contracts/interface/ISTokensManager.sol";
  * - After 10 blocks, Alice withdraws Property-A staking reward. The reward at this time is 5000 DEV (10 blocks * 500 DEV) + 3125 DEV (10 blocks * 62.5% * 500 DEV) + 2500 DEV (10 blocks * 50% * 500 DEV).
  */
 contract Lockup is ILockup, InitializableUsingRegistry {
+	using EnumerableSet for EnumerableSet.AddressSet;
 	uint256 public override cap; // From [get/set]StorageCap
 	uint256 public override totalLocked; // From [get/set]StorageAllValue
 	uint256 public cumulativeHoldersRewardCap; // From [get/set]StorageCumulativeHoldersRewardCap
@@ -51,7 +53,7 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 	uint256 public cumulativeGlobalReward; // From [get/set]StorageCumulativeGlobalRewards
 	uint256 public lastSameGlobalRewardAmount; // From [get/set]StorageLastSameRewardsAmountAndBlock
 	uint256 public lastSameGlobalRewardTimestamp; // From [get/set]StorageLastSameRewardsAmountAndBlock
-	address[] public lockedupProperties;
+	EnumerableSet.AddressSet private lockedupProperties;
 	mapping(address => uint256)
 		public lastCumulativeHoldersRewardPricePerProperty; // {Property: Value} // [get/set]StorageLastCumulativeHoldersRewardPricePerProperty
 	mapping(address => uint256) public initialCumulativeHoldersRewardCap; // {Property: Value} // From [get/set]StorageInitialCumulativeHoldersRewardCap
@@ -148,7 +150,7 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 			registry().registries("STokensManager")
 		);
 		if (sTokenManager.positionsOfProperty(_property).length == 0) {
-			lockedupProperties.push(_property);
+			lockedupProperties.add(_property);
 		}
 		uint256 tokenId = sTokenManager.mint(
 			msg.sender,
@@ -276,7 +278,7 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 			0
 		);
 		if (totalLockedForProperty[positions.property] == 0) {
-			deleteUnlockedPropertyInfo(positions.property);
+			lockedupProperties.remove(positions.property);
 		}
 
 		emit Withdrew(msg.sender, positions.property, _amount, value, _tokenId);
@@ -295,12 +297,12 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		override
 		returns (LockedupProperty[] memory)
 	{
-		uint256 propertyCount = lockedupProperties.length;
+		uint256 propertyCount = lockedupProperties.length();
 		LockedupProperty[] memory results = new LockedupProperty[](
 			propertyCount
 		);
 		for (uint256 i = 0; i < propertyCount; i++) {
-			address property = lockedupProperties[i];
+			address property = lockedupProperties.at(i);
 			uint256 value = totalLockedForProperty[property];
 			results[i] = LockedupProperty(property, value);
 		}
@@ -764,28 +766,5 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		uint256 value = totalLockedForProperty[_property];
 		uint256 nextValue = value - _value;
 		totalLockedForProperty[_property] = nextValue;
-	}
-
-	/**
-	 * delete unlocked property address info
-	 */
-	function deleteUnlockedPropertyInfo(address _property) private {
-		uint256 propertyCount = lockedupProperties.length;
-		address[] memory properties = new address[](propertyCount - 1);
-		uint256 counter = 0;
-		bool deleteFlg = false;
-		for (uint256 i = 0; i < propertyCount; i++) {
-			address property = lockedupProperties[i];
-			if (_property != property) {
-				properties[counter] = property;
-				counter += 1;
-			} else {
-				deleteFlg = true;
-			}
-		}
-		if (deleteFlg == false) {
-			revert("illegal token id");
-		}
-		lockedupProperties = properties;
 	}
 }
