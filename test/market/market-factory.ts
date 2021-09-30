@@ -140,6 +140,28 @@ contract('MarketFactoryTest', ([deployer, user, dummyMarketAddress]) => {
 		})
 	})
 
+	describe('MarketFactory; enableMarketList', () => {
+		it('get market address list', async () => {
+			const [dev, marketAddress] = await init()
+			const result = await dev.marketFactory.enableMarketList()
+			expect(result.length).to.be.equal(1)
+			expect(result[0]).to.be.equal(marketAddress)
+		})
+		it('add market address list', async () => {
+			const [dev, marketAddress] = await init()
+			const market = await dev.getMarket('MarketTest2', user)
+			const result = await dev.marketFactory.create(market.address, {
+				from: user,
+			})
+			const marketAddress2 = getMarketAddress(result)
+			await dev.marketFactory.enable(marketAddress2)
+			const markets = await dev.marketFactory.enableMarketList()
+			expect(markets.length).to.be.equal(2)
+			expect(markets[0]).to.be.equal(marketAddress)
+			expect(markets[1]).to.be.equal(marketAddress2)
+		})
+	})
+
 	describe('MarketFactory; marketsCount', () => {
 		it('Returns the number of enabled Markets', async () => {
 			const [dev] = await init()

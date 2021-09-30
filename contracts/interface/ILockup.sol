@@ -10,6 +10,11 @@ interface ILockup {
 		uint256 holdersCap;
 	}
 
+	struct LockedupProperty {
+		address property;
+		uint256 value;
+	}
+
 	event Lockedup(
 		address indexed _from,
 		address indexed _property,
@@ -33,6 +38,11 @@ interface ILockup {
 	function depositToPosition(uint256 _tokenId, uint256 _amount)
 		external
 		returns (bool);
+
+	function getLockedupProperties()
+		external
+		view
+		returns (LockedupProperty[] memory);
 
 	function update() external;
 

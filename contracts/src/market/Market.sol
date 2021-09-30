@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity =0.8.9;
 
+import {EnumerableSet} from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import {UsingRegistry} from "contracts/src/common/registry/UsingRegistry.sol";
 import {IProperty} from "contracts/interface/IProperty.sol";
 import {IMarket} from "contracts/interface/IMarket.sol";
@@ -17,12 +18,14 @@ import {IDevBridge} from "contracts/interface/IDevBridge.sol";
  * A user deploys a contract that inherits IMarketBehavior and creates this Market contract with the MarketFactory contract.
  */
 contract Market is UsingRegistry, IMarket {
+	EnumerableSet.AddressSet private authenticatedProperties;
 	bool public override enabled;
 	address public override behavior;
 	uint256 public override votingEndTimestamp;
-	uint256 public override issuedMetrics;
 	mapping(bytes32 => bool) private idMap;
 	mapping(address => bytes32) private idHashMetricsMap;
+
+	using EnumerableSet for EnumerableSet.AddressSet;
 
 	/**
 	 * Initialize the passed address as AddressRegistry address and user-proposed contract.
@@ -214,7 +217,7 @@ contract Market is UsingRegistry, IMarket {
 		/**
 		 * Adds the number of authenticated assets in this Market.
 		 */
-		issuedMetrics = issuedMetrics + 1;
+		authenticatedProperties.add(_property);
 		return metrics;
 	}
 
@@ -249,7 +252,8 @@ contract Market is UsingRegistry, IMarket {
 		/**
 		 * Subtracts the number of authenticated assets in this Market.
 		 */
-		issuedMetrics = issuedMetrics - 1;
+		address property = IMetrics(_metrics).property();
+		authenticatedProperties.remove(property);
 	}
 
 	/**
@@ -264,6 +268,24 @@ contract Market is UsingRegistry, IMarket {
 	 */
 	function schema() external view override returns (string memory) {
 		return IMarketBehavior(behavior).schema();
+	}
+
+	/**
+	 * get issued metrics count
+	 */
+	function issuedMetrics() external view returns (uint256) {
+		return authenticatedProperties.length();
+	}
+
+	/**
+	 * get authentivated properties
+	 */
+	function getAuthenticatedProperties()
+		external
+		view
+		returns (address[] memory)
+	{
+		return authenticatedProperties.values();
 	}
 
 	function isDuringVotingPeriod() private view returns (bool) {
