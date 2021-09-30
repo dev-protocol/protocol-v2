@@ -279,7 +279,11 @@ contract Market is UsingRegistry, IMarket {
 	/**
 	 * get authentivated properties
 	 */
-	function getAuthenticatedProperties() external view returns (address[] memory) {
+	function getAuthenticatedProperties()
+		external
+		view
+		returns (address[] memory)
+	{
 		return authenticatedProperties.values();
 	}
 
