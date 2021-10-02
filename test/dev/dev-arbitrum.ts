@@ -32,19 +32,28 @@ contract('Dev', ([deployer, user1, user2, dummyMarket]) => {
 		it('deployer has admin role', async () => {
 			const dev = await createDev()
 			expect(
-				await dev.devArbitrum.hasRole(await dev.devArbitrum.DEFAULT_ADMIN_ROLE(), deployer)
+				await dev.devArbitrum.hasRole(
+					await dev.devArbitrum.DEFAULT_ADMIN_ROLE(),
+					deployer
+				)
 			).to.equal(true)
 		})
 		it('deployer has burner role', async () => {
 			const dev = await createDev()
 			expect(
-				await dev.devArbitrum.hasRole(await dev.devArbitrum.BURNER_ROLE(), deployer)
+				await dev.devArbitrum.hasRole(
+					await dev.devArbitrum.BURNER_ROLE(),
+					deployer
+				)
 			).to.equal(true)
 		})
 		it('deployer has minter role', async () => {
 			const dev = await createDev()
 			expect(
-				await dev.devArbitrum.hasRole(await dev.devArbitrum.MINTER_ROLE(), deployer)
+				await dev.devArbitrum.hasRole(
+					await dev.devArbitrum.MINTER_ROLE(),
+					deployer
+				)
 			).to.equal(true)
 		})
 	})

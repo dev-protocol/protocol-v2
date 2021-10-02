@@ -12,11 +12,7 @@ import {IDev} from "contracts/interface/IDev.sol";
  * Also, mint will be performed based on the Allocator contract.
  * When authenticated a new asset by the Market contracts, DEV token is burned as fees.
  */
-contract Dev is
-	ERC20Upgradeable,
-	AccessControlEnumerableUpgradeable,
-	IDev
-{
+contract Dev is ERC20Upgradeable, AccessControlEnumerableUpgradeable, IDev {
 	bytes32 public constant override BURNER_ROLE = keccak256("BURNER_ROLE");
 	bytes32 public constant override MINTER_ROLE = keccak256("MINTER_ROLE");
 

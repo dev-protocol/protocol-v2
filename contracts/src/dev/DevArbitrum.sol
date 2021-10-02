@@ -11,7 +11,6 @@ import {Dev} from "contracts/src/dev/Dev.sol";
  * When authenticated a new asset by the Market contracts, DEV token is burned as fees.
  */
 contract DevArbitrum is Dev {
-
 	/**
 	 * Initialize the passed address as AddressRegistry address.
 	 * The token name is `Dev`, the token symbol is `DEV`, and the decimals is 18.

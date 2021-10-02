@@ -155,7 +155,10 @@ export class DevProtocolInstance {
 	}
 
 	public async generateDevArbitrum(): Promise<void> {
-		const [proxfied] = await deployProxy(contract('DevArbitrum'), this._deployer)
+		const [proxfied] = await deployProxy(
+			contract('DevArbitrum'),
+			this._deployer
+		)
 		await proxfied.initialize()
 		this._devArbitrum = proxfied
 		await this.addressRegistry.setRegistry(
