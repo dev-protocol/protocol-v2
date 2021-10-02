@@ -4,7 +4,6 @@ pragma solidity =0.8.9;
 import {ERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 import {AccessControlEnumerableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/AccessControlEnumerableUpgradeable.sol";
 import {IDev} from "contracts/interface/IDev.sol";
-import {IArbToken} from "contracts/interface/IArbToken.sol";
 
 /**
  * The contract used as the DEV token.
@@ -16,10 +15,8 @@ import {IArbToken} from "contracts/interface/IArbToken.sol";
 contract Dev is
 	ERC20Upgradeable,
 	AccessControlEnumerableUpgradeable,
-	IArbToken,
 	IDev
 {
-	address public override l1Address;
 	bytes32 public constant override BURNER_ROLE = keccak256("BURNER_ROLE");
 	bytes32 public constant override MINTER_ROLE = keccak256("MINTER_ROLE");
 
@@ -27,21 +24,12 @@ contract Dev is
 	 * Initialize the passed address as AddressRegistry address.
 	 * The token name is `Dev`, the token symbol is `DEV`, and the decimals is 18.
 	 */
-	function initialize(address _l1DevAddress) external initializer {
-		__ERC20_init("Dev", "DEV");
+	function initialize(string memory _devName) external initializer {
+		__ERC20_init(_devName, "DEV");
 		__AccessControlEnumerable_init();
 		_setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
 		_setupRole(BURNER_ROLE, _msgSender());
 		_setupRole(MINTER_ROLE, _msgSender());
-		l1Address = _l1DevAddress;
-	}
-
-	function bridgeMint(address account, uint256 amount) external override {
-		mint(account, amount);
-	}
-
-	function bridgeBurn(address account, uint256 amount) external override {
-		burn(account, amount);
 	}
 
 	function mint(address _account, uint256 _amount) public override {
