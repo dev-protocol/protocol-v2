@@ -25,7 +25,7 @@ type ContractInstance = {
 
 export const deployProxy = async <L extends ContractInstance>(
 	logic: L,
-	deployer: string
+	deployer: string,
 ): Promise<[ReturnType<L['at']>, AdminInstance]> => {
 	const [admin, impl] = await Promise.all([
 		contract('Admin').new(),
@@ -145,7 +145,7 @@ export class DevProtocolInstance {
 
 	public async generateDev(): Promise<void> {
 		const [proxfied] = await deployProxy(contract('Dev'), this._deployer)
-		await proxfied.initialize('Dev')
+		await proxfied.__Dev_init('Dev')
 		this._dev = proxfied
 		await this.addressRegistry.setRegistry(
 			'Dev',
@@ -159,7 +159,7 @@ export class DevProtocolInstance {
 			contract('DevArbitrum'),
 			this._deployer
 		)
-		await proxfied.initialize()
+		await proxfied.initialize(this._deployer) // Set l1Address to deployer just for testing
 		this._devArbitrum = proxfied
 		await this.addressRegistry.setRegistry(
 			'DevArbitrum',

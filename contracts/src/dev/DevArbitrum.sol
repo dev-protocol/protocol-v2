@@ -12,18 +12,16 @@ import {IArbToken} from "contracts/interface/IArbToken.sol";
  * When authenticated a new asset by the Market contracts, DEV token is burned as fees.
  */
 contract DevArbitrum is Dev, IArbToken {
-	// TODO
-	// `l1Address` getter should be returned an address of a deployed https://github.com/dev-protocol/dev-arb-one/blob/main/contracts/Dev.sol
-
 	/**
 	 * Initialize the passed address as AddressRegistry address.
-	 * The token name is `Dev`, the token symbol is `DEV`, and the decimals is 18.
+	 * The token name is `Dev Arbitrum`, the token symbol is `DEV`, and the decimals is 18.
 	 */
 
 	address public l1Address;
 
-	function initialize() external initializer {
-		this.initialize("Dev Arbitrum");
+	function initialize(address _l1Token) external initializer {
+		__Dev_init("Dev Arbitrum");
+		l1Address = _l1Token;
 	}
 
 	function bridgeMint(address account, uint256 amount) external override {

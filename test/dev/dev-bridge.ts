@@ -30,7 +30,7 @@ contract(
 			await addressRegistry.initialize()
 
 			const [dev] = await deployProxy(contract('Dev'), deployer)
-			await dev.initialize(l1DevAddress)
+			await dev.__Dev_init('Dev')
 			await addressRegistry.setRegistry('Dev', dev.address, {
 				from: deployer,
 			})
