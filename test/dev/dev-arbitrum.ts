@@ -40,49 +40,57 @@ contract('Dev', ([deployer, user1, user2, dummyMarket]) => {
 				)
 			).to.equal(true)
 		})
-			it('deployer has burner role', async () => {
-				const dev = await createDev()
-				expect(
-					await dev.devArbitrum.hasRole(
-						await dev.devArbitrum.BURNER_ROLE(),
-						deployer
-					)
-				).to.equal(true)
-			})
-			it('deployer has minter role', async () => {
-				const dev = await createDev()
-				expect(
-					await dev.devArbitrum.hasRole(
-						await dev.devArbitrum.MINTER_ROLE(),
-						deployer
-					)
-				).to.equal(true)
-			})
+		it('deployer has burner role', async () => {
+			const dev = await createDev()
+			expect(
+				await dev.devArbitrum.hasRole(
+					await dev.devArbitrum.BURNER_ROLE(),
+					deployer
+				)
+			).to.equal(true)
 		})
-		describe('DevArbitrum; BridgeMint', () => {
-			it('the initial balance is 0', async () => {
-				const dev = await createDev()
-				expect((await dev.devArbitrum.totalSupply()).toNumber()).to.equal(0)
-			})
-			it('increase the balance by running the mint', async () => {
-				const dev = await createDev()
-				await dev.devArbitrum.bridgeMint(deployer, 100)
-				expect((await dev.devArbitrum.totalSupply()).toNumber()).to.equal(100)
-				expect((await dev.devArbitrum.balanceOf(deployer)).toNumber()).to.equal(100)
-			})
+		it('deployer has minter role', async () => {
+			const dev = await createDev()
+			expect(
+				await dev.devArbitrum.hasRole(
+					await dev.devArbitrum.MINTER_ROLE(),
+					deployer
+				)
+			).to.equal(true)
+		})
+	})
+	describe('DevArbitrum; BridgeMint', () => {
+		it('the initial balance is 0', async () => {
+			const dev = await createDev()
+			expect((await dev.devArbitrum.totalSupply()).toNumber()).to.equal(0)
+		})
+		it('increase the balance by running the mint', async () => {
+			const dev = await createDev()
+			await dev.devArbitrum.bridgeMint(deployer, 100)
+			expect((await dev.devArbitrum.totalSupply()).toNumber()).to.equal(100)
+			expect((await dev.devArbitrum.balanceOf(deployer)).toNumber()).to.equal(
+				100
+			)
+		})
 		it('running with 0', async () => {
 			const dev = await createDev()
 			await dev.devArbitrum.bridgeMint(deployer, 100)
 			expect((await dev.devArbitrum.totalSupply()).toNumber()).to.equal(100)
-			expect((await dev.devArbitrum.balanceOf(deployer)).toNumber()).to.equal(100)
+			expect((await dev.devArbitrum.balanceOf(deployer)).toNumber()).to.equal(
+				100
+			)
 
 			await dev.devArbitrum.bridgeMint(deployer, 0)
 			expect((await dev.devArbitrum.totalSupply()).toNumber()).to.equal(100)
-			expect((await dev.devArbitrum.balanceOf(deployer)).toNumber()).to.equal(100)
+			expect((await dev.devArbitrum.balanceOf(deployer)).toNumber()).to.equal(
+				100
+			)
 		})
 		it('should fail to run mint when sent from other than minter', async () => {
 			const dev = await createDev()
-			const res = await dev.devArbitrum.bridgeMint(deployer, 100, { from: user1 }).catch(err)
+			const res = await dev.devArbitrum
+				.bridgeMint(deployer, 100, { from: user1 })
+				.catch(err)
 			validateErrorMessage(res, 'must have minter role to mint')
 			expect((await dev.devArbitrum.totalSupply()).toNumber()).to.equal(0)
 			expect((await dev.devArbitrum.balanceOf(deployer)).toNumber()).to.equal(0)
@@ -111,29 +119,41 @@ contract('Dev', ([deployer, user1, user2, dummyMarket]) => {
 			const dev = await createDev()
 			await dev.devArbitrum.bridgeMint(deployer, 100)
 			expect((await dev.devArbitrum.totalSupply()).toNumber()).to.equal(100)
-			expect((await dev.devArbitrum.balanceOf(deployer)).toNumber()).to.equal(100)
+			expect((await dev.devArbitrum.balanceOf(deployer)).toNumber()).to.equal(
+				100
+			)
 
 			await dev.devArbitrum.bridgeBurn(deployer, 50)
 			expect((await dev.devArbitrum.totalSupply()).toNumber()).to.equal(50)
-			expect((await dev.devArbitrum.balanceOf(deployer)).toNumber()).to.equal(50)
+			expect((await dev.devArbitrum.balanceOf(deployer)).toNumber()).to.equal(
+				50
+			)
 		})
 		it('running with 0', async () => {
 			const dev = await createDev()
 			await dev.devArbitrum.bridgeMint(deployer, 100)
 			expect((await dev.devArbitrum.totalSupply()).toNumber()).to.equal(100)
-			expect((await dev.devArbitrum.balanceOf(deployer)).toNumber()).to.equal(100)
+			expect((await dev.devArbitrum.balanceOf(deployer)).toNumber()).to.equal(
+				100
+			)
 
 			await dev.devArbitrum.bridgeBurn(deployer, 0)
 			expect((await dev.devArbitrum.totalSupply()).toNumber()).to.equal(100)
-			expect((await dev.devArbitrum.balanceOf(deployer)).toNumber()).to.equal(100)
+			expect((await dev.devArbitrum.balanceOf(deployer)).toNumber()).to.equal(
+				100
+			)
 		})
 		it('should fail to decrease the balance when sent from no balance account', async () => {
 			const dev = await createDev()
 			await dev.devArbitrum.bridgeMint(deployer, 100)
 			expect((await dev.devArbitrum.totalSupply()).toNumber()).to.equal(100)
-			expect((await dev.devArbitrum.balanceOf(deployer)).toNumber()).to.equal(100)
+			expect((await dev.devArbitrum.balanceOf(deployer)).toNumber()).to.equal(
+				100
+			)
 
-			const res = await dev.devArbitrum.bridgeBurn(deployer, 50, { from: user1 }).catch(err)
+			const res = await dev.devArbitrum
+				.bridgeBurn(deployer, 50, { from: user1 })
+				.catch(err)
 			expect((await dev.devArbitrum.totalSupply()).toNumber()).to.equal(100)
 			validateErrorMessage(res, 'must have burner role to burn')
 		})
@@ -141,14 +161,18 @@ contract('Dev', ([deployer, user1, user2, dummyMarket]) => {
 			const dev = await createDev()
 			await dev.devArbitrum.bridgeMint(deployer, 100)
 			expect((await dev.devArbitrum.totalSupply()).toNumber()).to.equal(100)
-			expect((await dev.devArbitrum.balanceOf(deployer)).toNumber()).to.equal(100)
+			expect((await dev.devArbitrum.balanceOf(deployer)).toNumber()).to.equal(
+				100
+			)
 
 			await dev.devArbitrum.approve(user1, 50)
 			const res = await dev.devArbitrum
 				.bridgeBurn(deployer, 51, { from: user1 })
 				.catch((err: Error) => err)
 			expect((await dev.devArbitrum.totalSupply()).toNumber()).to.equal(100)
-			expect((await dev.devArbitrum.balanceOf(deployer)).toNumber()).to.equal(100)
+			expect((await dev.devArbitrum.balanceOf(deployer)).toNumber()).to.equal(
+				100
+			)
 			expect(res).to.be.an.instanceof(Error)
 		})
 	})

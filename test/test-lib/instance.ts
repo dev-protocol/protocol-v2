@@ -25,7 +25,7 @@ type ContractInstance = {
 
 export const deployProxy = async <L extends ContractInstance>(
 	logic: L,
-	deployer: string,
+	deployer: string
 ): Promise<[ReturnType<L['at']>, AdminInstance]> => {
 	const [admin, impl] = await Promise.all([
 		contract('Admin').new(),
