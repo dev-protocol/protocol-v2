@@ -12,6 +12,9 @@ import {IArbToken} from "contracts/interface/IArbToken.sol";
  * When authenticated a new asset by the Market contracts, DEV token is burned as fees.
  */
 contract DevArbitrum is Dev, IArbToken {
+	// TODO
+	// `l1Address` getter should be returned an address of a deployed https://github.com/dev-protocol/dev-arb-one/blob/main/contracts/Dev.sol
+
 	/**
 	 * Initialize the passed address as AddressRegistry address.
 	 * The token name is `Dev`, the token symbol is `DEV`, and the decimals is 18.
