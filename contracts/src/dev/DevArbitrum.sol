@@ -16,7 +16,7 @@ contract DevArbitrum is Dev, IArbToken {
 	 * Initialize the passed address as AddressRegistry address.
 	 * The token name is `Dev`, the token symbol is `DEV`, and the decimals is 18.
 	 */
-	
+
 	address public l1Address;
 
 	function initialize() external initializer {

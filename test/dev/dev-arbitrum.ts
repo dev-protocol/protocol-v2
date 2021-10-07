@@ -15,7 +15,7 @@ contract('Dev', ([deployer, user1, user2, dummyMarket]) => {
 
 	const err = (error: Error): Error => error
 	describe('Dev; initialize', () => {
-		// it('the name is Dev', async () => {
+		// It('the name is Dev', async () => {
 		// 	const dev = await createDev()
 		// 	expect(await dev.devArbitrum.name()).to.equal('Dev Arbitrum')
 		// })
@@ -38,37 +38,37 @@ contract('Dev', ([deployer, user1, user2, dummyMarket]) => {
 				)
 			).to.equal(true)
 		})
-	// 	it('deployer has burner role', async () => {
-	// 		const dev = await createDev()
-	// 		expect(
-	// 			await dev.devArbitrum.hasRole(
-	// 				await dev.devArbitrum.BURNER_ROLE(),
-	// 				dev.devArbitrum.address
-	// 			)
-	// 		).to.equal(true)
-	// 	})
-	// 	it('deployer has minter role', async () => {
-	// 		const dev = await createDev()
-	// 		expect(
-	// 			await dev.devArbitrum.hasRole(
-	// 				await dev.devArbitrum.MINTER_ROLE(),
-	// 				dev.devArbitrum.address
-	// 			)
-	// 		).to.equal(true)
-	// 	})
-	// })
-	// describe('Dev; mint', () => {
-	// 	it('the initial balance is 0', async () => {
-	// 		const dev = await createDev()
-	// 		expect((await dev.devArbitrum.totalSupply()).toNumber()).to.equal(0)
-	// 	})
-	// 	it('increase the balance by running the mint', async () => {
-	// 		const dev = await createDev()
-	// 		await dev.devArbitrum.bridgeMint(deployer, 100)
-	// 		console.log('sender',await dev.devArbitrum.sender())
-	// 		expect((await dev.devArbitrum.totalSupply()).toNumber()).to.equal(100)
-	// 		expect((await dev.devArbitrum.balanceOf(deployer)).toNumber()).to.equal(100)
-	// 	})
+		// 	It('deployer has burner role', async () => {
+		// 		const dev = await createDev()
+		// 		expect(
+		// 			await dev.devArbitrum.hasRole(
+		// 				await dev.devArbitrum.BURNER_ROLE(),
+		// 				dev.devArbitrum.address
+		// 			)
+		// 		).to.equal(true)
+		// 	})
+		// 	it('deployer has minter role', async () => {
+		// 		const dev = await createDev()
+		// 		expect(
+		// 			await dev.devArbitrum.hasRole(
+		// 				await dev.devArbitrum.MINTER_ROLE(),
+		// 				dev.devArbitrum.address
+		// 			)
+		// 		).to.equal(true)
+		// 	})
+		// })
+		// describe('Dev; mint', () => {
+		// 	it('the initial balance is 0', async () => {
+		// 		const dev = await createDev()
+		// 		expect((await dev.devArbitrum.totalSupply()).toNumber()).to.equal(0)
+		// 	})
+		// 	it('increase the balance by running the mint', async () => {
+		// 		const dev = await createDev()
+		// 		await dev.devArbitrum.bridgeMint(deployer, 100)
+		// 		console.log('sender',await dev.devArbitrum.sender())
+		// 		expect((await dev.devArbitrum.totalSupply()).toNumber()).to.equal(100)
+		// 		expect((await dev.devArbitrum.balanceOf(deployer)).toNumber()).to.equal(100)
+		// 	})
 		// it('running with 0', async () => {
 		// 	const dev = await createDev()
 		// 	await dev.devArbitrum.mint(deployer, 100)
