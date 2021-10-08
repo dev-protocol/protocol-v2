@@ -5,7 +5,7 @@ import { validateErrorMessage } from '../test-lib/utils/error'
 
 contract(
 	'DevBridge',
-	([deployer, user1, lockup, withdraw, market, l1DevAddress]) => {
+	([deployer, user1, lockup, withdraw, market]) => {
 		const createDevInstance = async (): Promise<DevProtocolInstance> => {
 			const dev = new DevProtocolInstance(deployer)
 			await dev.generateAddressRegistry()

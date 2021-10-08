@@ -20,6 +20,7 @@ contract Dev is ERC20Upgradeable, AccessControlEnumerableUpgradeable, IDev {
 	 * Initialize the passed address as AddressRegistry address.
 	 * The token name is `Dev`, the token symbol is `DEV`, and the decimals is 18.
 	 */
+	// solhint-disable-next-line func-name-mixedcase
 	function __Dev_init(string memory _devName) public initializer {
 		__ERC20_init(_devName, "DEV");
 		__AccessControlEnumerable_init();
