@@ -18,7 +18,7 @@ export const generateDevInstances = async (
 	const devContract = artifacts.require('Dev')
 	// eslint-disable-next-line @typescript-eslint/await-thenable
 	const devProxy = await devContract.at(proxy.address)
-	await devProxy.initialize(l1DevAddress)
+	await devProxy.__Dev_init('Dev')
 	return devProxy
 }
 

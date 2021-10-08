@@ -2,6 +2,7 @@
 import {
 	AddressRegistryInstance,
 	DevInstance,
+	DevArbitrumInstance,
 	LockupInstance,
 	PropertyFactoryInstance,
 	PolicyFactoryTestInstance,
@@ -47,6 +48,7 @@ export class DevProtocolInstance {
 
 	private _addressRegistry!: AddressRegistryInstance
 	private _dev!: DevInstance
+	private _devArbitrum!: DevArbitrumInstance
 	private _lockup!: LockupInstance
 	private _propertyFactory!: PropertyFactoryInstance
 	private _policyFactory!: PolicyFactoryTestInstance
@@ -56,7 +58,6 @@ export class DevProtocolInstance {
 	private _treasury!: TreasuryTestInstance
 	private _devBridge!: DevBridgeInstance
 	private _sTokensManager!: STokensManagerInstance
-	private _l1DevAddress!: string
 
 	constructor(deployer: string) {
 		this._deployer = deployer
@@ -76,6 +77,10 @@ export class DevProtocolInstance {
 
 	public get dev(): DevInstance {
 		return this._dev
+	}
+
+	public get devArbitrum(): DevArbitrumInstance {
+		return this._devArbitrum
 	}
 
 	public get lockup(): LockupInstance {
@@ -110,10 +115,6 @@ export class DevProtocolInstance {
 		return this._sTokensManager
 	}
 
-	public get l1DevAddress(): string {
-		return this._l1DevAddress
-	}
-
 	public async generateAddressRegistry(): Promise<void> {
 		const [proxfied] = await deployProxy(
 			contract('AddressRegistry'),
@@ -144,12 +145,25 @@ export class DevProtocolInstance {
 
 	public async generateDev(): Promise<void> {
 		const [proxfied] = await deployProxy(contract('Dev'), this._deployer)
-		this._l1DevAddress = web3.eth.accounts.create().address
-		await proxfied.initialize(this._l1DevAddress)
+		await proxfied.__Dev_init('Dev')
 		this._dev = proxfied
 		await this.addressRegistry.setRegistry(
 			'Dev',
 			this._dev.address,
+			this.fromDeployer
+		)
+	}
+
+	public async generateDevArbitrum(): Promise<void> {
+		const [proxfied] = await deployProxy(
+			contract('DevArbitrum'),
+			this._deployer
+		)
+		await proxfied.initialize(this._deployer) // Set l1Address to deployer just for testing
+		this._devArbitrum = proxfied
+		await this.addressRegistry.setRegistry(
+			'Dev',
+			this._devArbitrum.address,
 			this.fromDeployer
 		)
 	}
