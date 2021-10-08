@@ -6,7 +6,6 @@
 		"no-empty-blocks": "off",
 		"reason-string": "off",
 		"max-states-count": "off",
-		"not-rely-on-time": "off",
-		"func-name-mixedcase": "off"
+		"not-rely-on-time": "off"
 	}
 }

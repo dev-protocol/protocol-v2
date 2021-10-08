@@ -162,7 +162,7 @@ export class DevProtocolInstance {
 		await proxfied.initialize(this._deployer) // Set l1Address to deployer just for testing
 		this._devArbitrum = proxfied
 		await this.addressRegistry.setRegistry(
-			'DevArbitrum',
+			'Dev',
 			this._devArbitrum.address,
 			this.fromDeployer
 		)
