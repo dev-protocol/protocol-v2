@@ -159,16 +159,28 @@ export class DevProtocolInstance {
 			contract('DevArbitrum'),
 			this._deployer
 		)
+		await proxfied.initialize(this._addressRegistry.address)
 
+		// L1 dev address
 		const [proxyDev] = await deployProxy(contract('Dev'), this._deployer)
 		await proxyDev.__Dev_init('Dev')
+		await this.addressRegistry.setRegistry(
+			'L1DevAddress',
+			proxyDev.address,
+			this.fromDeployer
+		)
 
+		// Arb sys
 		const [proxyArbSys] = await deployProxy(
 			contract('ArbSysTest'),
 			this._deployer
 		)
+		await this.addressRegistry.setRegistry(
+			'ArbSys',
+			proxyArbSys.address,
+			this.fromDeployer
+		)
 
-		await proxfied.initialize(proxyDev.address, proxyArbSys.address)
 		this._devArbitrum = proxfied
 		await this.addressRegistry.setRegistry(
 			'Dev',

@@ -5,6 +5,7 @@ import {Dev} from "contracts/src/dev/Dev.sol";
 import {IArbToken} from "contracts/interface/IArbToken.sol";
 import {IArbSys} from "contracts/interface/IArbSys.sol";
 import {IDevArbitrum} from "contracts/interface/IDevArbitrum.sol";
+import {InitializableUsingRegistry} from "contracts/src/common/registry/InitializableUsingRegistry.sol";
 
 /**
  * The contract used as the DEV token.
@@ -13,22 +14,24 @@ import {IDevArbitrum} from "contracts/interface/IDevArbitrum.sol";
  * Also, mint will be performed based on the Allocator contract.
  * When authenticated a new asset by the Market contracts, DEV token is burned as fees.
  */
-contract DevArbitrum is Dev, IArbToken, IDevArbitrum {
-	address public l1Address;
-	address public arbSys;
+contract DevArbitrum is
+	Dev,
+	IArbToken,
+	IDevArbitrum,
+	InitializableUsingRegistry
+{
 	uint256 public bridgeBalanceOnL1;
 
 	/**
-	 * Initialize the passed l1 token and ArbSys address.
-	 * The token name is `Dev Arbitrum`, the token symbol is `DEV`, and the decimals is 18.
+	 * Initialize the passed address as AddressRegistry address.
 	 */
-	function initialize(address _l1Token, address _arbSys)
-		external
-		initializer
-	{
+	function initialize(address _registry) external initializer {
+		__UsingRegistry_init(_registry);
 		__Dev_init("Dev Arbitrum");
-		l1Address = _l1Token;
-		arbSys = _arbSys;
+	}
+
+	function l1Address() external view override returns (address) {
+		return registry().registries("L1DevAddress");
 	}
 
 	function bridgeMint(address _account, uint256 _amount) external override {
@@ -56,8 +59,10 @@ contract DevArbitrum is Dev, IArbToken, IDevArbitrum {
 			_amount
 		);
 		// Use Arbitrum's messaging system to execute L1Token.escrowMint
+		address arbSys = registry().registries("ArbSys");
 		uint256 id = IArbSys(arbSys).sendTxToL1(_to, data);
-		emit L1EscrowMint(l1Address, id, _amount);
+		address l1DevAddress = registry().registries("L1DevAddress");
+		emit L1EscrowMint(l1DevAddress, id, _amount);
 		emit TxToL1(address(this), _to, id, data);
 	}
 }

@@ -66,7 +66,7 @@ contract('Dev', ([deployer, user1, user2]) => {
 
 		it('get ArbSys address', async () => {
 			const dev = await createDev()
-			const arbSys = await dev.devArbitrum.arbSys()
+			const arbSys = await dev.addressRegistry.registries('ArbSys')
 			const arbSysInstance = await artifacts.require('ArbSysTest').at(arbSys)
 			expect(await arbSysInstance.isTopLevelCall()).to.equal(true)
 		})
