@@ -244,9 +244,7 @@ contract('Dev', ([deployer, user1, user2]) => {
 			await dev.devArbitrum.bridgeMint(deployer, 100)
 			await dev.devArbitrum.mint(deployer, 100)
 			await dev.devArbitrum.bridgeBurn(deployer, 150)
-			expect((await dev.devArbitrum.bridgeBalanceOnL1()).toNumber()).to.equal(
-				0
-			)
+			expect((await dev.devArbitrum.bridgeBalanceOnL1()).toNumber()).to.equal(0)
 		})
 		it('generate BridgeBurn event', async () => {
 			const dev = await createDev()
@@ -261,14 +259,14 @@ contract('Dev', ([deployer, user1, user2]) => {
 			])
 			expect(account).to.equal(deployer)
 			expect(amount).to.equal('50')
-			expect((await dev.devArbitrum.bridgeBalanceOnL1()).toNumber()).to.equal(50)
+			expect((await dev.devArbitrum.bridgeBalanceOnL1()).toNumber()).to.equal(
+				50
+			)
 		})
 		it('generate TxToL1 event', async () => {
 			const dev = await createDev()
 			await dev.devArbitrum.mint(deployer, 100)
-			expect((await dev.devArbitrum.bridgeBalanceOnL1()).toNumber()).to.equal(
-				0
-			)
+			expect((await dev.devArbitrum.bridgeBalanceOnL1()).toNumber()).to.equal(0)
 			dev.devArbitrum.bridgeBurn(deployer, 50)
 			const [from, to, id, data] = await Promise.all([
 				getEventValue(dev.devArbitrum)('TxToL1', '_from'),
@@ -287,9 +285,7 @@ contract('Dev', ([deployer, user1, user2]) => {
 		it('generate L1EscrowMint event', async () => {
 			const dev = await createDev()
 			await dev.devArbitrum.mint(deployer, 100)
-			expect((await dev.devArbitrum.bridgeBalanceOnL1()).toNumber()).to.equal(
-				0
-			)
+			expect((await dev.devArbitrum.bridgeBalanceOnL1()).toNumber()).to.equal(0)
 			dev.devArbitrum.bridgeBurn(deployer, 50)
 			const [token, id, amount] = await Promise.all([
 				getEventValue(dev.devArbitrum)('L1EscrowMint', '_token'),
