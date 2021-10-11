@@ -3,8 +3,8 @@ pragma solidity =0.8.9;
 
 import {Dev} from "contracts/src/dev/Dev.sol";
 import {IArbToken} from "contracts/interface/IArbToken.sol";
+import {IArbSys} from "contracts/interface/IArbSys.sol";
 import {IDevArbitrum} from "contracts/interface/IDevArbitrum.sol";
-import {ArbitrumMessenger} from "contracts/src/dev/ArbitrumMessenger.sol";
 
 /**
  * The contract used as the DEV token.
@@ -13,8 +13,9 @@ import {ArbitrumMessenger} from "contracts/src/dev/ArbitrumMessenger.sol";
  * Also, mint will be performed based on the Allocator contract.
  * When authenticated a new asset by the Market contracts, DEV token is burned as fees.
  */
-contract DevArbitrum is Dev, IArbToken, IDevArbitrum, ArbitrumMessenger {
+contract DevArbitrum is Dev, IArbToken, IDevArbitrum {
 	address public l1Address;
+	address public arbSys;
 	uint256 public bridgeBalanceOnL1;
 
 	/**
@@ -26,7 +27,7 @@ contract DevArbitrum is Dev, IArbToken, IDevArbitrum, ArbitrumMessenger {
 		initializer
 	{
 		__Dev_init("Dev Arbitrum");
-		__ArbitrumMessenger_init(_arbSys);
+		arbSys = _arbSys;
 		l1Address = _l1Token;
 	}
 
@@ -50,12 +51,13 @@ contract DevArbitrum is Dev, IArbToken, IDevArbitrum, ArbitrumMessenger {
 	}
 
 	function _mintL1(address _to, uint256 _amount) private {
-		// Use Arbitrum's messaging system to execute L1Token.escrowMint
-		uint256 id = sendTxToL1(
-			address(this),
-			_to,
-			abi.encodeWithSignature("escrowMint(uint256)", _amount)
+		bytes memory data = abi.encodeWithSignature(
+			"escrowMint(uint256)",
+			_amount
 		);
+		// Use Arbitrum's messaging system to execute L1Token.escrowMint
+		uint256 id = IArbSys(arbSys).sendTxToL1(_to, data);
+		emit TxToL1(address(this), _to, id, data);
 		emit L1EscrowMint(l1Address, id, _amount);
 	}
 }
