@@ -1,6 +1,9 @@
+/* eslint-disable @typescript-eslint/await-thenable */
+/* eslint-disable @typescript-eslint/no-floating-promises */
 /* eslint-disable new-cap */
 import { DevProtocolInstance } from '../test-lib/instance'
 import { validateErrorMessage } from '../test-lib/utils/error'
+import { getEventValue } from '../test-lib/utils/event'
 
 contract('Dev', ([deployer, user1, user2]) => {
 	const createDev = async (): Promise<DevProtocolInstance> => {
@@ -25,10 +28,6 @@ contract('Dev', ([deployer, user1, user2]) => {
 		it('the decimals is 18', async () => {
 			const dev = await createDev()
 			expect((await dev.devArbitrum.decimals()).toNumber()).to.equal(18)
-		})
-		it('the l1Address is deployer', async () => {
-			const dev = await createDev()
-			expect(await dev.devArbitrum.l1Address()).to.equal(deployer)
 		})
 		it('deployer has admin role', async () => {
 			const dev = await createDev()
@@ -57,11 +56,26 @@ contract('Dev', ([deployer, user1, user2]) => {
 				)
 			).to.equal(true)
 		})
+
+		it('get l1 token address', async () => {
+			const dev = await createDev()
+			const l1TokenAddress = await dev.devArbitrum.l1Address()
+			const devInstance = await artifacts.require('Dev').at(l1TokenAddress)
+			expect(await devInstance.name()).to.equal('Dev')
+		})
+
+		it('get ArbSys address', async () => {
+			const dev = await createDev()
+			const arbSys = await dev.devArbitrum.arbSys()
+			const arbSysInstance = await artifacts.require('ArbSysTest').at(arbSys)
+			expect(await arbSysInstance.isTopLevelCall()).to.equal(true)
+		})
 	})
 	describe('DevArbitrum; BridgeMint', () => {
 		it('the initial balance is 0', async () => {
 			const dev = await createDev()
 			expect((await dev.devArbitrum.totalSupply()).toNumber()).to.equal(0)
+			expect((await dev.devArbitrum.bridgeBalanceOnL1()).toNumber()).to.equal(0)
 		})
 		it('increase the balance by running the mint', async () => {
 			const dev = await createDev()
@@ -70,6 +84,19 @@ contract('Dev', ([deployer, user1, user2]) => {
 			expect((await dev.devArbitrum.balanceOf(deployer)).toNumber()).to.equal(
 				100
 			)
+			expect((await dev.devArbitrum.bridgeBalanceOnL1()).toNumber()).to.equal(
+				100
+			)
+		})
+		it('generate event', async () => {
+			const dev = await createDev()
+			dev.devArbitrum.bridgeMint(deployer, 100)
+			const [account, amount] = await Promise.all([
+				getEventValue(dev.devArbitrum)('BridgeMint', '_account'),
+				getEventValue(dev.devArbitrum)('BridgeMint', '_amount'),
+			])
+			expect(account).to.equal(deployer)
+			expect(amount).to.equal('100')
 		})
 		it('running with 0', async () => {
 			const dev = await createDev()
@@ -83,6 +110,26 @@ contract('Dev', ([deployer, user1, user2]) => {
 			expect((await dev.devArbitrum.totalSupply()).toNumber()).to.equal(100)
 			expect((await dev.devArbitrum.balanceOf(deployer)).toNumber()).to.equal(
 				100
+			)
+			expect((await dev.devArbitrum.bridgeBalanceOnL1()).toNumber()).to.equal(
+				100
+			)
+		})
+		it('Additional minting', async () => {
+			const dev = await createDev()
+			await dev.devArbitrum.bridgeMint(deployer, 100)
+			expect((await dev.devArbitrum.totalSupply()).toNumber()).to.equal(100)
+			expect((await dev.devArbitrum.balanceOf(deployer)).toNumber()).to.equal(
+				100
+			)
+
+			await dev.devArbitrum.bridgeMint(deployer, 200)
+			expect((await dev.devArbitrum.totalSupply()).toNumber()).to.equal(300)
+			expect((await dev.devArbitrum.balanceOf(deployer)).toNumber()).to.equal(
+				300
+			)
+			expect((await dev.devArbitrum.bridgeBalanceOnL1()).toNumber()).to.equal(
+				300
 			)
 		})
 		it('should fail to run mint when sent from other than minter', async () => {
@@ -121,10 +168,16 @@ contract('Dev', ([deployer, user1, user2]) => {
 			expect((await dev.devArbitrum.balanceOf(deployer)).toNumber()).to.equal(
 				100
 			)
+			expect((await dev.devArbitrum.bridgeBalanceOnL1()).toNumber()).to.equal(
+				100
+			)
 
 			await dev.devArbitrum.bridgeBurn(deployer, 50)
 			expect((await dev.devArbitrum.totalSupply()).toNumber()).to.equal(50)
 			expect((await dev.devArbitrum.balanceOf(deployer)).toNumber()).to.equal(
+				50
+			)
+			expect((await dev.devArbitrum.bridgeBalanceOnL1()).toNumber()).to.equal(
 				50
 			)
 		})
@@ -135,10 +188,15 @@ contract('Dev', ([deployer, user1, user2]) => {
 			expect((await dev.devArbitrum.balanceOf(deployer)).toNumber()).to.equal(
 				100
 			)
-
+			expect((await dev.devArbitrum.bridgeBalanceOnL1()).toNumber()).to.equal(
+				100
+			)
 			await dev.devArbitrum.bridgeBurn(deployer, 0)
 			expect((await dev.devArbitrum.totalSupply()).toNumber()).to.equal(100)
 			expect((await dev.devArbitrum.balanceOf(deployer)).toNumber()).to.equal(
+				100
+			)
+			expect((await dev.devArbitrum.bridgeBalanceOnL1()).toNumber()).to.equal(
 				100
 			)
 		})
@@ -149,7 +207,9 @@ contract('Dev', ([deployer, user1, user2]) => {
 			expect((await dev.devArbitrum.balanceOf(deployer)).toNumber()).to.equal(
 				100
 			)
-
+			expect((await dev.devArbitrum.bridgeBalanceOnL1()).toNumber()).to.equal(
+				100
+			)
 			const res = await dev.devArbitrum
 				.bridgeBurn(deployer, 50, { from: user1 })
 				.catch(err)
@@ -163,7 +223,9 @@ contract('Dev', ([deployer, user1, user2]) => {
 			expect((await dev.devArbitrum.balanceOf(deployer)).toNumber()).to.equal(
 				100
 			)
-
+			expect((await dev.devArbitrum.bridgeBalanceOnL1()).toNumber()).to.equal(
+				100
+			)
 			await dev.devArbitrum.approve(user1, 50)
 			const res = await dev.devArbitrum
 				.bridgeBurn(deployer, 51, { from: user1 })
@@ -172,7 +234,72 @@ contract('Dev', ([deployer, user1, user2]) => {
 			expect((await dev.devArbitrum.balanceOf(deployer)).toNumber()).to.equal(
 				100
 			)
+			expect((await dev.devArbitrum.bridgeBalanceOnL1()).toNumber()).to.equal(
+				100
+			)
 			expect(res).to.be.an.instanceof(Error)
+		})
+		it('When the bidge balance is exceeded, it becomes zero', async () => {
+			const dev = await createDev()
+			await dev.devArbitrum.bridgeMint(deployer, 100)
+			await dev.devArbitrum.mint(deployer, 100)
+			await dev.devArbitrum.bridgeBurn(deployer, 150)
+			expect((await dev.devArbitrum.bridgeBalanceOnL1()).toNumber()).to.equal(
+				0
+			)
+		})
+		it('generate BridgeBurn event', async () => {
+			const dev = await createDev()
+			await dev.devArbitrum.bridgeMint(deployer, 100)
+			expect((await dev.devArbitrum.bridgeBalanceOnL1()).toNumber()).to.equal(
+				100
+			)
+			dev.devArbitrum.bridgeBurn(deployer, 50)
+			const [account, amount] = await Promise.all([
+				getEventValue(dev.devArbitrum)('BridgeBurn', '_account'),
+				getEventValue(dev.devArbitrum)('BridgeBurn', '_amount'),
+			])
+			expect(account).to.equal(deployer)
+			expect(amount).to.equal('50')
+			expect((await dev.devArbitrum.bridgeBalanceOnL1()).toNumber()).to.equal(50)
+		})
+		it('generate TxToL1 event', async () => {
+			const dev = await createDev()
+			await dev.devArbitrum.mint(deployer, 100)
+			expect((await dev.devArbitrum.bridgeBalanceOnL1()).toNumber()).to.equal(
+				0
+			)
+			dev.devArbitrum.bridgeBurn(deployer, 50)
+			const [from, to, id, data] = await Promise.all([
+				getEventValue(dev.devArbitrum)('TxToL1', '_from'),
+				getEventValue(dev.devArbitrum)('TxToL1', '_to'),
+				getEventValue(dev.devArbitrum)('TxToL1', '_id'),
+				getEventValue(dev.devArbitrum)('TxToL1', '_data'),
+			])
+			expect(from).to.equal(dev.devArbitrum.address)
+			expect(to).to.equal(deployer)
+			expect(id).to.equal('1')
+			expect(data).to.equal(
+				'0x3f553a310000000000000000000000000000000000000000000000000000000000000032'
+			)
+			expect((await dev.devArbitrum.bridgeBalanceOnL1()).toNumber()).to.equal(0)
+		})
+		it('generate L1EscrowMint event', async () => {
+			const dev = await createDev()
+			await dev.devArbitrum.mint(deployer, 100)
+			expect((await dev.devArbitrum.bridgeBalanceOnL1()).toNumber()).to.equal(
+				0
+			)
+			dev.devArbitrum.bridgeBurn(deployer, 50)
+			const [token, id, amount] = await Promise.all([
+				getEventValue(dev.devArbitrum)('L1EscrowMint', '_token'),
+				getEventValue(dev.devArbitrum)('L1EscrowMint', '_id'),
+				getEventValue(dev.devArbitrum)('L1EscrowMint', '_amount'),
+			])
+			expect(token).to.equal(await dev.devArbitrum.l1Address())
+			expect(id).to.equal('1')
+			expect(amount).to.equal('50')
+			expect((await dev.devArbitrum.bridgeBalanceOnL1()).toNumber()).to.equal(0)
 		})
 	})
 })

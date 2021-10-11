@@ -27,8 +27,8 @@ contract DevArbitrum is Dev, IArbToken, IDevArbitrum {
 		initializer
 	{
 		__Dev_init("Dev Arbitrum");
-		arbSys = _arbSys;
 		l1Address = _l1Token;
+		arbSys = _arbSys;
 	}
 
 	function bridgeMint(address _account, uint256 _amount) external override {
@@ -57,7 +57,7 @@ contract DevArbitrum is Dev, IArbToken, IDevArbitrum {
 		);
 		// Use Arbitrum's messaging system to execute L1Token.escrowMint
 		uint256 id = IArbSys(arbSys).sendTxToL1(_to, data);
-		emit TxToL1(address(this), _to, id, data);
 		emit L1EscrowMint(l1Address, id, _amount);
+		emit TxToL1(address(this), _to, id, data);
 	}
 }
