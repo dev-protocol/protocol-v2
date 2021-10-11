@@ -59,6 +59,7 @@
 		"@devprotocol/util-contracts": "3.3.0",
 		"@openzeppelin/contracts": "4.3.2",
 		"@openzeppelin/contracts-upgradeable": "4.3.2",
+		"@openzeppelin/truffle-upgrades": "^1.9.1",
 		"arb-ethers-web3-bridge": "0.7.3"
 	},
 	"directories": {
