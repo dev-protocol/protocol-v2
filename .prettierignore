@@ -3,3 +3,4 @@ contracts/modules
 *.js
 !truffle-config.js
 !truffle-config.arbitrum.js
+types/
