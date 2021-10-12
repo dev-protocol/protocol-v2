@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity =0.8.9;
 
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlEnumerableUpgradeable.sol";
 import "../../interface/IDev.sol";
@@ -12,7 +14,7 @@ import "../../interface/IDev.sol";
  * Also, mint will be performed based on the Allocator contract.
  * When authenticated a new asset by the Market contracts, DEV token is burned as fees.
  */
-contract Dev is ERC20Upgradeable, AccessControlEnumerableUpgradeable, IDev {
+contract Dev is ERC20Upgradeable, AccessControlEnumerableUpgradeable, OwnableUpgradeable, UUPSUpgradeable, IDev {
 	bytes32 public constant override BURNER_ROLE = keccak256("BURNER_ROLE");
 	bytes32 public constant override MINTER_ROLE = keccak256("MINTER_ROLE");
 
@@ -22,6 +24,8 @@ contract Dev is ERC20Upgradeable, AccessControlEnumerableUpgradeable, IDev {
 	 */
 	// solhint-disable-next-line func-name-mixedcase
 	function __Dev_init(string memory _devName) public initializer {
+		__Ownable_init();
+		__UUPSUpgradeable_init();
 		__ERC20_init(_devName, "DEV");
 		__AccessControlEnumerable_init();
 		_setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
@@ -44,4 +48,6 @@ contract Dev is ERC20Upgradeable, AccessControlEnumerableUpgradeable, IDev {
 		);
 		_burn(_account, _amount);
 	}
+
+	function _authorizeUpgrade(address) internal override onlyOwner {}
 }

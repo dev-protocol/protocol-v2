@@ -2,6 +2,7 @@
 pragma solidity =0.8.9;
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "../../interface/IPolicy.sol";
 import "../../interface/IPolicyFactory.sol";
 import "../common/registry/InitializableUsingRegistry.sol";
@@ -12,6 +13,7 @@ import "../common/registry/InitializableUsingRegistry.sol";
 contract PolicyFactory is
 	InitializableUsingRegistry,
 	OwnableUpgradeable,
+	UUPSUpgradeable,
 	IPolicyFactory
 {
 	mapping(address => bool) public override isPotentialPolicy;
@@ -22,6 +24,7 @@ contract PolicyFactory is
 	 */
 	function initialize(address _registry) external initializer {
 		__Ownable_init();
+		__UUPSUpgradeable_init();
 		__UsingRegistry_init(_registry);
 	}
 
@@ -85,4 +88,6 @@ contract PolicyFactory is
 	{
 		return block.timestamp < closeVoteAt[_policy];
 	}
+
+	function _authorizeUpgrade(address) internal override onlyOwner {}
 }

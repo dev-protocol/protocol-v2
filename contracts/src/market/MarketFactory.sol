@@ -2,6 +2,7 @@
 pragma solidity =0.8.9;
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "../../interface/IMarket.sol";
 import "../../interface/IMarketBehavior.sol";
 import "../../interface/IMarketFactory.sol";
@@ -14,6 +15,7 @@ import "./Market.sol";
 contract MarketFactory is
 	InitializableUsingRegistry,
 	OwnableUpgradeable,
+	UUPSUpgradeable,
 	IMarketFactory
 {
 	uint256 public override marketsCount;
@@ -26,6 +28,7 @@ contract MarketFactory is
 	 */
 	function initialize(address _registry) external initializer {
 		__Ownable_init();
+		__UUPSUpgradeable_init();
 		__UsingRegistry_init(_registry);
 	}
 
@@ -103,4 +106,6 @@ contract MarketFactory is
 	function _addCount() internal {
 		marketsCount = marketsCount + 1;
 	}
+
+	function _authorizeUpgrade(address) internal override onlyOwner {}
 }

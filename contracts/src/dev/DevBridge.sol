@@ -3,6 +3,7 @@ pragma solidity =0.8.9;
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/IAccessControlUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "../../interface/IAddressRegistry.sol";
 import "../../interface/IDevBridge.sol";
 import "../../interface/IDev.sol";
@@ -12,10 +13,12 @@ import "../common/registry/InitializableUsingRegistry.sol";
 contract DevBridge is
 	InitializableUsingRegistry,
 	OwnableUpgradeable,
+	UUPSUpgradeable,
 	IDevBridge
 {
 	function initialize(address _registry) external initializer {
 		__Ownable_init();
+		__UUPSUpgradeable_init();
 		__UsingRegistry_init(_registry);
 	}
 
@@ -78,4 +81,6 @@ contract DevBridge is
 		);
 		accessControl.renounceRole(dev.BURNER_ROLE(), address(this));
 	}
+
+	function _authorizeUpgrade(address) internal override onlyOwner {}
 }
