@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity =0.8.9;
 
-import {MarketFactory} from "contracts/src/market/MarketFactory.sol";
+import "../../src/market/MarketFactory.sol";
 
 /**
  * A factory contract that creates a new Market contract.

@@ -1,12 +1,11 @@
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity =0.8.9;
 
-import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
-import {UsingRegistry} from "contracts/src/common/registry/UsingRegistry.sol";
-import {IMarketBehavior} from "contracts/interface/IMarketBehavior.sol";
-import {IMarket} from "contracts/interface/IMarket.sol";
+import "../../interface/IMarketBehavior.sol";
+import "../../interface/IMarket.sol";
+import "../../src/common/registry/UsingRegistry.sol";
 
-contract MarketTest2 is Ownable, IMarketBehavior, UsingRegistry {
+contract MarketTest2 is IMarketBehavior, UsingRegistry {
 	string public override schema = "[]";
 	address public override associatedMarket;
 	mapping(address => string) internal keys;

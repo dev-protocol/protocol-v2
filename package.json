@@ -15,9 +15,9 @@
 		"build": "tsc -p tsconfig.build.json",
 		"prebuild": "yarn generate",
 		"prepare": "husky install",
-		"compile": "truffle compile && yarn compile:arb",
-		"test:arb": "truffle test --config truffle-config.arbitrum.js",
-		"compile:arb": "truffle compile --config truffle-config.arbitrum.js"
+		"compile": "yarn compile:arb",
+		"test:arb": "truffle test --config truffle-config.js",
+		"compile:arb": "truffle compile --config truffle-config.js"
 	},
 	"files": [
 		"contracts/interface"

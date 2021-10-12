@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity =0.8.9;
 
-import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import {IAccessControlUpgradeable} from "@openzeppelin/contracts-upgradeable/access/IAccessControlUpgradeable.sol";
-import {InitializableUsingRegistry} from "contracts/src/common/registry/InitializableUsingRegistry.sol";
-import {IAddressRegistry} from "contracts/interface/IAddressRegistry.sol";
-import {IDevBridge} from "contracts/interface/IDevBridge.sol";
-import {IDev} from "contracts/interface/IDev.sol";
-import {IMarketFactory} from "contracts/interface/IMarketFactory.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/IAccessControlUpgradeable.sol";
+import "../../interface/IAddressRegistry.sol";
+import "../../interface/IDevBridge.sol";
+import "../../interface/IDev.sol";
+import "../../interface/IMarketFactory.sol";
+import "../common/registry/InitializableUsingRegistry.sol";
 
 contract DevBridge is
 	InitializableUsingRegistry,

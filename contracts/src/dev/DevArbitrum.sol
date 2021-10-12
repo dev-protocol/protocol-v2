@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity =0.8.9;
 
-import {Dev} from "contracts/src/dev/Dev.sol";
-import {IArbToken} from "contracts/interface/IArbToken.sol";
-import {IArbSys} from "contracts/interface/IArbSys.sol";
-import {IDevArbitrum} from "contracts/interface/IDevArbitrum.sol";
-import {InitializableUsingRegistry} from "contracts/src/common/registry/InitializableUsingRegistry.sol";
+import "../../interface/IArbToken.sol";
+import "../../interface/IArbSys.sol";
+import "../../interface/IDevArbitrum.sol";
+import "./Dev.sol";
+import "../common/registry/InitializableUsingRegistry.sol";
 
 /**
  * The contract used as the DEV token.

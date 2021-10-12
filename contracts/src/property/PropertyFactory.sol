@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity =0.8.9;
 
-import {InitializableUsingRegistry} from "contracts/src/common/registry/InitializableUsingRegistry.sol";
-import {Property} from "contracts/src/property/Property.sol";
-import {IPropertyFactory} from "contracts/interface/IPropertyFactory.sol";
-import {IMarket} from "contracts/interface/IMarket.sol";
+import "../../interface/IPropertyFactory.sol";
+import "../../interface/IMarket.sol";
+import "../common/registry/InitializableUsingRegistry.sol";
+import "./Property.sol";
 
 /**
  * A factory contract that creates a new Property contract.

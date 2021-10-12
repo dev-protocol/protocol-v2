@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity =0.8.9;
 
-import {IMetrics} from "contracts/interface/IMetrics.sol";
+import "../../interface/IMetrics.sol";
 
 /**
  * A contract for associating a Property and an asset authenticated by a Market.

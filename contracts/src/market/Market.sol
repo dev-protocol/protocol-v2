@@ -1,17 +1,17 @@
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity =0.8.9;
 
-import {EnumerableSet} from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
-import {UsingRegistry} from "contracts/src/common/registry/UsingRegistry.sol";
-import {IProperty} from "contracts/interface/IProperty.sol";
-import {IMarket} from "contracts/interface/IMarket.sol";
-import {IMarketBehavior} from "contracts/interface/IMarketBehavior.sol";
-import {IPolicy} from "contracts/interface/IPolicy.sol";
-import {IMetrics} from "contracts/interface/IMetrics.sol";
-import {IMetricsFactory} from "contracts/interface/IMetricsFactory.sol";
-import {ILockup} from "contracts/interface/ILockup.sol";
-import {IDev} from "contracts/interface/IDev.sol";
-import {IDevBridge} from "contracts/interface/IDevBridge.sol";
+import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
+import "../../interface/IProperty.sol";
+import "../../interface/IMarket.sol";
+import "../../interface/IMarketBehavior.sol";
+import "../../interface/IPolicy.sol";
+import "../../interface/IMetrics.sol";
+import "../../interface/IMetricsFactory.sol";
+import "../../interface/ILockup.sol";
+import "../../interface/IDev.sol";
+import "../../interface/IDevBridge.sol";
+import "../common/registry/UsingRegistry.sol";
 
 /**
  * A user-proposable contract for authenticating and associating assets with Property.

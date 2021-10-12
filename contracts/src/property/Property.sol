@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity =0.8.9;
 
-import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import {UsingRegistry} from "contracts/src/common/registry/UsingRegistry.sol";
-import {IWithdraw} from "contracts/interface/IWithdraw.sol";
-import {IProperty} from "contracts/interface/IProperty.sol";
-import {IPropertyFactory} from "contracts/interface/IPropertyFactory.sol";
-import {IPolicy} from "contracts/interface/IPolicy.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "../../interface/IWithdraw.sol";
+import "../../interface/IProperty.sol";
+import "../../interface/IPropertyFactory.sol";
+import "../../interface/IPolicy.sol";
+import "../common/registry/UsingRegistry.sol";
 
 /**
  * A contract that represents the assets of the user and collects staking from the stakers.

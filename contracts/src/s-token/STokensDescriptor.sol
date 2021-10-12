@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity =0.8.9;
 
-import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
-import {AddressLib} from "@devprotocol/util-contracts/contracts/utils/AddressLib.sol";
-import {Base64} from "@devprotocol/util-contracts/contracts/utils/Base64.sol";
-import {ISTokensManager} from "contracts/interface/ISTokensManager.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
+import "@devprotocol/util-contracts/contracts/utils/AddressLib.sol";
+import "@devprotocol/util-contracts/contracts/utils/Base64.sol";
+import "../../interface/ISTokensManager.sol";
 
 contract STokensDescriptor {
 	using Base64 for bytes;
