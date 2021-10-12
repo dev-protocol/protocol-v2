@@ -1,6 +1,7 @@
 const { deployProxy } = require('@openzeppelin/truffle-upgrades');
 
-module.exports = async function (deployer) {
+module.exports = async function (deployer, network) {
+	console.log(network)
 	// Address Registry
 	const addressRegistory = await deployProxy(artifacts.require('AddressRegistry'), [], { deployer });
 
