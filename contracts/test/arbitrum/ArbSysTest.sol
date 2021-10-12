@@ -3,7 +3,7 @@ pragma solidity =0.8.9;
 
 import {Counters} from "@openzeppelin/contracts/utils/Counters.sol";
 
-contract ArbSysTest is IArbSys {
+contract ArbSysTest {
 	Counters.Counter private idCounter;
 
 	using Counters for Counters.Counter;
