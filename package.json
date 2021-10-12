@@ -13,7 +13,7 @@
 		"lint:format": "prettier --write '**/*.{sol,ts,js,json,md,yml}'",
 		"prepack": "yarn build",
 		"build": "tsc -p tsconfig.build.json",
-		"prebuild": "del 'migrations/**/*.js' 'scripts/**/*.js' && yarn generate",
+		"prebuild": "yarn generate",
 		"prepare": "husky install",
 		"compile": "truffle compile && yarn compile:arb",
 		"test:arb": "truffle test --config truffle-config.arbitrum.js",
