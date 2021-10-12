@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-floating-promises */
 import { DevProtocolInstance } from '../test-lib/instance'
 import { PropertyInstance } from '../../types/truffle-contracts'
 import BigNumber from 'bignumber.js'
