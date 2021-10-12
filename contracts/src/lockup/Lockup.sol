@@ -43,7 +43,12 @@ import "../common/registry/InitializableUsingRegistry.sol";
  * - After 10 blocks, Carol stakes 40 DEV on Property-A (Alice's staking state on Property-A: `M`=500, `B`=20, `P`=140, `S`=200, `U`=100)
  * - After 10 blocks, Alice withdraws Property-A staking reward. The reward at this time is 5000 DEV (10 blocks * 500 DEV) + 3125 DEV (10 blocks * 62.5% * 500 DEV) + 2500 DEV (10 blocks * 50% * 500 DEV).
  */
-contract Lockup is ILockup, OwnableUpgradeable, UUPSUpgradeable, InitializableUsingRegistry {
+contract Lockup is
+	ILockup,
+	OwnableUpgradeable,
+	UUPSUpgradeable,
+	InitializableUsingRegistry
+{
 	uint256 public override cap; // From [get/set]StorageCap
 	uint256 public override totalLocked; // From [get/set]StorageAllValue
 	uint256 public cumulativeHoldersRewardCap; // From [get/set]StorageCumulativeHoldersRewardCap

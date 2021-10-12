@@ -15,7 +15,12 @@ import "../common/registry/InitializableUsingRegistry.sol";
 /**
  * A contract that manages the withdrawal of holder rewards for Property holders.
  */
-contract Withdraw is OwnableUpgradeable, UUPSUpgradeable, InitializableUsingRegistry, IWithdraw {
+contract Withdraw is
+	OwnableUpgradeable,
+	UUPSUpgradeable,
+	InitializableUsingRegistry,
+	IWithdraw
+{
 	mapping(address => mapping(address => uint256))
 		public lastWithdrawnRewardPrice; // {Property: {User: Value}} // From [get/set]StorageLastWithdrawnReward
 	mapping(address => mapping(address => uint256))

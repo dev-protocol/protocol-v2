@@ -11,7 +11,12 @@ import "./Property.sol";
 /**
  * A factory contract that creates a new Property contract.
  */
-contract PropertyFactory is OwnableUpgradeable, UUPSUpgradeable, InitializableUsingRegistry, IPropertyFactory {
+contract PropertyFactory is
+	OwnableUpgradeable,
+	UUPSUpgradeable,
+	InitializableUsingRegistry,
+	IPropertyFactory
+{
 	mapping(address => bool) public override isProperty;
 
 	/**

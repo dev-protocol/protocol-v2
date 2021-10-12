@@ -9,7 +9,11 @@ import "../../../interface/IAddressRegistry.sol";
  * A registry contract to hold the latest contract addresses.
  * Dev Protocol will be upgradeable by this contract.
  */
-contract AddressRegistry is OwnableUpgradeable, UUPSUpgradeable, IAddressRegistry {
+contract AddressRegistry is
+	OwnableUpgradeable,
+	UUPSUpgradeable,
+	IAddressRegistry
+{
 	mapping(bytes32 => address) private reg;
 
 	function initialize() external initializer {
