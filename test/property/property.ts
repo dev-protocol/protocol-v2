@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/await-thenable */
 import { DevProtocolInstance } from '../test-lib/instance'
 import { getPropertyAddress, getTransferToAddress } from '../test-lib/utils/log'
 import {

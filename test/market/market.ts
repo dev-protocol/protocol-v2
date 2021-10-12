@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/await-thenable */
 import { DevProtocolInstance } from '../test-lib/instance'
 import { forwardBlockTimestamp } from '../test-lib/utils/common'
 import { MarketInstance } from '../../types/truffle-contracts'

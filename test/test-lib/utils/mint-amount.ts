@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/await-thenable */
 import BigNumber from 'bignumber.js'
 import { DevProtocolInstance } from '../instance'
 import { toBigNumber } from './common'

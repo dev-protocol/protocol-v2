@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-floating-promises */
 import { DevProtocolInstance } from '../test-lib/instance'
 import { PropertyInstance } from '../../types/truffle-contracts'
 import BigNumber from 'bignumber.js'
@@ -9,7 +10,6 @@ import {
 import { getPropertyAddress } from '../test-lib/utils/log'
 import { getEventValue } from '../test-lib/utils/event'
 import { validateErrorMessage } from '../test-lib/utils/error'
-import { isString } from 'util'
 
 contract('LockupTest', ([deployer, user1, user2, user3]) => {
 	const deployerBalance = new BigNumber(1e18).times(10000000)
