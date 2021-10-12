@@ -1,5 +1,5 @@
 import {
-	AdminInstance,
+	DevAdminInstance,
 	UpgradeabilityBaseInstance,
 } from '../../../types/truffle-contracts'
 import { deployProxy } from '../../test-lib/instance'
@@ -10,7 +10,7 @@ const random = () => toBigNumber(Math.random()).times(1e32).toFixed()
 contract('Upgradeability ', ([deployer, address]) => {
 	describe('Same name', () => {
 		let contract: UpgradeabilityBaseInstance
-		let admin: AdminInstance
+		let admin: DevAdminInstance
 		const values = [random(), random(), random()]
 
 		before(async () => {
@@ -50,7 +50,7 @@ contract('Upgradeability ', ([deployer, address]) => {
 
 	describe('Different contract name', () => {
 		let contract: UpgradeabilityBaseInstance
-		let admin: AdminInstance
+		let admin: DevAdminInstance
 		const values = [random(), random(), random()]
 
 		before(async () => {
@@ -91,7 +91,7 @@ contract('Upgradeability ', ([deployer, address]) => {
 	})
 	describe('Different contract name, different state order', () => {
 		let contract: UpgradeabilityBaseInstance
-		let admin: AdminInstance
+		let admin: DevAdminInstance
 		const values = [random(), random(), random()]
 
 		before(async () => {
