@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity =0.8.9;
 
-import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import {InitializableUsingRegistry} from "contracts/src/common/registry/InitializableUsingRegistry.sol";
-import {Market} from "contracts/src/market/Market.sol";
-import {IMarket} from "contracts/interface/IMarket.sol";
-import {IMarketBehavior} from "contracts/interface/IMarketBehavior.sol";
-import {IMarketFactory} from "contracts/interface/IMarketFactory.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "../../interface/IMarket.sol";
+import "../../interface/IMarketBehavior.sol";
+import "../../interface/IMarketFactory.sol";
+import "../common/registry/InitializableUsingRegistry.sol";
+import "./Market.sol";
 
 /**
  * A factory contract that creates a new Market contract.

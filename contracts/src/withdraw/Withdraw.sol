@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity =0.8.9;
 
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {Decimals} from "contracts/src/common/libs/Decimals.sol";
-import {InitializableUsingRegistry} from "contracts/src/common/registry/InitializableUsingRegistry.sol";
-import {IDevBridge} from "contracts/interface/IDevBridge.sol";
-import {IWithdraw} from "contracts/interface/IWithdraw.sol";
-import {ILockup} from "contracts/interface/ILockup.sol";
-import {IMetricsFactory} from "contracts/interface/IMetricsFactory.sol";
-import {IPropertyFactory} from "contracts/interface/IPropertyFactory.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "../../interface/IDevBridge.sol";
+import "../../interface/IWithdraw.sol";
+import "../../interface/ILockup.sol";
+import "../../interface/IMetricsFactory.sol";
+import "../../interface/IPropertyFactory.sol";
+import "../common/libs/Decimals.sol";
+import "../common/registry/InitializableUsingRegistry.sol";
 
 /**
  * A contract that manages the withdrawal of holder rewards for Property holders.

@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity =0.8.9;
 
-import {ERC721Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
-import {EnumerableSet} from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
-import {Counters} from "@openzeppelin/contracts/utils/Counters.sol";
-import {InitializableUsingRegistry} from "contracts/src/common/registry/InitializableUsingRegistry.sol";
-import {STokensDescriptor} from "contracts/src/s-token/STokensDescriptor.sol";
-import {ISTokensManager} from "contracts/interface//ISTokensManager.sol";
-import {IAddressRegistry} from "contracts/interface/IAddressRegistry.sol";
-import {ILockup} from "contracts/interface/ILockup.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
+import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
+import "@openzeppelin/contracts/utils/Counters.sol";
+import "../../interface/ISTokensManager.sol";
+import "../../interface/IAddressRegistry.sol";
+import "../../interface/ILockup.sol";
+import "../common/registry/InitializableUsingRegistry.sol";
+import "./STokensDescriptor.sol";
 
 contract STokensManager is
 	ISTokensManager,

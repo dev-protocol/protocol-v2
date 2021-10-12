@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity =0.8.9;
 
-import {MetricsFactory} from "contracts/src/metrics/MetricsFactory.sol";
+import "../../src/metrics/MetricsFactory.sol";
 
 /**
  * A factory contract that creates a new Market contract.

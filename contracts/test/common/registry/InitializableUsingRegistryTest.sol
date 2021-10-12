@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity =0.8.9;
 
-import {InitializableUsingRegistry} from "contracts/src/common/registry/InitializableUsingRegistry.sol";
+import "../../../src/common/registry/InitializableUsingRegistry.sol";
 
 /**
  * Module for using AddressRegistry contracts.

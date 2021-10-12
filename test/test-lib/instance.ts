@@ -15,7 +15,7 @@ import {
 	TreasuryTestInstance,
 	STokensManagerInstance,
 	DevBridgeInstance,
-	AdminInstance,
+	DevAdminInstance,
 } from '../../types/truffle-contracts'
 
 type ContractInstance = {
@@ -26,12 +26,12 @@ type ContractInstance = {
 export const deployProxy = async <L extends ContractInstance>(
 	logic: L,
 	deployer: string
-): Promise<[ReturnType<L['at']>, AdminInstance]> => {
+): Promise<[ReturnType<L['at']>, DevAdminInstance]> => {
 	const [admin, impl] = await Promise.all([
-		contract('Admin').new(),
+		contract('DevAdmin').new(),
 		logic.new(),
 	])
-	const proxy = await contract('Proxy').new(
+	const proxy = await contract('DevProxy').new(
 		impl.address,
 		admin.address,
 		web3.utils.fromUtf8(''),

@@ -1,18 +1,16 @@
+/* eslint-disable @typescript-eslint/restrict-plus-operands */
+/* eslint-disable prefer-destructuring */
+/* eslint-disable object-shorthand */
 /* eslint-disable @typescript-eslint/no-var-requires */
 require('ts-node/register')
 require('dotenv').config()
+const wrapProvider = require('arb-ethers-web3-bridge').wrapProvider
 const HDWalletProvider = require('@truffle/hdwallet-provider')
-const {
-	ETHEREUM_PROVIDERS_MAINNET,
-	ETHEREUM_PROVIDERS_ROPSTEN,
-	ETHEREUM_PROVIDERS_AZURE,
-	ETHEREUM_WALLET_MNEMONIC,
-	ETHEREUM_MOCK_HOST,
-	ETHEREUM_MOCK_PORT,
-} = process.env
+const { INFURA_KEY, MNEMONIC } = process.env
 
 module.exports = {
 	test_file_extension_regexp: /.*\.ts$/,
+	contracts_build_directory: './build/arbitrum-contracts',
 	compilers: {
 		solc: {
 			version: '0.8.9',
@@ -23,41 +21,53 @@ module.exports = {
 			},
 		},
 	},
+
 	networks: {
-		mainnet: {
-			provider: () =>
-				new HDWalletProvider(
-					ETHEREUM_WALLET_MNEMONIC,
-					ETHEREUM_PROVIDERS_MAINNET
-				),
-			network_id: 1,
-			gas: 4000000,
-			gasPrice: 10000000000,
-		},
-		ropsten: {
-			provider: () =>
-				new HDWalletProvider(
-					ETHEREUM_WALLET_MNEMONIC,
-					ETHEREUM_PROVIDERS_ROPSTEN
-				),
-			network_id: 3,
-			gas: 4000000,
-			gasPrice: 10000000000,
-		},
-		mock: {
-			host: ETHEREUM_MOCK_HOST,
-			port: ETHEREUM_MOCK_PORT,
+		arbitrum_local: {
 			network_id: '*',
+			gas: 8500000,
+			provider: function () {
+				return new HDWalletProvider({
+					mnemonic: {
+						phrase: MNEMONIC,
+					},
+					providerOrUrl: 'http://127.0.0.1:8547/',
+					addressIndex: 0,
+					numberOfAddresses: 1,
+				})
+			},
 		},
-		azure: {
-			provider: () =>
-				new HDWalletProvider(
-					ETHEREUM_WALLET_MNEMONIC,
-					ETHEREUM_PROVIDERS_AZURE
-				),
-			network_id: '*',
-			gas: 0,
-			gasPrice: 0,
+		arbitrum_testnet: {
+			network_id: 421611,
+			chain_id: 421611,
+			gas: 287853530,
+			provider: function () {
+				return wrapProvider(
+					new HDWalletProvider(
+						MNEMONIC,
+						'https://arbitrum-rinkeby.infura.io/v3/' + INFURA_KEY
+					)
+				)
+			},
 		},
+		arbitrum_mainnet: {
+			network_id: 42161,
+			chain_id: 42161,
+			provider: function () {
+				return new HDWalletProvider(
+					MNEMONIC,
+					'https://arbitrum-mainnet.infura.io/v3/' + INFURA_KEY,
+					0,
+					1
+				)
+			},
+		},
+	},
+
+	mocha: {
+		timeout: 100000,
+	},
+	db: {
+		enabled: false,
 	},
 }

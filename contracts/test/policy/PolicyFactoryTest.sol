@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity =0.8.9;
 
-import {PolicyFactory} from "contracts/src/policy/PolicyFactory.sol";
+import "../../src/policy/PolicyFactory.sol";
 
 /**
  * A factory contract that creates a new Market contract.

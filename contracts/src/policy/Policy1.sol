@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity =0.8.9;
 
-import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {Curve} from "contracts/src/common/libs/Curve.sol";
-import {UsingRegistry} from "contracts/src/common/registry/UsingRegistry.sol";
-import {IPolicy} from "contracts/interface/IPolicy.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "../../interface/IPolicy.sol";
+import "../common/libs/Curve.sol";
+import "../common/registry/UsingRegistry.sol";
 
 contract Policy1 is IPolicy, Ownable, Curve, UsingRegistry {
 	uint256 public override marketVotingSeconds = 86400 * 5;

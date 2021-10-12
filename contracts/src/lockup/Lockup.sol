@@ -1,17 +1,17 @@
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity =0.8.9;
 
-import {EnumerableSet} from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
-import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {Decimals} from "contracts/src/common/libs/Decimals.sol";
-import {InitializableUsingRegistry} from "contracts/src/common/registry/InitializableUsingRegistry.sol";
-import {IDevBridge} from "contracts/interface/IDevBridge.sol";
-import {IProperty} from "contracts/interface/IProperty.sol";
-import {IPolicy} from "contracts/interface/IPolicy.sol";
-import {ILockup} from "contracts/interface/ILockup.sol";
-import {IMetricsFactory} from "contracts/interface/IMetricsFactory.sol";
-import {ISTokensManager} from "contracts/interface/ISTokensManager.sol";
+import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "../../interface/IDevBridge.sol";
+import "../../interface/IProperty.sol";
+import "../../interface/IPolicy.sol";
+import "../../interface/ILockup.sol";
+import "../../interface/IMetricsFactory.sol";
+import "../../interface/ISTokensManager.sol";
+import "../common/libs/Decimals.sol";
+import "../common/registry/InitializableUsingRegistry.sol";
 
 /**
  * A contract that manages the staking of DEV tokens and calculates rewards.
