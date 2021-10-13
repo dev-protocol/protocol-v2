@@ -60,24 +60,27 @@ contract('Upgradeability ', ([deployer, address, user]) => {
 			await contract.initialize()
 		})
 		it('Cannot be updated by anyone other than the owner.', async () => {
-			const newImpl = await artifacts.require('UpgradeabilityDifferentContractName').new()
-			const res = await contract.upgradeTo(newImpl.address, {from: user}).catch(err)
+			const newImpl = await artifacts
+				.require('UpgradeabilityDifferentContractName')
+				.new()
+			const res = await contract
+				.upgradeTo(newImpl.address, { from: user })
+				.catch(err)
 			validateErrorMessage(res, 'Ownable: caller is not the owner')
 		})
 		it('Cannot run update from a contract that implements the logic.', async () => {
 			const impl = await artifacts.require('UpgradeabilityBase').new()
 			const impl2 = await artifacts.require('UpgradeabilityBase').new()
-			const proxy = await artifacts.require('DevProxy').new(
-				impl.address,
-				web3.utils.fromUtf8(''),
-				{ from: deployer }
-			)
-			const wrap = await artifacts.require('UpgradeabilityBase').at(proxy.address)
+			const proxy = await artifacts
+				.require('DevProxy')
+				.new(impl.address, web3.utils.fromUtf8(''), { from: deployer })
+			const wrap = await artifacts
+				.require('UpgradeabilityBase')
+				.at(proxy.address)
 			const res = await impl.upgradeTo(impl2.address).catch(err)
 			validateErrorMessage(res, 'Function must be called through delegatecall')
 		})
 	})
-
 
 	describe('Different contract name', () => {
 		let contract: UpgradeabilityBaseInstance
