@@ -7,7 +7,7 @@ import { getEventValue } from '../../test-lib/utils/event'
 const random = () => toBigNumber(Math.random()).times(1e32).toFixed()
 
 contract('Upgradeability ', ([deployer, address]) => {
-	describe.only('Same name', () => {
+	describe('Same name', () => {
 		let contract: UpgradeabilityBaseInstance
 		const values = [random(), random(), random()]
 
