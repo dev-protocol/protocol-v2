@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity =0.8.9;
 
-import "./PolicyTestBase.sol";
 import "../../src/common/libs/Decimals.sol";
+import "./PolicyTestBase.sol";
 
 contract PolicyTest1 is PolicyTestBase {
 	using Decimals for uint256;

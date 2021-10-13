@@ -4,8 +4,8 @@ pragma solidity =0.8.9;
 import "../../interface/IArbToken.sol";
 import "../../interface/IArbSys.sol";
 import "../../interface/IDevArbitrum.sol";
-import "./Dev.sol";
 import "../common/registry/InitializableUsingRegistry.sol";
+import "./Dev.sol";
 
 /**
  * The contract used as the DEV token.

@@ -9,7 +9,7 @@ contract ArbSysTest {
 	using Counters for Counters.Counter;
 
 	// solhint-disable-next-line no-unused-vars
-	function sendTxToL1(address destination, bytes calldata calldataForL1)
+	function sendTxToL1(address, bytes calldata)
 		external
 		payable
 		returns (uint256)

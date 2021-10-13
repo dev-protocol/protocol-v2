@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity =0.8.9;
 
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "../../interface/IDevBridge.sol";
 import "../../interface/IWithdraw.sol";
@@ -13,7 +15,12 @@ import "../common/registry/InitializableUsingRegistry.sol";
 /**
  * A contract that manages the withdrawal of holder rewards for Property holders.
  */
-contract Withdraw is IWithdraw, InitializableUsingRegistry {
+contract Withdraw is
+	OwnableUpgradeable,
+	UUPSUpgradeable,
+	InitializableUsingRegistry,
+	IWithdraw
+{
 	mapping(address => mapping(address => uint256))
 		public lastWithdrawnRewardPrice; // {Property: {User: Value}} // From [get/set]StorageLastWithdrawnReward
 	mapping(address => mapping(address => uint256))
@@ -27,6 +34,8 @@ contract Withdraw is IWithdraw, InitializableUsingRegistry {
 	 * Initialize the passed address as AddressRegistry address.
 	 */
 	function initialize(address _registry) external initializer {
+		__Ownable_init();
+		__UUPSUpgradeable_init();
 		__UsingRegistry_init(_registry);
 	}
 
@@ -284,4 +293,6 @@ contract Withdraw is IWithdraw, InitializableUsingRegistry {
 	{
 		return _calculateWithdrawableAmount(_property, _user);
 	}
+
+	function _authorizeUpgrade(address) internal override onlyOwner {}
 }
