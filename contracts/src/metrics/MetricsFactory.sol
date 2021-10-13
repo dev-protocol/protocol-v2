@@ -1,18 +1,23 @@
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity =0.8.9;
 
-import "../common/registry/InitializableUsingRegistry.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "../../interface/IMetrics.sol";
 import "../../interface/IMetricsFactory.sol";
 import "../../interface/IMarketFactory.sol";
+import "../common/registry/InitializableUsingRegistry.sol";
 import "./Metrics.sol";
 
 /**
  * A factory contract for creating new Metrics contracts and logical deletion of Metrics contracts.
  */
-contract MetricsFactory is InitializableUsingRegistry, IMetricsFactory {
+contract MetricsFactory is
+	UUPSUpgradeable,
+	OwnableUpgradeable,
+	InitializableUsingRegistry,
+	IMetricsFactory
+{
 	uint256 public override metricsCount;
 	uint256 public override authenticatedPropertiesCount;
 	mapping(address => bool) public override isMetrics;

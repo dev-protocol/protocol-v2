@@ -7,7 +7,7 @@ import "../../../interface/IAddressRegistry.sol";
 /**
  * Module for using AddressRegistry contracts.
  */
-contract InitializableUsingRegistry is Initializable {
+abstract contract InitializableUsingRegistry is Initializable {
 	address private _registry;
 
 	/**

@@ -14,7 +14,7 @@ import "../../interface/IDev.sol";
  * Also, mint will be performed based on the Allocator contract.
  * When authenticated a new asset by the Market contracts, DEV token is burned as fees.
  */
-contract Dev is
+abstract contract Dev is
 	ERC20Upgradeable,
 	AccessControlEnumerableUpgradeable,
 	OwnableUpgradeable,

@@ -16,6 +16,8 @@ contract STokensManager is
 	ISTokensManager,
 	STokensDescriptor,
 	ERC721Upgradeable,
+	OwnableUpgradeable,
+	UUPSUpgradeable,
 	InitializableUsingRegistry
 {
 	Counters.Counter private tokenIdCounter;
