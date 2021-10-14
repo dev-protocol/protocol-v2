@@ -153,7 +153,7 @@ contract('Upgradeability ', ([deployer, address, user]) => {
 				.require('UpgradeabilityDifferentContractName')
 				.new()
 			const res = await admin
-				.upgrade(contract.address, newImpl.address, {from: user})
+				.upgrade(contract.address, newImpl.address, { from: user })
 				.catch(err)
 			validateErrorMessage(res, 'Ownable: caller is not the owner')
 		})
