@@ -132,6 +132,7 @@ contract MetricsFactory is InitializableUsingRegistry, IMetricsFactory {
 	function hasAssets(address _property)
 		external
 		view
+		virtual
 		override
 		returns (bool)
 	{

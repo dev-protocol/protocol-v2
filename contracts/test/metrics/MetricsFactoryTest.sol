@@ -9,6 +9,7 @@ import "../../src/metrics/MetricsFactory.sol";
  */
 contract MetricsFactoryTest is MetricsFactory {
 	using EnumerableSet for EnumerableSet.AddressSet;
+	mapping(address => bool) public override hasAssets;
 
 	constructor() MetricsFactory() {}
 
@@ -28,5 +29,9 @@ contract MetricsFactoryTest is MetricsFactory {
 		} else {
 			metricsOfProperty_[_addr].add(address(1));
 		}
+	}
+
+	function __setHasAssets(address _addr, bool _has) public {
+		hasAssets[_addr] = _has;
 	}
 }
