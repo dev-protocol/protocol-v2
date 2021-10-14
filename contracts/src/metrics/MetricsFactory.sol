@@ -15,7 +15,7 @@ contract MetricsFactory is InitializableUsingRegistry, IMetricsFactory {
 	uint256 public override metricsCount;
 	uint256 public override authenticatedPropertiesCount;
 	mapping(address => bool) public override isMetrics;
-	mapping(address => EnumerableSet.AddressSet) internal metricsPerProperty_;
+	mapping(address => EnumerableSet.AddressSet) internal metricsOfProperty_;
 
 	using EnumerableSet for EnumerableSet.AddressSet;
 
@@ -95,38 +95,38 @@ contract MetricsFactory is InitializableUsingRegistry, IMetricsFactory {
 		override
 		returns (uint256)
 	{
-		return metricsPerProperty_[_property].length();
+		return metricsOfProperty_[_property].length();
 	}
 
-	function metricsPerProperty(address _property)
+	function metricsOfProperty(address _property)
 		external
 		view
 		override
 		returns (address[] memory)
 	{
-		return metricsPerProperty_[_property].values();
+		return metricsOfProperty_[_property].values();
 	}
 
 	function _addMetrics(address _addr) internal {
 		isMetrics[_addr] = true;
 		address property = IMetrics(_addr).property();
-		uint256 countPerProperty = metricsPerProperty_[property].length();
+		uint256 countPerProperty = metricsOfProperty_[property].length();
 		if (countPerProperty == 0) {
 			authenticatedPropertiesCount = authenticatedPropertiesCount + 1;
 		}
 		metricsCount = metricsCount + 1;
-		metricsPerProperty_[property].add(_addr);
+		metricsOfProperty_[property].add(_addr);
 	}
 
 	function _removeMetrics(address _addr) internal {
 		isMetrics[_addr] = false;
 		address property = IMetrics(_addr).property();
-		uint256 countPerProperty = metricsPerProperty_[property].length();
+		uint256 countPerProperty = metricsOfProperty_[property].length();
 		if (countPerProperty == 1) {
 			authenticatedPropertiesCount = authenticatedPropertiesCount - 1;
 		}
 		metricsCount = metricsCount - 1;
-		metricsPerProperty_[property].remove(_addr);
+		metricsOfProperty_[property].remove(_addr);
 	}
 
 	function hasAssets(address _property)
@@ -135,6 +135,6 @@ contract MetricsFactory is InitializableUsingRegistry, IMetricsFactory {
 		override
 		returns (bool)
 	{
-		return metricsPerProperty_[_property].length() > 0;
+		return metricsOfProperty_[_property].length() > 0;
 	}
 }

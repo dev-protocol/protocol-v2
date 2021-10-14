@@ -24,9 +24,9 @@ contract MetricsFactoryTest is MetricsFactory {
 		public
 	{
 		if (_zeroOrOne == 0) {
-			metricsPerProperty_[_addr].remove(address(1));
+			metricsOfProperty_[_addr].remove(address(1));
 		} else {
-			metricsPerProperty_[_addr].add(address(1));
+			metricsOfProperty_[_addr].add(address(1));
 		}
 	}
 }

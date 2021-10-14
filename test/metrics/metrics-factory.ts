@@ -69,11 +69,11 @@ contract(
 					await dev.metricsFactory.metricsCount().then((x) => x.toNumber())
 				).to.be.equal(2)
 			})
-			it('Should to be increased metricsPerProperty always', async () => {
+			it('Should to be increased metricsOfProperty always', async () => {
 				const [dev] = await init()
 				expect(
 					await dev.metricsFactory
-						.metricsPerProperty(property1)
+						.metricsOfProperty(property1)
 						.then((x) => x.length)
 				).to.be.equal(0)
 				const m1 = await dev.metricsFactory
@@ -83,7 +83,7 @@ contract(
 					.then(getMetricsAddress)
 				expect(
 					await dev.metricsFactory
-						.metricsPerProperty(property1)
+						.metricsOfProperty(property1)
 						.then((x) => x.length)
 				).to.be.equal(1)
 
@@ -94,12 +94,12 @@ contract(
 					.then(getMetricsAddress)
 				expect(
 					await dev.metricsFactory
-						.metricsPerProperty(property1)
+						.metricsOfProperty(property1)
 						.then((x) => x.length)
 				).to.be.equal(2)
-				expect(
-					await dev.metricsFactory.metricsPerProperty(property1)
-				).to.be.eql([m1, m2])
+				expect(await dev.metricsFactory.metricsOfProperty(property1)).to.be.eql(
+					[m1, m2]
+				)
 			})
 			it('Should to be increased metricsCountPerProperty always', async () => {
 				const [dev] = await init()
@@ -250,7 +250,7 @@ contract(
 					await dev.metricsFactory.metricsCount().then((x) => x.toNumber())
 				).to.be.equal(0)
 			})
-			it('Should to be decerased metricsPerProperty always', async () => {
+			it('Should to be decerased metricsOfProperty always', async () => {
 				const [dev] = await init()
 				const m1 = await dev.metricsFactory
 					.create(property1, {
@@ -264,7 +264,7 @@ contract(
 					.then(getMetricsAddress)
 				expect(
 					await dev.metricsFactory
-						.metricsPerProperty(property1)
+						.metricsOfProperty(property1)
 						.then((x) => x.length)
 				).to.be.equal(2)
 
@@ -273,7 +273,7 @@ contract(
 				})
 				expect(
 					await dev.metricsFactory
-						.metricsPerProperty(property1)
+						.metricsOfProperty(property1)
 						.then((x) => x.length)
 				).to.be.equal(1)
 
@@ -282,12 +282,12 @@ contract(
 				})
 				expect(
 					await dev.metricsFactory
-						.metricsPerProperty(property1)
+						.metricsOfProperty(property1)
 						.then((x) => x.length)
 				).to.be.equal(0)
-				expect(
-					await dev.metricsFactory.metricsPerProperty(property1)
-				).to.be.eql([])
+				expect(await dev.metricsFactory.metricsOfProperty(property1)).to.be.eql(
+					[]
+				)
 			})
 			it('Should to be decreased metricsCountPerProperty always', async () => {
 				const [dev] = await init()

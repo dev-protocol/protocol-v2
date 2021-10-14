@@ -27,7 +27,7 @@ interface IMetricsFactory {
 		view
 		returns (uint256);
 
-	function metricsPerProperty(address _property)
+	function metricsOfProperty(address _property)
 		external
 		view
 		returns (address[] memory);
