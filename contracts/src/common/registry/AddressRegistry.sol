@@ -2,23 +2,17 @@
 pragma solidity =0.8.9;
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "../../../interface/IAddressRegistry.sol";
 
 /**
  * A registry contract to hold the latest contract addresses.
  * Dev Protocol will be upgradeable by this contract.
  */
-contract AddressRegistry is
-	OwnableUpgradeable,
-	UUPSUpgradeable,
-	IAddressRegistry
-{
+contract AddressRegistry is OwnableUpgradeable, IAddressRegistry {
 	mapping(bytes32 => address) private reg;
 
 	function initialize() external initializer {
 		__Ownable_init();
-		__UUPSUpgradeable_init();
 	}
 
 	function setRegistry(string memory _key, address _addr) external override {
@@ -46,6 +40,4 @@ contract AddressRegistry is
 		bytes32 key = keccak256(abi.encodePacked(_key));
 		return reg[key];
 	}
-
-	function _authorizeUpgrade(address) internal override onlyOwner {}
 }

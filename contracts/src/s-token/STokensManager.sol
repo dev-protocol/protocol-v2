@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity =0.8.9;
 
-import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
@@ -16,8 +14,6 @@ contract STokensManager is
 	ISTokensManager,
 	STokensDescriptor,
 	ERC721Upgradeable,
-	OwnableUpgradeable,
-	UUPSUpgradeable,
 	InitializableUsingRegistry
 {
 	Counters.Counter private tokenIdCounter;
@@ -38,8 +34,6 @@ contract STokensManager is
 
 	function initialize(address _registry) external initializer {
 		__ERC721_init("Dev Protocol sTokens V1", "DEV-STOKENS-V1");
-		__Ownable_init();
-		__UUPSUpgradeable_init();
 		__UsingRegistry_init(_registry);
 	}
 
@@ -196,6 +190,4 @@ contract STokensManager is
 			tokenIdsMapOfOwner[to].add(tokenId);
 		}
 	}
-
-	function _authorizeUpgrade(address) internal override onlyOwner {}
 }

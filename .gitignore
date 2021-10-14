@@ -128,5 +128,3 @@ types
 # use yarn
 
 package-lock.json
-
-!migrations/*
