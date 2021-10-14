@@ -8,7 +8,7 @@ const handler = async function (deployer, network) {
 	const logic = artifacts.require('AddressRegistry')
 	await deployer.deploy(logic)
 	const logicInstance = await logic.deployed()
-	console.log(`logix address:${logicInstance.address}`)
+	console.log(`logic address:${logicInstance.address}`)
 
 	const admin = artifacts.require('DevAdmin')
 	const adminInstance = await admin.deployed()
@@ -23,6 +23,11 @@ const handler = async function (deployer, network) {
 	)
 	const proxyInstance = await devProxy.deployed()
 	console.log(`proxy address:${proxyInstance.address}`)
+
+	const wrap = await logic.at(proxyInstance.address)
+	await wrap.initialize()
+	console.log(`finished to initialize`)
+	process.env.ADDRESS_REGISTRY = proxyInstance.address
 } as Truffle.Migration
 
 export = handler
