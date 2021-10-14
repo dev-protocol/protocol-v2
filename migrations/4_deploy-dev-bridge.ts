@@ -24,7 +24,9 @@ const handler = async function (deployer, network) {
 	const proxyInstance = await devProxy.deployed()
 	console.log(`proxy address:${proxyInstance.address}`)
 
-	const regInstance = artifacts.require('AddressRegistry').at(process.env.ADDRESS_REGISTRY!)
+	const regInstance = artifacts
+		.require('AddressRegistry')
+		.at(process.env.ADDRESS_REGISTRY!)
 	console.log(`registry address:${regInstance.address}`)
 
 	await regInstance.setRegistry('DevBridge', proxyInstance.address)
