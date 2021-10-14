@@ -1332,18 +1332,9 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 							)
 						),
 				])
-				await dev.metricsFactory.__setHasAssets(
-					property2.address,
-					true
-				)
-				await dev.metricsFactory.__setHasAssets(
-					property3.address,
-					true
-				)
-				await dev.metricsFactory.__setHasAssets(
-					property4.address,
-					true
-				)
+				await dev.metricsFactory.__setHasAssets(property2.address, true)
+				await dev.metricsFactory.__setHasAssets(property3.address, true)
+				await dev.metricsFactory.__setHasAssets(property4.address, true)
 
 				await dev.lockup.depositToProperty(property1.address, 10000, {
 					from: alice,
