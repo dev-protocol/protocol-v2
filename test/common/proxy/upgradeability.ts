@@ -4,7 +4,6 @@ import {
 } from '../../../types/truffle-contracts'
 import { deployProxy } from '../../test-lib/instance'
 import { toBigNumber } from '../../test-lib/utils/common'
-import { getEventValue } from '../../test-lib/utils/event'
 import { validateErrorMessage } from '../../test-lib/utils/error'
 
 const random = () => toBigNumber(Math.random()).times(1e32).toFixed()
@@ -154,7 +153,7 @@ contract('Upgradeability ', ([deployer, address, user]) => {
 				.require('UpgradeabilityDifferentContractName')
 				.new()
 			const res = await admin
-				.upgrade(contract.address, newImpl.address)
+				.upgrade(contract.address, newImpl.address, {from: user})
 				.catch(err)
 			validateErrorMessage(res, 'Ownable: caller is not the owner')
 		})
