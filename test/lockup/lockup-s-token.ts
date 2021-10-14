@@ -813,10 +813,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 							)
 						),
 				])
-				await dev.metricsFactory.__setMetricsCountPerProperty(
-					property2.address,
-					1
-				)
+				await dev.metricsFactory.__setHasAssets(property2.address, true)
 
 				const bobBalance = toBigNumber(10000000).times(1e18)
 				await dev.dev.mint(bob, bobBalance)
@@ -849,10 +846,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				const propertyAddress = getPropertyAddress(
 					await dev.propertyFactory.create('test', 'TEST', deployer)
 				)
-				await dev.metricsFactory.__setMetricsCountPerProperty(
-					propertyAddress,
-					1
-				)
+				await dev.metricsFactory.__setHasAssets(propertyAddress, true)
 				await dev.lockup.depositToProperty(propertyAddress, 1000000000000, {
 					from: alice,
 				})
@@ -861,10 +855,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 					from: alice,
 				})
 				await forwardBlockTimestamp(1)
-				await dev.metricsFactory.__setMetricsCountPerProperty(
-					propertyAddress,
-					0
-				)
+				await dev.metricsFactory.__setHasAssets(propertyAddress, false)
 				const result = await dev.lockup
 					.calculateWithdrawableInterestAmountByPosition(aliceFourthTokenId)
 					.then(toBigNumber)
@@ -1341,17 +1332,17 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 							)
 						),
 				])
-				await dev.metricsFactory.__setMetricsCountPerProperty(
+				await dev.metricsFactory.__setHasAssets(
 					property2.address,
-					1
+					true
 				)
-				await dev.metricsFactory.__setMetricsCountPerProperty(
+				await dev.metricsFactory.__setHasAssets(
 					property3.address,
-					1
+					true
 				)
-				await dev.metricsFactory.__setMetricsCountPerProperty(
+				await dev.metricsFactory.__setHasAssets(
 					property4.address,
-					1
+					true
 				)
 
 				await dev.lockup.depositToProperty(property1.address, 10000, {
