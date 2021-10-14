@@ -21,19 +21,19 @@ contract('DevBridge', ([deployer, user1, lockup, withdraw, market]) => {
 	> => {
 		const contract = artifacts.require
 
-		const addressRegistry = await deployProxy(
+		const [addressRegistry] = await deployProxy(
 			contract('AddressRegistry'),
 			deployer
 		)
 		await addressRegistry.initialize()
 
-		const dev = await deployProxy(contract('Dev'), deployer)
+		const [dev] = await deployProxy(contract('Dev'), deployer)
 		await dev.__Dev_init('Dev')
 		await addressRegistry.setRegistry('Dev', dev.address, {
 			from: deployer,
 		})
 
-		const marketFactory = await deployProxy(
+		const [marketFactory] = await deployProxy(
 			contract('MarketFactoryTest'),
 			deployer
 		)
@@ -43,7 +43,7 @@ contract('DevBridge', ([deployer, user1, lockup, withdraw, market]) => {
 			from: deployer,
 		})
 
-		const devBridge = await deployProxy(contract('DevBridge'), deployer)
+		const [devBridge] = await deployProxy(contract('DevBridge'), deployer)
 		await devBridge.initialize(addressRegistry.address)
 
 		await addressRegistry.setRegistry('Lockup', lockup, {

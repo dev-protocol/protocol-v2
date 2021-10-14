@@ -1,18 +1,18 @@
-/* eslint-disable @typescript-eslint/no-floating-promises */
-import { UpgradeabilityLibraryV1Instance } from '../../../types/truffle-contracts'
+import {
+	DevAdminInstance,
+	UpgradeabilityLibraryV1Instance,
+} from '../../../types/truffle-contracts'
 import { deployProxy } from '../../test-lib/instance'
-import { getEventValue } from '../../test-lib/utils/event'
 
 contract('UpgradeabilityLibrary ', ([deployer, address, user]) => {
 	describe('Same data', () => {
 		let contract: UpgradeabilityLibraryV1Instance
-
+		let admin: DevAdminInstance
 		before(async () => {
-			contract = await deployProxy(
+			;[contract, admin] = await deployProxy(
 				artifacts.require('UpgradeabilityLibraryV1'),
 				deployer
 			)
-			await contract.initialize()
 		})
 		it('Store data', async () => {
 			await Promise.all([
@@ -32,11 +32,11 @@ contract('UpgradeabilityLibrary ', ([deployer, address, user]) => {
 		})
 		it('Should data be upgradable', async () => {
 			const newImpl = await artifacts.require('UpgradeabilityLibraryV2').new()
-			contract.upgradeTo(newImpl.address)
-			const [implementation] = await Promise.all([
-				getEventValue(contract)('Upgraded', 'implementation'),
-			])
-			expect(implementation).to.equal(newImpl.address)
+			await admin.upgrade(contract.address, newImpl.address)
+
+			expect(
+				(await admin.getProxyImplementation(contract.address)).toString()
+			).to.equal(newImpl.address)
 			expect((await contract.getCounter()).toString()).to.equal('1')
 			const eSet = await contract.getEnumerableSet()
 			expect(eSet.length).to.equal(2)

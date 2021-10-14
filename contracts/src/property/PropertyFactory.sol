@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity =0.8.9;
 
-import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "../../interface/IPropertyFactory.sol";
 import "../../interface/IMarket.sol";
 import "../common/registry/InitializableUsingRegistry.sol";
@@ -11,12 +9,7 @@ import "./Property.sol";
 /**
  * A factory contract that creates a new Property contract.
  */
-contract PropertyFactory is
-	OwnableUpgradeable,
-	UUPSUpgradeable,
-	InitializableUsingRegistry,
-	IPropertyFactory
-{
+contract PropertyFactory is InitializableUsingRegistry, IPropertyFactory {
 	mapping(address => bool) public override isProperty;
 
 	/**
@@ -24,8 +17,6 @@ contract PropertyFactory is
 	 * @param _registry AddressRegistry address.
 	 */
 	function initialize(address _registry) external initializer {
-		__Ownable_init();
-		__UUPSUpgradeable_init();
 		__UsingRegistry_init(_registry);
 	}
 
@@ -98,6 +89,4 @@ contract PropertyFactory is
 		emit Create(msg.sender, propertyAddr);
 		return propertyAddr;
 	}
-
-	function _authorizeUpgrade(address) internal override onlyOwner {}
 }

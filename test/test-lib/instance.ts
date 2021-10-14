@@ -15,6 +15,7 @@ import {
 	TreasuryTestInstance,
 	STokensManagerInstance,
 	DevBridgeInstance,
+	DevAdminInstance,
 } from '../../types/truffle-contracts'
 
 type ContractInstance = {
@@ -25,15 +26,19 @@ type ContractInstance = {
 export const deployProxy = async <L extends ContractInstance>(
 	logic: L,
 	deployer: string
-): Promise<ReturnType<L['at']>> => {
-	const impl = await logic.new()
+): Promise<[ReturnType<L['at']>, DevAdminInstance]> => {
+	const [admin, impl] = await Promise.all([
+		contract('DevAdmin').new(),
+		logic.new(),
+	])
 	const proxy = await contract('DevProxy').new(
 		impl.address,
+		admin.address,
 		web3.utils.fromUtf8(''),
 		{ from: deployer }
 	)
-	const wrap = await logic.at(proxy.address)
-	return wrap
+	const [wrap] = await Promise.all([logic.at(proxy.address)])
+	return [wrap, admin]
 }
 
 const contract = artifacts.require
@@ -111,7 +116,7 @@ export class DevProtocolInstance {
 	}
 
 	public async generateAddressRegistry(): Promise<void> {
-		const proxfied = await deployProxy(
+		const [proxfied] = await deployProxy(
 			contract('AddressRegistry'),
 			this._deployer
 		)
@@ -120,7 +125,7 @@ export class DevProtocolInstance {
 	}
 
 	public async generateDevBridge(): Promise<void> {
-		const proxfied = await deployProxy(contract('DevBridge'), this._deployer)
+		const [proxfied] = await deployProxy(contract('DevBridge'), this._deployer)
 		await proxfied.initialize(this._addressRegistry.address)
 		this._devBridge = proxfied
 		await this._dev.grantRole(
@@ -139,7 +144,7 @@ export class DevProtocolInstance {
 	}
 
 	public async generateDev(): Promise<void> {
-		const proxfied = await deployProxy(contract('Dev'), this._deployer)
+		const [proxfied] = await deployProxy(contract('Dev'), this._deployer)
 		await proxfied.__Dev_init('Dev')
 		this._dev = proxfied
 		await this.addressRegistry.setRegistry(
@@ -150,11 +155,14 @@ export class DevProtocolInstance {
 	}
 
 	public async generateDevArbitrum(): Promise<void> {
-		const proxfied = await deployProxy(contract('DevArbitrum'), this._deployer)
+		const [proxfied] = await deployProxy(
+			contract('DevArbitrum'),
+			this._deployer
+		)
 		await proxfied.initialize(this._addressRegistry.address)
 
 		// L1 dev address
-		const proxyDev = await deployProxy(contract('Dev'), this._deployer)
+		const [proxyDev] = await deployProxy(contract('Dev'), this._deployer)
 		await proxyDev.__Dev_init('Dev')
 		await this.addressRegistry.setRegistry(
 			'L1DevAddress',
@@ -163,7 +171,7 @@ export class DevProtocolInstance {
 		)
 
 		// Arb sys
-		const proxyArbSys = await deployProxy(
+		const [proxyArbSys] = await deployProxy(
 			contract('ArbSysTest'),
 			this._deployer
 		)
@@ -182,7 +190,7 @@ export class DevProtocolInstance {
 	}
 
 	public async generateSTokensManager(): Promise<void> {
-		const proxfied = await deployProxy(
+		const [proxfied] = await deployProxy(
 			contract('STokensManager'),
 			this._deployer
 		)
@@ -196,7 +204,7 @@ export class DevProtocolInstance {
 	}
 
 	public async generateLockup(): Promise<void> {
-		const proxfied = await deployProxy(contract('Lockup'), this._deployer)
+		const [proxfied] = await deployProxy(contract('Lockup'), this._deployer)
 		await proxfied.initialize(this._addressRegistry.address)
 		this._lockup = proxfied
 		await this.addressRegistry.setRegistry(
@@ -207,7 +215,7 @@ export class DevProtocolInstance {
 	}
 
 	public async generatePropertyFactory(): Promise<void> {
-		const proxfied = await deployProxy(
+		const [proxfied] = await deployProxy(
 			contract('PropertyFactory'),
 			this._deployer
 		)
@@ -221,7 +229,7 @@ export class DevProtocolInstance {
 	}
 
 	public async generatePolicyFactory(): Promise<void> {
-		const proxfied = await deployProxy(
+		const [proxfied] = await deployProxy(
 			contract('PolicyFactoryTest'),
 			this._deployer
 		)
@@ -235,7 +243,7 @@ export class DevProtocolInstance {
 	}
 
 	public async generateMarketFactory(): Promise<void> {
-		const proxfied = await deployProxy(
+		const [proxfied] = await deployProxy(
 			contract('MarketFactoryTest'),
 			this._deployer
 		)
@@ -249,7 +257,7 @@ export class DevProtocolInstance {
 	}
 
 	public async generateMetricsFactory(): Promise<void> {
-		const proxfied = await deployProxy(
+		const [proxfied] = await deployProxy(
 			contract('MetricsFactoryTest'),
 			this._deployer
 		)
@@ -263,7 +271,10 @@ export class DevProtocolInstance {
 	}
 
 	public async generateWithdraw(): Promise<void> {
-		const proxfied = await deployProxy(contract('WithdrawTest'), this._deployer)
+		const [proxfied] = await deployProxy(
+			contract('WithdrawTest'),
+			this._deployer
+		)
 		await proxfied.initialize(this._addressRegistry.address)
 		this._withdraw = proxfied
 		await this.addressRegistry.setRegistry(
@@ -282,7 +293,10 @@ export class DevProtocolInstance {
 	}
 
 	public async generateTreasury(): Promise<void> {
-		const proxfied = await deployProxy(contract('TreasuryTest'), this._deployer)
+		const [proxfied] = await deployProxy(
+			contract('TreasuryTest'),
+			this._deployer
+		)
 		await proxfied.initialize(this._addressRegistry.address)
 		this._treasury = proxfied
 		await this.addressRegistry.setRegistry(

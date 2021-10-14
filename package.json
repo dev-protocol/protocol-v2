@@ -13,7 +13,7 @@
 		"lint:format": "prettier --write '**/*.{sol,ts,js,json,md,yml}'",
 		"prepack": "yarn build",
 		"build": "tsc -p tsconfig.build.json",
-		"prebuild": "yarn generate",
+		"prebuild": "del 'migrations/**/*.js' && yarn generate",
 		"prepare": "husky install",
 		"compile": "yarn compile:arb",
 		"test:arb": "truffle test --config truffle-config.js",
@@ -33,7 +33,7 @@
 		"@types/shelljs": "0.8.9",
 		"@typescript-eslint/eslint-plugin": "5.0.0",
 		"@typescript-eslint/parser": "5.0.0",
-		"@openzeppelin/truffle-upgrades": "1.9.1",
+		"arb-ethers-web3-bridge": "0.7.3",
 		"bent": "7.3.12",
 		"bignumber.js": "9.0.1",
 		"del-cli": "4.0.1",
@@ -54,8 +54,7 @@
 		"typechain": "4.0.3",
 		"typechain-target-truffle": "1.0.2",
 		"typescript": "4.4.4",
-		"web3": "1.6.0",
-		"arb-ethers-web3-bridge": "0.7.3"
+		"web3": "1.6.0"
 	},
 	"dependencies": {
 		"@devprotocol/util-contracts": "3.3.0",
