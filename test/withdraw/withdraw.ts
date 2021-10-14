@@ -844,7 +844,10 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 			})
 
 			it(`Property that unauthenticated but already staked before DIP9 has no reward`, async () => {
-				await dev.metricsFactory.__setHasAssets(property.address, true)
+				await dev.metricsFactory.__setMetricsCountPerProperty(
+					property.address,
+					1
+				)
 				await dev.lockup.depositToProperty(
 					property.address,
 					toBigNumber(10000).times(1e18),
@@ -861,7 +864,10 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 					}
 				)
 				await forwardBlockTimestamp(1)
-				await dev.metricsFactory.__setHasAssets(property.address, false)
+				await dev.metricsFactory.__setMetricsCountPerProperty(
+					property.address,
+					0
+				)
 				const aliceAmount = await dev.withdraw.calculateRewardAmount(
 					property.address,
 					alice
