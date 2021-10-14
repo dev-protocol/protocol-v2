@@ -69,6 +69,38 @@ contract(
 					await dev.metricsFactory.metricsCount().then((x) => x.toNumber())
 				).to.be.equal(2)
 			})
+			it('Should to be increased metricsPerProperty always', async () => {
+				const [dev] = await init()
+				expect(
+					await dev.metricsFactory
+						.metricsPerProperty(property1)
+						.then((x) => x.length)
+				).to.be.equal(0)
+				const m1 = await dev.metricsFactory
+					.create(property1, {
+						from: market,
+					})
+					.then(getMetricsAddress)
+				expect(
+					await dev.metricsFactory
+						.metricsPerProperty(property1)
+						.then((x) => x.length)
+				).to.be.equal(1)
+
+				const m2 = await dev.metricsFactory
+					.create(property1, {
+						from: market,
+					})
+					.then(getMetricsAddress)
+				expect(
+					await dev.metricsFactory
+						.metricsPerProperty(property1)
+						.then((x) => x.length)
+				).to.be.equal(2)
+				expect(
+					await dev.metricsFactory.metricsPerProperty(property1)
+				).to.be.eql([m1, m2])
+			})
 			it('Should to be increased metricsCountPerProperty always', async () => {
 				const [dev] = await init()
 				expect(
@@ -217,6 +249,45 @@ contract(
 				expect(
 					await dev.metricsFactory.metricsCount().then((x) => x.toNumber())
 				).to.be.equal(0)
+			})
+			it('Should to be decerased metricsPerProperty always', async () => {
+				const [dev] = await init()
+				const m1 = await dev.metricsFactory
+					.create(property1, {
+						from: market,
+					})
+					.then(getMetricsAddress)
+				const m2 = await dev.metricsFactory
+					.create(property1, {
+						from: market,
+					})
+					.then(getMetricsAddress)
+				expect(
+					await dev.metricsFactory
+						.metricsPerProperty(property1)
+						.then((x) => x.length)
+				).to.be.equal(2)
+
+				await dev.metricsFactory.destroy(m1, {
+					from: market,
+				})
+				expect(
+					await dev.metricsFactory
+						.metricsPerProperty(property1)
+						.then((x) => x.length)
+				).to.be.equal(1)
+
+				await dev.metricsFactory.destroy(m2, {
+					from: market,
+				})
+				expect(
+					await dev.metricsFactory
+						.metricsPerProperty(property1)
+						.then((x) => x.length)
+				).to.be.equal(0)
+				expect(
+					await dev.metricsFactory.metricsPerProperty(property1)
+				).to.be.eql([])
 			})
 			it('Should to be decreased metricsCountPerProperty always', async () => {
 				const [dev] = await init()
