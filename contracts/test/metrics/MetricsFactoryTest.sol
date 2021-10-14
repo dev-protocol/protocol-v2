@@ -21,6 +21,16 @@ contract MetricsFactoryTest is MetricsFactory {
 		_removeMetrics(_addr);
 	}
 
+	function __setMetricsCountPerProperty(address _addr, uint8 _zeroOrOne)
+		public
+	{
+		if (_zeroOrOne == 0) {
+			metricsOfProperty_[_addr].remove(address(1));
+		} else {
+			metricsOfProperty_[_addr].add(address(1));
+		}
+	}
+
 	function __setHasAssets(address _addr, bool _has) public {
 		hasAssets[_addr] = _has;
 	}

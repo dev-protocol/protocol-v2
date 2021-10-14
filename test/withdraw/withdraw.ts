@@ -62,7 +62,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 		const [property] = await Promise.all([
 			artifacts.require('Property').at(propertyAddress),
 		])
-		await dev.metricsFactory.__setHasAssets(property.address, true)
+		await dev.metricsFactory.__setMetricsCountPerProperty(property.address, 1)
 		const marketBehavior = await dev.getMarket('MarketTest1', deployer)
 		const marketAddress = getMarketAddress(
 			await dev.marketFactory.create(marketBehavior.address)
@@ -784,7 +784,10 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 								)
 							),
 					])
-					await dev.metricsFactory.__setHasAssets(property2.address, true)
+					await dev.metricsFactory.__setMetricsCountPerProperty(
+						property2.address,
+						1
+					)
 					await dev.lockup.depositToProperty(
 						property2.address,
 						toBigNumber(10000).times(1e18),
@@ -827,7 +830,10 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 			})
 
 			it(`Unauthenticated property has no reward`, async () => {
-				await dev.metricsFactory.__setHasAssets(property.address, false)
+				await dev.metricsFactory.__setMetricsCountPerProperty(
+					property.address,
+					0
+				)
 				const aliceAmount = await dev.withdraw.calculateRewardAmount(
 					property.address,
 					alice
@@ -1211,9 +1217,18 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 							)
 						),
 				])
-				await dev.metricsFactory.__setHasAssets(property2.address, true)
-				await dev.metricsFactory.__setHasAssets(property3.address, true)
-				await dev.metricsFactory.__setHasAssets(property4.address, true)
+				await dev.metricsFactory.__setMetricsCountPerProperty(
+					property2.address,
+					1
+				)
+				await dev.metricsFactory.__setMetricsCountPerProperty(
+					property3.address,
+					1
+				)
+				await dev.metricsFactory.__setMetricsCountPerProperty(
+					property4.address,
+					1
+				)
 				await dev.dev.approve(dev.lockup.address, '50000000000000000000000', {
 					from: dave,
 				})

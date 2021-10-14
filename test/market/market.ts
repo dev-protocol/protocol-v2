@@ -164,7 +164,10 @@ contract(
 					propertyAuther
 				)
 				propertyAddress = getPropertyAddress(createPropertyResult)
-				await dev.metricsFactory.__setHasAssets(propertyAddress, true)
+				await dev.metricsFactory.__setMetricsCountPerProperty(
+					propertyAddress,
+					1
+				)
 				await dev.dev.mint(propertyAuther, 10000000000, { from: deployer })
 				await dev.dev.approve(dev.lockup.address, 100000, {
 					from: propertyAuther,
@@ -357,7 +360,10 @@ contract(
 					propertyAuther
 				)
 				propertyAddress = getPropertyAddress(createPropertyResult)
-				await dev.metricsFactory.__setHasAssets(propertyAddress, true)
+				await dev.metricsFactory.__setMetricsCountPerProperty(
+					propertyAddress,
+					1
+				)
 				await dev.dev.mint(propertyAuther, 10000000000, { from: deployer })
 				await dev.addressRegistry.setRegistry(
 					'PropertyFactory',
