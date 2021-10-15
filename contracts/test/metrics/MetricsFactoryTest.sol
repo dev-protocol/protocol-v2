@@ -24,12 +24,14 @@ contract MetricsFactoryTest is MetricsFactory {
 		public
 	{
 		uint256 metricsCount = metricsOfProperty_[_addr].length();
+		address[] memory tmp = new address[](metricsCount);
 		for (uint256 i = 0; i < metricsCount; i++) {
 			address metrics = metricsOfProperty_[_addr].at(i);
-			metricsOfProperty_[_addr].remove(metrics);
+			tmp[i] = metrics;
 		}
-
-		require(metricsOfProperty_[_addr].length() == 0, "Improper processing");
+		for (uint256 i = 0; i < metricsCount; i++) {
+			metricsOfProperty_[_addr].remove(tmp[i]);
+		}
 
 		if (_zeroOrOne == 0) {
 			return;
