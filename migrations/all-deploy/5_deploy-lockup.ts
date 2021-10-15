@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable @typescript-eslint/await-thenable */
 
 const handler = async function (deployer, network) {
@@ -5,7 +6,7 @@ const handler = async function (deployer, network) {
 		return
 	}
 
-	const logic = artifacts.require('AddressRegistry')
+	const logic = artifacts.require('Lockup')
 	await deployer.deploy(logic)
 	const logicInstance = await logic.deployed()
 	console.log(`logic address:${logicInstance.address}`)
@@ -24,10 +25,17 @@ const handler = async function (deployer, network) {
 	const proxyInstance = await devProxy.deployed()
 	console.log(`proxy address:${proxyInstance.address}`)
 
+	const regInstance = await artifacts
+		.require('AddressRegistry')
+		.at(process.env.ADDRESS_REGISTRY!)
+	console.log(`registry address:${regInstance.address}`)
+
+	await regInstance.setRegistry('Lockup', proxyInstance.address)
+	console.log('set proxy address to registry')
+
 	const wrap = await logic.at(proxyInstance.address)
-	await wrap.initialize()
+	await wrap.initialize(regInstance.address)
 	console.log(`finished to initialize`)
-	process.env.ADDRESS_REGISTRY = proxyInstance.address
 } as Truffle.Migration
 
 export = handler

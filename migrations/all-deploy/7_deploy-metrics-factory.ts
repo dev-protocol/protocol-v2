@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable @typescript-eslint/await-thenable */
 
 const handler = async function (deployer, network) {
@@ -5,7 +6,7 @@ const handler = async function (deployer, network) {
 		return
 	}
 
-	const logic = artifacts.require('DevBridge')
+	const logic = artifacts.require('MetricsFactory')
 	await deployer.deploy(logic)
 	const logicInstance = await logic.deployed()
 	console.log(`logic address:${logicInstance.address}`)
@@ -24,12 +25,12 @@ const handler = async function (deployer, network) {
 	const proxyInstance = await devProxy.deployed()
 	console.log(`proxy address:${proxyInstance.address}`)
 
-	const regInstance = artifacts
+	const regInstance = await artifacts
 		.require('AddressRegistry')
 		.at(process.env.ADDRESS_REGISTRY!)
 	console.log(`registry address:${regInstance.address}`)
 
-	await regInstance.setRegistry('DevBridge', proxyInstance.address)
+	await regInstance.setRegistry('MetricsFactory', proxyInstance.address)
 	console.log('set proxy address to registry')
 
 	const wrap = await logic.at(proxyInstance.address)
