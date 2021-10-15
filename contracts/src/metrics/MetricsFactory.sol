@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity =0.8.9;
 
+import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "../../interface/IMetrics.sol";
 import "../../interface/IMetricsFactory.sol";
 import "../../interface/IMarketFactory.sol";
@@ -14,7 +15,9 @@ contract MetricsFactory is InitializableUsingRegistry, IMetricsFactory {
 	uint256 public override metricsCount;
 	uint256 public override authenticatedPropertiesCount;
 	mapping(address => bool) public override isMetrics;
-	mapping(address => uint256) public override metricsCountPerProperty;
+	mapping(address => EnumerableSet.AddressSet) internal metricsOfProperty_;
+
+	using EnumerableSet for EnumerableSet.AddressSet;
 
 	/**
 	 * Initialize the passed address as AddressRegistry address.
@@ -86,34 +89,53 @@ contract MetricsFactory is InitializableUsingRegistry, IMetricsFactory {
 		emit Destroy(msg.sender, IMetrics(_metrics).property(), _metrics);
 	}
 
+	function metricsCountPerProperty(address _property)
+		external
+		view
+		override
+		returns (uint256)
+	{
+		return metricsOfProperty_[_property].length();
+	}
+
+	function metricsOfProperty(address _property)
+		external
+		view
+		override
+		returns (address[] memory)
+	{
+		return metricsOfProperty_[_property].values();
+	}
+
 	function _addMetrics(address _addr) internal {
 		isMetrics[_addr] = true;
 		address property = IMetrics(_addr).property();
-		uint256 countPerProperty = metricsCountPerProperty[property];
+		uint256 countPerProperty = metricsOfProperty_[property].length();
 		if (countPerProperty == 0) {
 			authenticatedPropertiesCount = authenticatedPropertiesCount + 1;
 		}
 		metricsCount = metricsCount + 1;
-		metricsCountPerProperty[property] = countPerProperty + 1;
+		metricsOfProperty_[property].add(_addr);
 	}
 
 	function _removeMetrics(address _addr) internal {
 		isMetrics[_addr] = false;
 		address property = IMetrics(_addr).property();
-		uint256 countPerProperty = metricsCountPerProperty[property];
+		uint256 countPerProperty = metricsOfProperty_[property].length();
 		if (countPerProperty == 1) {
 			authenticatedPropertiesCount = authenticatedPropertiesCount - 1;
 		}
 		metricsCount = metricsCount - 1;
-		metricsCountPerProperty[property] = countPerProperty - 1;
+		metricsOfProperty_[property].remove(_addr);
 	}
 
 	function hasAssets(address _property)
 		external
 		view
+		virtual
 		override
 		returns (bool)
 	{
-		return metricsCountPerProperty[_property] > 0;
+		return metricsOfProperty_[_property].length() > 0;
 	}
 }

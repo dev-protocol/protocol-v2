@@ -1,12 +1,15 @@
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity =0.8.9;
 
+import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "../../src/metrics/MetricsFactory.sol";
 
 /**
  * A factory contract that creates a new Market contract.
  */
 contract MetricsFactoryTest is MetricsFactory {
+	using EnumerableSet for EnumerableSet.AddressSet;
+
 	constructor() MetricsFactory() {}
 
 	function __addMetrics(address _addr) public {
@@ -17,9 +20,25 @@ contract MetricsFactoryTest is MetricsFactory {
 		_removeMetrics(_addr);
 	}
 
-	function __setMetricsCountPerProperty(address _addr, uint256 _value)
+	function __setMetricsCountPerProperty(address _addr, uint8 _zeroOrOne)
 		public
 	{
-		metricsCountPerProperty[_addr] = _value;
+		uint256 metricsCount = metricsOfProperty_[_addr].length();
+		address[] memory tmp = new address[](metricsCount);
+		for (uint256 i = 0; i < metricsCount; i++) {
+			address metrics = metricsOfProperty_[_addr].at(i);
+			tmp[i] = metrics;
+		}
+		for (uint256 i = 0; i < metricsCount; i++) {
+			metricsOfProperty_[_addr].remove(tmp[i]);
+		}
+
+		if (_zeroOrOne == 0) {
+			return;
+		} else if (_zeroOrOne == 1) {
+			metricsOfProperty_[_addr].add(address(1));
+		} else {
+			revert("argument should be specified as 0 or 1");
+		}
 	}
 }
