@@ -23,10 +23,20 @@ contract MetricsFactoryTest is MetricsFactory {
 	function __setMetricsCountPerProperty(address _addr, uint8 _zeroOrOne)
 		public
 	{
+		uint256 metricsCount = metricsOfProperty_[_addr].length();
+		for (uint256 i = 0; i < metricsCount; i++) {
+			address metrics = metricsOfProperty_[_addr].at(i);
+			metricsOfProperty_[_addr].remove(metrics);
+		}
+
+		require(metricsOfProperty_[_addr].length() == 0, "Improper processing");
+
 		if (_zeroOrOne == 0) {
-			metricsOfProperty_[_addr].remove(address(1));
-		} else {
+			return;
+		} else if (_zeroOrOne == 1) {
 			metricsOfProperty_[_addr].add(address(1));
+		} else {
+			revert("argument should be specified as 0 or 1");
 		}
 	}
 }
