@@ -19,7 +19,6 @@ const handler = async function (deployer, network) {
 
 	await devArbitrumInstance.grantRole(bunerRole, devBridgeAddress)
 	await devArbitrumInstance.grantRole(minterRole, devBridgeAddress)
-
 } as Truffle.Migration
 
 export = handler
