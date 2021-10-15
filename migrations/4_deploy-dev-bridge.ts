@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable @typescript-eslint/await-thenable */
 
 const handler = async function (deployer, network) {
@@ -24,7 +25,7 @@ const handler = async function (deployer, network) {
 	const proxyInstance = await devProxy.deployed()
 	console.log(`proxy address:${proxyInstance.address}`)
 
-	const regInstance = artifacts
+	const regInstance = await artifacts
 		.require('AddressRegistry')
 		.at(process.env.ADDRESS_REGISTRY!)
 	console.log(`registry address:${regInstance.address}`)
