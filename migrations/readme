@@ -1,0 +1,1 @@
+npx truffle migrate --network arbitrum_testnet
