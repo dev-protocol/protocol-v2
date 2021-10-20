@@ -22,7 +22,11 @@ const handler = async function (deployer, network) {
 		.at(propertyFactoryAddress)
 	console.log(`property factory address:${propertyFactoryAddress}`)
 
-	await propertyFactoryInstance.create('test', 'TEST', '0xDaEca4F52C4bE0d6e7DE675C2FEB4C3006A96C84')
+	await propertyFactoryInstance.create(
+		'test',
+		'TEST',
+		'0xDaEca4F52C4bE0d6e7DE675C2FEB4C3006A96C84'
+	)
 	console.log('finish')
 } as Truffle.Migration
 
