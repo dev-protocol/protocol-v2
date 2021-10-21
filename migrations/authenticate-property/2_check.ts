@@ -10,9 +10,7 @@ const handler = async function (deployer, network) {
 	const marketAddress = ''
 	/// ////////////////////////////////////////////////////////////////
 
-	const marketInstance = await artifacts
-		.require('Market')
-		.at(marketAddress)
+	const marketInstance = await artifacts.require('Market').at(marketAddress)
 	console.log(`market address:${marketInstance.address}`)
 	const properties = await marketInstance.getAuthenticatedProperties()
 	console.log(properties)
