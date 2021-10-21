@@ -73,7 +73,7 @@ contract MarketFactory is
 		_enable(_addr);
 	}
 
-	function enableMarketList() external view returns (address[] memory) {
+	function getEnabledMarkets() external view returns (address[] memory) {
 		return enabledMarkets;
 	}
 
