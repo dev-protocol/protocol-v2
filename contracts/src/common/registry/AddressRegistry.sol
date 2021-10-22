@@ -2,13 +2,13 @@
 pragma solidity =0.8.9;
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import "../../../interface/IAddressRegistry.sol";
+import "../../../interface/IL2AddressRegistry.sol";
 
 /**
  * A registry contract to hold the latest contract addresses.
  * Dev Protocol will be upgradeable by this contract.
  */
-contract AddressRegistry is OwnableUpgradeable, IAddressRegistry {
+contract AddressRegistry is OwnableUpgradeable, IL2AddressRegistry {
 	mapping(bytes32 => address) private reg;
 
 	function initialize() external initializer {

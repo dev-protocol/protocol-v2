@@ -2,7 +2,7 @@ import { DevProtocolInstance } from '../test-lib/instance'
 import {
 	MetricsInstance,
 	PropertyInstance,
-	IPolicyInstance,
+	IL2PolicyInstance,
 	MarketInstance,
 } from '../../types/truffle-contracts'
 import BigNumber from 'bignumber.js'
@@ -27,7 +27,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 			DevProtocolInstance,
 			MetricsInstance,
 			PropertyInstance,
-			IPolicyInstance,
+			IL2PolicyInstance,
 			MarketInstance
 		]
 	> => {

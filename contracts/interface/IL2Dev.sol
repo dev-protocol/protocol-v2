@@ -2,7 +2,7 @@
 // solhint-disable-next-line compiler-version
 pragma solidity ^0.8.0;
 
-interface IDev {
+interface IL2Dev {
 	// solhint-disable-next-line func-name-mixedcase
 	function MINTER_ROLE() external returns (bytes32);
 

@@ -3,11 +3,11 @@ pragma solidity =0.8.9;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "../../interface/IPolicy.sol";
+import "../../interface/IL2Policy.sol";
 import "../common/libs/Curve.sol";
 import "../common/registry/UsingRegistry.sol";
 
-contract Policy1 is IPolicy, Ownable, Curve, UsingRegistry {
+contract Policy1 is IL2Policy, Ownable, Curve, UsingRegistry {
 	uint256 public override marketVotingSeconds = 86400 * 5;
 	uint256 public override policyVotingSeconds = 86400 * 5;
 	uint256 private constant MINT_PER_SECOND_AND_ASSET = 132000000000000 / 15;

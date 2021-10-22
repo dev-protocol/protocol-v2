@@ -3,16 +3,16 @@ pragma solidity =0.8.9;
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/IAccessControlUpgradeable.sol";
-import "../../interface/IAddressRegistry.sol";
-import "../../interface/IDevBridge.sol";
-import "../../interface/IDev.sol";
-import "../../interface/IMarketFactory.sol";
+import "../../interface/IL2AddressRegistry.sol";
+import "../../interface/IL2DevBridge.sol";
+import "../../interface/IL2Dev.sol";
+import "../../interface/IL2MarketFactory.sol";
 import "../common/registry/InitializableUsingRegistry.sol";
 
 contract DevBridge is
 	InitializableUsingRegistry,
 	OwnableUpgradeable,
-	IDevBridge
+	IL2DevBridge
 {
 	function initialize(address _registry) external initializer {
 		__Ownable_init();
@@ -27,13 +27,13 @@ contract DevBridge is
 		override
 		returns (bool)
 	{
-		IAddressRegistry reg = registry();
+		IL2AddressRegistry reg = registry();
 		require(
 			msg.sender == reg.registries("Lockup") ||
 				msg.sender == reg.registries("Withdraw"),
 			"illegal access"
 		);
-		IDev(reg.registries("Dev")).mint(_account, _amount);
+		IL2Dev(reg.registries("Dev")).mint(_account, _amount);
 		return true;
 	}
 
@@ -46,12 +46,12 @@ contract DevBridge is
 		returns (bool)
 	{
 		require(
-			IMarketFactory(registry().registries("MarketFactory")).isMarket(
+			IL2MarketFactory(registry().registries("MarketFactory")).isMarket(
 				msg.sender
 			),
 			"illegal access"
 		);
-		IDev(registry().registries("Dev")).burn(_account, _amount);
+		IL2Dev(registry().registries("Dev")).burn(_account, _amount);
 		return true;
 	}
 
@@ -60,7 +60,7 @@ contract DevBridge is
 	 */
 	function renounceMinter() external override onlyOwner {
 		address token = registry().registries("Dev");
-		IDev dev = IDev(token);
+		IL2Dev dev = IL2Dev(token);
 		IAccessControlUpgradeable accessControl = IAccessControlUpgradeable(
 			token
 		);
@@ -72,7 +72,7 @@ contract DevBridge is
 	 */
 	function renounceBurner() external override onlyOwner {
 		address token = registry().registries("Dev");
-		IDev dev = IDev(token);
+		IL2Dev dev = IL2Dev(token);
 		IAccessControlUpgradeable accessControl = IAccessControlUpgradeable(
 			token
 		);

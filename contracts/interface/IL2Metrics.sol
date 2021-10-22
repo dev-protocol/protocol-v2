@@ -2,7 +2,7 @@
 // solhint-disable-next-line compiler-version
 pragma solidity ^0.8.0;
 
-interface IMetrics {
+interface IL2Metrics {
 	function market() external view returns (address);
 
 	function property() external view returns (address);

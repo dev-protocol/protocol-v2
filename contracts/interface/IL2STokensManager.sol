@@ -2,7 +2,7 @@
 // solhint-disable-next-line compiler-version
 pragma solidity ^0.8.0;
 
-interface ISTokensManager {
+interface IL2STokensManager {
 	/*
 	 * @dev Struct to declares a staking position.
 	 * @param owner The address of the owner of the new staking position

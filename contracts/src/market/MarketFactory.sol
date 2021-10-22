@@ -2,9 +2,9 @@
 pragma solidity =0.8.9;
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import "../../interface/IMarket.sol";
-import "../../interface/IMarketBehavior.sol";
-import "../../interface/IMarketFactory.sol";
+import "../../interface/IL2Market.sol";
+import "../../interface/IL2MarketBehavior.sol";
+import "../../interface/IL2MarketFactory.sol";
 import "../common/registry/InitializableUsingRegistry.sol";
 import "./Market.sol";
 
@@ -14,7 +14,7 @@ import "./Market.sol";
 contract MarketFactory is
 	InitializableUsingRegistry,
 	OwnableUpgradeable,
-	IMarketFactory
+	IL2MarketFactory
 {
 	uint256 public override marketsCount;
 	address[] public enabledMarkets;
@@ -39,7 +39,7 @@ contract MarketFactory is
 		require(_addr != address(0), "this is illegal address");
 
 		/**
-		 * Creates a new Market contract with the passed address as the IMarketBehavior.
+		 * Creates a new Market contract with the passed address as the IL2MarketBehavior.
 		 */
 		Market market = new Market(address(registry()), _addr);
 
@@ -52,7 +52,7 @@ contract MarketFactory is
 		/**
 		 * set associated market address to behavior
 		 */
-		IMarketBehavior(_addr).setAssociatedMarket(marketAddr);
+		IL2MarketBehavior(_addr).setAssociatedMarket(marketAddr);
 
 		/**
 		 * For the first Market contract, it will be activated immediately.
@@ -88,7 +88,7 @@ contract MarketFactory is
 		/**
 		 * Market will be enable.
 		 */
-		IMarket market = IMarket(_addr);
+		IL2Market market = IL2Market(_addr);
 		require(market.enabled() == false, "already enabled");
 
 		market.toEnable();

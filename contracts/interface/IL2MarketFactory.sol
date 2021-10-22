@@ -2,7 +2,7 @@
 // solhint-disable-next-line compiler-version
 pragma solidity ^0.8.0;
 
-interface IMarketFactory {
+interface IL2MarketFactory {
 	event Create(address indexed _market, address _from);
 
 	function getEnabledMarkets() external view returns (address[] memory);

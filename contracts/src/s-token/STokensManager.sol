@@ -4,14 +4,13 @@ pragma solidity =0.8.9;
 import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
-import "../../interface/ISTokensManager.sol";
-import "../../interface/IAddressRegistry.sol";
-import "../../interface/ILockup.sol";
+import "../../interface/IL2STokensManager.sol";
+import "../../interface/IL2Lockup.sol";
 import "../common/registry/InitializableUsingRegistry.sol";
 import "./STokensDescriptor.sol";
 
 contract STokensManager is
-	ISTokensManager,
+	IL2STokensManager,
 	STokensDescriptor,
 	ERC721Upgradeable,
 	InitializableUsingRegistry
@@ -118,7 +117,7 @@ contract STokensManager is
 		override
 		returns (Rewards memory)
 	{
-		uint256 withdrawableReward = ILockup(registry().registries("Lockup"))
+		uint256 withdrawableReward = IL2Lockup(registry().registries("Lockup"))
 			.calculateWithdrawableInterestAmountByPosition(_tokenId);
 		StakingPositions memory currentPosition = getStoragePositions(_tokenId);
 		uint256 cumulativeReward = currentPosition.cumulativeReward;
