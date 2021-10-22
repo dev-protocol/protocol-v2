@@ -2,7 +2,7 @@
 // solhint-disable-next-line compiler-version
 pragma solidity ^0.8.0;
 
-interface IAddressRegistry {
+interface IL2AddressRegistry {
 	function setRegistry(string memory _key, address _addr) external;
 
 	function registries(string memory _key) external view returns (address);

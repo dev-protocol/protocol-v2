@@ -2,8 +2,8 @@
 pragma solidity =0.8.9;
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import "../../interface/IPolicy.sol";
-import "../../interface/IPolicyFactory.sol";
+import "../../interface/IL2Policy.sol";
+import "../../interface/IL2PolicyFactory.sol";
 import "../common/registry/InitializableUsingRegistry.sol";
 
 /**
@@ -12,7 +12,7 @@ import "../common/registry/InitializableUsingRegistry.sol";
 contract PolicyFactory is
 	InitializableUsingRegistry,
 	OwnableUpgradeable,
-	IPolicyFactory
+	IL2PolicyFactory
 {
 	mapping(address => bool) public override isPotentialPolicy;
 	mapping(address => uint256) public override closeVoteAt;
@@ -71,7 +71,7 @@ contract PolicyFactory is
 	function _addPolicy(address _addr) internal {
 		isPotentialPolicy[_addr] = true;
 
-		uint256 votingPeriod = IPolicy(registry().registries("Policy"))
+		uint256 votingPeriod = IL2Policy(registry().registries("Policy"))
 			.policyVotingSeconds();
 		uint256 votingEndTimestamp = block.timestamp + votingPeriod;
 		closeVoteAt[_addr] = votingEndTimestamp;

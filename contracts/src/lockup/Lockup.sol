@@ -4,12 +4,12 @@ pragma solidity =0.8.9;
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "../../interface/IDevBridge.sol";
-import "../../interface/IProperty.sol";
-import "../../interface/IPolicy.sol";
-import "../../interface/ILockup.sol";
-import "../../interface/IMetricsFactory.sol";
-import "../../interface/ISTokensManager.sol";
+import "../../interface/IL2DevBridge.sol";
+import "../../interface/IL2Property.sol";
+import "../../interface/IL2Policy.sol";
+import "../../interface/IL2Lockup.sol";
+import "../../interface/IL2MetricsFactory.sol";
+import "../../interface/IL2STokensManager.sol";
 import "../common/libs/Decimals.sol";
 import "../common/registry/InitializableUsingRegistry.sol";
 
@@ -41,7 +41,7 @@ import "../common/registry/InitializableUsingRegistry.sol";
  * - After 10 blocks, Carol stakes 40 DEV on Property-A (Alice's staking state on Property-A: `M`=500, `B`=20, `P`=140, `S`=200, `U`=100)
  * - After 10 blocks, Alice withdraws Property-A staking reward. The reward at this time is 5000 DEV (10 blocks * 500 DEV) + 3125 DEV (10 blocks * 62.5% * 500 DEV) + 2500 DEV (10 blocks * 50% * 500 DEV).
  */
-contract Lockup is ILockup, InitializableUsingRegistry {
+contract Lockup is IL2Lockup, InitializableUsingRegistry {
 	uint256 public override cap; // From [get/set]StorageCap
 	uint256 public override totalLocked; // From [get/set]StorageAllValue
 	uint256 public cumulativeHoldersRewardCap; // From [get/set]StorageCumulativeHoldersRewardCap
@@ -76,7 +76,7 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 	 */
 	modifier onlyAuthenticatedProperty(address _property) {
 		require(
-			IMetricsFactory(registry().registries("MetricsFactory")).hasAssets(
+			IL2MetricsFactory(registry().registries("MetricsFactory")).hasAssets(
 				_property
 			),
 			"unable to stake to unauthenticated property"
@@ -146,7 +146,7 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		/**
 		 * mint s tokens
 		 */
-		ISTokensManager sTokenManager = ISTokensManager(
+		IL2STokensManager sTokenManager = IL2STokensManager(
 			registry().registries("STokensManager")
 		);
 		if (sTokenManager.positionsOfProperty(_property).length == 0) {
@@ -179,13 +179,13 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		 * Validates _amount is not 0.
 		 */
 		require(_amount != 0, "illegal deposit amount");
-		ISTokensManager sTokenManager = ISTokensManager(
+		IL2STokensManager sTokenManager = IL2STokensManager(
 			registry().registries("STokensManager")
 		);
 		/**
 		 * get position information
 		 */
-		ISTokensManager.StakingPositions memory positions = sTokenManager
+		IL2STokensManager.StakingPositions memory positions = sTokenManager
 			.positions(_tokenId);
 		/**
 		 * Gets the withdrawable amount.
@@ -237,13 +237,13 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		onlyPositionOwner(_tokenId)
 		returns (bool)
 	{
-		ISTokensManager sTokenManager = ISTokensManager(
+		IL2STokensManager sTokenManager = IL2STokensManager(
 			registry().registries("STokensManager")
 		);
 		/**
 		 * get position information
 		 */
-		ISTokensManager.StakingPositions memory positions = sTokenManager
+		IL2STokensManager.StakingPositions memory positions = sTokenManager
 			.positions(_tokenId);
 		/**
 		 * If the balance of the withdrawal request is bigger than the balance you are staking
@@ -259,7 +259,7 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		 * Transfer the staked amount to the sender.
 		 */
 		if (_amount != 0) {
-			IProperty(positions.property).withdraw(msg.sender, _amount);
+			IL2Property(positions.property).withdraw(msg.sender, _amount);
 		}
 		/**
 		 * Saves variables that should change due to the canceling staking..
@@ -422,7 +422,7 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		/**
 		 * Calculates the holders reward out of the total reward amount.
 		 */
-		uint256 holdersShare = IPolicy(registry().registries("Policy"))
+		uint256 holdersShare = IL2Policy(registry().registries("Policy"))
 			.holdersShare(price, allStakes);
 
 		/**
@@ -511,12 +511,12 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 	 * @return Maximum number of mints per block.
 	 */
 	function calculateMaxRewardsPerBlock() private view returns (uint256) {
-		uint256 totalAssets = IMetricsFactory(
+		uint256 totalAssets = IL2MetricsFactory(
 			registry().registries("MetricsFactory")
 		).metricsCount();
 		uint256 totalLockedUps = totalLocked;
 		return
-			IPolicy(registry().registries("Policy")).rewards(
+			IL2Policy(registry().registries("Policy")).rewards(
 				totalLockedUps,
 				totalAssets
 			);
@@ -607,13 +607,13 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 	 * Returns the total rewards currently available for withdrawal. (For calling from inside the contract)
 	 */
 	function _calculateWithdrawableInterestAmount(
-		ISTokensManager.StakingPositions memory positions
+		IL2STokensManager.StakingPositions memory positions
 	) private view returns (uint256 amount_, RewardPrices memory prices_) {
 		/**
 		 * If the passed Property has not authenticated, returns always 0.
 		 */
 		if (
-			IMetricsFactory(registry().registries("MetricsFactory")).hasAssets(
+			IL2MetricsFactory(registry().registries("MetricsFactory")).hasAssets(
 				positions.property
 			) == false
 		) {
@@ -645,10 +645,10 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		override
 		returns (uint256)
 	{
-		ISTokensManager sTokensManagerInstance = ISTokensManager(
+		IL2STokensManager sTokensManagerInstance = IL2STokensManager(
 			registry().registries("STokensManager")
 		);
-		ISTokensManager.StakingPositions
+		IL2STokensManager.StakingPositions
 			memory positions = sTokensManagerInstance.positions(_tokenId);
 		(uint256 result, ) = _calculateWithdrawableInterestAmount(positions);
 		return result;
@@ -658,7 +658,7 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 	 * Withdraws staking reward as an interest.
 	 */
 	function _withdrawInterest(
-		ISTokensManager.StakingPositions memory positions
+		IL2STokensManager.StakingPositions memory positions
 	) private returns (uint256 value_, RewardPrices memory prices_) {
 		/**
 		 * Gets the withdrawable amount.
@@ -672,7 +672,7 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		 * Mints the reward.
 		 */
 		require(
-			IDevBridge(registry().registries("DevBridge")).mint(
+			IL2DevBridge(registry().registries("DevBridge")).mint(
 				msg.sender,
 				value
 			),

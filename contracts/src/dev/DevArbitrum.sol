@@ -3,7 +3,7 @@ pragma solidity =0.8.9;
 
 import "../../interface/IArbToken.sol";
 import "../../interface/IArbSys.sol";
-import "../../interface/IDevArbitrum.sol";
+import "../../interface/IL2DevArbitrum.sol";
 import "../common/registry/InitializableUsingRegistry.sol";
 import "./Dev.sol";
 
@@ -17,7 +17,7 @@ import "./Dev.sol";
 contract DevArbitrum is
 	Dev,
 	IArbToken,
-	IDevArbitrum,
+	IL2DevArbitrum,
 	InitializableUsingRegistry
 {
 	uint256 public bridgeBalanceOnL1;

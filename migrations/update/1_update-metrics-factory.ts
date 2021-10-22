@@ -6,7 +6,7 @@ const handler = async function (deployer, network) {
 		return
 	}
 
-	const logic = artifacts.require('MetricsFactory')
+	const logic = artifacts.require('MarketFactory')
 	await deployer.deploy(logic)
 	const logicInstance = await logic.deployed()
 	console.log(`logic address:${logicInstance.address}`)
@@ -16,12 +16,12 @@ const handler = async function (deployer, network) {
 		.at('0x00551f424BD3426A1B15eb1Ea4680cc2bf7E9D76')
 	console.log(`admin address:${adminInstance.address}`)
 
-	const metricsFactoryProxy = '0x650663aD898A018cca44Ac224Be2286D14B7421d'
+	const proxy = '0x84b6712Ec4174536daBf019fa6549A2e2125DEae'
 
-	await adminInstance.upgrade(metricsFactoryProxy, logicInstance.address)
+	await adminInstance.upgrade(proxy, logicInstance.address)
 
 	const implAddress = await adminInstance.getProxyImplementation(
-		metricsFactoryProxy
+		proxy
 	)
 
 	console.log(`impl address:${implAddress}`)

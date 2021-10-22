@@ -2,7 +2,7 @@
 // solhint-disable-next-line compiler-version
 pragma solidity ^0.8.0;
 
-interface IPolicy {
+interface IL2Policy {
 	function rewards(uint256 _lockups, uint256 _assets)
 		external
 		view

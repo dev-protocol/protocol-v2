@@ -2,7 +2,7 @@
 // solhint-disable-next-line compiler-version
 pragma solidity ^0.8.0;
 
-interface IPropertyFactory {
+interface IL2PropertyFactory {
 	event Create(address indexed _from, address _property);
 
 	function create(

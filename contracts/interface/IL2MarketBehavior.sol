@@ -2,7 +2,7 @@
 // solhint-disable-next-line compiler-version
 pragma solidity ^0.8.0;
 
-interface IMarketBehavior {
+interface IL2MarketBehavior {
 	function authenticate(
 		address _prop,
 		string[] memory _args,

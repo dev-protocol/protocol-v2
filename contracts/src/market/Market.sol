@@ -2,22 +2,22 @@
 pragma solidity =0.8.9;
 
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
-import "../../interface/IProperty.sol";
-import "../../interface/IMarket.sol";
-import "../../interface/IMarketBehavior.sol";
-import "../../interface/IPolicy.sol";
-import "../../interface/IMetrics.sol";
-import "../../interface/IMetricsFactory.sol";
-import "../../interface/ILockup.sol";
-import "../../interface/IDev.sol";
-import "../../interface/IDevBridge.sol";
+import "../../interface/IL2Property.sol";
+import "../../interface/IL2Market.sol";
+import "../../interface/IL2MarketBehavior.sol";
+import "../../interface/IL2Policy.sol";
+import "../../interface/IL2Metrics.sol";
+import "../../interface/IL2MetricsFactory.sol";
+import "../../interface/IL2Lockup.sol";
+import "../../interface/IL2Dev.sol";
+import "../../interface/IL2DevBridge.sol";
 import "../common/registry/UsingRegistry.sol";
 
 /**
  * A user-proposable contract for authenticating and associating assets with Property.
- * A user deploys a contract that inherits IMarketBehavior and creates this Market contract with the MarketFactory contract.
+ * A user deploys a contract that inherits IL2MarketBehavior and creates this Market contract with the MarketFactory contract.
  */
-contract Market is UsingRegistry, IMarket {
+contract Market is UsingRegistry, IL2Market {
 	EnumerableSet.AddressSet private authenticatedProperties;
 	bool public override enabled;
 	address public override behavior;
@@ -53,7 +53,7 @@ contract Market is UsingRegistry, IMarket {
 		 * Sets the period during which voting by voters can be accepted.
 		 * This period is determined by `Policy.marketVotingSeconds`.
 		 */
-		uint256 marketVotingSeconds = IPolicy(registry().registries("Policy"))
+		uint256 marketVotingSeconds = IL2Policy(registry().registries("Policy"))
 			.marketVotingSeconds();
 		votingEndTimestamp = block.timestamp + marketVotingSeconds;
 	}
@@ -63,7 +63,7 @@ contract Market is UsingRegistry, IMarket {
 	 */
 	function propertyValidation(address _prop) private view {
 		require(
-			msg.sender == IProperty(_prop).author(),
+			msg.sender == IL2Property(_prop).author(),
 			"this is illegal address"
 		);
 		require(enabled, "market is not enabled");
@@ -81,7 +81,7 @@ contract Market is UsingRegistry, IMarket {
 	 * Modifier for validates the sender is the author of the Property associated with the passed Metrics contract.
 	 */
 	modifier onlyLinkedPropertyAuthor(address _metrics) {
-		address _prop = IMetrics(_metrics).property();
+		address _prop = IL2Metrics(_metrics).property();
 		propertyValidation(_prop);
 		_;
 	}
@@ -136,7 +136,7 @@ contract Market is UsingRegistry, IMarket {
 	}
 
 	/**
-	 * Bypass to IMarketBehavior.authenticate.
+	 * Bypass to IL2MarketBehavior.authenticate.
 	 * Authenticates the new asset and proves that the Property author is the owner of the asset.
 	 */
 	function _authenticate(
@@ -144,7 +144,7 @@ contract Market is UsingRegistry, IMarket {
 		address _author,
 		string[] memory _args
 	) private returns (bool) {
-		return IMarketBehavior(behavior).authenticate(_prop, _args, _author);
+		return IL2MarketBehavior(behavior).authenticate(_prop, _args, _author);
 	}
 
 	/**
@@ -157,10 +157,10 @@ contract Market is UsingRegistry, IMarket {
 		view
 		returns (uint256)
 	{
-		uint256 tokenValue = ILockup(registry().registries("Lockup"))
+		uint256 tokenValue = IL2Lockup(registry().registries("Lockup"))
 			.totalLockedForProperty(_property);
-		IPolicy policy = IPolicy(registry().registries("Policy"));
-		IMetricsFactory metricsFactory = IMetricsFactory(
+		IL2Policy policy = IL2Policy(registry().registries("Policy"));
+		IL2MetricsFactory metricsFactory = IL2MetricsFactory(
 			registry().registries("MetricsFactory")
 		);
 		return
@@ -177,7 +177,7 @@ contract Market is UsingRegistry, IMarket {
 		returns (address)
 	{
 		/**
-		 * Validates the sender is the saved IMarketBehavior address.
+		 * Validates the sender is the saved IL2MarketBehavior address.
 		 */
 		require(msg.sender == behavior, "this is illegal address");
 		require(enabled, "market is not enabled");
@@ -191,12 +191,12 @@ contract Market is UsingRegistry, IMarket {
 		/**
 		 * Gets the Property author address.
 		 */
-		address sender = IProperty(_property).author();
+		address sender = IL2Property(_property).author();
 
 		/**
 		 * Publishes a new Metrics contract and associate the Property with the asset.
 		 */
-		IMetricsFactory metricsFactory = IMetricsFactory(
+		IL2MetricsFactory metricsFactory = IL2MetricsFactory(
 			registry().registries("MetricsFactory")
 		);
 		address metrics = metricsFactory.create(_property);
@@ -207,7 +207,7 @@ contract Market is UsingRegistry, IMarket {
 		 */
 		uint256 authenticationFee = getAuthenticationFee(_property);
 		require(
-			IDevBridge(registry().registries("DevBridge")).burn(
+			IL2DevBridge(registry().registries("DevBridge")).burn(
 				sender,
 				authenticationFee
 			),
@@ -244,7 +244,7 @@ contract Market is UsingRegistry, IMarket {
 		/**
 		 * Removes the passed Metrics contract from the Metrics address set.
 		 */
-		IMetricsFactory metricsFactory = IMetricsFactory(
+		IL2MetricsFactory metricsFactory = IL2MetricsFactory(
 			registry().registries("MetricsFactory")
 		);
 		metricsFactory.destroy(_metrics);
@@ -252,22 +252,22 @@ contract Market is UsingRegistry, IMarket {
 		/**
 		 * Subtracts the number of authenticated assets in this Market.
 		 */
-		address property = IMetrics(_metrics).property();
+		address property = IL2Metrics(_metrics).property();
 		authenticatedProperties.remove(property);
 	}
 
 	/**
-	 * Bypass to IMarketBehavior.name.
+	 * Bypass to IL2MarketBehavior.name.
 	 */
 	function name() external view override returns (string memory) {
-		return IMarketBehavior(behavior).name();
+		return IL2MarketBehavior(behavior).name();
 	}
 
 	/**
-	 * Bypass to IMarketBehavior.schema.
+	 * Bypass to IL2MarketBehavior.schema.
 	 */
 	function schema() external view override returns (string memory) {
-		return IMarketBehavior(behavior).schema();
+		return IL2MarketBehavior(behavior).schema();
 	}
 
 	/**
