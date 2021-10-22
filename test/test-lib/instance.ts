@@ -8,8 +8,8 @@ import {
 	PolicyFactoryTestInstance,
 	MarketFactoryTestInstance,
 	MetricsFactoryTestInstance,
-	IL2PolicyInstance,
-	IL2MarketBehaviorInstance,
+	IPolicyInstance,
+	IMarketBehaviorInstance,
 	WithdrawTestInstance,
 	MetricsInstance,
 	TreasuryTestInstance,
@@ -321,7 +321,7 @@ export class DevProtocolInstance {
 	public async getPolicy(
 		contractName: string,
 		user: string
-	): Promise<IL2PolicyInstance> {
+	): Promise<IPolicyInstance> {
 		const tmp = await contract(contractName).new({ from: user })
 		return tmp
 	}
@@ -329,7 +329,7 @@ export class DevProtocolInstance {
 	public async getMarket(
 		contractName: string,
 		user: string
-	): Promise<IL2MarketBehaviorInstance> {
+	): Promise<IMarketBehaviorInstance> {
 		const tmp = await contract(contractName).new(this.addressRegistry.address, {
 			from: user,
 		})

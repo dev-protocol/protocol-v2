@@ -1,4 +1,4 @@
-import { IL2PolicyInstance } from '../../types/truffle-contracts'
+import { IPolicyInstance } from '../../types/truffle-contracts'
 import { DevProtocolInstance } from '../test-lib/instance'
 import {
 	collectsEth,
@@ -15,7 +15,7 @@ contract('PolicyFactory', ([deployer, dummyPolicy, user1, ...accounts]) => {
 	before(async () => {
 		await collectsEth(deployer)(accounts)
 	})
-	const init = async (): Promise<[DevProtocolInstance, IL2PolicyInstance]> => {
+	const init = async (): Promise<[DevProtocolInstance, IPolicyInstance]> => {
 		const dev = new DevProtocolInstance(deployer)
 		await dev.generateAddressRegistry()
 		await Promise.all([

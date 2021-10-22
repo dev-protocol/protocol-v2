@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity =0.8.9;
 
-import "../../interface/IL2PropertyFactory.sol";
-import "../../interface/IL2Market.sol";
+import "../../interface/IPropertyFactory.sol";
+import "../../interface/IMarket.sol";
 import "../common/registry/InitializableUsingRegistry.sol";
 import "./Property.sol";
 
 /**
  * A factory contract that creates a new Property contract.
  */
-contract PropertyFactory is InitializableUsingRegistry, IL2PropertyFactory {
+contract PropertyFactory is InitializableUsingRegistry, IPropertyFactory {
 	mapping(address => bool) public override isProperty;
 
 	/**
@@ -51,7 +51,7 @@ contract PropertyFactory is InitializableUsingRegistry, IL2PropertyFactory {
 		string[] memory _args
 	) external override returns (bool) {
 		return
-			IL2Market(_market).authenticateFromPropertyFactory(
+			IMarket(_market).authenticateFromPropertyFactory(
 				_create(_name, _symbol, msg.sender),
 				msg.sender,
 				_args

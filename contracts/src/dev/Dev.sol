@@ -3,7 +3,7 @@ pragma solidity =0.8.9;
 
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlEnumerableUpgradeable.sol";
-import "../../interface/IL2Dev.sol";
+import "../../interface/IDev.sol";
 
 /**
  * The contract used as the DEV token.
@@ -12,7 +12,7 @@ import "../../interface/IL2Dev.sol";
  * Also, mint will be performed based on the Allocator contract.
  * When authenticated a new asset by the Market contracts, DEV token is burned as fees.
  */
-contract Dev is ERC20Upgradeable, AccessControlEnumerableUpgradeable, IL2Dev {
+contract Dev is ERC20Upgradeable, AccessControlEnumerableUpgradeable, IDev {
 	bytes32 public constant override BURNER_ROLE = keccak256("BURNER_ROLE");
 	bytes32 public constant override MINTER_ROLE = keccak256("MINTER_ROLE");
 

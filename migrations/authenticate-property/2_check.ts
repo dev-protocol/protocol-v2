@@ -7,7 +7,7 @@ const handler = async function (deployer, network) {
 	}
 
 	// Check it!!!//////////////////////////////////////////////////////
-	const marketAddress = '0xeb85170bCE4Ea8a9ca0fb5B6620aB74Ef111a50C'
+	const marketAddress = ''
 	/// ////////////////////////////////////////////////////////////////
 
 	const marketInstance = await artifacts.require('Market').at(marketAddress)

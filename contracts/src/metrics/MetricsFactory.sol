@@ -2,16 +2,16 @@
 pragma solidity =0.8.9;
 
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
-import "../../interface/IL2Metrics.sol";
-import "../../interface/IL2MetricsFactory.sol";
-import "../../interface/IL2MarketFactory.sol";
+import "../../interface/IMetrics.sol";
+import "../../interface/IMetricsFactory.sol";
+import "../../interface/IMarketFactory.sol";
 import "../common/registry/InitializableUsingRegistry.sol";
 import "./Metrics.sol";
 
 /**
  * A factory contract for creating new Metrics contracts and logical deletion of Metrics contracts.
  */
-contract MetricsFactory is InitializableUsingRegistry, IL2MetricsFactory {
+contract MetricsFactory is InitializableUsingRegistry, IMetricsFactory {
 	uint256 public override metricsCount;
 	uint256 public override authenticatedPropertiesCount;
 	mapping(address => bool) public override isMetrics;
@@ -34,7 +34,7 @@ contract MetricsFactory is InitializableUsingRegistry, IL2MetricsFactory {
 		 * Validates the sender is included in the Market address set.
 		 */
 		require(
-			IL2MarketFactory(registry().registries("MarketFactory")).isMarket(
+			IMarketFactory(registry().registries("MarketFactory")).isMarket(
 				msg.sender
 			),
 			"this is illegal address"
@@ -68,7 +68,7 @@ contract MetricsFactory is InitializableUsingRegistry, IL2MetricsFactory {
 		 * Validates the sender is included in the Market address set.
 		 */
 		require(
-			IL2MarketFactory(registry().registries("MarketFactory")).isMarket(
+			IMarketFactory(registry().registries("MarketFactory")).isMarket(
 				msg.sender
 			),
 			"this is illegal address"
@@ -78,7 +78,7 @@ contract MetricsFactory is InitializableUsingRegistry, IL2MetricsFactory {
 		 *  Validates the sender is the Market contract associated with the passed Metrics.
 		 */
 		require(
-			msg.sender == IL2Metrics(_metrics).market(),
+			msg.sender == IMetrics(_metrics).market(),
 			"this is illegal address"
 		);
 
@@ -86,7 +86,7 @@ contract MetricsFactory is InitializableUsingRegistry, IL2MetricsFactory {
 		 * Logical deletions a Metrics contract.
 		 */
 		_removeMetrics(_metrics);
-		emit Destroy(msg.sender, IL2Metrics(_metrics).property(), _metrics);
+		emit Destroy(msg.sender, IMetrics(_metrics).property(), _metrics);
 	}
 
 	function metricsCountPerProperty(address _property)
@@ -109,7 +109,7 @@ contract MetricsFactory is InitializableUsingRegistry, IL2MetricsFactory {
 
 	function _addMetrics(address _addr) internal {
 		isMetrics[_addr] = true;
-		address property = IL2Metrics(_addr).property();
+		address property = IMetrics(_addr).property();
 		uint256 countPerProperty = metricsOfProperty_[property].length();
 		if (countPerProperty == 0) {
 			authenticatedPropertiesCount = authenticatedPropertiesCount + 1;
@@ -120,7 +120,7 @@ contract MetricsFactory is InitializableUsingRegistry, IL2MetricsFactory {
 
 	function _removeMetrics(address _addr) internal {
 		isMetrics[_addr] = false;
-		address property = IL2Metrics(_addr).property();
+		address property = IMetrics(_addr).property();
 		uint256 countPerProperty = metricsOfProperty_[property].length();
 		if (countPerProperty == 1) {
 			authenticatedPropertiesCount = authenticatedPropertiesCount - 1;

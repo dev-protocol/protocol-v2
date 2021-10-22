@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity =0.8.9;
 
-import "../../../interface/IL2AddressRegistry.sol";
+import "../../../interface/IAddressRegistry.sol";
 
 /**
  * Module for using AddressRegistry contracts.
@@ -19,8 +19,8 @@ abstract contract UsingRegistry {
 	/**
 	 * Returns the latest AddressRegistry instance.
 	 */
-	function registry() internal view returns (IL2AddressRegistry) {
-		return IL2AddressRegistry(_registry);
+	function registry() internal view returns (IAddressRegistry) {
+		return IAddressRegistry(_registry);
 	}
 
 	/**

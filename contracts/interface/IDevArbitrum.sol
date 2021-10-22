@@ -2,7 +2,7 @@
 // solhint-disable-next-line compiler-version
 pragma solidity ^0.8.0;
 
-interface IL2DevArbitrum {
+interface IDevArbitrum {
 	event BridgeMint(address indexed _account, uint256 _amount);
 	event BridgeBurn(address indexed _account, uint256 _amount);
 	event TxToL1(

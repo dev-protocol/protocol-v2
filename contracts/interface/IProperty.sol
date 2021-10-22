@@ -2,7 +2,7 @@
 // solhint-disable-next-line compiler-version
 pragma solidity ^0.8.0;
 
-interface IL2Property {
+interface IProperty {
 	event ChangeAuthor(address _old, address _new);
 	event ChangeName(string _old, string _new);
 	event ChangeSymbol(string _old, string _new);

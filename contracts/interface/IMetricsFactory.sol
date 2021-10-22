@@ -2,7 +2,7 @@
 // solhint-disable-next-line compiler-version
 pragma solidity ^0.8.0;
 
-interface IL2MetricsFactory {
+interface IMetricsFactory {
 	event Create(
 		address indexed _market,
 		address indexed _property,

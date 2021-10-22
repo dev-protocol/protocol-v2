@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity =0.8.9;
 
-import "../../interface/IL2MarketBehavior.sol";
-import "../../interface/IL2Market.sol";
+import "../../interface/IMarketBehavior.sol";
+import "../../interface/IMarket.sol";
 import "../../src/common/registry/UsingRegistry.sol";
 
-contract MarketTest2 is IL2MarketBehavior, UsingRegistry {
+contract MarketTest2 is IMarketBehavior, UsingRegistry {
 	string public override schema = "[]";
 	address public override associatedMarket;
 	mapping(address => string) internal keys;
@@ -28,7 +28,7 @@ contract MarketTest2 is IL2MarketBehavior, UsingRegistry {
 		require(msg.sender == associatedMarket, "Invalid sender");
 
 		bytes32 idHash = keccak256(abi.encodePacked(_args[0]));
-		address _metrics = IL2Market(msg.sender).authenticatedCallback(
+		address _metrics = IMarket(msg.sender).authenticatedCallback(
 			_prop,
 			idHash
 		);

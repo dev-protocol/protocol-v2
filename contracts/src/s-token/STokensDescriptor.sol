@@ -4,6 +4,7 @@ pragma solidity =0.8.9;
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@devprotocol/util-contracts/contracts/utils/AddressLib.sol";
 import "@devprotocol/util-contracts/contracts/utils/Base64.sol";
+import "../../interface/ISTokensManager.sol";
 
 contract STokensDescriptor {
 	using Base64 for bytes;
