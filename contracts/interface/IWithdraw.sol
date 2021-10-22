@@ -2,7 +2,7 @@
 // solhint-disable-next-line compiler-version
 pragma solidity ^0.8.0;
 
-interface IL2Withdraw {
+interface IWithdraw {
 	event PropertyTransfer(
 		address indexed _property,
 		address _from,

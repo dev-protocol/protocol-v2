@@ -2,22 +2,22 @@
 pragma solidity =0.8.9;
 
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
-import "../../interface/IL2Property.sol";
-import "../../interface/IL2Market.sol";
-import "../../interface/IL2MarketBehavior.sol";
-import "../../interface/IL2Policy.sol";
-import "../../interface/IL2Metrics.sol";
-import "../../interface/IL2MetricsFactory.sol";
-import "../../interface/IL2Lockup.sol";
-import "../../interface/IL2Dev.sol";
-import "../../interface/IL2DevBridge.sol";
+import "../../interface/IProperty.sol";
+import "../../interface/IMarket.sol";
+import "../../interface/IMarketBehavior.sol";
+import "../../interface/IPolicy.sol";
+import "../../interface/IMetrics.sol";
+import "../../interface/IMetricsFactory.sol";
+import "../../interface/ILockup.sol";
+import "../../interface/IDev.sol";
+import "../../interface/IDevBridge.sol";
 import "../common/registry/UsingRegistry.sol";
 
 /**
  * A user-proposable contract for authenticating and associating assets with Property.
- * A user deploys a contract that inherits IL2MarketBehavior and creates this Market contract with the MarketFactory contract.
+ * A user deploys a contract that inherits IMarketBehavior and creates this Market contract with the MarketFactory contract.
  */
-contract Market is UsingRegistry, IL2Market {
+contract Market is UsingRegistry, IMarket {
 	EnumerableSet.AddressSet private authenticatedProperties;
 	bool public override enabled;
 	address public override behavior;
@@ -53,7 +53,7 @@ contract Market is UsingRegistry, IL2Market {
 		 * Sets the period during which voting by voters can be accepted.
 		 * This period is determined by `Policy.marketVotingSeconds`.
 		 */
-		uint256 marketVotingSeconds = IL2Policy(registry().registries("Policy"))
+		uint256 marketVotingSeconds = IPolicy(registry().registries("Policy"))
 			.marketVotingSeconds();
 		votingEndTimestamp = block.timestamp + marketVotingSeconds;
 	}
@@ -63,7 +63,7 @@ contract Market is UsingRegistry, IL2Market {
 	 */
 	function propertyValidation(address _prop) private view {
 		require(
-			msg.sender == IL2Property(_prop).author(),
+			msg.sender == IProperty(_prop).author(),
 			"this is illegal address"
 		);
 		require(enabled, "market is not enabled");
@@ -81,7 +81,7 @@ contract Market is UsingRegistry, IL2Market {
 	 * Modifier for validates the sender is the author of the Property associated with the passed Metrics contract.
 	 */
 	modifier onlyLinkedPropertyAuthor(address _metrics) {
-		address _prop = IL2Metrics(_metrics).property();
+		address _prop = IMetrics(_metrics).property();
 		propertyValidation(_prop);
 		_;
 	}
@@ -136,7 +136,7 @@ contract Market is UsingRegistry, IL2Market {
 	}
 
 	/**
-	 * Bypass to IL2MarketBehavior.authenticate.
+	 * Bypass to IMarketBehavior.authenticate.
 	 * Authenticates the new asset and proves that the Property author is the owner of the asset.
 	 */
 	function _authenticate(
@@ -144,7 +144,7 @@ contract Market is UsingRegistry, IL2Market {
 		address _author,
 		string[] memory _args
 	) private returns (bool) {
-		return IL2MarketBehavior(behavior).authenticate(_prop, _args, _author);
+		return IMarketBehavior(behavior).authenticate(_prop, _args, _author);
 	}
 
 	/**
@@ -157,10 +157,10 @@ contract Market is UsingRegistry, IL2Market {
 		view
 		returns (uint256)
 	{
-		uint256 tokenValue = IL2Lockup(registry().registries("Lockup"))
+		uint256 tokenValue = ILockup(registry().registries("Lockup"))
 			.totalLockedForProperty(_property);
-		IL2Policy policy = IL2Policy(registry().registries("Policy"));
-		IL2MetricsFactory metricsFactory = IL2MetricsFactory(
+		IPolicy policy = IPolicy(registry().registries("Policy"));
+		IMetricsFactory metricsFactory = IMetricsFactory(
 			registry().registries("MetricsFactory")
 		);
 		return
@@ -177,7 +177,7 @@ contract Market is UsingRegistry, IL2Market {
 		returns (address)
 	{
 		/**
-		 * Validates the sender is the saved IL2MarketBehavior address.
+		 * Validates the sender is the saved IMarketBehavior address.
 		 */
 		require(msg.sender == behavior, "this is illegal address");
 		require(enabled, "market is not enabled");
@@ -191,12 +191,12 @@ contract Market is UsingRegistry, IL2Market {
 		/**
 		 * Gets the Property author address.
 		 */
-		address sender = IL2Property(_property).author();
+		address sender = IProperty(_property).author();
 
 		/**
 		 * Publishes a new Metrics contract and associate the Property with the asset.
 		 */
-		IL2MetricsFactory metricsFactory = IL2MetricsFactory(
+		IMetricsFactory metricsFactory = IMetricsFactory(
 			registry().registries("MetricsFactory")
 		);
 		address metrics = metricsFactory.create(_property);
@@ -207,7 +207,7 @@ contract Market is UsingRegistry, IL2Market {
 		 */
 		uint256 authenticationFee = getAuthenticationFee(_property);
 		require(
-			IL2DevBridge(registry().registries("DevBridge")).burn(
+			IDevBridge(registry().registries("DevBridge")).burn(
 				sender,
 				authenticationFee
 			),
@@ -244,7 +244,7 @@ contract Market is UsingRegistry, IL2Market {
 		/**
 		 * Removes the passed Metrics contract from the Metrics address set.
 		 */
-		IL2MetricsFactory metricsFactory = IL2MetricsFactory(
+		IMetricsFactory metricsFactory = IMetricsFactory(
 			registry().registries("MetricsFactory")
 		);
 		metricsFactory.destroy(_metrics);
@@ -252,22 +252,22 @@ contract Market is UsingRegistry, IL2Market {
 		/**
 		 * Subtracts the number of authenticated assets in this Market.
 		 */
-		address property = IL2Metrics(_metrics).property();
+		address property = IMetrics(_metrics).property();
 		authenticatedProperties.remove(property);
 	}
 
 	/**
-	 * Bypass to IL2MarketBehavior.name.
+	 * Bypass to IMarketBehavior.name.
 	 */
 	function name() external view override returns (string memory) {
-		return IL2MarketBehavior(behavior).name();
+		return IMarketBehavior(behavior).name();
 	}
 
 	/**
-	 * Bypass to IL2MarketBehavior.schema.
+	 * Bypass to IMarketBehavior.schema.
 	 */
 	function schema() external view override returns (string memory) {
-		return IL2MarketBehavior(behavior).schema();
+		return IMarketBehavior(behavior).schema();
 	}
 
 	/**

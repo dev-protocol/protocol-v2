@@ -2,9 +2,10 @@
 pragma solidity =0.8.9;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "../../interface/IL2Withdraw.sol";
-import "../../interface/IL2Property.sol";
-import "../../interface/IL2Policy.sol";
+import "../../interface/IWithdraw.sol";
+import "../../interface/IProperty.sol";
+import "../../interface/IPropertyFactory.sol";
+import "../../interface/IPolicy.sol";
 import "../common/registry/UsingRegistry.sol";
 
 /**
@@ -12,7 +13,7 @@ import "../common/registry/UsingRegistry.sol";
  * Property contract inherits ERC20.
  * Holders of Property contracts(tokens) receive holder rewards according to their share.
  */
-contract Property is ERC20, UsingRegistry, IL2Property {
+contract Property is ERC20, UsingRegistry, IProperty {
 	uint8 private constant PROPERTY_DECIMALS = 18;
 	uint8 private __decimals;
 	uint256 private constant SUPPLY = 10000000000000000000000000;
@@ -55,7 +56,7 @@ contract Property is ERC20, UsingRegistry, IL2Property {
 		/**
 		 * Mints to the author and  treasury contract.
 		 */
-		IL2Policy policy = IL2Policy(registry().registries("Policy"));
+		IPolicy policy = IPolicy(registry().registries("Policy"));
 		uint256 toTreasury = policy.shareOfTreasury(SUPPLY);
 		uint256 toAuthor = SUPPLY - toTreasury;
 		require(toAuthor != 0, "share of author is 0");
@@ -168,7 +169,7 @@ contract Property is ERC20, UsingRegistry, IL2Property {
 		 * Calls Withdraw contract via Allocator contract.
 		 * Passing through the Allocator contract is due to the historical reason for the old Property contract.
 		 */
-		IL2Withdraw(registry().registries("Withdraw")).beforeBalanceChange(
+		IWithdraw(registry().registries("Withdraw")).beforeBalanceChange(
 			msg.sender,
 			_to
 		);
@@ -202,7 +203,7 @@ contract Property is ERC20, UsingRegistry, IL2Property {
 		 * Calls Withdraw contract via Allocator contract.
 		 * Passing through the Allocator contract is due to the historical reason for the old Property contract.
 		 */
-		IL2Withdraw(registry().registries("Withdraw")).beforeBalanceChange(
+		IWithdraw(registry().registries("Withdraw")).beforeBalanceChange(
 			_from,
 			_to
 		);

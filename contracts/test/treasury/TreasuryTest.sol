@@ -3,7 +3,8 @@ pragma solidity =0.8.9;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import "../../interface/IL2Withdraw.sol";
+import "../../interface/IWithdraw.sol";
+import "../../interface/IAddressRegistry.sol";
 import "../../src/common/registry/InitializableUsingRegistry.sol";
 
 contract TreasuryTest is OwnableUpgradeable, InitializableUsingRegistry {
@@ -16,7 +17,7 @@ contract TreasuryTest is OwnableUpgradeable, InitializableUsingRegistry {
 	}
 
 	function withdraw(address _property) external {
-		IL2Withdraw(registry().registries("Withdraw")).withdraw(_property);
+		IWithdraw(registry().registries("Withdraw")).withdraw(_property);
 	}
 
 	function transfer() external onlyOwner returns (bool) {

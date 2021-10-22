@@ -2,7 +2,7 @@
 // solhint-disable-next-line compiler-version
 pragma solidity ^0.8.0;
 
-interface IL2Lockup {
+interface ILockup {
 	struct RewardPrices {
 		uint256 reward;
 		uint256 holders;

@@ -2,18 +2,18 @@
 pragma solidity =0.8.9;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "../../interface/IL2DevBridge.sol";
-import "../../interface/IL2Withdraw.sol";
-import "../../interface/IL2Lockup.sol";
-import "../../interface/IL2MetricsFactory.sol";
-import "../../interface/IL2PropertyFactory.sol";
+import "../../interface/IDevBridge.sol";
+import "../../interface/IWithdraw.sol";
+import "../../interface/ILockup.sol";
+import "../../interface/IMetricsFactory.sol";
+import "../../interface/IPropertyFactory.sol";
 import "../common/libs/Decimals.sol";
 import "../common/registry/InitializableUsingRegistry.sol";
 
 /**
  * A contract that manages the withdrawal of holder rewards for Property holders.
  */
-contract Withdraw is InitializableUsingRegistry, IL2Withdraw {
+contract Withdraw is InitializableUsingRegistry, IWithdraw {
 	mapping(address => mapping(address => uint256))
 		public lastWithdrawnRewardPrice; // {Property: {User: Value}} // From [get/set]StorageLastWithdrawnReward
 	mapping(address => mapping(address => uint256))
@@ -39,7 +39,7 @@ contract Withdraw is InitializableUsingRegistry, IL2Withdraw {
 		 * the passed Property address is included the Property address set.
 		 */
 		require(
-			IL2PropertyFactory(registry().registries("PropertyFactory"))
+			IPropertyFactory(registry().registries("PropertyFactory"))
 				.isProperty(_property),
 			"this is illegal address"
 		);
@@ -75,7 +75,7 @@ contract Withdraw is InitializableUsingRegistry, IL2Withdraw {
 		 * Mints the holder reward.
 		 */
 		require(
-			IL2DevBridge(registry().registries("DevBridge")).mint(
+			IDevBridge(registry().registries("DevBridge")).mint(
 				msg.sender,
 				value
 			),
@@ -85,7 +85,7 @@ contract Withdraw is InitializableUsingRegistry, IL2Withdraw {
 		/**
 		 * Since the total supply of tokens has changed, updates the latest maximum mint amount.
 		 */
-		IL2Lockup lockup = IL2Lockup(registry().registries("Lockup"));
+		ILockup lockup = ILockup(registry().registries("Lockup"));
 		lockup.update();
 
 		/**
@@ -106,7 +106,7 @@ contract Withdraw is InitializableUsingRegistry, IL2Withdraw {
 		 * Validates the sender is Allocator contract.
 		 */
 		require(
-			IL2PropertyFactory(registry().registries("PropertyFactory"))
+			IPropertyFactory(registry().registries("PropertyFactory"))
 				.isProperty(msg.sender),
 			"this is illegal address"
 		);
@@ -167,7 +167,7 @@ contract Withdraw is InitializableUsingRegistry, IL2Withdraw {
 			uint256 _allReward
 		)
 	{
-		IL2Lockup lockup = IL2Lockup(registry().registries("Lockup"));
+		ILockup lockup = ILockup(registry().registries("Lockup"));
 		/**
 		 * Gets the latest reward.
 		 */
@@ -254,8 +254,9 @@ contract Withdraw is InitializableUsingRegistry, IL2Withdraw {
 		 * If the passed Property has not authenticated, returns always 0.
 		 */
 		if (
-			IL2MetricsFactory(registry().registries("MetricsFactory"))
-				.hasAssets(_property) == false
+			IMetricsFactory(registry().registries("MetricsFactory")).hasAssets(
+				_property
+			) == false
 		) {
 			return (0, price, cap, 0);
 		}

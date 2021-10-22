@@ -2,7 +2,7 @@
 // solhint-disable-next-line compiler-version
 pragma solidity ^0.8.0;
 
-interface IL2PolicyFactory {
+interface IPolicyFactory {
 	event Create(address indexed _from, address _policy);
 
 	function create(address _newPolicyAddress) external;

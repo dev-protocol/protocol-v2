@@ -2,7 +2,7 @@
 pragma solidity =0.8.9;
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import "../../../interface/IL2AddressRegistry.sol";
+import "../../../interface/IAddressRegistry.sol";
 
 /**
  * Module for using AddressRegistry contracts.
@@ -24,8 +24,8 @@ abstract contract InitializableUsingRegistry is Initializable {
 	/**
 	 * Returns the latest AddressRegistry instance.
 	 */
-	function registry() internal view returns (IL2AddressRegistry) {
-		return IL2AddressRegistry(_registry);
+	function registry() internal view returns (IAddressRegistry) {
+		return IAddressRegistry(_registry);
 	}
 
 	/**
