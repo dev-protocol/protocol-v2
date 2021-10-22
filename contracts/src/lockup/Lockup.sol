@@ -76,9 +76,8 @@ contract Lockup is IL2Lockup, InitializableUsingRegistry {
 	 */
 	modifier onlyAuthenticatedProperty(address _property) {
 		require(
-			IL2MetricsFactory(registry().registries("MetricsFactory")).hasAssets(
-				_property
-			),
+			IL2MetricsFactory(registry().registries("MetricsFactory"))
+				.hasAssets(_property),
 			"unable to stake to unauthenticated property"
 		);
 		_;
@@ -613,9 +612,8 @@ contract Lockup is IL2Lockup, InitializableUsingRegistry {
 		 * If the passed Property has not authenticated, returns always 0.
 		 */
 		if (
-			IL2MetricsFactory(registry().registries("MetricsFactory")).hasAssets(
-				positions.property
-			) == false
+			IL2MetricsFactory(registry().registries("MetricsFactory"))
+				.hasAssets(positions.property) == false
 		) {
 			return (0, RewardPrices(0, 0, 0, 0));
 		}

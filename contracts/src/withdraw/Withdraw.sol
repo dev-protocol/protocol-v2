@@ -254,9 +254,8 @@ contract Withdraw is InitializableUsingRegistry, IL2Withdraw {
 		 * If the passed Property has not authenticated, returns always 0.
 		 */
 		if (
-			IL2MetricsFactory(registry().registries("MetricsFactory")).hasAssets(
-				_property
-			) == false
+			IL2MetricsFactory(registry().registries("MetricsFactory"))
+				.hasAssets(_property) == false
 		) {
 			return (0, price, cap, 0);
 		}
