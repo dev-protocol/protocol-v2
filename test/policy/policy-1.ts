@@ -1,10 +1,14 @@
-import { Policy1Instance } from '../../types/truffle-contracts'
+import {
+	Policy1Instance,
+	CurveTestInstance,
+} from '../../types/truffle-contracts'
 import { DevProtocolInstance } from '../test-lib/instance'
 import { toBigNumber } from '../test-lib/utils/common'
 import BigNumber from 'bignumber.js'
 
 contract('Policy1', ([deployer]) => {
 	let policy: Policy1Instance
+	let curve: CurveTestInstance
 	let dev: DevProtocolInstance
 
 	before(async () => {
@@ -16,99 +20,71 @@ contract('Policy1', ([deployer]) => {
 		await dev.generateLockup()
 		await dev.dev.mint(deployer, new BigNumber(1e18).times(10000000))
 		policy = await artifacts.require('Policy1').new(dev.addressRegistry.address)
+		curve = await artifacts.require('CurveTest').new()
 	})
 
 	describe('Policy1; rewards', () => {
-		const rewards = (stake: BigNumber, _asset: BigNumber): BigNumber => {
-			// Rewards = Max*(1-StakingRate)^((12-(StakingRate*10))/2+1)
-			const totalSupply = new BigNumber(1e18).times(10000000)
-			const stakingRate = new BigNumber(stake).div(totalSupply)
-			const asset = _asset.times(new BigNumber(1).minus(stakingRate))
-			const max = new BigNumber('132000000000000').div(15).times(asset)
-			const _d = new BigNumber(1).minus(stakingRate)
-			const _p = new BigNumber(12).minus(stakingRate.times(10)).div(2).plus(1)
-			const p = ~~_p.toNumber()
-			const rp = p + 1
-			const f = _p.minus(p)
-			const d1 = _d.pow(p)
-			const d2 = _d.pow(rp)
-			const g = d1.minus(d2).times(f)
-			const d = d1.minus(g)
-			const expected = new BigNumber(max).times(d)
-			return expected.integerValue(BigNumber.ROUND_DOWN)
+		const max = new BigNumber('132000000000000').div(15).integerValue()
+		const totalSupply = new BigNumber(1e18).times(10000000)
+		const createRandom = () => {
+			const staked = totalSupply.times(Math.random()).integerValue()
+			const assets = new BigNumber(Math.random()).times(1e4).integerValue()
+			return [staked.toFixed(), assets.toFixed()]
 		}
 
-		it('Returns the total number of mint per block when the total number of lockups and the total number of assets is passed', async () => {
-			const stake = new BigNumber(1e18).times(220000)
-			const result = await policy.rewards(stake, 1)
-			const expected = rewards(stake, new BigNumber(1))
-			expect(result.toString()).to.be.equal(expected.toString())
-		})
-		it('Returns 0.0000088 when zero staked and one asset', async () => {
-			const result = await policy.rewards(0, 1)
-			expect(result.toString()).to.be.equal('8800000000000')
-			expect(
-				new BigNumber(result.toString()).div(new BigNumber(1e18)).toString()
-			).to.be.equal('0.0000088')
-		})
-		it('Depends staking rate, decrease the impact of assets', async () => {
-			const assets = new BigNumber(2000)
-			const natural = (i: BigNumber): BigNumber => i.div(new BigNumber(1e18))
-			const per1010 = new BigNumber(1e18).times(1010000)
-			const per2170 = new BigNumber(1e18).times(2170000)
-			const per9560 = new BigNumber(1e18).times(9560000)
-			const result1 = await policy.rewards(per1010, assets).then(toBigNumber)
-			const result2 = await policy.rewards(per2170, assets).then(toBigNumber)
-			const result3 = await policy.rewards(per9560, assets).then(toBigNumber)
+		it('Correct curve', async () => {
+			const random1 = createRandom()
+			const random2 = createRandom()
+			const random3 = createRandom()
+			const random4 = createRandom()
+			const random5 = createRandom()
+			const random6 = createRandom()
+			console.log({ random1, random2, random3, random4, random5, random6 })
 
-			expect(result1.toString()).to.be.equal('7935173026534157')
-			expect(result2.toString()).to.be.equal('3250550847356926')
-			expect(result3.toString()).to.be.equal('1183918579712')
-			expect(natural(result1).toString()).to.be.equal('0.007935173026534157')
-			expect(natural(result2).toString()).to.be.equal('0.003250550847356926')
-			expect(natural(result3).toString()).to.be.equal('0.000001183918579712')
-			expect(rewards(per1010, assets).toString()).to.be.equal(
-				'7935173026534157'
-			)
-			expect(rewards(per2170, assets).toString()).to.be.equal(
-				'3250550847356926'
-			)
-			expect(rewards(per9560, assets).toString()).to.be.equal('1183918579712')
-		})
-		it('Will be correct curve', async () => {
-			const one = new BigNumber(1)
-			const natural = (i: BigNumber): BigNumber => i.div(new BigNumber(1e18))
-			const per199 = new BigNumber(1e18).times(1990000)
-			const per200 = new BigNumber(1e18).times(2000000)
-			const per201 = new BigNumber(1e18).times(2010000)
-			const result1 = await policy.rewards(per199, 1).then(toBigNumber)
-			const result2 = await policy.rewards(per200, 1).then(toBigNumber)
-			const result3 = await policy.rewards(per201, 1).then(toBigNumber)
+			const result1 = await policy
+				.rewards(random1[0], random1[1])
+				.then(toBigNumber)
+			const result2 = await policy
+				.rewards(random2[0], random2[1])
+				.then(toBigNumber)
+			const result3 = await policy
+				.rewards(random3[0], random3[1])
+				.then(toBigNumber)
+			const result4 = await policy
+				.rewards(random4[0], random4[1])
+				.then(toBigNumber)
+			const result5 = await policy
+				.rewards(random5[0], random5[1])
+				.then(toBigNumber)
+			const result6 = await policy
+				.rewards(random6[0], random6[1])
+				.then(toBigNumber)
 
-			expect(result1.toString()).to.be.equal('1859850117979')
-			expect(result2.toString()).to.be.equal('1845493760000')
-			expect(result3.toString()).to.be.equal('1831707186636')
-			expect(natural(result1).toString()).to.be.equal('0.000001859850117979')
-			expect(natural(result2).toString()).to.be.equal('0.00000184549376')
-			expect(natural(result3).toString()).to.be.equal('0.000001831707186636')
-			expect(rewards(per199, one).toString()).to.be.equal('1859850117979')
-			expect(rewards(per200, one).toString()).to.be.equal('1845493760000')
-			expect(rewards(per201, one).toString()).to.be.equal('1831707186636')
-		})
-		it('When a number of stakes are 0', async () => {
-			const result = await policy.rewards(0, 99999)
-			const expected = rewards(new BigNumber(0), new BigNumber(99999))
-			expect(result.toString()).to.be.equal(expected.toString())
-		})
-		it('Returns 0 when the number of assets is 0', async () => {
-			const stake = new BigNumber(1e18).times(220000)
-			const result = await policy.rewards(stake, 0)
-			expect(result.toString()).to.be.equal('0')
-		})
-		it('Returns 0 when the staking rate is 100%', async () => {
-			const stake = new BigNumber(1e18).times(10000000)
-			const result = await policy.rewards(stake, 99999)
-			expect(result.toString()).to.be.equal('0')
+			const expected1 = await curve
+				.curveRewardsTest(random1[0], random1[1], totalSupply, max)
+				.then(toBigNumber)
+			const expected2 = await curve
+				.curveRewardsTest(random2[0], random2[1], totalSupply, max)
+				.then(toBigNumber)
+			const expected3 = await curve
+				.curveRewardsTest(random3[0], random3[1], totalSupply, max)
+				.then(toBigNumber)
+			const expected4 = await curve
+				.curveRewardsTest(random4[0], random4[1], totalSupply, max)
+				.then(toBigNumber)
+			const expected5 = await curve
+				.curveRewardsTest(random5[0], random5[1], totalSupply, max)
+				.then(toBigNumber)
+			const expected6 = await curve
+				.curveRewardsTest(random6[0], random6[1], totalSupply, max)
+				.then(toBigNumber)
+
+			expect(result1.toString()).to.be.equal(expected1.toString())
+			expect(result2.toString()).to.be.equal(expected2.toString())
+			expect(result3.toString()).to.be.equal(expected3.toString())
+			expect(result4.toString()).to.be.equal(expected4.toString())
+			expect(result5.toString()).to.be.equal(expected5.toString())
+			expect(result6.toString()).to.be.equal(expected6.toString())
 		})
 	})
 	describe('Policy1; holdersShare', () => {
