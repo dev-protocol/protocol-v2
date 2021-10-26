@@ -150,8 +150,6 @@ contract Withdraw is InitializableUsingRegistry, IWithdraw {
 		 */
 		pendingWithdrawal[msg.sender][_from] = pendFrom + amountFrom;
 		pendingWithdrawal[msg.sender][_to] = pendTo + amountTo;
-
-		emit PropertyTransfer(msg.sender, _from, _to);
 	}
 
 	/**

@@ -39,20 +39,20 @@ contract('MarketFactoryTest', ([deployer, user, dummyMarketAddress]) => {
 	describe('MarketFactory; create', () => {
 		it('Create a new market contract and emit create event telling created market address,', async () => {
 			const [, market, marketBehavior] = await init()
-			// eslint-disable-next-line @typescript-eslint/await-thenable
+
 			const deployedMarket = await marketContract.at(market)
 			const behaviorAddress = await deployedMarket.behavior({ from: deployer })
 			expect(behaviorAddress).to.be.equal(marketBehavior)
 		})
 		it('A freshly created market is enabled,', async () => {
 			const [, market] = await init()
-			// eslint-disable-next-line @typescript-eslint/await-thenable
+
 			const deployedMarket = await marketContract.at(market)
 			expect(await deployedMarket.enabled()).to.be.equal(true)
 		})
 		it('A secoundly created market is not enabled,', async () => {
 			const [dev, market] = await init()
-			// eslint-disable-next-line @typescript-eslint/await-thenable
+
 			const deployedMarket = await marketContract.at(market)
 			expect(await deployedMarket.enabled()).to.be.equal(true)
 		})
@@ -68,7 +68,7 @@ contract('MarketFactoryTest', ([deployer, user, dummyMarketAddress]) => {
 				from: user,
 			})
 			const secoundMarketAddress = getMarketAddress(result)
-			// eslint-disable-next-line @typescript-eslint/await-thenable
+
 			const deployedMarket = await marketContract.at(secoundMarketAddress)
 			expect(await deployedMarket.enabled()).to.be.equal(false)
 		})
@@ -122,7 +122,7 @@ contract('MarketFactoryTest', ([deployer, user, dummyMarketAddress]) => {
 				})
 				const secoundMarketAddress = getMarketAddress(result)
 				await dev.marketFactory.enable(secoundMarketAddress)
-				// eslint-disable-next-line @typescript-eslint/await-thenable
+
 				const deployedMarket = await marketContract.at(secoundMarketAddress)
 				expect(await deployedMarket.enabled()).to.be.equal(true)
 			})

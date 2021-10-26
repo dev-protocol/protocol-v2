@@ -32,7 +32,7 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 
 		it('Create a new property contract and emit Create event', async () => {
 			const [, property] = await init()
-			// eslint-disable-next-line @typescript-eslint/await-thenable
+
 			const deployedProperty = await artifacts.require('Property').at(property)
 			const name = await deployedProperty.name({ from: user2 })
 			const symbol = await deployedProperty.symbol({ from: user2 })
