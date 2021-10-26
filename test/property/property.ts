@@ -11,22 +11,110 @@ contract(
 	'PropertyTest',
 	([deployer, author, user, propertyFactory, lockup, transfer, nextAuthor]) => {
 		const propertyContract = artifacts.require('Property')
-		describe('Property; constructor', () => {
+		const init = async (): Promise<DevProtocolInstance> => {
 			const dev = new DevProtocolInstance(deployer)
-			before(async () => {
-				await dev.generateAddressRegistry()
-				await dev.generateDev()
-				await dev.generateDevBridge()
-				await dev.generateSTokensManager()
-				await dev.generatePolicyFactory()
-				await dev.generateLockup()
-				await dev.generateMetricsFactory()
-				await dev.generatePolicy()
-				await dev.generateTreasury()
-				await dev.setCapSetter()
-				await dev.updateCap()
+			await dev.generateAddressRegistry()
+			await dev.generateDev()
+			await dev.generateDevBridge()
+			await dev.generateSTokensManager()
+			await dev.generatePolicyFactory()
+			await dev.generateLockup()
+			await dev.generateMetricsFactory()
+			await dev.generatePolicy()
+			await dev.generateTreasury()
+			await dev.setCapSetter()
+			await dev.updateCap()
+
+			return dev
+		}
+
+		describe('Property; getBalances', () => {
+			it('author and treasury hold the balance.', async () => {
+				const dev = await init()
+				await dev.generatePropertyFactory()
+				const transaction = await dev.propertyFactory.create(
+					'sample',
+					'SAMPLE',
+					author
+				)
+				const propertyAddress = getPropertyAddress(transaction)
+				const propertyInstance = await propertyContract.at(propertyAddress)
+				const balances = await propertyInstance.getBalances()
+				expect(balances[0].account).to.be.equal(author)
+				expect(balances[0].balance.toString()).to.be.equal(
+					'9500000000000000000000000'
+				)
+				expect(balances[1].account).to.be.equal(dev.treasury.address)
+				expect(balances[1].balance.toString()).to.be.equal(
+					'500000000000000000000000'
+				)
 			})
+			it('The balance will be transferred(transfer).', async () => {
+				const dev = await init()
+				await dev.generatePropertyFactory()
+				await dev.generateWithdraw()
+				const transaction = await dev.propertyFactory.create(
+					'sample',
+					'SAMPLE',
+					author
+				)
+				const propertyAddress = getPropertyAddress(transaction)
+				const propertyInstance = await propertyContract.at(propertyAddress)
+				await propertyInstance.transfer(user, '500000000000000000000000', {
+					from: author,
+				})
+				const balances = await propertyInstance.getBalances()
+				expect(balances[0].account).to.be.equal(author)
+				expect(balances[0].balance.toString()).to.be.equal(
+					'9000000000000000000000000'
+				)
+				expect(balances[1].account).to.be.equal(dev.treasury.address)
+				expect(balances[1].balance.toString()).to.be.equal(
+					'500000000000000000000000'
+				)
+				expect(balances[2].account).to.be.equal(user)
+				expect(balances[2].balance.toString()).to.be.equal(
+					'500000000000000000000000'
+				)
+			})
+			it('The balance will be transferred(transferFrom).', async () => {
+				const dev = await init()
+				await dev.generatePropertyFactory()
+				await dev.generateWithdraw()
+				const transaction = await dev.propertyFactory.create(
+					'sample',
+					'SAMPLE',
+					author
+				)
+				const propertyAddress = getPropertyAddress(transaction)
+				const propertyInstance = await propertyContract.at(propertyAddress)
+				await propertyInstance.approve(deployer, '500000000000000000000000', {
+					from: author,
+				})
+				await propertyInstance.transferFrom(
+					author,
+					user,
+					'500000000000000000000000'
+				)
+				const balances = await propertyInstance.getBalances()
+				expect(balances[0].account).to.be.equal(author)
+				expect(balances[0].balance.toString()).to.be.equal(
+					'9000000000000000000000000'
+				)
+				expect(balances[1].account).to.be.equal(dev.treasury.address)
+				expect(balances[1].balance.toString()).to.be.equal(
+					'500000000000000000000000'
+				)
+				expect(balances[2].account).to.be.equal(user)
+				expect(balances[2].balance.toString()).to.be.equal(
+					'500000000000000000000000'
+				)
+			})
+		})
+
+		describe('Property; constructor', () => {
 			it('Cannot be created from other than factory', async () => {
+				const dev = await init()
 				const result = await propertyContract
 					.new(dev.addressRegistry.address, author, 'sample', 'SAMPLE', {
 						from: deployer,
@@ -35,6 +123,7 @@ contract(
 				validateAddressErrorMessage(result)
 			})
 			it('The author, decimal places, and number of issues are fixed values', async () => {
+				const dev = await init()
 				await dev.addressRegistry.setRegistry(
 					'PropertyFactory',
 					propertyFactory
@@ -71,21 +160,8 @@ contract(
 			})
 		})
 		describe('Property; changeAuthor', () => {
-			const dev = new DevProtocolInstance(deployer)
-			before(async () => {
-				await dev.generateAddressRegistry()
-				await dev.generateDev()
-				await dev.generateDevBridge()
-				await dev.generateSTokensManager()
-				await dev.generatePolicyFactory()
-				await dev.generateLockup()
-				await dev.generateMetricsFactory()
-				await dev.generatePolicy()
-				await dev.generateTreasury()
-				await dev.setCapSetter()
-				await dev.updateCap()
-			})
 			it('Executing a changeAuthor function with a non-Author.', async () => {
+				const dev = await init()
 				await dev.addressRegistry.setRegistry(
 					'PropertyFactory',
 					propertyFactory
@@ -105,6 +181,7 @@ contract(
 				validateErrorMessage(result, 'illegal sender')
 			})
 			it('Author is changed.', async () => {
+				const dev = await init()
 				await dev.generatePropertyFactory()
 				const transaction = await dev.propertyFactory.create(
 					'sample',
@@ -120,6 +197,8 @@ contract(
 				expect(await propertyInstance.author()).to.be.equal(nextAuthor)
 			})
 			it('Should emit ChangeAuthor event', async () => {
+				const dev = await init()
+				await dev.generatePropertyFactory()
 				await dev.addressRegistry.setRegistry(
 					'PropertyFactory',
 					propertyFactory
@@ -143,21 +222,8 @@ contract(
 			})
 		})
 		describe('Property; changeName', () => {
-			const dev = new DevProtocolInstance(deployer)
-			before(async () => {
-				await dev.generateAddressRegistry()
-				await dev.generateDev()
-				await dev.generateDevBridge()
-				await dev.generateSTokensManager()
-				await dev.generateLockup()
-				await dev.generatePolicyFactory()
-				await dev.generateMetricsFactory()
-				await dev.generatePolicy()
-				await dev.generateTreasury()
-				await dev.setCapSetter()
-				await dev.updateCap()
-			})
 			it('Should fail to call when the sender is not author', async () => {
+				const dev = await init()
 				await dev.addressRegistry.setRegistry(
 					'PropertyFactory',
 					propertyFactory
@@ -177,6 +243,7 @@ contract(
 				validateErrorMessage(result, 'illegal sender')
 			})
 			it('Change the name', async () => {
+				const dev = await init()
 				await dev.generatePropertyFactory()
 				const transaction = await dev.propertyFactory.create(
 					'sample',
@@ -192,6 +259,8 @@ contract(
 				expect(await propertyInstance.name()).to.be.equal('next-name')
 			})
 			it('Should emit ChangeName event', async () => {
+				const dev = await init()
+				await dev.generatePropertyFactory()
 				await dev.addressRegistry.setRegistry(
 					'PropertyFactory',
 					propertyFactory
@@ -215,21 +284,8 @@ contract(
 			})
 		})
 		describe('Property; changeSymbol', () => {
-			const dev = new DevProtocolInstance(deployer)
-			before(async () => {
-				await dev.generateAddressRegistry()
-				await dev.generateDev()
-				await dev.generateDevBridge()
-				await dev.generateSTokensManager()
-				await dev.generateLockup()
-				await dev.generatePolicyFactory()
-				await dev.generateMetricsFactory()
-				await dev.generatePolicy()
-				await dev.generateTreasury()
-				await dev.setCapSetter()
-				await dev.updateCap()
-			})
 			it('Should fail to call when the sender is not author', async () => {
+				const dev = await init()
 				await dev.addressRegistry.setRegistry(
 					'PropertyFactory',
 					propertyFactory
@@ -249,6 +305,7 @@ contract(
 				validateErrorMessage(result, 'illegal sender')
 			})
 			it('Change the symbol', async () => {
+				const dev = await init()
 				await dev.generatePropertyFactory()
 				const transaction = await dev.propertyFactory.create(
 					'sample',
@@ -264,6 +321,8 @@ contract(
 				expect(await propertyInstance.symbol()).to.be.equal('NEXTSYMBOL')
 			})
 			it('Should emit ChangeSymbol event', async () => {
+				const dev = await init()
+				await dev.generatePropertyFactory()
 				await dev.addressRegistry.setRegistry(
 					'PropertyFactory',
 					propertyFactory
