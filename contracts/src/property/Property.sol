@@ -2,6 +2,7 @@
 pragma solidity =0.8.9;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "../../interface/IWithdraw.sol";
 import "../../interface/IProperty.sol";
 import "../../interface/IPropertyFactory.sol";
@@ -20,7 +21,9 @@ contract Property is ERC20, UsingRegistry, IProperty {
 	address private __author;
 	string private __name;
 	string private __symbol;
+	EnumerableSet.AddressSet private holders;
 
+	using EnumerableSet for EnumerableSet.AddressSet;
 	/**
 	 * @dev Initializes the passed value as AddressRegistry address, author address, token name, and token symbol.
 	 * @param _registry AddressRegistry address.
@@ -242,4 +245,37 @@ contract Property is ERC20, UsingRegistry, IProperty {
 		bool result = devToken.transfer(_sender, _value);
 		require(result, "dev transfer failed");
 	}
+
+	/**
+	 * @dev Get the holder and its balance
+	 * @return holder and its balance
+	 */
+	function getBalances() external view override returns (PropertyBalance[] memory){
+		uint256 holderCount = holders.length();
+		PropertyBalance[] memory results = new PropertyBalance[](
+			holderCount
+		);
+		for (uint256 i = 0; i < holderCount; i++) {
+			address holder = holders.at(i);
+			uint256 balance = balanceOf(holder);
+			results[i] = PropertyBalance(holder, balance);
+		}
+		return results;
+	}
+
+	/**
+	 * @dev set folder information
+	 * @param _from sender of the token
+	 * @param _to where to send the token
+	 * @param _amount amount of tokens sent
+	 */
+    function _afterTokenTransfer(
+        address _from,
+        address _to,
+        uint256 _amount
+    ) internal virtual override {
+        super._afterTokenTransfer(_from, _to, _amount);
+		// not burned
+		holders.add(_to);
+    }
 }
