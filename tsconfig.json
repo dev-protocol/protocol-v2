@@ -10,7 +10,7 @@
 		"skipLibCheck": true,
 		"resolveJsonModule": true,
 		"typeRoots": ["./node_modules/@types", "./types"],
-		"types": ["node", "truffle-contracts"]
+		"types": ["node", "truffle-typings"]
 	},
 	"include": ["**/*"]
 }
