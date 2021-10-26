@@ -1,6 +1,3 @@
-
-/* eslint-disable @typescript-eslint/await-thenable */
-
 const handler = async function (deployer, network) {
 	if (network === 'test') {
 		return
@@ -14,7 +11,6 @@ const handler = async function (deployer, network) {
 	await deployer.deploy(policy, regProxyAddress)
 	const instance = await policy.deployed()
 	console.log(`policy address:${instance.address}`)
-
 } as Truffle.Migration
 
 export = handler

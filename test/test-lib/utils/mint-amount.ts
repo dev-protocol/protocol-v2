@@ -12,7 +12,7 @@ async function getWithdrawAmount(
 		.then(toBigNumber)
 	const totalLockedUps = await dev.lockup.totalLocked().then(toBigNumber)
 	const policyAddress = await dev.addressRegistry.registries('Policy')
-	// eslint-disable-next-line @typescript-eslint/await-thenable
+
 	const policyInstance = await artifacts.require('IPolicy').at(policyAddress)
 	const cal = await policyInstance
 		.rewards(totalLockedUps.toFixed(), totalIssuedMetrics.toFixed())

@@ -52,7 +52,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 		await dev.generateTreasury()
 		await dev.setCapSetter()
 		await dev.updateCap()
-		// eslint-disable-next-line @typescript-eslint/await-thenable
+
 		const policy = await artifacts
 			.require('PolicyTestForWithdraw')
 			.at(policyAddress)

@@ -1,6 +1,3 @@
-
-/* eslint-disable @typescript-eslint/await-thenable */
-
 const handler = async function (deployer, network) {
 	if (network === 'test') {
 		return
@@ -16,7 +13,6 @@ const handler = async function (deployer, network) {
 	console.log(properties)
 	const count = await marketInstance.issuedMetrics()
 	console.log(count.toString())
-
 } as Truffle.Migration
 
 export = handler
