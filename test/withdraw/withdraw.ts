@@ -52,7 +52,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 		await dev.generateTreasury()
 		await dev.setCapSetter()
 		await dev.updateCap()
-		// eslint-disable-next-line @typescript-eslint/await-thenable
+
 		const policy = await artifacts
 			.require('PolicyTestForWithdraw')
 			.at(policyAddress)
@@ -450,19 +450,6 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 					.catch((err: Error) => err)
 				validateAddressErrorMessage(res)
 			})
-
-			it('Should emit PropertyTransfer event', async () => {
-				void property.transfer(bob, 1, {
-					from: alice,
-				})
-				const watcher = getEventValue(dev.withdraw)
-				const event = await Promise.all([
-					watcher('PropertyTransfer', '_property'),
-					watcher('PropertyTransfer', '_from'),
-					watcher('PropertyTransfer', '_to'),
-				])
-				expect(event).to.deep.equal([property.address, alice, bob])
-			})
 		})
 		describe('Withdraw; Alice has sent 10% tokens to Bob after 20% tokens sent. Bob has increased from 20% tokens to 30% tokens.', () => {
 			let dev: DevProtocolInstance
@@ -609,34 +596,6 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 					expect(toBigNumber(aliceAmount[0]).toFixed()).to.be.equal('0')
 					expect(toBigNumber(bobAmount[0]).toFixed()).to.be.equal('0')
 				})
-			})
-		})
-
-		describe('Transferring the property creates an event.', () => {
-			let dev: DevProtocolInstance
-			let property: PropertyInstance
-			const alice = deployer
-			const bob = user1
-
-			before(async () => {
-				;[dev, , property] = await init()
-			})
-
-			it(`event is generated`, async () => {
-				const totalSupply = await property.totalSupply().then(toBigNumber)
-				property
-					.transfer(bob, totalSupply.times(0.2), {
-						from: alice,
-					})
-					.catch(console.error)
-				const [_property, _from, _to] = await Promise.all([
-					getEventValue(dev.withdraw)('PropertyTransfer', '_property'),
-					getEventValue(dev.withdraw)('PropertyTransfer', '_from'),
-					getEventValue(dev.withdraw)('PropertyTransfer', '_to'),
-				])
-				expect(_property).to.be.equal(property.address)
-				expect(_from).to.be.equal(alice)
-				expect(_to).to.be.equal(bob)
 			})
 		})
 	})

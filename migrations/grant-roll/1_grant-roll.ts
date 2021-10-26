@@ -1,5 +1,4 @@
 /* eslint-disable new-cap */
-/* eslint-disable @typescript-eslint/await-thenable */
 
 const handler = async function (deployer, network) {
 	if (network === 'test') {
