@@ -177,7 +177,7 @@ contract(
 				await dev.lockup.depositToProperty(propertyAddress, 100000, {
 					from: propertyAuther,
 				})
-				// eslint-disable-next-line @typescript-eslint/await-thenable
+
 				const marketInstance = await marketContract.at(marketAddress1)
 				marketInstance
 					.authenticate(propertyAddress, ['id-key'], {
@@ -189,14 +189,14 @@ contract(
 						resolve(values._metrics)
 					})
 				})
-				// eslint-disable-next-line @typescript-eslint/await-thenable
+
 				const metrics = await artifacts.require('Metrics').at(metricsAddress)
 				expect(await metrics.market()).to.be.equal(marketAddress1)
 				expect(await metrics.property()).to.be.equal(propertyAddress)
 				const tmp = await dev.dev.balanceOf(propertyAuther)
 				expect(tmp.toNumber()).to.be.equal(9999800000)
 				const behavuor = await marketInstance.behavior()
-				// eslint-disable-next-line @typescript-eslint/await-thenable
+
 				const behavuorInstance = await artifacts
 					.require('MarketTest3')
 					.at(behavuor)
@@ -204,13 +204,12 @@ contract(
 				expect(key).to.be.equal('id-key')
 			})
 			it(`The sender's address is passed to Market Behavior.`, async () => {
-				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const marketInstance = await marketContract.at(marketAddress1)
 				await marketInstance.authenticate(propertyAddress, ['id-key'], {
 					from: propertyAuther,
 				})
 				const marketTest3 = artifacts.require('MarketTest3')
-				// eslint-disable-next-line @typescript-eslint/await-thenable
+
 				const marketTest3Instance = await marketTest3.at(
 					await marketInstance.behavior()
 				)
@@ -219,7 +218,6 @@ contract(
 				).to.be.equal(propertyAuther)
 			})
 			it('Should fail to run when not enabled Market.', async () => {
-				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const marketInstance = await marketContract.at(marketAddress2)
 				const result = await marketInstance
 					.authenticate(propertyAddress, ['id-key'], {
@@ -229,7 +227,6 @@ contract(
 				validateErrorMessage(result, 'market is not enabled')
 			})
 			it('Should fail to run when sent from other than Property Factory Contract.', async () => {
-				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const marketInstance = await marketContract.at(marketAddress1)
 				const result = await marketInstance
 					.authenticate(propertyAddress, ['id-key'])
@@ -237,7 +234,6 @@ contract(
 				validateAddressErrorMessage(result)
 			})
 			it('Should fail to run when the passed ID is already authenticated.', async () => {
-				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const marketInstance = await marketContract.at(marketAddress1)
 				await marketInstance.authenticate(propertyAddress, ['id-key'], {
 					from: propertyAuther,
@@ -251,7 +247,6 @@ contract(
 			})
 
 			it('Should fail to deauthenticate when sent from other than passed metrics linked property author.', async () => {
-				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const marketInstance = await marketContract.at(marketAddress1)
 				marketInstance
 					.authenticate(propertyAddress, ['id-key'], {
@@ -269,7 +264,6 @@ contract(
 				validateErrorMessage(result, 'this is illegal address')
 			})
 			it('When deauthenticate, decrease the issuedMetrics, emit the Destroy event.', async () => {
-				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const marketInstance = await marketContract.at(marketAddress1)
 				marketInstance
 					.authenticate(propertyAddress, ['id-key'], {
@@ -300,7 +294,6 @@ contract(
 				expect(_metrics).to.be.equal(metricsAddress)
 			})
 			it('Should fail to deauthenticate when passed already deauthenticated metrics.', async () => {
-				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const marketInstance = await marketContract.at(marketAddress1)
 				marketInstance
 					.authenticate(propertyAddress, ['id-key'], {
@@ -377,7 +370,7 @@ contract(
 				await dev.lockup.depositToProperty(propertyAddress, 100000, {
 					from: propertyAuther,
 				})
-				// eslint-disable-next-line @typescript-eslint/await-thenable
+
 				const marketInstance = await marketContract.at(marketAddress1)
 				void marketInstance.authenticateFromPropertyFactory(
 					propertyAddress,
@@ -392,14 +385,14 @@ contract(
 						resolve(values._metrics)
 					})
 				})
-				// eslint-disable-next-line @typescript-eslint/await-thenable
+
 				const metrics = await artifacts.require('Metrics').at(metricsAddress)
 				expect(await metrics.market()).to.be.equal(marketAddress1)
 				expect(await metrics.property()).to.be.equal(propertyAddress)
 				const tmp = await dev.dev.balanceOf(propertyAuther)
 				expect(tmp.toNumber()).to.be.equal(9999800000)
 				const behavuor = await marketInstance.behavior()
-				// eslint-disable-next-line @typescript-eslint/await-thenable
+
 				const behavuorInstance = await artifacts
 					.require('MarketTest3')
 					.at(behavuor)
@@ -407,7 +400,6 @@ contract(
 				expect(key).to.be.equal('id-key')
 			})
 			it('The passed address is passed to Market Behavior.', async () => {
-				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const marketInstance = await marketContract.at(marketAddress1)
 				await marketInstance.authenticateFromPropertyFactory(
 					propertyAddress,
@@ -416,7 +408,7 @@ contract(
 					{ from: propertyFactory }
 				)
 				const marketTest3 = artifacts.require('MarketTest3')
-				// eslint-disable-next-line @typescript-eslint/await-thenable
+
 				const marketTest3Instance = await marketTest3.at(
 					await marketInstance.behavior()
 				)
@@ -425,7 +417,6 @@ contract(
 				).to.be.equal(propertyAuther)
 			})
 			it('Should fail to run when not enabled Market.', async () => {
-				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const marketInstance = await marketContract.at(marketAddress2)
 				const result = await marketInstance
 					.authenticateFromPropertyFactory(
@@ -440,7 +431,6 @@ contract(
 				validateErrorMessage(result, 'market is not enabled')
 			})
 			it('Should fail to run when sent from other than Property Factory Contract.', async () => {
-				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const marketInstance = await marketContract.at(marketAddress1)
 				const result = await marketInstance
 					.authenticateFromPropertyFactory(propertyAddress, propertyAuther, [
@@ -450,7 +440,6 @@ contract(
 				validateAddressErrorMessage(result)
 			})
 			it('Should fail to run when the passed ID is already authenticated.', async () => {
-				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const marketInstance = await marketContract.at(marketAddress1)
 				await marketInstance.authenticate(propertyAddress, ['id-key'], {
 					from: propertyAuther,
@@ -495,7 +484,7 @@ contract(
 					propertyAuther
 				)
 				const propertyAddress = getPropertyAddress(createPropertyResult)
-				// eslint-disable-next-line @typescript-eslint/await-thenable
+
 				const marketInstance = await marketContract.at(marketAddress1)
 				await dev.dev.mint(propertyAuther, 10000000000, { from: deployer })
 				return [dev, marketInstance, propertyAddress]
@@ -541,7 +530,7 @@ contract(
 				})
 				const behaviorAddress = await marketInstance.behavior()
 				const marketTest1Contract = artifacts.require('MarketTest1')
-				// eslint-disable-next-line @typescript-eslint/await-thenable
+
 				const market1Instance = await marketTest1Contract.at(behaviorAddress)
 				const metricsAddress = await market1Instance.getMetrics('test')
 				await marketInstance.deauthenticate(metricsAddress, {
@@ -566,7 +555,7 @@ contract(
 				})
 				const behaviorAddress = await marketInstance.behavior()
 				const marketTest1Contract = artifacts.require('MarketTest1')
-				// eslint-disable-next-line @typescript-eslint/await-thenable
+
 				const market1Instance = await marketTest1Contract.at(behaviorAddress)
 				const metricsAddress2 = await market1Instance.getMetrics('test2')
 				await marketInstance.deauthenticate(metricsAddress2, {

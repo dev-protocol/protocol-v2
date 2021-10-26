@@ -32,7 +32,7 @@ contract('LockupTest', ([deployer, user1, user2]) => {
 		await dev.generateTreasury()
 		await dev.setCapSetter()
 		await dev.updateCap()
-		// eslint-disable-next-line @typescript-eslint/await-thenable
+
 		const policy = await artifacts.require('PolicyTestBase').at(policyAddress)
 		const propertyAddress = getPropertyAddress(
 			await dev.propertyFactory.create('test', 'TEST', user2, {
