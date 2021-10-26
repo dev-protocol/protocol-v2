@@ -11,9 +11,7 @@ contract(
 	'PropertyTest',
 	([deployer, author, user, propertyFactory, lockup, transfer, nextAuthor]) => {
 		const propertyContract = artifacts.require('Property')
-		const init = async (): Promise<
-			DevProtocolInstance
-		> => {
+		const init = async (): Promise<DevProtocolInstance> => {
 			const dev = new DevProtocolInstance(deployer)
 			await dev.generateAddressRegistry()
 			await dev.generateDev()
@@ -31,7 +29,7 @@ contract(
 		}
 
 		describe('Property; getBalances', () => {
-			it('authorとtreasuryに残高がある.', async () => {
+			it('author and treasury hold the balance.', async () => {
 				const dev = await init()
 				await dev.generatePropertyFactory()
 				const transaction = await dev.propertyFactory.create(
@@ -42,20 +40,16 @@ contract(
 				const propertyAddress = getPropertyAddress(transaction)
 				const propertyInstance = await propertyContract.at(propertyAddress)
 				const balances = await propertyInstance.getBalances()
-				expect(balances[0].account).to.be.equal(
-					author
-				)
+				expect(balances[0].account).to.be.equal(author)
 				expect(balances[0].balance.toString()).to.be.equal(
 					'9500000000000000000000000'
 				)
-				expect(balances[1].account).to.be.equal(
-					dev.treasury.address
-				)
+				expect(balances[1].account).to.be.equal(dev.treasury.address)
 				expect(balances[1].balance.toString()).to.be.equal(
 					'500000000000000000000000'
 				)
 			})
-			it('transferすると残高が移動する.', async () => {
+			it('The balance will be transferred(transfer).', async () => {
 				const dev = await init()
 				await dev.generatePropertyFactory()
 				await dev.generateWithdraw()
@@ -66,28 +60,24 @@ contract(
 				)
 				const propertyAddress = getPropertyAddress(transaction)
 				const propertyInstance = await propertyContract.at(propertyAddress)
-				await propertyInstance.transfer(user, '500000000000000000000000', {from: author})
+				await propertyInstance.transfer(user, '500000000000000000000000', {
+					from: author,
+				})
 				const balances = await propertyInstance.getBalances()
-				expect(balances[0].account).to.be.equal(
-					author
-				)
+				expect(balances[0].account).to.be.equal(author)
 				expect(balances[0].balance.toString()).to.be.equal(
 					'9000000000000000000000000'
 				)
-				expect(balances[1].account).to.be.equal(
-					dev.treasury.address
-				)
+				expect(balances[1].account).to.be.equal(dev.treasury.address)
 				expect(balances[1].balance.toString()).to.be.equal(
 					'500000000000000000000000'
 				)
-				expect(balances[2].account).to.be.equal(
-					user
-				)
+				expect(balances[2].account).to.be.equal(user)
 				expect(balances[2].balance.toString()).to.be.equal(
 					'500000000000000000000000'
 				)
 			})
-			it('transferFromすると残高が移動する.', async () => {
+			it('The balance will be transferred(transferFrom).', async () => {
 				const dev = await init()
 				await dev.generatePropertyFactory()
 				await dev.generateWithdraw()
@@ -98,24 +88,24 @@ contract(
 				)
 				const propertyAddress = getPropertyAddress(transaction)
 				const propertyInstance = await propertyContract.at(propertyAddress)
-				await propertyInstance.approve(deployer, '500000000000000000000000', {from: author})
-				await propertyInstance.transferFrom(author, user, '500000000000000000000000')
-				const balances = await propertyInstance.getBalances()
-				expect(balances[0].account).to.be.equal(
-					author
+				await propertyInstance.approve(deployer, '500000000000000000000000', {
+					from: author,
+				})
+				await propertyInstance.transferFrom(
+					author,
+					user,
+					'500000000000000000000000'
 				)
+				const balances = await propertyInstance.getBalances()
+				expect(balances[0].account).to.be.equal(author)
 				expect(balances[0].balance.toString()).to.be.equal(
 					'9000000000000000000000000'
 				)
-				expect(balances[1].account).to.be.equal(
-					dev.treasury.address
-				)
+				expect(balances[1].account).to.be.equal(dev.treasury.address)
 				expect(balances[1].balance.toString()).to.be.equal(
 					'500000000000000000000000'
 				)
-				expect(balances[2].account).to.be.equal(
-					user
-				)
+				expect(balances[2].account).to.be.equal(user)
 				expect(balances[2].balance.toString()).to.be.equal(
 					'500000000000000000000000'
 				)

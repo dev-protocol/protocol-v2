@@ -24,6 +24,7 @@ contract Property is ERC20, UsingRegistry, IProperty {
 	EnumerableSet.AddressSet private holders;
 
 	using EnumerableSet for EnumerableSet.AddressSet;
+
 	/**
 	 * @dev Initializes the passed value as AddressRegistry address, author address, token name, and token symbol.
 	 * @param _registry AddressRegistry address.
@@ -250,11 +251,14 @@ contract Property is ERC20, UsingRegistry, IProperty {
 	 * @dev Get the holder and its balance
 	 * @return holder and its balance
 	 */
-	function getBalances() external view override returns (PropertyBalance[] memory){
+	function getBalances()
+		external
+		view
+		override
+		returns (PropertyBalance[] memory)
+	{
 		uint256 holderCount = holders.length();
-		PropertyBalance[] memory results = new PropertyBalance[](
-			holderCount
-		);
+		PropertyBalance[] memory results = new PropertyBalance[](holderCount);
 		for (uint256 i = 0; i < holderCount; i++) {
 			address holder = holders.at(i);
 			uint256 balance = balanceOf(holder);
@@ -269,13 +273,13 @@ contract Property is ERC20, UsingRegistry, IProperty {
 	 * @param _to where to send the token
 	 * @param _amount amount of tokens sent
 	 */
-    function _afterTokenTransfer(
-        address _from,
-        address _to,
-        uint256 _amount
-    ) internal virtual override {
-        super._afterTokenTransfer(_from, _to, _amount);
+	function _afterTokenTransfer(
+		address _from,
+		address _to,
+		uint256 _amount
+	) internal virtual override {
+		super._afterTokenTransfer(_from, _to, _amount);
 		// not burned
 		holders.add(_to);
-    }
+	}
 }
