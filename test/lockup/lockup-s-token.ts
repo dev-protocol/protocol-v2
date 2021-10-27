@@ -484,7 +484,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				expect(toBigNumber(info[0].value).toNumber()).to.be.equal(50)
 			})
 			it('get lockup info maltible value.', async () => {
-				const [dev, property, tokenId] = await init2()
+				const [dev, , tokenId] = await init2()
 				const propertyAddress = getPropertyAddress(
 					await dev.propertyFactory.create('test2', 'TEST2', user2, {
 						from: user2,

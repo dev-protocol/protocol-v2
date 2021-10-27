@@ -4,7 +4,7 @@ import {
 } from '../../../types/truffle-contracts'
 import { deployProxy } from '../../test-lib/instance'
 
-contract('UpgradeabilityLibrary ', ([deployer, address, user]) => {
+contract('UpgradeabilityLibrary ', ([deployer]) => {
 	describe('Same data', () => {
 		let contract: UpgradeabilityLibraryV1Instance
 		let admin: DevAdminInstance
