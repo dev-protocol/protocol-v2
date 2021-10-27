@@ -66,7 +66,11 @@ contract('STokensManager', ([deployer, user]) => {
 		expect(uriInfo.length).to.equal(2)
 		expect(uriInfo[0]).to.equal('data:application/json;base64')
 		const decodedData = Buffer.from(uriInfo[1], 'base64').toString()
-		const details = JSON.parse(decodedData)
+		const details = JSON.parse(decodedData) as {
+			name: string
+			description: string
+			image: string
+		}
 		const { name, description, image } = details
 		checkName(name, property, amount, cumulativeReward)
 		checkDescription(description, property)
