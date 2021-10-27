@@ -215,7 +215,7 @@ contract(
 				const result = await propertyInstance.changeAuthor(nextAuthor, {
 					from: author,
 				})
-				const event = result.logs[0].args
+				const event = result.logs[0].args as { _old: string; _new: string }
 				expect(result.logs[0].event).to.be.equal('ChangeAuthor')
 				expect(event._old).to.be.equal(author)
 				expect(event._new).to.be.equal(nextAuthor)
@@ -277,7 +277,7 @@ contract(
 				const result = await propertyInstance.changeName('next', {
 					from: author,
 				})
-				const event = result.logs[0].args
+				const event = result.logs[0].args as { _old: string; _new: string }
 				expect(result.logs[0].event).to.be.equal('ChangeName')
 				expect(event._old).to.be.equal('sample')
 				expect(event._new).to.be.equal('next')
@@ -339,7 +339,7 @@ contract(
 				const result = await propertyInstance.changeSymbol('NEXT', {
 					from: author,
 				})
-				const event = result.logs[0].args
+				const event = result.logs[0].args as { _old: string; _new: string }
 				expect(result.logs[0].event).to.be.equal('ChangeSymbol')
 				expect(event._old).to.be.equal('SAMPLE')
 				expect(event._new).to.be.equal('NEXT')

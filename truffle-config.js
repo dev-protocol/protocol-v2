@@ -2,6 +2,9 @@
 /* eslint-disable prefer-destructuring */
 /* eslint-disable object-shorthand */
 /* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-disable @typescript-eslint/no-require-imports */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+
 require('ts-node/register')
 require('dotenv').config()
 const wrapProvider = require('arb-ethers-web3-bridge').wrapProvider
