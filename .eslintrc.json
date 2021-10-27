@@ -16,7 +16,13 @@
 		"@typescript-eslint/restrict-template-expressions": "off",
 		"@typescript-eslint/await-thenable": "off",
 		"@typescript-eslint/no-floating-promises": "off",
-		"@typescript-eslint/naming-convention": "off"
+		"@typescript-eslint/naming-convention": [
+			"error",
+			{
+				"selector": "class",
+				"format": ["PascalCase"]
+			}
+		]
 	},
 	"overrides": [
 		{
