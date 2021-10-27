@@ -3,7 +3,7 @@ import { DevInstance } from '../../types/truffle-contracts'
 import { DevProtocolInstance } from '../test-lib/instance'
 import { validateErrorMessage } from '../test-lib/utils/error'
 
-contract('Dev', ([deployer, user1, user2, dummyMarket]) => {
+contract('Dev', ([deployer, user1, user2]) => {
 	const createDev = async (): Promise<DevProtocolInstance> => {
 		const dev = new DevProtocolInstance(deployer)
 		await dev.generateAddressRegistry()
