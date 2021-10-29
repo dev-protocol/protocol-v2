@@ -27,7 +27,7 @@
 	"devDependencies": {
 		"@devprotocol/util-ts": "2.2.1",
 		"@truffle/hdwallet-provider": "1.5.1",
-		"@typechain/truffle-v4": "^4.1.0",
+		"@typechain/truffle-v4": "4.1.0",
 		"@types/bent": "7.3.2",
 		"@types/dotenv": "8.2.0",
 		"@types/node": "16.11.6",
@@ -56,7 +56,7 @@
 		"typechain-target-truffle": "1.0.2",
 		"typescript": "4.4.4",
 		"web3": "1.6.0",
-		"web3-utils": "^1.6.0"
+		"web3-utils": "1.6.0"
 	},
 	"dependencies": {
 		"@devprotocol/util-contracts": "3.3.0",
