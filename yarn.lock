@@ -15265,10 +15265,10 @@ typechain-target-truffle@1.0.2:
   dependencies:
     lodash "^4.17.15"
 
-typechain@6.0.0:
-  version "6.0.0"
-  resolved "https://registry.yarnpkg.com/typechain/-/typechain-6.0.0.tgz#9d0549dd41073cd9b03f6434568f65c435aabaab"
-  integrity sha512-qKCgioqC4NywVe/lvOkZzG+UGAZc3kqyZ2WU7OUEJC7Wdo5l5zNrnUQPeXdWByN8M5/8ahQjidI3Ul1vUHSKJw==
+typechain@6.0.1:
+  version "6.0.1"
+  resolved "https://registry.yarnpkg.com/typechain/-/typechain-6.0.1.tgz#30c74b3f7b222f0c313596a0db840af290922ecb"
+  integrity sha512-R9s12Tvx9hLuGv/jej/92D9JSzvTi0CT39gNipjQlzOQdsy1jnszEmoSN6JX+LVq/cwSVobtfs832qJozskEIQ==
   dependencies:
     "@types/prettier" "^2.1.1"
     command-line-args "^4.0.7"
