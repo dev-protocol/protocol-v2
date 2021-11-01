@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/restrict-plus-operands */
 /* eslint-disable new-cap */
 import { DevProtocolInstance } from '../test-lib/instance'
 import { validateErrorMessage } from '../test-lib/utils/error'
@@ -266,14 +267,12 @@ contract('Dev', ([deployer, user1, user2]) => {
 			await dev.devArbitrum.mint(deployer, 100)
 			expect((await dev.devArbitrum.bridgeBalanceOnL1()).toNumber()).to.equal(0)
 			dev.devArbitrum.bridgeBurn(deployer, 50)
-			const [from, to, id, data] = await Promise.all([
+			const [from, id, data] = await Promise.all([
 				getEventValue(dev.devArbitrum)('TxToL1', '_from'),
-				getEventValue(dev.devArbitrum)('TxToL1', '_to'),
 				getEventValue(dev.devArbitrum)('TxToL1', '_id'),
 				getEventValue(dev.devArbitrum)('TxToL1', '_data'),
 			])
 			expect(from).to.equal(dev.devArbitrum.address)
-			expect(to).to.equal(deployer)
 			expect(id).to.equal('1')
 			expect(data).to.equal(
 				'0x3f553a310000000000000000000000000000000000000000000000000000000000000032'
@@ -294,6 +293,22 @@ contract('Dev', ([deployer, user1, user2]) => {
 			expect(id).to.equal('1')
 			expect(amount).to.equal('50')
 			expect((await dev.devArbitrum.bridgeBalanceOnL1()).toNumber()).to.equal(0)
+		})
+
+		it('call sendTxToL1 func', async () => {
+			const dev = await createDev()
+			await dev.devArbitrum.mint(deployer, 100)
+			expect((await dev.devArbitrum.bridgeBalanceOnL1()).toNumber()).to.equal(0)
+			await dev.devArbitrum.bridgeBurn(deployer, 50)
+			expect(await dev.arbSys.latestSendTxToL1Arg1()).to.equal(
+				await dev.devArbitrum.l1Address()
+			)
+			const funcData = web3.eth.abi.encodeFunctionSignature(
+				'escrowMint(uint256)'
+			)
+			const argData = web3.eth.abi.encodeParameter('uint256', '50')
+			const data = funcData + argData.replace('0x', '')
+			expect(await dev.arbSys.latestSendTxToL1Arg2()).to.equal(data)
 		})
 	})
 })

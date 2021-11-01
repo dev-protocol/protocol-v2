@@ -16,6 +16,7 @@ import {
 	STokensManagerInstance,
 	DevBridgeInstance,
 	DevAdminInstance,
+	ArbSysTestInstance,
 } from '../../types/truffle-contracts'
 
 type ContractInstance = {
@@ -51,6 +52,7 @@ export class DevProtocolInstance {
 	private _addressRegistry!: AddressRegistryInstance
 	private _dev!: DevInstance
 	private _devArbitrum!: DevArbitrumInstance
+	private _arbSys!: ArbSysTestInstance
 	private _lockup!: LockupInstance
 	private _propertyFactory!: PropertyFactoryInstance
 	private _policyFactory!: PolicyFactoryTestInstance
@@ -83,6 +85,10 @@ export class DevProtocolInstance {
 
 	public get devArbitrum(): DevArbitrumInstance {
 		return this._devArbitrum
+	}
+
+	public get arbSys(): ArbSysTestInstance {
+		return this._arbSys
 	}
 
 	public get lockup(): LockupInstance {
@@ -177,6 +183,7 @@ export class DevProtocolInstance {
 			contract('ArbSysTest'),
 			this._deployer
 		)
+		this._arbSys = proxyArbSys
 		await this.addressRegistry.setRegistry(
 			'ArbSys',
 			proxyArbSys.address,
