@@ -5,11 +5,6 @@ pragma solidity ^0.8.0;
 interface IDevArbitrum {
 	event BridgeMint(address indexed _account, uint256 _amount);
 	event BridgeBurn(address indexed _account, uint256 _amount);
-	event TxToL1(
-		address indexed _from,
-		address indexed _to,
-		uint256 indexed _id,
-		bytes _data
-	);
+	event TxToL1(address indexed _from, uint256 indexed _id, bytes _data);
 	event L1EscrowMint(address _token, uint256 _id, uint256 _amount);
 }
