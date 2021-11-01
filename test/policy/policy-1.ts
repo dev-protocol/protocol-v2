@@ -10,6 +10,7 @@ contract('Policy1', ([deployer]) => {
 	let policy: Policy1Instance
 	let curve: CurveTestInstance
 	let dev: DevProtocolInstance
+	const max = new BigNumber('132000000000000').div(15).integerValue()
 
 	before(async () => {
 		dev = new DevProtocolInstance(deployer)
@@ -19,12 +20,13 @@ contract('Policy1', ([deployer]) => {
 		await dev.generateSTokensManager()
 		await dev.generateLockup()
 		await dev.dev.mint(deployer, new BigNumber(1e18).times(10000000))
-		policy = await artifacts.require('Policy1').new(dev.addressRegistry.address)
+		policy = await artifacts
+			.require('Policy1')
+			.new(dev.addressRegistry.address, max, 0)
 		curve = await artifacts.require('CurveTest').new()
 	})
 
 	describe('Policy1; rewards', () => {
-		const max = new BigNumber('132000000000000').div(15).integerValue()
 		const totalSupply = new BigNumber(1e18).times(10000000)
 		const createRandom = () => {
 			const staked = totalSupply.times(Math.random()).integerValue()
@@ -85,6 +87,46 @@ contract('Policy1', ([deployer]) => {
 			expect(result4.toString()).to.be.equal(expected4.toString())
 			expect(result5.toString()).to.be.equal(expected5.toString())
 			expect(result6.toString()).to.be.equal(expected6.toString())
+		})
+		it('constructing mintPerSecondAndAsset', async () => {
+			const contract = await artifacts
+				.require('Policy1')
+				.new(dev.addressRegistry.address, '1234567890', 0)
+			const random = createRandom()
+
+			const result = await contract
+				.rewards(random[0], random[1])
+				.then(toBigNumber)
+
+			const expected = await curve
+				.curveRewardsTest(random[0], random[1], totalSupply, '1234567890')
+				.then(toBigNumber)
+
+			expect(result.toString()).to.be.equal(expected.toString())
+		})
+		it('constructing presumptiveAssets', async () => {
+			const contract = await artifacts
+				.require('Policy1')
+				.new(dev.addressRegistry.address, max, 1000)
+			const random = createRandom()
+
+			const result1 = await contract.rewards(random[0], 999).then(toBigNumber)
+			const result2 = await contract.rewards(random[0], 1000).then(toBigNumber)
+			const result3 = await contract.rewards(random[0], 1001).then(toBigNumber)
+
+			const expected1 = await curve
+				.curveRewardsTest(random[0], 1000, totalSupply, max)
+				.then(toBigNumber)
+			const expected2 = await curve
+				.curveRewardsTest(random[0], 1000, totalSupply, max)
+				.then(toBigNumber)
+			const expected3 = await curve
+				.curveRewardsTest(random[0], 1001, totalSupply, max)
+				.then(toBigNumber)
+
+			expect(result1.toString()).to.be.equal(expected1.toString())
+			expect(result2.toString()).to.be.equal(expected2.toString())
+			expect(result3.toString()).to.be.equal(expected3.toString())
 		})
 	})
 	describe('Policy1; holdersShare', () => {

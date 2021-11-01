@@ -10,9 +10,17 @@ import "../common/registry/UsingRegistry.sol";
 contract Policy1 is IPolicy, Ownable, Curve, UsingRegistry {
 	uint256 public override marketVotingSeconds = 86400 * 5;
 	uint256 public override policyVotingSeconds = 86400 * 5;
-	uint256 private constant MINT_PER_SECOND_AND_ASSET = 132000000000000 / 15;
+	uint256 public mintPerSecondAndAsset;
+	uint256 public presumptiveAssets;
 
-	constructor(address _registry) UsingRegistry(_registry) {}
+	constructor(
+		address _registry,
+		uint256 _maxMintPerSecondAndAsset,
+		uint256 _presumptiveAssets
+	) UsingRegistry(_registry) {
+		mintPerSecondAndAsset = _maxMintPerSecondAndAsset;
+		presumptiveAssets = _presumptiveAssets;
+	}
 
 	function rewards(uint256 _lockups, uint256 _assets)
 		external
@@ -23,13 +31,11 @@ contract Policy1 is IPolicy, Ownable, Curve, UsingRegistry {
 	{
 		uint256 totalSupply = IERC20(registry().registries("Dev"))
 			.totalSupply();
+		uint256 assets = _assets > presumptiveAssets
+			? _assets
+			: presumptiveAssets;
 		return
-			curveRewards(
-				_lockups,
-				_assets,
-				totalSupply,
-				MINT_PER_SECOND_AND_ASSET
-			);
+			curveRewards(_lockups, assets, totalSupply, mintPerSecondAndAsset);
 	}
 
 	function holdersShare(uint256 _reward, uint256 _lockups)

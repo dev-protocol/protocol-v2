@@ -38,6 +38,9 @@
 			"globals": {
 				"artifacts": "readonly",
 				"Truffle": "readonly"
+			},
+			"rules": {
+				"@typescript-eslint/no-unsafe-assignment": "off"
 			}
 		}
 	]
