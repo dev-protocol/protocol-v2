@@ -1,5 +1,4 @@
 import Web3 from 'web3'
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
 export const watch =
 	(deployedContract: any) =>
