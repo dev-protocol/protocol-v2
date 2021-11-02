@@ -47,13 +47,13 @@ contract DevArbitrum is
 		burn(_account, _amount);
 		emit BridgeBurn(_account, _amount);
 		if (insufficient > 0) {
-			_mintL1(insufficient);
+			_mintL1(0, insufficient);
 		}
 		uint256 tmp = insufficient > 0 ? bridgeBalanceOnL1 : _amount;
 		bridgeBalanceOnL1 = bridgeBalanceOnL1 - tmp;
 	}
 
-	function _mintL1(uint256 _amount) private {
+	function _mintL1(uint256 _l1CallValue, uint256 _amount) private {
 		bytes memory data = abi.encodeWithSignature(
 			"escrowMint(uint256)",
 			_amount
@@ -61,7 +61,10 @@ contract DevArbitrum is
 		// Use Arbitrum's messaging system to execute L1Token.escrowMint
 		address arbSys = registry().registries("ArbSys");
 		address l1DevAddress = registry().registries("L1DevAddress");
-		uint256 id = IArbSys(arbSys).sendTxToL1(l1DevAddress, data);
+		uint256 id = IArbSys(arbSys).sendTxToL1{value: _l1CallValue}(
+			l1DevAddress,
+			data
+		);
 		emit L1EscrowMint(l1DevAddress, id, _amount);
 		emit TxToL1(address(this), id, data);
 	}
