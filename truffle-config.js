@@ -56,6 +56,8 @@ module.exports = {
 		arbitrum_mainnet: {
 			network_id: 42161,
 			chain_id: 42161,
+			gas: 287853530,
+			gasPrice: 1400000000,
 			provider: function () {
 				return new HDWalletProvider(
 					MNEMONIC,
