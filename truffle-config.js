@@ -9,7 +9,7 @@ require('ts-node/register')
 require('dotenv').config()
 const wrapProvider = require('arb-ethers-web3-bridge').wrapProvider
 const HDWalletProvider = require('@truffle/hdwallet-provider')
-const { INFURA_KEY, MNEMONIC } = process.env
+const { INFURA_KEY, ETHERSCAN_KEY, MNEMONIC } = process.env
 
 module.exports = {
 	test_file_extension_regexp: /.*\.ts$/,
@@ -74,5 +74,9 @@ module.exports = {
 	},
 	db: {
 		enabled: false,
+	},
+	plugins: ['truffle-plugin-verify'],
+	api_keys: {
+		etherscan: ETHERSCAN_KEY,
 	},
 }
