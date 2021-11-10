@@ -8,7 +8,6 @@ contract('DevBridge', ([deployer, user1, lockup, withdraw, market]) => {
 		const dev = new DevProtocolInstance(deployer)
 		await dev.generateAddressRegistry()
 		await dev.generateDev()
-		await dev.generateDevBridge()
 		await dev.generateMarketFactory()
 		await dev.addressRegistry.setRegistry('Lockup', lockup)
 		await dev.addressRegistry.setRegistry('Withdraw', withdraw)

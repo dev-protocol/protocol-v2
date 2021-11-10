@@ -20,7 +20,6 @@ contract('STokensManager', ([deployer, user]) => {
 		const dev = new DevProtocolInstance(deployer)
 		await dev.generateAddressRegistry()
 		await dev.generateDev()
-		await dev.generateDevBridge()
 		await dev.generateSTokensManager()
 		await Promise.all([
 			dev.generateMarketFactory(),

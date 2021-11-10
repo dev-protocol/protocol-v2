@@ -6,7 +6,6 @@ contract('UsingRegistryTest', ([deployer]) => {
 	before(async () => {
 		await dev.generateAddressRegistry()
 		await dev.generateDev()
-		await dev.generateDevBridge()
 	})
 	describe('UsingRegistry; registry', () => {
 		it('You can get the address of registry by setting it in the constructor.', async () => {

@@ -9,7 +9,6 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 			const dev = new DevProtocolInstance(deployer)
 			await dev.generateAddressRegistry()
 			await dev.generateDev()
-			await dev.generateDevBridge()
 			await dev.generateSTokensManager()
 			await Promise.all([
 				dev.generateMetricsFactory(),
@@ -65,7 +64,6 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 		before(async () => {
 			await dev.generateAddressRegistry()
 			await dev.generateDev()
-			await dev.generateDevBridge()
 			await dev.generateSTokensManager()
 			await Promise.all([
 				dev.generateMarketFactory(),
