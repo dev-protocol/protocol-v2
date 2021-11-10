@@ -136,7 +136,6 @@ contract(
 			beforeEach(async () => {
 				await dev.generateAddressRegistry()
 				await dev.generateDev()
-				await dev.generateDevBridge()
 				await dev.generateSTokensManager()
 				await Promise.all([
 					dev.generateMarketFactory(),
@@ -325,7 +324,6 @@ contract(
 			beforeEach(async () => {
 				await dev.generateAddressRegistry()
 				await dev.generateDev()
-				await dev.generateDevBridge()
 				await dev.generateSTokensManager()
 				await Promise.all([
 					dev.generateMarketFactory(),
@@ -459,7 +457,6 @@ contract(
 				const dev = new DevProtocolInstance(deployer)
 				await dev.generateAddressRegistry()
 				await dev.generateDev()
-				await dev.generateDevBridge()
 				await dev.generateSTokensManager()
 				await Promise.all([
 					dev.generateMarketFactory(),
