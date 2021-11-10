@@ -34,7 +34,6 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 		const dev = new DevProtocolInstance(deployer)
 		await dev.generateAddressRegistry()
 		await dev.generateDev()
-		await dev.generateDevBridge()
 		await dev.generateSTokensManager()
 		await Promise.all([
 			dev.generateMarketFactory(),
