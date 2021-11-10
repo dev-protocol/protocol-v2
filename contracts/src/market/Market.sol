@@ -10,7 +10,6 @@ import "../../interface/IMetrics.sol";
 import "../../interface/IMetricsFactory.sol";
 import "../../interface/ILockup.sol";
 import "../../interface/IDev.sol";
-import "../../interface/IDevBridge.sol";
 import "../common/registry/UsingRegistry.sol";
 
 /**
@@ -206,13 +205,8 @@ contract Market is UsingRegistry, IMarket {
 		 * Burn as a authentication fee.
 		 */
 		uint256 authenticationFee = getAuthenticationFee(_property);
-		require(
-			IDevBridge(registry().registries("DevBridge")).burn(
-				sender,
-				authenticationFee
-			),
-			"dev fee failed"
-		);
+
+		IDev(registry().registries("Dev")).burn(sender, authenticationFee);
 
 		/**
 		 * Adds the number of authenticated assets in this Market.
