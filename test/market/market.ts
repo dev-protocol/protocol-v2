@@ -155,8 +155,10 @@ contract(
 					behavior1.address
 				)
 				marketAddress1 = getMarketAddress(createMarketResult)
+				await dev.addBurnerRole(marketAddress1)
 				createMarketResult = await dev.marketFactory.create(behavior2.address)
 				marketAddress2 = getMarketAddress(createMarketResult)
+				await dev.addBurnerRole(marketAddress2)
 				const createPropertyResult = await dev.propertyFactory.create(
 					'test',
 					'TEST',
@@ -333,6 +335,7 @@ contract(
 					dev.generateLockup(),
 					dev.generateWithdraw(),
 				])
+				await dev.addMinterRole()
 				const behavior1 = await dev.getMarket('MarketTest3', user)
 				const behavior2 = await dev.getMarket('MarketTest3', user)
 				await dev.generatePolicy('PolicyTest1')
@@ -343,8 +346,10 @@ contract(
 					behavior1.address
 				)
 				marketAddress1 = getMarketAddress(createMarketResult)
+				await dev.addBurnerRole(marketAddress1)
 				createMarketResult = await dev.marketFactory.create(behavior2.address)
 				marketAddress2 = getMarketAddress(createMarketResult)
+				await dev.addBurnerRole(marketAddress2)
 				const createPropertyResult = await dev.propertyFactory.create(
 					'test',
 					'TEST',
@@ -466,6 +471,7 @@ contract(
 					dev.generateLockup(),
 					dev.generateWithdraw(),
 				])
+				await dev.addMinterRole()
 				const behavior1 = await dev.getMarket('MarketTest1', user)
 				await dev.generatePolicy('PolicyTest1')
 				await dev.generateTreasury()
@@ -475,6 +481,7 @@ contract(
 					behavior1.address
 				)
 				const marketAddress1 = getMarketAddress(createMarketResult)
+				await dev.addBurnerRole(marketAddress1)
 				const createPropertyResult = await dev.propertyFactory.create(
 					'test',
 					'TEST',
