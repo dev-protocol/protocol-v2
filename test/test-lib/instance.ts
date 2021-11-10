@@ -1,4 +1,3 @@
-/* eslint-disable new-cap */
 import {
 	AddressRegistryInstance,
 	DevInstance,
@@ -14,7 +13,6 @@ import {
 	MetricsInstance,
 	TreasuryTestInstance,
 	STokensManagerInstance,
-	DevBridgeInstance,
 	DevAdminInstance,
 	ArbSysTestInstance,
 } from '../../types/truffle-contracts'
@@ -60,7 +58,6 @@ export class DevProtocolInstance {
 	private _metricsFactory!: MetricsFactoryTestInstance
 	private _withdraw!: WithdrawTestInstance
 	private _treasury!: TreasuryTestInstance
-	private _devBridge!: DevBridgeInstance
 	private _sTokensManager!: STokensManagerInstance
 
 	constructor(deployer: string) {
@@ -73,10 +70,6 @@ export class DevProtocolInstance {
 
 	public get addressRegistry(): AddressRegistryInstance {
 		return this._addressRegistry
-	}
-
-	public get devBridge(): DevBridgeInstance {
-		return this._devBridge
 	}
 
 	public get dev(): DevInstance {
@@ -130,25 +123,6 @@ export class DevProtocolInstance {
 		)
 		await proxfied.initialize()
 		this._addressRegistry = proxfied
-	}
-
-	public async generateDevBridge(): Promise<void> {
-		const [proxfied] = await deployProxy(contract('DevBridge'), this._deployer)
-		await proxfied.initialize(this._addressRegistry.address)
-		this._devBridge = proxfied
-		await this._dev.grantRole(
-			await this._dev.MINTER_ROLE(),
-			this._devBridge.address
-		)
-		await this._dev.grantRole(
-			await this._dev.BURNER_ROLE(),
-			this._devBridge.address
-		)
-		await this.addressRegistry.setRegistry(
-			'DevBridge',
-			this._devBridge.address,
-			this.fromDeployer
-		)
 	}
 
 	public async generateDev(): Promise<void> {
