@@ -2,6 +2,7 @@
 pragma solidity =0.8.9;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "../../interface/IDev.sol";
 import "../../interface/IDevBridge.sol";
 import "../../interface/IWithdraw.sol";
 import "../../interface/ILockup.sol";
@@ -74,13 +75,14 @@ contract Withdraw is InitializableUsingRegistry, IWithdraw {
 		/**
 		 * Mints the holder reward.
 		 */
-		require(
-			IDevBridge(registry().registries("DevBridge")).mint(
-				msg.sender,
-				value
-			),
-			"dev mint failed"
-		);
+		// require(
+		// 	IDevBridge(registry().registries("DevBridge")).mint(
+		// 		msg.sender,
+		// 		value
+		// 	),
+		// 	"dev mint failed"
+		// );
+		IDev(registry().registries("Dev")).mint(msg.sender, value);
 
 		/**
 		 * Since the total supply of tokens has changed, updates the latest maximum mint amount.

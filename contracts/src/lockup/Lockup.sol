@@ -4,6 +4,7 @@ pragma solidity =0.8.9;
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "../../interface/IDev.sol";
 import "../../interface/IDevBridge.sol";
 import "../../interface/IProperty.sol";
 import "../../interface/IPolicy.sol";
@@ -671,13 +672,14 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		/**
 		 * Mints the reward.
 		 */
-		require(
-			IDevBridge(registry().registries("DevBridge")).mint(
-				msg.sender,
-				value
-			),
-			"dev mint failed"
-		);
+		// require(
+		// 	IDevBridge(registry().registries("DevBridge")).mint(
+		// 		msg.sender,
+		// 		value
+		// 	),
+		// 	"dev mint failed"
+		// );
+		IDev(registry().registries("Dev")).mint(msg.sender, value);
 
 		/**
 		 * Since the total supply of tokens has changed, updates the latest maximum mint amount.
