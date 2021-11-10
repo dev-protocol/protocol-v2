@@ -75,13 +75,6 @@ contract Withdraw is InitializableUsingRegistry, IWithdraw {
 		/**
 		 * Mints the holder reward.
 		 */
-		// require(
-		// 	IDevBridge(registry().registries("DevBridge")).mint(
-		// 		msg.sender,
-		// 		value
-		// 	),
-		// 	"dev mint failed"
-		// );
 		IDev(registry().registries("Dev")).mint(msg.sender, value);
 
 		/**
