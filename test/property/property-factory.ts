@@ -15,7 +15,9 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 				dev.generatePropertyFactory(),
 				dev.generatePolicyFactory(),
 				dev.generateLockup(),
+				dev.generateWithdraw(),
 			])
+			await dev.addMinterRole()
 			await dev.generatePolicy()
 			await dev.generateTreasury()
 			await dev.setCapSetter()
@@ -73,6 +75,7 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 				dev.generateLockup(),
 				dev.generateWithdraw(),
 			])
+			await dev.addMinterRole()
 			await dev.generatePolicy('PolicyTest1')
 			await dev.generateTreasury()
 			await dev.setCapSetter()
@@ -84,6 +87,7 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 				})
 				.then(getMarketAddress)
 			await dev.dev.mint(user, 10000000000)
+			await dev.addBurnerRole(marketAddress)
 		})
 
 		it('Create a new Property and authenticate at the same time', async () => {
