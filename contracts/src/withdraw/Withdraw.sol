@@ -75,8 +75,10 @@ contract Withdraw is InitializableUsingRegistry, IWithdraw {
 		/**
 		 * Mints the holder reward.
 		 */
-		IDev(registry().registries("Dev")).mint(msg.sender, value);
-
+		require(
+		    IDev(registry().registries("Dev")).mint(msg.sender, value),
+            "dev mint failed"
+		);
 		/**
 		 * Since the total supply of tokens has changed, updates the latest maximum mint amount.
 		 */
