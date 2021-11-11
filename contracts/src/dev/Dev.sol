@@ -29,7 +29,11 @@ contract Dev is ERC20Upgradeable, AccessControlEnumerableUpgradeable, IDev {
 		_setupRole(MINTER_ROLE, _msgSender());
 	}
 
-	function mint(address _account, uint256 _amount) public override returns(bool) {
+	function mint(address _account, uint256 _amount)
+		public
+		override
+		returns (bool)
+	{
 		require(
 			hasRole(MINTER_ROLE, _msgSender()),
 			"must have minter role to mint"
@@ -39,7 +43,11 @@ contract Dev is ERC20Upgradeable, AccessControlEnumerableUpgradeable, IDev {
 		return true;
 	}
 
-	function burn(address _account, uint256 _amount) public override returns(bool) {
+	function burn(address _account, uint256 _amount)
+		public
+		override
+		returns (bool)
+	{
 		require(
 			hasRole(BURNER_ROLE, _msgSender()),
 			"must have burner role to burn"
