@@ -672,7 +672,10 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		/**
 		 * Mints the reward.
 		 */
-		IDev(registry().registries("Dev")).mint(msg.sender, value);
+		require(
+		    IDev(registry().registries("Dev")).mint(msg.sender, value),
+			"dev mint failed"
+		);
 
 		/**
 		 * Since the total supply of tokens has changed, updates the latest maximum mint amount.
