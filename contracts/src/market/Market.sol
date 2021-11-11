@@ -207,8 +207,8 @@ contract Market is UsingRegistry, IMarket {
 		uint256 authenticationFee = getAuthenticationFee(_property);
 
 		require(
-		    IDev(registry().registries("Dev")).burn(sender, authenticationFee),
-            "dev fee failed"
+			IDev(registry().registries("Dev")).burn(sender, authenticationFee),
+			"dev fee failed"
 		);
 		/**
 		 * Adds the number of authenticated assets in this Market.
