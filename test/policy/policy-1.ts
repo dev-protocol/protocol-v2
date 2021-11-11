@@ -18,6 +18,8 @@ contract('Policy1', ([deployer]) => {
 		await dev.generateDev()
 		await dev.generateSTokensManager()
 		await dev.generateLockup()
+		await dev.generateWithdraw()
+		await dev.addMinterRole()
 		await dev.dev.mint(deployer, new BigNumber(1e18).times(10000000))
 		policy = await artifacts
 			.require('Policy1')
