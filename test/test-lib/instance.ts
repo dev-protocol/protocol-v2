@@ -1,3 +1,4 @@
+/* eslint new-cap: 0 */
 import {
 	AddressRegistryInstance,
 	DevInstance,
@@ -337,5 +338,20 @@ export class DevProtocolInstance {
 		value = '115792089237316000000000000000000000'
 	): Promise<void> {
 		await this._lockup.updateCap(value)
+	}
+
+	public async addMinterRole(): Promise<void> {
+		await this._dev.grantRole(
+			await this._dev.MINTER_ROLE(),
+			this._withdraw.address
+		)
+		await this._dev.grantRole(
+			await this._dev.MINTER_ROLE(),
+			this._lockup.address
+		)
+	}
+
+	public async addBurnerRole(marketAddress: string): Promise<void> {
+		await this._dev.grantRole(await this._dev.BURNER_ROLE(), marketAddress)
 	}
 }
