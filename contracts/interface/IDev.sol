@@ -9,7 +9,7 @@ interface IDev {
 	// solhint-disable-next-line func-name-mixedcase
 	function BURNER_ROLE() external returns (bytes32);
 
-	function mint(address _account, uint256 _amount) external;
+	function mint(address _account, uint256 _amount) external returns (bool);
 
-	function burn(address _account, uint256 _amount) external;
+	function burn(address _account, uint256 _amount) external returns (bool);
 }
