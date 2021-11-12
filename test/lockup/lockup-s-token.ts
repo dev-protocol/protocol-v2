@@ -25,7 +25,6 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 			dev.generatePropertyFactory(),
 			dev.generatePolicyFactory(),
 		])
-		await dev.addMinterRole()
 		await dev.dev.mint(deployer, deployerBalance)
 		await dev.generatePolicy('PolicyTestBase')
 		await dev.generateTreasury()

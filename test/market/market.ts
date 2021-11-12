@@ -335,7 +335,6 @@ contract(
 					dev.generateLockup(),
 					dev.generateWithdraw(),
 				])
-				await dev.addMinterRole()
 				const behavior1 = await dev.getMarket('MarketTest3', user)
 				const behavior2 = await dev.getMarket('MarketTest3', user)
 				await dev.generatePolicy('PolicyTest1')
@@ -471,7 +470,6 @@ contract(
 					dev.generateLockup(),
 					dev.generateWithdraw(),
 				])
-				await dev.addMinterRole()
 				const behavior1 = await dev.getMarket('MarketTest1', user)
 				await dev.generatePolicy('PolicyTest1')
 				await dev.generateTreasury()

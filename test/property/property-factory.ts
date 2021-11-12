@@ -15,9 +15,7 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 				dev.generatePropertyFactory(),
 				dev.generatePolicyFactory(),
 				dev.generateLockup(),
-				dev.generateWithdraw(),
 			])
-			await dev.addMinterRole()
 			await dev.generatePolicy()
 			await dev.generateTreasury()
 			await dev.setCapSetter()
@@ -75,7 +73,6 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 				dev.generateLockup(),
 				dev.generateWithdraw(),
 			])
-			await dev.addMinterRole()
 			await dev.generatePolicy('PolicyTest1')
 			await dev.generateTreasury()
 			await dev.setCapSetter()

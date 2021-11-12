@@ -18,13 +18,11 @@ contract(
 			await dev.generateSTokensManager()
 			await dev.generatePolicyFactory()
 			await dev.generateLockup()
-			await dev.generateWithdraw()
 			await dev.generateMetricsFactory()
 			await dev.generatePolicy()
 			await dev.generateTreasury()
 			await dev.setCapSetter()
 			await dev.updateCap()
-			await dev.addMinterRole()
 
 			return dev
 		}
@@ -357,10 +355,8 @@ contract(
 					dev.generatePropertyFactory(),
 					dev.generatePolicyFactory(),
 					dev.generateLockup(),
-					dev.generateWithdraw(),
 					dev.generateMetricsFactory(),
 				])
-				await dev.addMinterRole()
 				await dev.generatePolicy()
 				await dev.generateTreasury()
 				await dev.setCapSetter()
@@ -457,11 +453,9 @@ contract(
 					dev.generateWithdraw(),
 					dev.generatePropertyFactory(),
 					dev.generateLockup(),
-					dev.generateWithdraw(),
 					dev.generatePolicyFactory(),
 					dev.generateMetricsFactory(),
 				])
-				await dev.addMinterRole()
 				await dev.generatePolicy('PolicyTestForProperty')
 				await dev.generateTreasury()
 				await dev.setCapSetter()

@@ -29,7 +29,6 @@ contract('STokensManager', ([deployer, user]) => {
 			dev.generatePropertyFactory(),
 			dev.generatePolicyFactory(),
 		])
-		await dev.addMinterRole()
 		await dev.dev.mint(deployer, deployerBalance)
 		await dev.dev.approve(dev.lockup.address, '100000')
 		await dev.generatePolicy('PolicyTestBase')
