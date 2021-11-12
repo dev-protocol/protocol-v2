@@ -187,7 +187,7 @@ export class DevProtocolInstance {
 		)
 	}
 
-	public async generateLockup(): Promise<void> {
+	public async generateLockup(addMinterRole=true): Promise<void> {
 		const [proxfied] = await deployProxy(contract('Lockup'), this._deployer)
 		await proxfied.initialize(this._addressRegistry.address)
 		this._lockup = proxfied
@@ -196,7 +196,9 @@ export class DevProtocolInstance {
 			this._lockup.address,
 			this.fromDeployer
 		)
-		await this._dev.grantRole(await this._dev.MINTER_ROLE(), proxfied.address)
+		if (addMinterRole) {
+            await this._dev.grantRole(await this._dev.MINTER_ROLE(), proxfied.address)
+		}
 	}
 
 	public async generatePropertyFactory(): Promise<void> {
