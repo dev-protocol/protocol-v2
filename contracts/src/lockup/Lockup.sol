@@ -5,7 +5,6 @@ import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "../../interface/IDev.sol";
-import "../../interface/IDevBridge.sol";
 import "../../interface/IProperty.sol";
 import "../../interface/IPolicy.sol";
 import "../../interface/ILockup.sol";
