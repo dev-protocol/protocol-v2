@@ -196,6 +196,7 @@ export class DevProtocolInstance {
 			this._lockup.address,
 			this.fromDeployer
 		)
+		await this._dev.grantRole(await this._dev.MINTER_ROLE(), proxfied.address)
 	}
 
 	public async generatePropertyFactory(): Promise<void> {
@@ -266,6 +267,7 @@ export class DevProtocolInstance {
 			this._withdraw.address,
 			this.fromDeployer
 		)
+		await this._dev.grantRole(await this._dev.MINTER_ROLE(), proxfied.address)
 	}
 
 	public async generatePolicy(
@@ -340,16 +342,16 @@ export class DevProtocolInstance {
 		await this._lockup.updateCap(value)
 	}
 
-	public async addMinterRole(): Promise<void> {
-		await this._dev.grantRole(
-			await this._dev.MINTER_ROLE(),
-			this._withdraw.address
-		)
-		await this._dev.grantRole(
-			await this._dev.MINTER_ROLE(),
-			this._lockup.address
-		)
-	}
+	// Public async addMinterRole(): Promise<void> {
+	// 	await this._dev.grantRole(
+	// 		await this._dev.MINTER_ROLE(),
+	// 		this._withdraw.address
+	// 	)
+	// 	await this._dev.grantRole(
+	// 		await this._dev.MINTER_ROLE(),
+	// 		this._lockup.address
+	// 	)
+	// }
 
 	public async addBurnerRole(marketAddress: string): Promise<void> {
 		await this._dev.grantRole(await this._dev.BURNER_ROLE(), marketAddress)
