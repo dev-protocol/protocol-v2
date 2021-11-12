@@ -16,7 +16,7 @@ contract('MarketFactoryTest', ([deployer, user, dummyMarketAddress]) => {
 		await Promise.all([
 			dev.generatePolicyFactory(),
 			dev.generateMarketFactory(),
-			dev.generateLockup(),
+			dev.generateLockup(false),
 			dev.generateMetricsFactory(),
 		])
 		const policy = await dev.getPolicy('PolicyTest1', user)

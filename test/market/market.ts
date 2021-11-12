@@ -113,7 +113,7 @@ contract(
 			it('Get associatedMarket Behavior Contract', async () => {
 				await dev.generateAddressRegistry()
 				await dev.generatePolicyFactory()
-				await dev.generateLockup()
+				await dev.generateLockup(false)
 				await dev.generateMarketFactory()
 				await dev.generateMetricsFactory()
 				await dev.generatePolicy('PolicyTest1')
