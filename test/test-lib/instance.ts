@@ -342,17 +342,6 @@ export class DevProtocolInstance {
 		await this._lockup.updateCap(value)
 	}
 
-	// Public async addMinterRole(): Promise<void> {
-	// 	await this._dev.grantRole(
-	// 		await this._dev.MINTER_ROLE(),
-	// 		this._withdraw.address
-	// 	)
-	// 	await this._dev.grantRole(
-	// 		await this._dev.MINTER_ROLE(),
-	// 		this._lockup.address
-	// 	)
-	// }
-
 	public async addBurnerRole(marketAddress: string): Promise<void> {
 		await this._dev.grantRole(await this._dev.BURNER_ROLE(), marketAddress)
 	}
