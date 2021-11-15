@@ -100,6 +100,18 @@ contract Market is UsingRegistry, IMarket {
 	}
 
 	/**
+	 * deactivates this Market.
+	 * Called from MarketFactory contract.
+	 */
+	function toDisable() external override {
+		require(
+			msg.sender == registry().registries("MarketFactory"),
+			"this is illegal address"
+		);
+		enabled = false;
+	}
+
+	/**
 	 * Authenticates the new asset and proves that the Property author is the owner of the asset.
 	 */
 	function authenticate(address _prop, string[] memory _args)

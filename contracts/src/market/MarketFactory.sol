@@ -67,17 +67,35 @@ contract MarketFactory is
 	}
 
 	/**
-	 * Creates a new Market contract.
+	 * active Market contract.
 	 */
 	function enable(address _addr) external override onlyOwner {
 		_enable(_addr);
+	}
+
+	/**
+	 * deactive Market contract.
+	 */
+	function disable(address _addr) external override onlyOwner {
+		isMarket[_addr] = false;
+		marketsCount += 1;
+		IMarket market = IMarket(_addr);
+		require(market.enabled() == true, "already disabled");
+		market.toDisable();
+		for (uint256 i = 0; i < enabledMarkets.length; i++) {
+			if (enabledMarkets[i] == _addr) {
+				delete enabledMarkets[i];
+				return;
+			}
+		}
+		revert("illegal address");
 	}
 
 	function getEnabledMarkets() external view returns (address[] memory) {
 		return enabledMarkets;
 	}
 
-	function _enable(address _addr) internal {
+	function _enable(address _addr) private {
 		/**
 		 * Validates the passed address is not 0 address.
 		 */
@@ -97,10 +115,6 @@ contract MarketFactory is
 
 	function _addMarket(address _addr) internal {
 		isMarket[_addr] = true;
-		_addCount();
-	}
-
-	function _addCount() internal {
-		marketsCount = marketsCount + 1;
+		marketsCount -= 1;
 	}
 }

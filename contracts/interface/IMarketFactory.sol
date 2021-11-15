@@ -13,6 +13,8 @@ interface IMarketFactory {
 
 	function enable(address _addr) external;
 
+	function disable(address _addr) external;
+
 	function isMarket(address _addr) external view returns (bool);
 
 	function isPotentialMarket(address _addr) external view returns (bool);

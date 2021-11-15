@@ -37,4 +37,6 @@ interface IMarket {
 		returns (address[] memory);
 
 	function toEnable() external;
+
+	function toDisable() external;
 }
