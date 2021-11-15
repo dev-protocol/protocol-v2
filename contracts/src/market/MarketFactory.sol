@@ -78,7 +78,7 @@ contract MarketFactory is
 	 */
 	function disable(address _addr) external override onlyOwner {
 		isMarket[_addr] = false;
-		marketsCount += 1;
+		marketsCount -= 1;
 		IMarket market = IMarket(_addr);
 		require(market.enabled() == true, "already disabled");
 		market.toDisable();
@@ -115,6 +115,6 @@ contract MarketFactory is
 
 	function _addMarket(address _addr) internal {
 		isMarket[_addr] = true;
-		marketsCount -= 1;
+		marketsCount += 1;
 	}
 }

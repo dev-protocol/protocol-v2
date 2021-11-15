@@ -93,7 +93,7 @@ contract Market is UsingRegistry, IMarket {
 	function toEnable() external override {
 		require(
 			msg.sender == registry().registries("MarketFactory"),
-			"this is illegal address"
+			"illegal access"
 		);
 		require(isDuringVotingPeriod(), "deadline is over");
 		enabled = true;
@@ -106,7 +106,7 @@ contract Market is UsingRegistry, IMarket {
 	function toDisable() external override {
 		require(
 			msg.sender == registry().registries("MarketFactory"),
-			"this is illegal address"
+			"illegal accesss"
 		);
 		enabled = false;
 	}
