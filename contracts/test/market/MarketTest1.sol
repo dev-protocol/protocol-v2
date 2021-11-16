@@ -3,6 +3,7 @@ pragma solidity =0.8.9;
 
 import "../../interface/IMarketBehavior.sol";
 import "../../interface/IMarket.sol";
+import "../../interface/IDevBridge.sol";
 import "../../src/common/registry/UsingRegistry.sol";
 
 contract MarketTest1 is IMarketBehavior, UsingRegistry {
@@ -65,5 +66,13 @@ contract MarketTest1 is IMarketBehavior, UsingRegistry {
 		address marketFactory = registry().registries("MarketFactory");
 		require(marketFactory == msg.sender, "illegal sender");
 		associatedMarket = _associatedMarket;
+	}
+
+	function burnTest(
+		address _devBridge,
+		address _account,
+		uint256 _amount
+	) external {
+		IDevBridge(_devBridge).burn(_account, _amount);
 	}
 }

@@ -1,26 +1,36 @@
 /* eslint-disable new-cap */
 import { deployProxy, DevProtocolInstance } from '../test-lib/instance'
-import { DevInstance, DevBridgeInstance } from '../../types/truffle-contracts'
+import {
+	DevInstance,
+	DevBridgeInstance,
+	MarketFactoryInstance,
+} from '../../types/truffle-contracts'
 import { validateErrorMessage } from '../test-lib/utils/error'
 
-contract('DevBridge', ([deployer, user1, lockup, withdraw, market]) => {
+contract('DevBridge', ([deployer, user1, lockup, withdraw]) => {
+	const contract = artifacts.require
+
 	const createDevInstance = async (): Promise<DevProtocolInstance> => {
 		const dev = new DevProtocolInstance(deployer)
 		await dev.generateAddressRegistry()
 		await dev.generateDev()
 		await dev.generateDevBridge()
 		await dev.generateMarketFactory()
+		await dev.generatePolicyFactory()
 		await dev.addressRegistry.setRegistry('Lockup', lockup)
 		await dev.addressRegistry.setRegistry('Withdraw', withdraw)
-		await dev.marketFactory.__addMarket(market)
+		const policy = await dev.getPolicy('PolicyTest1', user1)
+		await dev.policyFactory.create(policy.address, { from: user1 })
+		const market = await dev.getMarket('MarketTest1', user1)
+		await dev.marketFactory.create(market.address, {
+			from: user1,
+		})
 		return dev
 	}
 
 	const createDevInstanceNotAddRole = async (): Promise<
-		[DevInstance, DevBridgeInstance]
+		[DevInstance, DevBridgeInstance, MarketFactoryInstance]
 	> => {
-		const contract = artifacts.require
-
 		const [addressRegistry] = await deployProxy(
 			contract('AddressRegistry'),
 			deployer
@@ -34,15 +44,34 @@ contract('DevBridge', ([deployer, user1, lockup, withdraw, market]) => {
 		})
 
 		const [marketFactory] = await deployProxy(
-			contract('MarketFactoryTest'),
+			contract('MarketFactory'),
 			deployer
 		)
 		await marketFactory.initialize(addressRegistry.address)
-		await marketFactory.__addMarket(market)
 		await addressRegistry.setRegistry('MarketFactory', marketFactory.address, {
 			from: deployer,
 		})
 
+		const policy = await contract('PolicyTest1').new()
+		const [policyFactory] = await deployProxy(
+			contract('PolicyFactory'),
+			deployer
+		)
+		await policyFactory.initialize(addressRegistry.address)
+		await addressRegistry.setRegistry(
+			'PolicyFactory',
+			policyFactory.address,
+			{
+				from: deployer,
+			}
+		)
+		await policyFactory.create(policy.address)
+		const market = await contract('MarketTest1').new(addressRegistry.address, {
+			from: deployer,
+		})
+		await marketFactory.create(market.address, {
+			from: deployer,
+		})
 		const [devBridge] = await deployProxy(contract('DevBridge'), deployer)
 		await devBridge.initialize(addressRegistry.address)
 
@@ -52,7 +81,7 @@ contract('DevBridge', ([deployer, user1, lockup, withdraw, market]) => {
 		await addressRegistry.setRegistry('Withdraw', withdraw, {
 			from: deployer,
 		})
-		return [dev, devBridge]
+		return [dev, devBridge, marketFactory]
 	}
 
 	describe('mint', () => {
@@ -93,22 +122,33 @@ contract('DevBridge', ([deployer, user1, lockup, withdraw, market]) => {
 	})
 	describe('burn', () => {
 		describe('success', () => {
-			it('If devBridge has burner privileges, it can burn Dev tokens.(MarketFactory)', async () => {
+			it.only('If devBridge has burner privileges, it can burn Dev tokens.(MarketFactory)', async () => {
 				const dev = await createDevInstance()
 				await dev.dev.mint(user1, 100)
+				console.log(1)
 				const before = await dev.dev.balanceOf(user1)
 				expect(before.toString()).to.equal('100')
-				await dev.devBridge.burn(user1, 100, { from: market })
+				console.log(2)
+				const marketAddress = await dev.marketFactory.getEnabledMarkets()
+				console.log(marketAddress)
+				const marketInstance = await contract('MarketTest1').at(marketAddress[0])
+				console.log(dev.devBridge.address)
+				console.log(marketInstance)
+				await marketInstance.burnTest(dev.devBridge.address, user1, 100)
+				console.log(4)
 				const after = await dev.dev.balanceOf(user1)
 				expect(after.toString()).to.equal('0')
 			})
 		})
 		describe('fail', () => {
 			it('If devBridge does not has minter privileges, it can not mint Dev tokens', async () => {
-				const [dev, devBridge] = await createDevInstanceNotAddRole()
+				const [dev, devBridge, marketFactory] =
+					await createDevInstanceNotAddRole()
 				await dev.mint(user1, 100)
-				const result = await devBridge
-					.burn(user1, 100, { from: market })
+				const marketAddress = (await marketFactory.getEnabledMarkets())[0]
+				const marketInstance = await contract('MarketTest1').at(marketAddress)
+				const result = await marketInstance
+					.burnTest(devBridge.address, user1, 100)
 					.catch((err: Error) => err)
 				validateErrorMessage(result, 'must have burner role to burn')
 			})
@@ -158,8 +198,10 @@ contract('DevBridge', ([deployer, user1, lockup, withdraw, market]) => {
 				await dev.devBridge.renounceBurner()
 				const after = await dev.dev.hasRole(role, dev.devBridge.address)
 				expect(after).to.equal(false)
-				const result = await dev.devBridge
-					.burn(user1, 100, { from: market })
+				const marketAddress = (await dev.marketFactory.getEnabledMarkets())[0]
+				const marketInstance = await contract('MarketTest1').at(marketAddress)
+				const result = await marketInstance
+					.burnTest(dev.devBridge.address, user1, 100)
 					.catch((err: Error) => err)
 				validateErrorMessage(result, 'must have burner role to burn')
 			})
