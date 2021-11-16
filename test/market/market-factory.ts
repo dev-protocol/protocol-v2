@@ -103,7 +103,7 @@ contract('MarketFactoryTest', ([deployer, user, dummyMarketAddress]) => {
 				const res = await dev.marketFactory
 					.enable(dummyMarketAddress)
 					.catch((err: Error) => err)
-				validateAddressErrorMessage(res)
+				validateErrorMessage(res, 'illegal address')
 			})
 			it('we cannot specify the address of an active market.', async () => {
 				const [dev, market] = await init()
@@ -115,16 +115,11 @@ contract('MarketFactoryTest', ([deployer, user, dummyMarketAddress]) => {
 		})
 		describe('success', () => {
 			it('Enabling the Market', async () => {
-				const [dev] = await init()
-				const secoundMarket = await dev.getMarket('MarketTest1', user)
-				const result = await dev.marketFactory.create(secoundMarket.address, {
-					from: user,
-				})
-				const secoundMarketAddress = getMarketAddress(result)
-				await dev.marketFactory.enable(secoundMarketAddress)
-
-				const deployedMarket = await marketContract.at(secoundMarketAddress)
-				expect(await deployedMarket.enabled()).to.be.equal(true)
+				const [dev, marketAddress] = await init()
+				const marketInstance = await marketContract.at(marketAddress)
+				expect(await marketInstance.enabled()).to.be.equal(true)
+				await dev.marketFactory.disable(marketInstance.address)
+				expect(await marketInstance.enabled()).to.be.equal(false)
 			})
 		})
 	})
@@ -136,7 +131,7 @@ contract('MarketFactoryTest', ([deployer, user, dummyMarketAddress]) => {
 				await dev.generateAddressRegistry()
 				await dev.generateMarketFactory()
 				const res = await dev.marketFactory
-					.enable(DEFAULT_ADDRESS, {
+					.disable(DEFAULT_ADDRESS, {
 						from: user,
 					})
 					.catch((err: Error) => err)
@@ -147,16 +142,17 @@ contract('MarketFactoryTest', ([deployer, user, dummyMarketAddress]) => {
 				await dev.generateAddressRegistry()
 				await dev.generateMarketFactory()
 				const res = await dev.marketFactory
-					.enable(dummyMarketAddress)
+					.disable(dummyMarketAddress)
 					.catch((err: Error) => err)
-				validateAddressErrorMessage(res)
+				validateErrorMessage(res, 'illegal address')
 			})
 			it('we cannot specify the address of an active market.', async () => {
 				const [dev, market] = await init()
+				await dev.marketFactory.disable(market)
 				const res = await dev.marketFactory
-					.enable(market)
+					.disable(market)
 					.catch((err: Error) => err)
-				validateErrorMessage(res, 'already enabled')
+				validateErrorMessage(res, 'illegal address')
 			})
 		})
 		describe('success', () => {

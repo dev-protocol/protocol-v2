@@ -78,6 +78,7 @@ contract MarketFactory is
 	 * deactive Market contract.
 	 */
 	function disable(address _addr) external override onlyOwner {
+		require(enabledMarketSet.contains(_addr) == true, "illegal address");
 		IMarket market = IMarket(_addr);
 		require(market.enabled() == true, "already disabled");
 		market.toDisable();
@@ -97,7 +98,7 @@ contract MarketFactory is
 		/**
 		 * Validates the passed address is not 0 address.
 		 */
-		require(isPotentialMarket[_addr], "this is illegal address");
+		require(isPotentialMarket[_addr], "illegal address");
 
 		enabledMarketSet.add(_addr);
 
@@ -108,10 +109,6 @@ contract MarketFactory is
 		require(market.enabled() == false, "already enabled");
 
 		market.toEnable();
-	}
-
-	function __addMarket(address _market) internal {
-		enabledMarketSet.add(_market);
 	}
 
 	// deprecated!!!!!!!!!!!!
