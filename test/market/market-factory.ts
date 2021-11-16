@@ -217,4 +217,37 @@ contract('MarketFactoryTest', ([deployer, user, dummyMarketAddress]) => {
 			expect(markets[0]).to.be.equal(marketAddress)
 		})
 	})
+
+	describe('MarketFactory; __addMarketAddress', () => {
+		describe('success', () => {
+			it('Disabling the Market', async () => {
+				const dev = new DevProtocolInstance(deployer)
+				await dev.generateAddressRegistry()
+				await dev.generateMarketFactory()
+				await dev.marketFactory.__addMarketAddress(dummyMarketAddress)
+				expect(
+					await dev.marketFactory.isMarket(dummyMarketAddress)
+				).to.be.equal(true)
+				const addresses = await dev.marketFactory.getEnabledMarkets()
+				expect(addresses.length).to.be.equal(1)
+				expect(addresses[0]).to.be.equal(dummyMarketAddress)
+				expect(
+					await dev.marketFactory.isPotentialMarket(dummyMarketAddress)
+				).to.be.equal(true)
+			})
+		})
+		describe('fail', () => {
+			it('only owner', async () => {
+				const dev = new DevProtocolInstance(deployer)
+				await dev.generateAddressRegistry()
+				await dev.generateMarketFactory()
+				const res = await dev.marketFactory
+					.__addMarketAddress(dummyMarketAddress, {
+						from: user,
+					})
+					.catch((err: Error) => err)
+				validateErrorMessage(res, 'caller is not the owner', false)
+			})
+		})
+	})
 })
