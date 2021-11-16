@@ -58,13 +58,9 @@ contract('DevBridge', ([deployer, user1, lockup, withdraw]) => {
 			deployer
 		)
 		await policyFactory.initialize(addressRegistry.address)
-		await addressRegistry.setRegistry(
-			'PolicyFactory',
-			policyFactory.address,
-			{
-				from: deployer,
-			}
-		)
+		await addressRegistry.setRegistry('PolicyFactory', policyFactory.address, {
+			from: deployer,
+		})
 		await policyFactory.create(policy.address)
 		const market = await contract('MarketTest1').new(addressRegistry.address, {
 			from: deployer,
@@ -131,7 +127,9 @@ contract('DevBridge', ([deployer, user1, lockup, withdraw]) => {
 				console.log(2)
 				const marketAddress = await dev.marketFactory.getEnabledMarkets()
 				console.log(marketAddress)
-				const marketInstance = await contract('MarketTest1').at(marketAddress[0])
+				const marketInstance = await contract('MarketTest1').at(
+					marketAddress[0]
+				)
 				console.log(dev.devBridge.address)
 				console.log(marketInstance)
 				await marketInstance.burnTest(dev.devBridge.address, user1, 100)
