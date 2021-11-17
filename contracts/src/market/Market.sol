@@ -194,11 +194,6 @@ contract Market is UsingRegistry, IMarket {
 		 */
 		require(msg.sender == behavior, "this is illegal address");
 		require(enabled, "market is not enabled");
-		address propertyFactory = registry().registries("PropertyFactory");
-		require(
-			IPropertyFactory(propertyFactory).isProperty(_property),
-			"not property address"
-		);
 
 		/**
 		 * Validates the assets are not double authenticated.
