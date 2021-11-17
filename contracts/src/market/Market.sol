@@ -8,7 +8,6 @@ import "../../interface/IMarketBehavior.sol";
 import "../../interface/IPolicy.sol";
 import "../../interface/IMetrics.sol";
 import "../../interface/IMetricsFactory.sol";
-import "../../interface/IPropertyFactory.sol";
 import "../../interface/ILockup.sol";
 import "../../interface/IDev.sol";
 import "../../interface/IDevBridge.sol";
