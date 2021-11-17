@@ -84,6 +84,7 @@ contract MarketFactory is
 		market.toDisable();
 		bool result = enabledMarketSet.remove(_addr);
 		require(result, "illegal address");
+		isPotentialMarket[_addr] = false;
 	}
 
 	function getEnabledMarkets() external view returns (address[] memory) {

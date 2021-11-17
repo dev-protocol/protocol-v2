@@ -115,11 +115,16 @@ contract('MarketFactoryTest', ([deployer, user, dummyMarketAddress]) => {
 		})
 		describe('success', () => {
 			it('Enabling the Market', async () => {
-				const [dev, marketAddress] = await init()
-				const marketInstance = await marketContract.at(marketAddress)
-				expect(await marketInstance.enabled()).to.be.equal(true)
-				await dev.marketFactory.disable(marketInstance.address)
-				expect(await marketInstance.enabled()).to.be.equal(false)
+				const [dev] = await init()
+				const secoundMarket = await dev.getMarket('MarketTest1', user)
+				const result = await dev.marketFactory.create(secoundMarket.address, {
+					from: user,
+				})
+				const secoundMarketAddress = getMarketAddress(result)
+				await dev.marketFactory.enable(secoundMarketAddress)
+
+				const deployedMarket = await marketContract.at(secoundMarketAddress)
+				expect(await deployedMarket.enabled()).to.be.equal(true)
 			})
 		})
 	})
@@ -154,19 +159,25 @@ contract('MarketFactoryTest', ([deployer, user, dummyMarketAddress]) => {
 					.catch((err: Error) => err)
 				validateErrorMessage(res, 'illegal address')
 			})
+			it.only('Once a market is disabled, it cannot be enabled again.', async () => {
+				const [dev, marketAddress] = await init()
+				const marketInstance = await marketContract.at(marketAddress)
+				expect(await marketInstance.enabled()).to.be.equal(true)
+				await dev.marketFactory.disable(marketInstance.address)
+				expect(await marketInstance.enabled()).to.be.equal(false)
+				const res = await dev.marketFactory
+					.enable(marketAddress)
+					.catch((err: Error) => err)
+				validateErrorMessage(res, 'illegal address')
+			})
 		})
 		describe('success', () => {
 			it('Disabling the Market', async () => {
-				const [dev] = await init()
-				const secoundMarket = await dev.getMarket('MarketTest1', user)
-				const result = await dev.marketFactory.create(secoundMarket.address, {
-					from: user,
-				})
-				const secoundMarketAddress = getMarketAddress(result)
-				await dev.marketFactory.enable(secoundMarketAddress)
-
-				const deployedMarket = await marketContract.at(secoundMarketAddress)
-				expect(await deployedMarket.enabled()).to.be.equal(true)
+				const [dev, marketAddress] = await init()
+				const marketInstance = await marketContract.at(marketAddress)
+				expect(await marketInstance.enabled()).to.be.equal(true)
+				await dev.marketFactory.disable(marketInstance.address)
+				expect(await marketInstance.enabled()).to.be.equal(false)
 			})
 		})
 	})
