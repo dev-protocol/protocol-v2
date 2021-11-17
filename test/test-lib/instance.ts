@@ -6,7 +6,7 @@ import {
 	LockupInstance,
 	PropertyFactoryInstance,
 	PolicyFactoryTestInstance,
-	MarketFactoryInstance,
+	MarketFactoryTestInstance,
 	MetricsFactoryTestInstance,
 	IPolicyInstance,
 	IMarketBehaviorInstance,
@@ -56,7 +56,7 @@ export class DevProtocolInstance {
 	private _lockup!: LockupInstance
 	private _propertyFactory!: PropertyFactoryInstance
 	private _policyFactory!: PolicyFactoryTestInstance
-	private _marketFactory!: MarketFactoryInstance
+	private _marketFactory!: MarketFactoryTestInstance
 	private _metricsFactory!: MetricsFactoryTestInstance
 	private _withdraw!: WithdrawTestInstance
 	private _treasury!: TreasuryTestInstance
@@ -103,7 +103,7 @@ export class DevProtocolInstance {
 		return this._policyFactory
 	}
 
-	public get marketFactory(): MarketFactoryInstance {
+	public get marketFactory(): MarketFactoryTestInstance {
 		return this._marketFactory
 	}
 
@@ -253,7 +253,7 @@ export class DevProtocolInstance {
 
 	public async generateMarketFactory(): Promise<void> {
 		const [proxfied] = await deployProxy(
-			contract('MarketFactory'),
+			contract('MarketFactoryTest'),
 			this._deployer
 		)
 		await proxfied.initialize(this._addressRegistry.address)

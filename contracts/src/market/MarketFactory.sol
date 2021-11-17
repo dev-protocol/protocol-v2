@@ -100,7 +100,7 @@ contract MarketFactory is
 		 */
 		require(isPotentialMarket[_addr], "illegal address");
 
-		enabledMarketSet.add(_addr);
+		_addMarket(_addr);
 
 		/**
 		 * Market will be enable.
@@ -109,6 +109,10 @@ contract MarketFactory is
 		require(market.enabled() == false, "already enabled");
 
 		market.toEnable();
+	}
+
+	function _addMarket(address _addr) internal {
+		enabledMarketSet.add(_addr);
 	}
 
 	// deprecated!!!!!!!!!!!!
