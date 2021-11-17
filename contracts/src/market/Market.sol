@@ -8,6 +8,7 @@ import "../../interface/IMarketBehavior.sol";
 import "../../interface/IPolicy.sol";
 import "../../interface/IMetrics.sol";
 import "../../interface/IMetricsFactory.sol";
+import "../../interface/IPropertyFactory.sol";
 import "../../interface/ILockup.sol";
 import "../../interface/IDev.sol";
 import "../../interface/IDevBridge.sol";
@@ -193,6 +194,11 @@ contract Market is UsingRegistry, IMarket {
 		 */
 		require(msg.sender == behavior, "this is illegal address");
 		require(enabled, "market is not enabled");
+		address propertyFactory = registry().registries("PropertyFactory");
+		require(
+			IPropertyFactory(propertyFactory).isProperty(_property),
+			"not property address"
+		);
 
 		/**
 		 * Validates the assets are not double authenticated.
