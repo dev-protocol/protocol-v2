@@ -4,10 +4,10 @@ const handler = async function (deployer, network) {
 	}
 
 	// Check it!!!//////////////////////////////////////////////////////
-	const marketAddress1 = '0x84b9e407e2Ee76A641b45d007bBFd9e60a13FF7d'
-	// Const marketAddress2 = ''
-	const adminAddress = '0xa3de020256816b3E2C18Fdc3e849Eed4c5e93C62'
-	const addressRegistry = '0xbeF4DeEA3AE863739Bd402E025c749536f491ffa'
+	// const marketAddress1 = ''
+	// const marketAddress2 = ''
+	const adminAddress = ''
+	const addressRegistry = ''
 	/// ////////////////////////////////////////////////////////////////
 
 	const logic = artifacts.require('MarketFactory')
@@ -42,8 +42,8 @@ const handler = async function (deployer, network) {
 	const wrap = await logic.at(proxyInstance.address)
 	await wrap.initialize(regInstance.address)
 
-	await wrap.__addMarketAddress(marketAddress1)
-	// Await wrap.__addMarketAddress(marketAddress2)
+	// Await wrap.__addMarketAddress(marketAddress1)
+	// await wrap.__addMarketAddress(marketAddress2)
 	const addresses = await wrap.getEnabledMarkets()
 	console.log(addresses)
 } as Truffle.Migration
