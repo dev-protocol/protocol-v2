@@ -115,10 +115,4 @@ contract MarketFactory is
 	function _addMarket(address _addr) internal {
 		enabledMarketSet.add(_addr);
 	}
-
-	// deprecated!!!!!!!!!!!!
-	function __addMarketAddress(address _market) external onlyOwner {
-		isPotentialMarket[_market] = true;
-		enabledMarketSet.add(_market);
-	}
 }
