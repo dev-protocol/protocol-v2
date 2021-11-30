@@ -103,7 +103,7 @@ contract('MarketFactoryTest', ([deployer, user, dummyMarketAddress]) => {
 				const res = await dev.marketFactory
 					.enable(dummyMarketAddress)
 					.catch((err: Error) => err)
-				validateAddressErrorMessage(res)
+				validateErrorMessage(res, 'illegal address')
 			})
 			it('we cannot specify the address of an active market.', async () => {
 				const [dev, market] = await init()
@@ -129,11 +129,72 @@ contract('MarketFactoryTest', ([deployer, user, dummyMarketAddress]) => {
 		})
 	})
 
+	describe('MarketFactory; disable', () => {
+		describe('failed', () => {
+			it('Cannot be executed by anyone but the owner.', async () => {
+				const dev = new DevProtocolInstance(deployer)
+				await dev.generateAddressRegistry()
+				await dev.generateMarketFactory()
+				const res = await dev.marketFactory
+					.disable(DEFAULT_ADDRESS, {
+						from: user,
+					})
+					.catch((err: Error) => err)
+				validateErrorMessage(res, 'caller is not the owner', false)
+			})
+			it('Only the market address can be specified.', async () => {
+				const dev = new DevProtocolInstance(deployer)
+				await dev.generateAddressRegistry()
+				await dev.generateMarketFactory()
+				const res = await dev.marketFactory
+					.disable(dummyMarketAddress)
+					.catch((err: Error) => err)
+				validateErrorMessage(res, 'illegal address')
+			})
+			it('we cannot specify the address of an active market.', async () => {
+				const [dev, market] = await init()
+				await dev.marketFactory.disable(market)
+				const res = await dev.marketFactory
+					.disable(market)
+					.catch((err: Error) => err)
+				validateErrorMessage(res, 'illegal address')
+			})
+			it.only('Once a market is disabled, it cannot be enabled again.', async () => {
+				const [dev, marketAddress] = await init()
+				const marketInstance = await marketContract.at(marketAddress)
+				expect(await marketInstance.enabled()).to.be.equal(true)
+				await dev.marketFactory.disable(marketInstance.address)
+				expect(await marketInstance.enabled()).to.be.equal(false)
+				const res = await dev.marketFactory
+					.enable(marketAddress)
+					.catch((err: Error) => err)
+				validateErrorMessage(res, 'illegal address')
+			})
+		})
+		describe('success', () => {
+			it('Disabling the Market', async () => {
+				const [dev, marketAddress] = await init()
+				const marketInstance = await marketContract.at(marketAddress)
+				expect(await marketInstance.enabled()).to.be.equal(true)
+				await dev.marketFactory.disable(marketInstance.address)
+				expect(await marketInstance.enabled()).to.be.equal(false)
+			})
+		})
+	})
+
 	describe('MarketFactory; isMarket', () => {
 		it('Returns true when the passed address is the created Market', async () => {
 			const [dev, market] = await init()
 			const result = await dev.marketFactory.isMarket(market)
 			expect(result).to.be.equal(true)
+		})
+		it('You can determine if it is a active market.', async () => {
+			const [dev, market] = await init()
+			let result = await dev.marketFactory.isMarket(market)
+			expect(result).to.be.equal(true)
+			await dev.marketFactory.disable(market)
+			result = await dev.marketFactory.isMarket(market)
+			expect(result).to.be.equal(false)
 		})
 		it('Returns false when the passed address is not the created Market', async () => {
 			const [dev] = await init()
@@ -149,7 +210,7 @@ contract('MarketFactoryTest', ([deployer, user, dummyMarketAddress]) => {
 			expect(result.length).to.be.equal(1)
 			expect(result[0]).to.be.equal(marketAddress)
 		})
-		it('add market address list', async () => {
+		it('add and delete market address list', async () => {
 			const [dev, marketAddress] = await init()
 			const market = await dev.getMarket('MarketTest2', user)
 			const result = await dev.marketFactory.create(market.address, {
@@ -157,27 +218,47 @@ contract('MarketFactoryTest', ([deployer, user, dummyMarketAddress]) => {
 			})
 			const marketAddress2 = getMarketAddress(result)
 			await dev.marketFactory.enable(marketAddress2)
-			const markets = await dev.marketFactory.getEnabledMarkets()
+			let markets = await dev.marketFactory.getEnabledMarkets()
 			expect(markets.length).to.be.equal(2)
 			expect(markets[0]).to.be.equal(marketAddress)
 			expect(markets[1]).to.be.equal(marketAddress2)
+			await dev.marketFactory.disable(marketAddress2)
+			markets = await dev.marketFactory.getEnabledMarkets()
+			expect(markets.length).to.be.equal(1)
+			expect(markets[0]).to.be.equal(marketAddress)
 		})
 	})
 
-	describe('MarketFactory; marketsCount', () => {
-		it('Returns the number of enabled Markets', async () => {
-			const [dev] = await init()
-			const result = await dev.marketFactory.marketsCount()
-			expect(result.toNumber()).to.be.equal(1)
+	describe('MarketFactory; __addMarketAddress', () => {
+		describe('success', () => {
+			it('Disabling the Market', async () => {
+				const dev = new DevProtocolInstance(deployer)
+				await dev.generateAddressRegistry()
+				await dev.generateMarketFactory()
+				await dev.marketFactory.__addMarketAddress(dummyMarketAddress)
+				expect(
+					await dev.marketFactory.isMarket(dummyMarketAddress)
+				).to.be.equal(true)
+				const addresses = await dev.marketFactory.getEnabledMarkets()
+				expect(addresses.length).to.be.equal(1)
+				expect(addresses[0]).to.be.equal(dummyMarketAddress)
+				expect(
+					await dev.marketFactory.isPotentialMarket(dummyMarketAddress)
+				).to.be.equal(true)
+			})
 		})
-		it('Should be increased the number when a new Market is enabled', async () => {
-			const [dev] = await init()
-			const behavior = await dev.getMarket('MarketTest3', user)
-			const created = await dev.marketFactory.create(behavior.address)
-			const secoundMarketAddress = getMarketAddress(created)
-			await dev.marketFactory.enable(secoundMarketAddress)
-			const result = await dev.marketFactory.marketsCount()
-			expect(result.toNumber()).to.be.equal(2)
+		describe('fail', () => {
+			it('only owner', async () => {
+				const dev = new DevProtocolInstance(deployer)
+				await dev.generateAddressRegistry()
+				await dev.generateMarketFactory()
+				const res = await dev.marketFactory
+					.__addMarketAddress(dummyMarketAddress, {
+						from: user,
+					})
+					.catch((err: Error) => err)
+				validateErrorMessage(res, 'caller is not the owner', false)
+			})
 		})
 	})
 })

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity =0.8.9;
 
+import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "../../interface/IMarket.sol";
 import "../../interface/IMarketBehavior.sol";
@@ -16,10 +17,10 @@ contract MarketFactory is
 	OwnableUpgradeable,
 	IMarketFactory
 {
-	uint256 public override marketsCount;
-	address[] public enabledMarkets;
-	mapping(address => bool) public override isMarket;
 	mapping(address => bool) public override isPotentialMarket;
+	EnumerableSet.AddressSet private enabledMarketSet;
+
+	using EnumerableSet for EnumerableSet.AddressSet;
 
 	/**
 	 * Initialize the passed address as AddressRegistry address.
@@ -58,7 +59,7 @@ contract MarketFactory is
 		 * For the first Market contract, it will be activated immediately.
 		 * If not, the Market contract will be activated after a vote by the voters.
 		 */
-		if (marketsCount == 0) {
+		if (enabledMarketSet.length() == 0) {
 			_enable(marketAddr);
 		}
 
@@ -67,21 +68,38 @@ contract MarketFactory is
 	}
 
 	/**
-	 * Creates a new Market contract.
+	 * active Market contract.
 	 */
 	function enable(address _addr) external override onlyOwner {
 		_enable(_addr);
 	}
 
-	function getEnabledMarkets() external view returns (address[] memory) {
-		return enabledMarkets;
+	/**
+	 * deactive Market contract.
+	 */
+	function disable(address _addr) external override onlyOwner {
+		require(enabledMarketSet.contains(_addr) == true, "illegal address");
+		IMarket market = IMarket(_addr);
+		require(market.enabled() == true, "already disabled");
+		market.toDisable();
+		bool result = enabledMarketSet.remove(_addr);
+		require(result, "illegal address");
+		isPotentialMarket[_addr] = false;
 	}
 
-	function _enable(address _addr) internal {
+	function getEnabledMarkets() external view returns (address[] memory) {
+		return enabledMarketSet.values();
+	}
+
+	function isMarket(address _market) external view returns (bool) {
+		return enabledMarketSet.contains(_market);
+	}
+
+	function _enable(address _addr) private {
 		/**
 		 * Validates the passed address is not 0 address.
 		 */
-		require(isPotentialMarket[_addr], "this is illegal address");
+		require(isPotentialMarket[_addr], "illegal address");
 
 		_addMarket(_addr);
 
@@ -92,15 +110,15 @@ contract MarketFactory is
 		require(market.enabled() == false, "already enabled");
 
 		market.toEnable();
-		enabledMarkets.push(_addr);
 	}
 
 	function _addMarket(address _addr) internal {
-		isMarket[_addr] = true;
-		_addCount();
+		enabledMarketSet.add(_addr);
 	}
 
-	function _addCount() internal {
-		marketsCount = marketsCount + 1;
+	// deprecated!!!!!!!!!!!!
+	function __addMarketAddress(address _market) external onlyOwner {
+		isPotentialMarket[_market] = true;
+		enabledMarketSet.add(_market);
 	}
 }
