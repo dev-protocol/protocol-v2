@@ -1,4 +1,17 @@
 {
 	"extends": ["config:base"],
-	"automerge": true
+	"automerge": true,
+	"packageRules": [
+		{
+			"packageNames": [
+				"@openzeppelin/contracts",
+				"@openzeppelin/contracts-upgradeable"
+			],
+			"allowedVersions": "4.3.2"
+		},
+		{
+			"packageNames": ["@devprotocol/util-contracts"],
+			"allowedVersions": "3.3.0"
+		}
+	]
 }
