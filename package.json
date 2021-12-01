@@ -61,8 +61,8 @@
 	},
 	"dependencies": {
 		"@devprotocol/util-contracts": "3.3.0",
-		"@openzeppelin/contracts": "4.4.0",
-		"@openzeppelin/contracts-upgradeable": "4.4.0"
+		"@openzeppelin/contracts": "4.3.2",
+		"@openzeppelin/contracts-upgradeable": "4.3.2"
 	},
 	"directories": {
 		"doc": "docs",
