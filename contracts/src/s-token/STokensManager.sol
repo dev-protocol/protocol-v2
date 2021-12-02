@@ -21,7 +21,7 @@ contract STokensManager is
 	mapping(bytes32 => bytes) private bytesStorage;
 	mapping(address => uint256[]) private tokenIdsMapOfProperty;
 	mapping(address => EnumerableSet.UintSet) private tokenIdsMapOfOwner;
-	mapping(uint256 => string) private header;// TODO bodyと合わせて構造体にしたほうがいいかも
+	mapping(uint256 => string) private header; // TODO bodyと合わせて構造体にしたほうがいいかも
 	mapping(uint256 => string) private body;
 	mapping(uint256 => bool) private freeze;
 
@@ -39,10 +39,7 @@ contract STokensManager is
 	modifier onlyAuthor(uint256 _tokenId) {
 		StakingPositions memory currentPosition = getStoragePositions(_tokenId);
 		address author = IProperty(currentPosition.property).author();
-		require(
-			author == _msgSender(),
-			"illegal access"
-		);
+		require(author == _msgSender(), "illegal access");
 		_;
 	}
 
@@ -122,22 +119,31 @@ contract STokensManager is
 		return true;
 	}
 
-	function setTokenURIImage(uint256 _tokenId, string memory _header, string memory _body) external override onlyAuthor(_tokenId) {
-		require(
-			freeze[_tokenId] == false,
-			"freezed"
-		);
+	function setTokenURIImage(
+		uint256 _tokenId,
+		string memory _header,
+		string memory _body
+	) external override onlyAuthor(_tokenId) {
+		require(freeze[_tokenId] == false, "freezed");
 		header[_tokenId] = _header;
 		body[_tokenId] = _body;
 		// TODO セットしたものをクリアする関数も用意しといたほうがいいかな
 	}
 
-	function freezeTokenURI(uint256 _tokenId) external override onlyAuthor(_tokenId) {
+	function freezeTokenURI(uint256 _tokenId)
+		external
+		override
+		onlyAuthor(_tokenId)
+	{
 		freeze[_tokenId] = true;
 	}
 
 	// TODO 単語のチョイス大丈夫？
-	function meltTokenURI(uint256 _tokenId) external override onlyAuthor(_tokenId) {
+	function meltTokenURI(uint256 _tokenId)
+		external
+		override
+		onlyAuthor(_tokenId)
+	{
 		freeze[_tokenId] = false;
 	}
 
