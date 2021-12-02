@@ -7,11 +7,10 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "../../interface/ISTokensManager.sol";
 import "../../interface/IAddressRegistry.sol";
 import "../../interface/ILockup.sol";
-import "../../interface/IProperty.sol";
 import "../common/registry/InitializableUsingRegistry.sol";
 import "./STokensDescriptor.sol";
 
-contract STokensManager is
+contract STokensManagerBeforeTest is
 	ISTokensManager,
 	STokensDescriptor,
 	ERC721Upgradeable,
@@ -21,9 +20,6 @@ contract STokensManager is
 	mapping(bytes32 => bytes) private bytesStorage;
 	mapping(address => uint256[]) private tokenIdsMapOfProperty;
 	mapping(address => EnumerableSet.UintSet) private tokenIdsMapOfOwner;
-	mapping(uint256 => string) private header;// TODO bodyと合わせて構造体にしたほうがいいかも
-	mapping(uint256 => string) private body;
-	mapping(uint256 => bool) private freeze;
 
 	using Counters for Counters.Counter;
 	using EnumerableSet for EnumerableSet.UintSet;
@@ -31,16 +27,6 @@ contract STokensManager is
 	modifier onlyLockup() {
 		require(
 			registry().registries("Lockup") == _msgSender(),
-			"illegal access"
-		);
-		_;
-	}
-
-	modifier onlyAuthor(uint256 _tokenId) {
-		StakingPositions memory currentPosition = getStoragePositions(_tokenId);
-		address author = IProperty(currentPosition.property).author();
-		require(
-			author == _msgSender(),
 			"illegal access"
 		);
 		_;
@@ -57,12 +43,6 @@ contract STokensManager is
 		override
 		returns (string memory)
 	{
-		string headerStr = header[_tokenId];
-		string bodyStr = body[_tokenId];
-		// toDO 構造体にした方がいいね
-		if (headerStr != "" && bodyStr != "") {
-			return getTokenURIChangedByAuthor(headerStr, bodyStr);
-		}
 		StakingPositions memory positons = getStoragePositions(_tokenId);
 		return
 			getTokenURI(
@@ -120,25 +100,6 @@ contract STokensManager is
 			_pendingReward
 		);
 		return true;
-	}
-
-	function setTokenURIImage(uint256 _tokenId, string memory _header, string memory _body) external override onlyAuthor(_tokenId) {
-		require(
-			freeze[_tokenId] == false,
-			"freezed"
-		);
-		header[_tokenId] = _header;
-		body[_tokenId] = _body;
-		// TODO セットしたものをクリアする関数も用意しといたほうがいいかな
-	}
-
-	function freezeTokenURI(uint256 _tokenId) external override onlyAuthor(_tokenId) {
-		freeze[_tokenId] = true;
-	}
-
-	// TODO 単語のチョイス大丈夫？
-	function meltTokenURI(uint256 _tokenId) external override onlyAuthor(_tokenId) {
-		freeze[_tokenId] = false;
 	}
 
 	function positions(uint256 _tokenId)

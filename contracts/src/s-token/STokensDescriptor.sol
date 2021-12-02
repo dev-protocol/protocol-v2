@@ -66,4 +66,17 @@ contract STokensDescriptor {
 				)
 			);
 	}
+
+	function getTokenURIChangedByAuthor(
+		string _header,
+		string _body
+	) internal pure returns (string memory) {
+		return
+			string(
+				abi.encodePacked(
+					_header,
+					_body
+				)
+			);
+	}
 }
