@@ -63,7 +63,10 @@ contract STokensManager is
 				);
 		}
 		Descriptors memory currentDescriptor = abi.decode(tmp, (Descriptors));
-		if (keccak256(abi.encodePacked(currentDescriptor.descriptor)) == keccak256(abi.encodePacked(""))) {
+		if (
+			keccak256(abi.encodePacked(currentDescriptor.descriptor)) ==
+			keccak256(abi.encodePacked(""))
+		) {
 			StakingPositions memory positons = getStoragePositions(_tokenId);
 			return
 				getTokenURI(
@@ -125,13 +128,19 @@ contract STokensManager is
 		return true;
 	}
 
-	function setTokenURIImage(
-		uint256 _tokenId,
-		string memory _data
-	) external override onlyAuthor(_tokenId) {
+	function setTokenURIImage(uint256 _tokenId, string memory _data)
+		external
+		override
+		onlyAuthor(_tokenId)
+	{
 		bytes32 key = getStorageDescriptorsKey(_tokenId);
 		bytes memory tmp = bytesStorage[key];
-		Descriptors memory descriptor = Descriptors(false, address(0), _data, _msgSender());
+		Descriptors memory descriptor = Descriptors(
+			false,
+			address(0),
+			_data,
+			_msgSender()
+		);
 		if (tmp.length == 0) {
 			setStorageDescriptors(_tokenId, descriptor);
 			return;
@@ -160,7 +169,10 @@ contract STokensManager is
 	{
 		Descriptors memory currentDescriptor = getStorageDescriptors(_tokenId);
 		require(currentDescriptor.isFreezed == true, "not freezed");
-		require(currentDescriptor.freezingUser == _msgSender(), "illegal access");
+		require(
+			currentDescriptor.freezingUser == _msgSender(),
+			"illegal access"
+		);
 		currentDescriptor.isFreezed = false;
 		currentDescriptor.freezingUser = address(0);
 		setStorageDescriptors(_tokenId, currentDescriptor);
