@@ -21,9 +21,6 @@ contract STokensManager is
 	mapping(bytes32 => bytes) private bytesStorage;
 	mapping(address => uint256[]) private tokenIdsMapOfProperty;
 	mapping(address => EnumerableSet.UintSet) private tokenIdsMapOfOwner;
-	mapping(uint256 => string) private header; // TODO bodyと合わせて構造体にしたほうがいいかも
-	mapping(uint256 => string) private body;
-	mapping(uint256 => bool) private freeze;
 
 	using Counters for Counters.Counter;
 	using EnumerableSet for EnumerableSet.UintSet;
@@ -54,19 +51,28 @@ contract STokensManager is
 		override
 		returns (string memory)
 	{
-		string headerStr = header[_tokenId];
-		string bodyStr = body[_tokenId];
-		// toDO 構造体にした方がいいね
-		if (headerStr != "" && bodyStr != "") {
-			return getTokenURIChangedByAuthor(headerStr, bodyStr);
+		bytes32 key = getStorageDescriptorsKey(_tokenId);
+		bytes memory tmp = bytesStorage[key];
+		if (tmp.length == 0) {
+			StakingPositions memory positons = getStoragePositions(_tokenId);
+			return
+				getTokenURI(
+					positons.property,
+					positons.amount,
+					positons.cumulativeReward
+				);
 		}
-		StakingPositions memory positons = getStoragePositions(_tokenId);
-		return
-			getTokenURI(
-				positons.property,
-				positons.amount,
-				positons.cumulativeReward
-			);
+		Descriptors memory currentDescriptor = abi.decode(tmp, (Descriptors));
+		if (keccak256(abi.encodePacked(currentDescriptor.descriptor)) == keccak256(abi.encodePacked(""))) {
+			StakingPositions memory positons = getStoragePositions(_tokenId);
+			return
+				getTokenURI(
+					positons.property,
+					positons.amount,
+					positons.cumulativeReward
+				);
+		}
+		return currentDescriptor.descriptor;
 	}
 
 	function mint(
@@ -121,13 +127,18 @@ contract STokensManager is
 
 	function setTokenURIImage(
 		uint256 _tokenId,
-		string memory _header,
-		string memory _body
+		string memory _data
 	) external override onlyAuthor(_tokenId) {
-		require(freeze[_tokenId] == false, "freezed");
-		header[_tokenId] = _header;
-		body[_tokenId] = _body;
-		// TODO セットしたものをクリアする関数も用意しといたほうがいいかな
+		bytes32 key = getStorageDescriptorsKey(_tokenId);
+		bytes memory tmp = bytesStorage[key];
+		Descriptors memory descriptor = Descriptors(false, address(0), _data, _msgSender());
+		if (tmp.length == 0) {
+			setStorageDescriptors(_tokenId, descriptor);
+			return;
+		}
+		Descriptors memory currentDescriptor = abi.decode(tmp, (Descriptors));
+		require(currentDescriptor.isFreezed == false, "freezed");
+		setStorageDescriptors(_tokenId, descriptor);
 	}
 
 	function freezeTokenURI(uint256 _tokenId)
@@ -135,16 +146,24 @@ contract STokensManager is
 		override
 		onlyAuthor(_tokenId)
 	{
-		freeze[_tokenId] = true;
+		Descriptors memory currentDescriptor = getStorageDescriptors(_tokenId);
+		require(currentDescriptor.isFreezed == false, "already freezed");
+		currentDescriptor.isFreezed = true;
+		currentDescriptor.freezingUser = _msgSender();
+		setStorageDescriptors(_tokenId, currentDescriptor);
 	}
 
-	// TODO 単語のチョイス大丈夫？
 	function meltTokenURI(uint256 _tokenId)
 		external
 		override
 		onlyAuthor(_tokenId)
 	{
-		freeze[_tokenId] = false;
+		Descriptors memory currentDescriptor = getStorageDescriptors(_tokenId);
+		require(currentDescriptor.isFreezed == true, "not freezed");
+		require(currentDescriptor.freezingUser == _msgSender(), "illegal access");
+		currentDescriptor.isFreezed = false;
+		currentDescriptor.freezingUser = address(0);
+		setStorageDescriptors(_tokenId, currentDescriptor);
 	}
 
 	function positions(uint256 _tokenId)
@@ -200,6 +219,16 @@ contract STokensManager is
 		return abi.decode(tmp, (StakingPositions));
 	}
 
+	function getStorageDescriptors(uint256 _tokenId)
+		private
+		view
+		returns (Descriptors memory)
+	{
+		bytes32 key = getStorageDescriptorsKey(_tokenId);
+		bytes memory tmp = bytesStorage[key];
+		return abi.decode(tmp, (Descriptors));
+	}
+
 	function setStoragePositions(
 		uint256 _tokenId,
 		StakingPositions memory _position
@@ -209,12 +238,29 @@ contract STokensManager is
 		bytesStorage[key] = tmp;
 	}
 
+	function setStorageDescriptors(
+		uint256 _tokenId,
+		Descriptors memory _descriptor
+	) private {
+		bytes32 key = getStorageDescriptorsKey(_tokenId);
+		bytes memory tmp = abi.encode(_descriptor);
+		bytesStorage[key] = tmp;
+	}
+
 	function getStoragePositionsKey(uint256 _tokenId)
 		private
 		pure
 		returns (bytes32)
 	{
 		return keccak256(abi.encodePacked("_positions", _tokenId));
+	}
+
+	function getStorageDescriptorsKey(uint256 _tokenId)
+		private
+		pure
+		returns (bytes32)
+	{
+		return keccak256(abi.encodePacked("_descriptors", _tokenId));
 	}
 
 	function _beforeTokenTransfer(
