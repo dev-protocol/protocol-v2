@@ -136,20 +136,20 @@ interface ISTokensManager {
 	) external returns (bool);
 
 	/*
-	 * @dev setTokenURI set token uri information
+	 * @dev set token uri information
 	 * @param _tokenId The ID of the staking position
 	 * @param _data set data
 	 */
-	function setTokenURI(uint256 _tokenId, string memory _data) external;
+	function setTokenURIImage(uint256 _tokenId, string memory _data) external;
 
 	/*
-	 * @dev freezeTokenURI freeze token uri data
+	 * @dev freeze token uri data
 	 * @param _tokenId The ID of the staking position
 	 */
 	function freezeTokenURI(uint256 _tokenId) external;
 
 	/*
-	 * @dev meltTokenURI melt token uri data
+	 * @dev melt token uri data
 	 * @param _tokenId The ID of the staking position
 	 */
 	function meltTokenURI(uint256 _tokenId) external;

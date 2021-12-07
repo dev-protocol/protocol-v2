@@ -141,7 +141,7 @@ contract('STokensManager', ([deployer, user]) => {
 			it('get custom token uri', async () => {
 				const [dev, property] = await init()
 				await dev.lockup.depositToProperty(property.address, '10000')
-				await dev.sTokensManager.setTokenURI(1, 'http://hogehoge', {
+				await dev.sTokensManager.setTokenURIImage(1, 'http://hogehoge', {
 					from: user,
 				})
 				const uri = await dev.sTokensManager.tokenURI(1)
@@ -305,12 +305,12 @@ contract('STokensManager', ([deployer, user]) => {
 		})
 	})
 
-	describe('setTokenURI', () => {
+	describe('setTokenURIImage', () => {
 		describe('success', () => {
 			it('get data', async () => {
 				const [dev, property] = await init()
 				await dev.lockup.depositToProperty(property.address, '10000')
-				await dev.sTokensManager.setTokenURI(1, 'http://dummy', {
+				await dev.sTokensManager.setTokenURIImage(1, 'http://dummy', {
 					from: user,
 				})
 				const tokenUri = await dev.sTokensManager.tokenURI(1)
@@ -319,7 +319,7 @@ contract('STokensManager', ([deployer, user]) => {
 			it('generate event', async () => {
 				const [dev, property] = await init()
 				await dev.lockup.depositToProperty(property.address, '10000')
-				dev.sTokensManager.setTokenURI(1, 'http://dummy', { from: user })
+				dev.sTokensManager.setTokenURIImage(1, 'http://dummy', { from: user })
 				const [_tokenId, _author, _data] = await Promise.all([
 					getEventValue(dev.sTokensManager)('SetTokenUri', 'tokenId'),
 					getEventValue(dev.sTokensManager)('SetTokenUri', 'author'),
@@ -332,10 +332,10 @@ contract('STokensManager', ([deployer, user]) => {
 			it('get overwritten data', async () => {
 				const [dev, property] = await init()
 				await dev.lockup.depositToProperty(property.address, '10000')
-				await dev.sTokensManager.setTokenURI(1, 'http://dummy', {
+				await dev.sTokensManager.setTokenURIImage(1, 'http://dummy', {
 					from: user,
 				})
-				await dev.sTokensManager.setTokenURI(1, 'http://dummy2', {
+				await dev.sTokensManager.setTokenURIImage(1, 'http://dummy2', {
 					from: user,
 				})
 				const tokenUri = await dev.sTokensManager.tokenURI(1)
@@ -347,19 +347,19 @@ contract('STokensManager', ([deployer, user]) => {
 				const [dev, property] = await init()
 				await dev.lockup.depositToProperty(property.address, '10000')
 				const res = await dev.sTokensManager
-					.setTokenURI(1, '')
+					.setTokenURIImage(1, '')
 					.catch((err: Error) => err)
 				validateErrorMessage(res, 'illegal access')
 			})
 			it('was freezed', async () => {
 				const [dev, property] = await init()
 				await dev.lockup.depositToProperty(property.address, '10000')
-				await dev.sTokensManager.setTokenURI(1, 'http://dummy', {
+				await dev.sTokensManager.setTokenURIImage(1, 'http://dummy', {
 					from: user,
 				})
 				await dev.sTokensManager.freezeTokenURI(1, { from: user })
 				const res = await dev.sTokensManager
-					.setTokenURI(1, '', { from: user })
+					.setTokenURIImage(1, '', { from: user })
 					.catch((err: Error) => err)
 				validateErrorMessage(res, 'freezed')
 			})
@@ -371,19 +371,19 @@ contract('STokensManager', ([deployer, user]) => {
 			it('data freezed', async () => {
 				const [dev, property] = await init()
 				await dev.lockup.depositToProperty(property.address, '10000')
-				await dev.sTokensManager.setTokenURI(1, 'http://dummy', {
+				await dev.sTokensManager.setTokenURIImage(1, 'http://dummy', {
 					from: user,
 				})
 				await dev.sTokensManager.freezeTokenURI(1, { from: user })
 				const res = await dev.sTokensManager
-					.setTokenURI(1, 'http://dummy', { from: user })
+					.setTokenURIImage(1, 'http://dummy', { from: user })
 					.catch((err: Error) => err)
 				validateErrorMessage(res, 'freezed')
 			})
 			it('generated event', async () => {
 				const [dev, property] = await init()
 				await dev.lockup.depositToProperty(property.address, '10000')
-				await dev.sTokensManager.setTokenURI(1, 'http://dummy', {
+				await dev.sTokensManager.setTokenURIImage(1, 'http://dummy', {
 					from: user,
 				})
 				dev.sTokensManager.freezeTokenURI(1, { from: user })
@@ -399,7 +399,7 @@ contract('STokensManager', ([deployer, user]) => {
 			it('not author.', async () => {
 				const [dev, property] = await init()
 				await dev.lockup.depositToProperty(property.address, '10000')
-				await dev.sTokensManager.setTokenURI(1, 'http://dummy', {
+				await dev.sTokensManager.setTokenURIImage(1, 'http://dummy', {
 					from: user,
 				})
 				const res = await dev.sTokensManager
@@ -418,7 +418,7 @@ contract('STokensManager', ([deployer, user]) => {
 			it('already freezed.', async () => {
 				const [dev, property] = await init()
 				await dev.lockup.depositToProperty(property.address, '10000')
-				await dev.sTokensManager.setTokenURI(1, 'http://dummy', {
+				await dev.sTokensManager.setTokenURIImage(1, 'http://dummy', {
 					from: user,
 				})
 				await dev.sTokensManager.freezeTokenURI(1, { from: user })
@@ -435,12 +435,12 @@ contract('STokensManager', ([deployer, user]) => {
 			it('data melted', async () => {
 				const [dev, property] = await init()
 				await dev.lockup.depositToProperty(property.address, '10000')
-				await dev.sTokensManager.setTokenURI(1, 'http://dummy', {
+				await dev.sTokensManager.setTokenURIImage(1, 'http://dummy', {
 					from: user,
 				})
 				await dev.sTokensManager.freezeTokenURI(1, { from: user })
 				await dev.sTokensManager.meltTokenURI(1, { from: user })
-				await dev.sTokensManager.setTokenURI(1, 'http://dummy2', {
+				await dev.sTokensManager.setTokenURIImage(1, 'http://dummy2', {
 					from: user,
 				})
 				const uri = await dev.sTokensManager.tokenURI(1)
@@ -449,7 +449,7 @@ contract('STokensManager', ([deployer, user]) => {
 			it('generated event', async () => {
 				const [dev, property] = await init()
 				await dev.lockup.depositToProperty(property.address, '10000')
-				await dev.sTokensManager.setTokenURI(1, 'http://dummy', {
+				await dev.sTokensManager.setTokenURIImage(1, 'http://dummy', {
 					from: user,
 				})
 				await dev.sTokensManager.freezeTokenURI(1, { from: user })
@@ -466,7 +466,7 @@ contract('STokensManager', ([deployer, user]) => {
 			it('not freezing user.', async () => {
 				const [dev, property] = await init()
 				await dev.lockup.depositToProperty(property.address, '10000')
-				await dev.sTokensManager.setTokenURI(1, 'http://dummy', {
+				await dev.sTokensManager.setTokenURIImage(1, 'http://dummy', {
 					from: user,
 				})
 				await dev.sTokensManager.freezeTokenURI(1, { from: user })
@@ -486,7 +486,7 @@ contract('STokensManager', ([deployer, user]) => {
 			it('not freezed.', async () => {
 				const [dev, property] = await init()
 				await dev.lockup.depositToProperty(property.address, '10000')
-				await dev.sTokensManager.setTokenURI(1, 'http://dummy', {
+				await dev.sTokensManager.setTokenURIImage(1, 'http://dummy', {
 					from: user,
 				})
 				await dev.sTokensManager.freezeTokenURI(1, { from: user })
@@ -527,7 +527,7 @@ contract('STokensManager', ([deployer, user]) => {
 			it('get data', async () => {
 				const [dev, property] = await init()
 				await dev.lockup.depositToProperty(property.address, '10000')
-				await dev.sTokensManager.setTokenURI(1, 'http://dummy', {
+				await dev.sTokensManager.setTokenURIImage(1, 'http://dummy', {
 					from: user,
 				})
 				await dev.sTokensManager.freezeTokenURI(1, { from: user })

@@ -116,7 +116,7 @@ contract STokensManager is
 		return true;
 	}
 
-	function setTokenURI(uint256 _tokenId, string memory _data)
+	function setTokenURIImage(uint256 _tokenId, string memory _data)
 		external
 		override
 		onlyAuthor(_tokenId)
