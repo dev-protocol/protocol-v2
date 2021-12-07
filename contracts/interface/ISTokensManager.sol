@@ -135,11 +135,23 @@ interface ISTokensManager {
 		uint256 _pendingReward
 	) external returns (bool);
 
-	// TODO コメント
-	function setTokenURIImage(uint256 _tokenId, string memory _data) external;
+	/*
+	 * @dev setTokenURI set token uri information
+	 * @param _tokenId The ID of the staking position
+	 * @param _data set data
+	 */
+	function setTokenURI(uint256 _tokenId, string memory _data) external;
 
+	/*
+	 * @dev freezeTokenURI freeze token uri data
+	 * @param _tokenId The ID of the staking position
+	 */
 	function freezeTokenURI(uint256 _tokenId) external;
 
+	/*
+	 * @dev meltTokenURI melt token uri data
+	 * @param _tokenId The ID of the staking position
+	 */
 	function meltTokenURI(uint256 _tokenId) external;
 
 	/*
@@ -152,7 +164,11 @@ interface ISTokensManager {
 		view
 		returns (StakingPositions memory);
 
-	// TODO コメント
+	/*
+	 * @dev Gets the set toke uri data.
+	 * @param _tokenId The ID of the staking position
+	 * @return Descriptors descriptor
+	 */
 	function descriptors(uint256 _tokenId)
 		external
 		view

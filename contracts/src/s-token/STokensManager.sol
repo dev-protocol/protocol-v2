@@ -63,18 +63,6 @@ contract STokensManager is
 				);
 		}
 		Descriptors memory currentDescriptor = abi.decode(tmp, (Descriptors));
-		if (
-			keccak256(abi.encodePacked(currentDescriptor.descriptor)) ==
-			keccak256(abi.encodePacked(""))
-		) {
-			StakingPositions memory positons = getStoragePositions(_tokenId);
-			return
-				getTokenURI(
-					positons.property,
-					positons.amount,
-					positons.cumulativeReward
-				);
-		}
 		return currentDescriptor.descriptor;
 	}
 
@@ -128,7 +116,7 @@ contract STokensManager is
 		return true;
 	}
 
-	function setTokenURIImage(uint256 _tokenId, string memory _data)
+	function setTokenURI(uint256 _tokenId, string memory _data)
 		external
 		override
 		onlyAuthor(_tokenId)
