@@ -135,12 +135,8 @@ contract STokensManager is
 	{
 		bytes32 key = getStorageDescriptorsKey(_tokenId);
 		bytes memory tmp = bytesStorage[key];
-		Descriptors memory descriptor = Descriptors(
-			false,
-			address(0),
-			_data,
-			_msgSender()
-		);
+		Descriptors memory descriptor = Descriptors(false, address(0), _data);
+		emit SetTokenUri(_tokenId, _msgSender(), _data);
 		if (tmp.length == 0) {
 			setStorageDescriptors(_tokenId, descriptor);
 			return;
@@ -160,13 +156,10 @@ contract STokensManager is
 		currentDescriptor.isFreezed = true;
 		currentDescriptor.freezingUser = _msgSender();
 		setStorageDescriptors(_tokenId, currentDescriptor);
+		emit Freezed(_tokenId, _msgSender());
 	}
 
-	function meltTokenURI(uint256 _tokenId)
-		external
-		override
-		onlyAuthor(_tokenId)
-	{
+	function meltTokenURI(uint256 _tokenId) external override {
 		Descriptors memory currentDescriptor = getStorageDescriptors(_tokenId);
 		require(currentDescriptor.isFreezed == true, "not freezed");
 		require(
@@ -176,6 +169,7 @@ contract STokensManager is
 		currentDescriptor.isFreezed = false;
 		currentDescriptor.freezingUser = address(0);
 		setStorageDescriptors(_tokenId, currentDescriptor);
+		emit Melted(_tokenId, _msgSender());
 	}
 
 	function positions(uint256 _tokenId)
@@ -186,6 +180,16 @@ contract STokensManager is
 	{
 		StakingPositions memory currentPosition = getStoragePositions(_tokenId);
 		return currentPosition;
+	}
+
+	function descriptors(uint256 _tokenId)
+		external
+		view
+		override
+		returns (Descriptors memory)
+	{
+		Descriptors memory currentDescriptor = getStorageDescriptors(_tokenId);
+		return currentDescriptor;
 	}
 
 	function rewards(uint256 _tokenId)

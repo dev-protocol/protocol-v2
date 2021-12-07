@@ -43,7 +43,6 @@ interface ISTokensManager {
 		bool isFreezed;
 		address freezingUser;
 		string descriptor;
-		address settingUser;
 	}
 
 	/*
@@ -78,6 +77,28 @@ interface ISTokensManager {
 		uint256 cumulativeReward,
 		uint256 pendingReward
 	);
+
+	/*
+	 * @dev The event fired when set toke uri.
+	 * @param tokenId The ID of the created new staking position
+	 * @param author user of set token uri
+	 * @param data The address of the owner of the new staking position
+	 */
+	event SetTokenUri(uint256 tokenId, address author, string data);
+
+	/*
+	 * @dev The event fired when toke uri freezed.
+	 * @param tokenId The ID of the freezed token uri
+	 * @param freezingUser user of freezed token uri
+	 */
+	event Freezed(uint256 tokenId, address freezingUser);
+
+	/*
+	 * @dev The event fired when toke uri melted.
+	 * @param tokenId The ID of the melted token uri
+	 * @param meltingUser user of melted token uri
+	 */
+	event Melted(uint256 tokenId, address meltingUser);
 
 	/*
 	 * @dev Creates the new staking position for the caller.
@@ -130,6 +151,12 @@ interface ISTokensManager {
 		external
 		view
 		returns (StakingPositions memory);
+
+	// TODO コメント
+	function descriptors(uint256 _tokenId)
+		external
+		view
+		returns (Descriptors memory);
 
 	/*
 	 * @dev Gets the reward status of the staking position.
