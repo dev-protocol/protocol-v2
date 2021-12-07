@@ -159,7 +159,7 @@ contract('MarketFactoryTest', ([deployer, user, dummyMarketAddress]) => {
 					.catch((err: Error) => err)
 				validateErrorMessage(res, 'illegal address')
 			})
-			it.only('Once a market is disabled, it cannot be enabled again.', async () => {
+			it('Once a market is disabled, it cannot be enabled again.', async () => {
 				const [dev, marketAddress] = await init()
 				const marketInstance = await marketContract.at(marketAddress)
 				expect(await marketInstance.enabled()).to.be.equal(true)
