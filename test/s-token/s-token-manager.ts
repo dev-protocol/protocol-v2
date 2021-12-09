@@ -444,7 +444,7 @@ contract('STokensManager', ([deployer, user]) => {
 					from: user,
 				})
 				const uri = await dev.sTokensManager.tokenURI(1)
-				expect(uri).to.equal('http://dummy')
+				expect(uri).to.equal('http://dummy2')
 			})
 			it('generated event', async () => {
 				const [dev, property] = await init()
@@ -489,7 +489,6 @@ contract('STokensManager', ([deployer, user]) => {
 				await dev.sTokensManager.setTokenURIImage(1, 'http://dummy', {
 					from: user,
 				})
-				await dev.sTokensManager.freezeTokenURI(1, { from: user })
 				const res = await dev.sTokensManager
 					.meltTokenURI(1, { from: user })
 					.catch((err: Error) => err)
