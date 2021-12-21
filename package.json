@@ -30,7 +30,7 @@
 		"@typechain/truffle-v4": "4.1.0",
 		"@types/bent": "7.3.2",
 		"@types/dotenv": "8.2.0",
-		"@types/node": "16.11.14",
+		"@types/node": "16.11.15",
 		"@types/shelljs": "0.8.10",
 		"@typescript-eslint/eslint-plugin": "5.8.0",
 		"@typescript-eslint/parser": "5.8.0",
