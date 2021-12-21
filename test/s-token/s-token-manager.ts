@@ -463,7 +463,7 @@ contract('STokensManager', ([deployer, user]) => {
 					from: user,
 				})
 				await dev.sTokensManager.freezeTokenURI(1, { from: user })
-				let descriptor = await dev.sTokensManager.descriptors(1)
+				const descriptor = await dev.sTokensManager.descriptors(1)
 				expect(descriptor.isFreezed).to.equal(true)
 				expect(descriptor.freezingUser).to.equal(user)
 				expect(descriptor.descriptor).to.equal('http://dummy')
