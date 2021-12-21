@@ -316,19 +316,6 @@ contract('STokensManager', ([deployer, user]) => {
 				const tokenUri = await dev.sTokensManager.tokenURI(1)
 				expect(tokenUri).to.equal('http://dummy')
 			})
-			it('generate event', async () => {
-				const [dev, property] = await init()
-				await dev.lockup.depositToProperty(property.address, '10000')
-				dev.sTokensManager.setTokenURIImage(1, 'http://dummy', { from: user })
-				const [_tokenId, _author, _data] = await Promise.all([
-					getEventValue(dev.sTokensManager)('SetTokenUri', 'tokenId'),
-					getEventValue(dev.sTokensManager)('SetTokenUri', 'author'),
-					getEventValue(dev.sTokensManager)('SetTokenUri', 'data'),
-				])
-				expect(_tokenId).to.equal('1')
-				expect(_author).to.equal(user)
-				expect(_data).to.equal('http://dummy')
-			})
 			it('get overwritten data', async () => {
 				const [dev, property] = await init()
 				await dev.lockup.depositToProperty(property.address, '10000')
@@ -374,7 +361,11 @@ contract('STokensManager', ([deployer, user]) => {
 				await dev.sTokensManager.setTokenURIImage(1, 'http://dummy', {
 					from: user,
 				})
+				let isFreezed = await dev.sTokensManager.isFreezed(1)
+				expect(isFreezed).to.equal(false)
 				await dev.sTokensManager.freezeTokenURI(1, { from: user })
+				isFreezed = await dev.sTokensManager.isFreezed(1)
+				expect(isFreezed).to.equal(true)
 				const res = await dev.sTokensManager
 					.setTokenURIImage(1, 'http://dummy', { from: user })
 					.catch((err: Error) => err)
@@ -413,7 +404,7 @@ contract('STokensManager', ([deployer, user]) => {
 				const res = await dev.sTokensManager
 					.freezeTokenURI(1, { from: user })
 					.catch((err: Error) => err)
-				validateVmExceptionErrorMessage(res, false)
+				validateErrorMessage(res, 'no data')
 			})
 			it('already freezed.', async () => {
 				const [dev, property] = await init()
@@ -448,32 +439,6 @@ contract('STokensManager', ([deployer, user]) => {
 				const [dev] = await init()
 				const res = await dev.sTokensManager
 					.positions(12345)
-					.catch((err: Error) => err)
-				validateVmExceptionErrorMessage(res, false)
-			})
-		})
-	})
-
-	describe('descriptors', () => {
-		describe('success', () => {
-			it('get data', async () => {
-				const [dev, property] = await init()
-				await dev.lockup.depositToProperty(property.address, '10000')
-				await dev.sTokensManager.setTokenURIImage(1, 'http://dummy', {
-					from: user,
-				})
-				await dev.sTokensManager.freezeTokenURI(1, { from: user })
-				const descriptor = await dev.sTokensManager.descriptors(1)
-				expect(descriptor.isFreezed).to.equal(true)
-				expect(descriptor.freezingUser).to.equal(user)
-				expect(descriptor.descriptor).to.equal('http://dummy')
-			})
-		})
-		describe('fail', () => {
-			it('deta is not found', async () => {
-				const [dev] = await init()
-				const res = await dev.sTokensManager
-					.descriptors(12345)
 					.catch((err: Error) => err)
 				validateVmExceptionErrorMessage(res, false)
 			})

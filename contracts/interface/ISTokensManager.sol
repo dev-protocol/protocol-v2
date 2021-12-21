@@ -34,18 +34,6 @@ interface ISTokensManager {
 	}
 
 	/*
-	 * @dev Struct to customize token uri.
-	 * @param isFreezed Whether the descriptor can be changed or not
-	 * @param freezingUser Authors who have done the Freeze process
-	 * @param descriptor File Contents
-	 */
-	struct Descriptors {
-		bool isFreezed;
-		address freezingUser;
-		string descriptor;
-	}
-
-	/*
 	 * @dev The event fired when a token is minted.
 	 * @param tokenId The ID of the created new staking position
 	 * @param owner The address of the owner of the new staking position
@@ -77,14 +65,6 @@ interface ISTokensManager {
 		uint256 cumulativeReward,
 		uint256 pendingReward
 	);
-
-	/*
-	 * @dev The event fired when set toke uri.
-	 * @param tokenId The ID of the created new staking position
-	 * @param author user of set token uri
-	 * @param data The address of the owner of the new staking position
-	 */
-	event SetTokenUri(uint256 tokenId, address author, string data);
 
 	/*
 	 * @dev The event fired when toke uri freezed.
@@ -152,14 +132,11 @@ interface ISTokensManager {
 		returns (StakingPositions memory);
 
 	/*
-	 * @dev Gets the set toke uri data.
+	 * @dev Get the freezed status.
 	 * @param _tokenId The ID of the staking position
-	 * @return Descriptors descriptor
+	 * @return bool If freezed, return true
 	 */
-	function descriptors(uint256 _tokenId)
-		external
-		view
-		returns (Descriptors memory);
+	function isFreezed(uint256 _tokenId) external view returns (bool);
 
 	/*
 	 * @dev Gets the reward status of the staking position.

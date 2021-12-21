@@ -21,6 +21,8 @@ contract STokensManager is
 	mapping(bytes32 => bytes) private bytesStorage;
 	mapping(address => uint256[]) private tokenIdsMapOfProperty;
 	mapping(address => EnumerableSet.UintSet) private tokenIdsMapOfOwner;
+	mapping(uint256 => string) private tokenUriImage;
+	mapping(uint256 => bool) public override isFreezed;
 
 	using Counters for Counters.Counter;
 	using EnumerableSet for EnumerableSet.UintSet;
@@ -51,9 +53,8 @@ contract STokensManager is
 		override
 		returns (string memory)
 	{
-		bytes32 key = getStorageDescriptorsKey(_tokenId);
-		bytes memory tmp = bytesStorage[key];
-		if (tmp.length == 0) {
+		string memory tokeUri = tokenUriImage[_tokenId];
+		if (bytes(tokeUri).length == 0) {
 			StakingPositions memory positons = getStoragePositions(_tokenId);
 			return
 				getTokenURI(
@@ -62,8 +63,7 @@ contract STokensManager is
 					positons.cumulativeReward
 				);
 		}
-		Descriptors memory currentDescriptor = abi.decode(tmp, (Descriptors));
-		return currentDescriptor.descriptor;
+		return tokeUri;
 	}
 
 	function mint(
@@ -121,17 +121,8 @@ contract STokensManager is
 		override
 		onlyAuthor(_tokenId)
 	{
-		bytes32 key = getStorageDescriptorsKey(_tokenId);
-		bytes memory tmp = bytesStorage[key];
-		Descriptors memory descriptor = Descriptors(false, address(0), _data);
-		emit SetTokenUri(_tokenId, _msgSender(), _data);
-		if (tmp.length == 0) {
-			setStorageDescriptors(_tokenId, descriptor);
-			return;
-		}
-		Descriptors memory currentDescriptor = abi.decode(tmp, (Descriptors));
-		require(currentDescriptor.isFreezed == false, "freezed");
-		setStorageDescriptors(_tokenId, descriptor);
+		require(isFreezed[_tokenId] == false, "freezed");
+		tokenUriImage[_tokenId] = _data;
 	}
 
 	function freezeTokenURI(uint256 _tokenId)
@@ -139,11 +130,10 @@ contract STokensManager is
 		override
 		onlyAuthor(_tokenId)
 	{
-		Descriptors memory currentDescriptor = getStorageDescriptors(_tokenId);
-		require(currentDescriptor.isFreezed == false, "already freezed");
-		currentDescriptor.isFreezed = true;
-		currentDescriptor.freezingUser = _msgSender();
-		setStorageDescriptors(_tokenId, currentDescriptor);
+		require(isFreezed[_tokenId] == false, "already freezed");
+		string memory tokeUri = tokenUriImage[_tokenId];
+		require(bytes(tokeUri).length != 0, "no data");
+		isFreezed[_tokenId] = true;
 		emit Freezed(_tokenId, _msgSender());
 	}
 
@@ -155,16 +145,6 @@ contract STokensManager is
 	{
 		StakingPositions memory currentPosition = getStoragePositions(_tokenId);
 		return currentPosition;
-	}
-
-	function descriptors(uint256 _tokenId)
-		external
-		view
-		override
-		returns (Descriptors memory)
-	{
-		Descriptors memory currentDescriptor = getStorageDescriptors(_tokenId);
-		return currentDescriptor;
 	}
 
 	function rewards(uint256 _tokenId)
@@ -210,16 +190,6 @@ contract STokensManager is
 		return abi.decode(tmp, (StakingPositions));
 	}
 
-	function getStorageDescriptors(uint256 _tokenId)
-		private
-		view
-		returns (Descriptors memory)
-	{
-		bytes32 key = getStorageDescriptorsKey(_tokenId);
-		bytes memory tmp = bytesStorage[key];
-		return abi.decode(tmp, (Descriptors));
-	}
-
 	function setStoragePositions(
 		uint256 _tokenId,
 		StakingPositions memory _position
@@ -229,29 +199,12 @@ contract STokensManager is
 		bytesStorage[key] = tmp;
 	}
 
-	function setStorageDescriptors(
-		uint256 _tokenId,
-		Descriptors memory _descriptor
-	) private {
-		bytes32 key = getStorageDescriptorsKey(_tokenId);
-		bytes memory tmp = abi.encode(_descriptor);
-		bytesStorage[key] = tmp;
-	}
-
 	function getStoragePositionsKey(uint256 _tokenId)
 		private
 		pure
 		returns (bytes32)
 	{
 		return keccak256(abi.encodePacked("_positions", _tokenId));
-	}
-
-	function getStorageDescriptorsKey(uint256 _tokenId)
-		private
-		pure
-		returns (bytes32)
-	{
-		return keccak256(abi.encodePacked("_descriptors", _tokenId));
 	}
 
 	function _beforeTokenTransfer(
