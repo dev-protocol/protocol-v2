@@ -430,73 +430,6 @@ contract('STokensManager', ([deployer, user]) => {
 		})
 	})
 
-	describe('meltTokenURI', () => {
-		describe('success', () => {
-			it('data melted', async () => {
-				const [dev, property] = await init()
-				await dev.lockup.depositToProperty(property.address, '10000')
-				await dev.sTokensManager.setTokenURIImage(1, 'http://dummy', {
-					from: user,
-				})
-				await dev.sTokensManager.freezeTokenURI(1, { from: user })
-				await dev.sTokensManager.meltTokenURI(1, { from: user })
-				await dev.sTokensManager.setTokenURIImage(1, 'http://dummy2', {
-					from: user,
-				})
-				const uri = await dev.sTokensManager.tokenURI(1)
-				expect(uri).to.equal('http://dummy2')
-			})
-			it('generated event', async () => {
-				const [dev, property] = await init()
-				await dev.lockup.depositToProperty(property.address, '10000')
-				await dev.sTokensManager.setTokenURIImage(1, 'http://dummy', {
-					from: user,
-				})
-				await dev.sTokensManager.freezeTokenURI(1, { from: user })
-				dev.sTokensManager.meltTokenURI(1, { from: user })
-				const [_tokenId, _meltingUser] = await Promise.all([
-					getEventValue(dev.sTokensManager)('Melted', 'tokenId'),
-					getEventValue(dev.sTokensManager)('Melted', 'meltingUser'),
-				])
-				expect(_tokenId).to.equal('1')
-				expect(_meltingUser).to.equal(user)
-			})
-		})
-		describe('fail', () => {
-			it('not freezing user.', async () => {
-				const [dev, property] = await init()
-				await dev.lockup.depositToProperty(property.address, '10000')
-				await dev.sTokensManager.setTokenURIImage(1, 'http://dummy', {
-					from: user,
-				})
-				await dev.sTokensManager.freezeTokenURI(1, { from: user })
-				const res = await dev.sTokensManager
-					.meltTokenURI(1)
-					.catch((err: Error) => err)
-				validateErrorMessage(res, 'illegal access')
-			})
-			it('no uri data.', async () => {
-				const [dev, property] = await init()
-				await dev.lockup.depositToProperty(property.address, '10000')
-				const res = await dev.sTokensManager
-					.meltTokenURI(1, { from: user })
-					.catch((err: Error) => err)
-				validateVmExceptionErrorMessage(res, false)
-			})
-			it('not freezed.', async () => {
-				const [dev, property] = await init()
-				await dev.lockup.depositToProperty(property.address, '10000')
-				await dev.sTokensManager.setTokenURIImage(1, 'http://dummy', {
-					from: user,
-				})
-				const res = await dev.sTokensManager
-					.meltTokenURI(1, { from: user })
-					.catch((err: Error) => err)
-				validateErrorMessage(res, 'not freezed')
-			})
-		})
-	})
-
 	describe('position', () => {
 		describe('success', () => {
 			it('get data', async () => {
@@ -533,11 +466,6 @@ contract('STokensManager', ([deployer, user]) => {
 				let descriptor = await dev.sTokensManager.descriptors(1)
 				expect(descriptor.isFreezed).to.equal(true)
 				expect(descriptor.freezingUser).to.equal(user)
-				expect(descriptor.descriptor).to.equal('http://dummy')
-				await dev.sTokensManager.meltTokenURI(1, { from: user })
-				descriptor = await dev.sTokensManager.descriptors(1)
-				expect(descriptor.isFreezed).to.equal(false)
-				expect(descriptor.freezingUser).to.equal(DEFAULT_ADDRESS)
 				expect(descriptor.descriptor).to.equal('http://dummy')
 			})
 		})
