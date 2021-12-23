@@ -53,17 +53,15 @@ contract STokensManager is
 		override
 		returns (string memory)
 	{
-		string memory tokeUri = tokenUriImage[_tokenId];
-		if (bytes(tokeUri).length == 0) {
-			StakingPositions memory positons = getStoragePositions(_tokenId);
-			return
-				getTokenURI(
-					positons.property,
-					positons.amount,
-					positons.cumulativeReward
-				);
-		}
-		return tokeUri;
+		string memory _tokeUriImage = tokenUriImage[_tokenId];
+		StakingPositions memory positons = getStoragePositions(_tokenId);
+		return
+			getTokenURI(
+				positons.property,
+				positons.amount,
+				positons.cumulativeReward,
+				_tokeUriImage
+			);
 	}
 
 	function mint(
