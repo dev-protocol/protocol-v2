@@ -67,6 +67,13 @@ interface ISTokensManager {
 	);
 
 	/*
+	 * @dev The event fired when toke uri freezed.
+	 * @param tokenId The ID of the freezed token uri
+	 * @param freezingUser user of freezed token uri
+	 */
+	event Freezed(uint256 tokenId, address freezingUser);
+
+	/*
 	 * @dev Creates the new staking position for the caller.
 	 * Mint must be called from the Lockup contract.
 	 * @param _owner The address of the owner of the new staking position
@@ -102,6 +109,19 @@ interface ISTokensManager {
 	) external returns (bool);
 
 	/*
+	 * @dev set token uri information
+	 * @param _tokenId The ID of the staking position
+	 * @param _data set data
+	 */
+	function setTokenURIImage(uint256 _tokenId, string memory _data) external;
+
+	/*
+	 * @dev freeze token uri data
+	 * @param _tokenId The ID of the staking position
+	 */
+	function freezeTokenURI(uint256 _tokenId) external;
+
+	/*
 	 * @dev Gets the existing staking position.
 	 * @param _tokenId The ID of the staking position
 	 * @return StakingPositions staking positions
@@ -110,6 +130,13 @@ interface ISTokensManager {
 		external
 		view
 		returns (StakingPositions memory);
+
+	/*
+	 * @dev Get the freezed status.
+	 * @param _tokenId The ID of the staking position
+	 * @return bool If freezed, return true
+	 */
+	function isFreezed(uint256 _tokenId) external view returns (bool);
 
 	/*
 	 * @dev Gets the reward status of the staking position.

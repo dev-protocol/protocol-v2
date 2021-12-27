@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "../../interface/ISTokensManager.sol";
 import "../../interface/IAddressRegistry.sol";
 import "../../interface/ILockup.sol";
+import "../../interface/IProperty.sol";
 import "../common/registry/InitializableUsingRegistry.sol";
 import "./STokensDescriptor.sol";
 
@@ -20,6 +21,8 @@ contract STokensManager is
 	mapping(bytes32 => bytes) private bytesStorage;
 	mapping(address => uint256[]) private tokenIdsMapOfProperty;
 	mapping(address => EnumerableSet.UintSet) private tokenIdsMapOfOwner;
+	mapping(uint256 => string) private tokenUriImage;
+	mapping(uint256 => bool) public override isFreezed;
 
 	using Counters for Counters.Counter;
 	using EnumerableSet for EnumerableSet.UintSet;
@@ -29,6 +32,13 @@ contract STokensManager is
 			registry().registries("Lockup") == _msgSender(),
 			"illegal access"
 		);
+		_;
+	}
+
+	modifier onlyAuthor(uint256 _tokenId) {
+		StakingPositions memory currentPosition = getStoragePositions(_tokenId);
+		address author = IProperty(currentPosition.property).author();
+		require(author == _msgSender(), "illegal access");
 		_;
 	}
 
@@ -43,12 +53,14 @@ contract STokensManager is
 		override
 		returns (string memory)
 	{
+		string memory _tokeUriImage = tokenUriImage[_tokenId];
 		StakingPositions memory positons = getStoragePositions(_tokenId);
 		return
 			getTokenURI(
 				positons.property,
 				positons.amount,
-				positons.cumulativeReward
+				positons.cumulativeReward,
+				_tokeUriImage
 			);
 	}
 
@@ -100,6 +112,27 @@ contract STokensManager is
 			_pendingReward
 		);
 		return true;
+	}
+
+	function setTokenURIImage(uint256 _tokenId, string memory _data)
+		external
+		override
+		onlyAuthor(_tokenId)
+	{
+		require(isFreezed[_tokenId] == false, "freezed");
+		tokenUriImage[_tokenId] = _data;
+	}
+
+	function freezeTokenURI(uint256 _tokenId)
+		external
+		override
+		onlyAuthor(_tokenId)
+	{
+		require(isFreezed[_tokenId] == false, "already freezed");
+		string memory tokeUri = tokenUriImage[_tokenId];
+		require(bytes(tokeUri).length != 0, "no data");
+		isFreezed[_tokenId] = true;
+		emit Freezed(_tokenId, _msgSender());
 	}
 
 	function positions(uint256 _tokenId)
