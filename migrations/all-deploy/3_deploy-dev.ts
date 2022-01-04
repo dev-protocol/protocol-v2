@@ -3,7 +3,7 @@ const handler = async function (deployer, network) {
 		return
 	}
 
-	const logic = artifacts.require('AddressRegistry')
+	const logic = artifacts.require('Dev')
 	await deployer.deploy(logic)
 	const logicInstance = await logic.deployed()
 	console.log(`logic address:${logicInstance.address}`)
@@ -22,8 +22,16 @@ const handler = async function (deployer, network) {
 	const proxyInstance = await devProxy.deployed()
 	console.log(`proxy address:${proxyInstance.address}`)
 
+	const regInstance = await artifacts
+		.require('AddressRegistry')
+		.at(process.env.ADDRESS_REGISTRY!)
+	console.log(`registry address:${regInstance.address}`)
+
+	await regInstance.setRegistry('Dev', proxyInstance.address)
+	console.log('set proxy address to registry')
+
 	const wrap = await logic.at(proxyInstance.address)
-	await wrap.initialize()
+	await wrap.__Dev_init('Dev')
 	console.log(`finished to initialize`)
 } as Truffle.Migration
 

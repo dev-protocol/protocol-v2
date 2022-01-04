@@ -3,7 +3,7 @@
 	"version": "0.5.0",
 	"description": "Securitize for Internet assets",
 	"scripts": {
-		"test": "yarn test:arb",
+		"test": "truffle test --config truffle-config.js",
 		"generate": "yarn compile && typechain --target=truffle-v4 './build/**/*.json'",
 		"deploy": "truffle migrate --network",
 		"predeploy": "yarn build",
@@ -15,9 +15,7 @@
 		"build": "tsc -p tsconfig.build.json",
 		"prebuild": "del 'migrations/**/*.js' && yarn generate",
 		"prepare": "husky install",
-		"compile": "yarn compile:arb",
-		"test:arb": "truffle test --config truffle-config.js",
-		"compile:arb": "truffle compile --config truffle-config.js"
+		"compile": "truffle compile --config truffle-config.js"
 	},
 	"files": [
 		"contracts/interface"
