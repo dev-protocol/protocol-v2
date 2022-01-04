@@ -19,11 +19,10 @@ const handler = async function (deployer, network) {
 	await policyFactoryInstance.create(policyAddress)
 
 	const addressRegistryInstance = await artifacts
-	.require('AddressRegistry')
-	.at(addressRegistory)
+		.require('AddressRegistry')
+		.at(addressRegistory)
 	const setPolicyAddress = await addressRegistryInstance.registries('Policy')
 	console.log(`setPolicy address:${setPolicyAddress}`)
-
 } as Truffle.Migration
 
 export = handler

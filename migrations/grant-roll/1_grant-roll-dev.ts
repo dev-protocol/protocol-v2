@@ -5,9 +5,7 @@ const handler = async function (deployer, network) {
 		return
 	}
 
-	const devInstance = await artifacts
-		.require('Dev')
-		.at(process.env.DEV!)
+	const devInstance = await artifacts.require('Dev').at(process.env.DEV!)
 	console.log(`dev address:${devInstance.address}`)
 
 	const minterRole = await devInstance.MINTER_ROLE()
@@ -24,7 +22,6 @@ const handler = async function (deployer, network) {
 	console.log(`burner roll:${hasBurnerRoll}`)
 	const hasMinterRoll = await devInstance.hasRole(minterRole, devBridgeAddress)
 	console.log(`minter roll:${hasMinterRoll}`)
-
 } as Truffle.Migration
 
 export = handler
