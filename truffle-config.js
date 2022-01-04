@@ -68,14 +68,15 @@ module.exports = {
 			},
 		},
 		polygon_testnet: {
-			provider: () => new HDWalletProvider(
-				MNEMONIC,
-				'https://polygon-mumbai.infura.io/v3/' + INFURA_KEY
-			),
+			provider: () =>
+				new HDWalletProvider(
+					MNEMONIC,
+					'https://polygon-mumbai.infura.io/v3/' + INFURA_KEY
+				),
 			network_id: 80001,
 			confirmations: 2,
 			timeoutBlocks: 200,
-			skipDryRun: true
+			skipDryRun: true,
 		},
 	},
 
