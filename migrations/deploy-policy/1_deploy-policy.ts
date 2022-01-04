@@ -3,11 +3,13 @@ const handler = async function (deployer, network) {
 		return
 	}
 
-	// Check it!!!//////////////////////////////////////////////////////
-	const regProxyAddress = '0x519d5e729fbE6B3e4607260413Fb684759612465'
-	const mintPerSecondAndAsset = '132000000000000'
-	const presumptiveAssets = '1650'
-	/// ////////////////////////////////////////////////////////////////
+	const regProxyAddress = process.env.ADDRESS_REGISTRY!
+	const mintPerSecondAndAsset = process.env.MINT_PER_SECOUND_AND_ASSETS!
+	const presumptiveAssets = process.env.PRESUMPTIVE_ASSETS!
+
+	console.log(`regProxyAddress address:${regProxyAddress}`)
+	console.log(`mintPerSecondAndAsset address:${mintPerSecondAndAsset}`)
+	console.log(`presumptiveAssets address:${presumptiveAssets}`)
 
 	const policy = artifacts.require('Policy1')
 	await deployer.deploy(
