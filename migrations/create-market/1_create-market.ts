@@ -3,14 +3,18 @@ const handler = async function (deployer, network) {
 		return
 	}
 
+	const marketFactory = process.env.MARKET_FACTORY!
+	const marketBehavior = process.env.MARKET_BEHAVIOR!
+
+	console.log(`market factory address:${marketFactory}`)
+	console.log(`market behavior address:${marketBehavior}`)
+
 	const marketFactoryInstance = await artifacts
 		.require('MarketFactory')
-		.at('0x84b6712Ec4174536daBf019fa6549A2e2125DEae')
+		.at(marketFactory)
 	console.log(`market factory address:${marketFactoryInstance.address}`)
 
-	await marketFactoryInstance.create(
-		'0x377B7d9C2DA6eD293EA62d2bCdA1cF54009751F8'
-	)
+	await marketFactoryInstance.create(marketBehavior)
 } as Truffle.Migration
 
 export = handler
