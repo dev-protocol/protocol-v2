@@ -75,7 +75,7 @@ module.exports = {
 	db: {
 		enabled: false,
 	},
-	plugins: ['truffle-plugin-verify'],
+	plugins: ['truffle-plugin-verify', 'truffle-plugin-stdjsonin'],
 	api_keys: {
 		etherscan: ETHERSCAN_KEY,
 	},
