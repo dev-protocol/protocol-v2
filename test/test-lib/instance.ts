@@ -17,6 +17,7 @@ import {
 	DevBridgeInstance,
 	DevAdminInstance,
 	ArbSysTestInstance,
+	DevPolygonInstance,
 } from '../../types/truffle-contracts'
 
 type ContractInstance = {
@@ -51,7 +52,7 @@ export class DevProtocolInstance {
 
 	private _addressRegistry!: AddressRegistryInstance
 	private _dev!: DevInstance
-	private _devArbitrum!: DevArbitrumInstance
+	private _devL2!: DevArbitrumInstance | DevPolygonInstance
 	private _arbSys!: ArbSysTestInstance
 	private _lockup!: LockupInstance
 	private _propertyFactory!: PropertyFactoryInstance
@@ -83,8 +84,8 @@ export class DevProtocolInstance {
 		return this._dev
 	}
 
-	public get devArbitrum(): DevArbitrumInstance {
-		return this._devArbitrum
+	public get devL2(): DevArbitrumInstance | DevPolygonInstance {
+		return this._devL2
 	}
 
 	public get arbSys(): ArbSysTestInstance {
@@ -190,10 +191,31 @@ export class DevProtocolInstance {
 			this.fromDeployer
 		)
 
-		this._devArbitrum = proxfied
+		this._devL2 = proxfied
 		await this.addressRegistry.setRegistry(
 			'Dev',
-			this._devArbitrum.address,
+			this._devL2.address,
+			this.fromDeployer
+		)
+	}
+
+	public async generateDevPolygon(): Promise<void> {
+		const [proxfied] = await deployProxy(contract('DevPolygon'), this._deployer)
+		await proxfied.initialize(this._addressRegistry.address)
+
+		// L1 dev address
+		const [proxyDev] = await deployProxy(contract('Dev'), this._deployer)
+		await proxyDev.__Dev_init('Dev')
+		await this.addressRegistry.setRegistry(
+			'L1DevAddress',
+			proxyDev.address,
+			this.fromDeployer
+		)
+
+		this._devL2 = proxfied
+		await this.addressRegistry.setRegistry(
+			'Dev',
+			this._devL2.address,
 			this.fromDeployer
 		)
 	}
