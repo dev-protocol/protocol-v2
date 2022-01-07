@@ -1,6 +1,6 @@
-![Dev Protocol](https://raw.githubusercontent.com/dev-protocol/protocol/main/public/asset/logo.png)
+![Dev Protocol](https://raw.githubusercontent.com/dev-protocol/protocol-v2/main/public/asset/logo.png)
 
-[![CI Status](https://github.com/dev-protocol/protocol/workflows/Node/badge.svg)](https://github.com/dev-protocol/protocol/actions)
+[![CI Status](https://github.com/dev-protocol/protocol-v2/workflows/Node/badge.svg)](https://github.com/dev-protocol/protocol-v2/actions)
 [![code style](https://img.shields.io/badge/code_style-XO-5ed9c7.svg)](https://github.com/xojs/xo)
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
 
@@ -52,7 +52,7 @@ arbitrum rinkeby：0xE75929F46355ad8C5C558755D836364f119BdB22
 
 ## How to contribute:
 
-Read the [contributing guide](https://github.com/dev-protocol/protocol/blob/main/.github/CONTRIBUTING.md), and create PR when you have time. 🧚✨
+Read the [contributing guide](https://github.com/dev-protocol/protocol-v2/blob/main/.github/CONTRIBUTING.md), and create PR when you have time. 🧚✨
 
 ## How to setup
 
