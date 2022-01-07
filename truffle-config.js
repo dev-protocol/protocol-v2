@@ -78,6 +78,17 @@ module.exports = {
 			timeoutBlocks: 200,
 			skipDryRun: true,
 		},
+		polygon_mainnet: {
+			provider: () =>
+				new HDWalletProvider(
+					MNEMONIC,
+					'https://polygon-mainnet.infura.io/v3/' + INFURA_KEY
+				),
+			network_id: 137,
+			confirmations: 2,
+			timeoutBlocks: 200,
+			skipDryRun: true,
+		},
 	},
 
 	mocha: {
