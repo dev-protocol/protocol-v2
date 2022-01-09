@@ -3,10 +3,11 @@ const handler = async function (deployer, network) {
 		return
 	}
 
-	// Check it!!!//////////////////////////////////////////////////////
-	const registryProxy = ''
-	const capSetter = ''
-	/// ////////////////////////////////////////////////////////////////
+	const registryProxy = process.env.ADDRESS_REGISTRY!
+	const capSetter = process.env.CAP_SETTER!
+
+	console.log(`registry proxy address:${registryProxy}`)
+	console.log(`cap setter address:${capSetter}`)
 
 	const addressRegistryInstance = await artifacts
 		.require('AddressRegistry')

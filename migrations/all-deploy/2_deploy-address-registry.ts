@@ -25,7 +25,6 @@ const handler = async function (deployer, network) {
 	const wrap = await logic.at(proxyInstance.address)
 	await wrap.initialize()
 	console.log(`finished to initialize`)
-	process.env.ADDRESS_REGISTRY = proxyInstance.address
 } as Truffle.Migration
 
 export = handler
