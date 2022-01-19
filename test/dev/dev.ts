@@ -156,7 +156,7 @@ contract('Dev', ([deployer, user1, user2]) => {
 		let mintedDev: DevInstance
 
 		before(async () => {
-            mintedDev = await createMintedDev()
+			mintedDev = await createMintedDev()
 		})
 
 		it('transfer token from user-to-user', async () => {
@@ -190,7 +190,9 @@ contract('Dev', ([deployer, user1, user2]) => {
 			expect((await mintedDev.balanceOf(deployer)).toNumber()).to.equal(100)
 			expect((await mintedDev.balanceOf(user1)).toNumber()).to.equal(0)
 
-			const res = await mintedDev.transfer(user1, 101).catch((err: Error) => err)
+			const res = await mintedDev
+				.transfer(user1, 101)
+				.catch((err: Error) => err)
 			expect((await mintedDev.balanceOf(deployer)).toNumber()).to.equal(100)
 			expect((await mintedDev.balanceOf(user1)).toNumber()).to.equal(0)
 			expect(res).to.be.an.instanceof(Error)
