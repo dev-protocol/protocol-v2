@@ -9,6 +9,8 @@ import {
 	revertToSnapshot,
 	Snapshot,
 } from '../test-lib/utils/snapshot'
+import BigNumber from 'bignumber.js'
+
 
 contract('DevArbitrum', ([deployer, user1, user2]) => {
 	const createDev = async (): Promise<DevProtocolInstance> => {
@@ -99,11 +101,10 @@ contract('DevArbitrum', ([deployer, user1, user2]) => {
 		})
 		it('generate event', async () => {
 			const tmp = dev.devL2 as DevArbitrumInstance
-			tmp.bridgeMint(deployer, 100)
-			const [account, amount] = await Promise.all([
-				getEventValue(dev.devL2)('BridgeMint', '_account'),
-				getEventValue(dev.devL2)('BridgeMint', '_amount'),
-			])
+			const tx = await tmp.bridgeMint(deployer, 100)
+			const event = tx.logs[1].args as {_account: string, _amount: BigNumber}
+			const account = event._account
+			const amount = event._amount.toString()
 			expect(account).to.equal(deployer)
 			expect(amount).to.equal('100')
 		})
