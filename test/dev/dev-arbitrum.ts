@@ -4,6 +4,11 @@ import { DevArbitrumInstance } from '../../types/truffle-contracts'
 import { DevProtocolInstance } from '../test-lib/instance'
 import { validateErrorMessage } from '../test-lib/utils/error'
 import { getEventValue } from '../test-lib/utils/event'
+import {
+	takeSnapshot,
+	revertToSnapshot,
+	Snapshot,
+} from '../test-lib/utils/snapshot'
 
 contract('DevArbitrum', ([deployer, user1, user2]) => {
 	const createDev = async (): Promise<DevProtocolInstance> => {
@@ -13,43 +18,53 @@ contract('DevArbitrum', ([deployer, user1, user2]) => {
 		return dev
 	}
 
+	let dev: DevProtocolInstance
+	let snapshot: Snapshot
+	let snapshotId: string
+
+	before(async () => {
+		dev = await createDev()
+	})
+
+	beforeEach(async () => {
+		snapshot = (await takeSnapshot()) as Snapshot
+		snapshotId = snapshot.result
+	})
+
+	afterEach(async () => {
+		await revertToSnapshot(snapshotId)
+	})
+
 	const err = (error: Error): Error => error
 	describe('DevArbitrum; initialize', () => {
 		it('the name is Dev Arbitrum', async () => {
-			const dev = await createDev()
 			expect(await dev.devL2.name()).to.equal('Dev Arbitrum')
 		})
 
 		it('the symbol is DEV', async () => {
-			const dev = await createDev()
 			expect(await dev.devL2.symbol()).to.equal('DEV')
 		})
 
 		it('the decimals is 18', async () => {
-			const dev = await createDev()
 			expect((await dev.devL2.decimals()).toNumber()).to.equal(18)
 		})
 		it('deployer has admin role', async () => {
-			const dev = await createDev()
 			expect(
 				await dev.devL2.hasRole(await dev.devL2.DEFAULT_ADMIN_ROLE(), deployer)
 			).to.equal(true)
 		})
 		it('deployer has burner role', async () => {
-			const dev = await createDev()
 			expect(
 				await dev.devL2.hasRole(await dev.devL2.BURNER_ROLE(), deployer)
 			).to.equal(true)
 		})
 		it('deployer has minter role', async () => {
-			const dev = await createDev()
 			expect(
 				await dev.devL2.hasRole(await dev.devL2.MINTER_ROLE(), deployer)
 			).to.equal(true)
 		})
 
 		it('get l1 token address', async () => {
-			const dev = await createDev()
 			const l1TokenAddress = await (
 				dev.devL2 as DevArbitrumInstance
 			).l1Address()
@@ -58,7 +73,6 @@ contract('DevArbitrum', ([deployer, user1, user2]) => {
 		})
 
 		it('get ArbSys address', async () => {
-			const dev = await createDev()
 			const arbSys = await dev.addressRegistry.registries('ArbSys')
 			const arbSysInstance = await artifacts.require('ArbSysTest').at(arbSys)
 			expect(await arbSysInstance.isTopLevelCall()).to.equal(true)
@@ -66,7 +80,6 @@ contract('DevArbitrum', ([deployer, user1, user2]) => {
 	})
 	describe('DevArbitrum; bridgeMint', () => {
 		it('the initial balance is 0', async () => {
-			const dev = await createDev()
 			expect((await dev.devL2.totalSupply()).toNumber()).to.equal(0)
 			expect(
 				(
@@ -75,7 +88,6 @@ contract('DevArbitrum', ([deployer, user1, user2]) => {
 			).to.equal(0)
 		})
 		it('increase the balance by running the mint', async () => {
-			const dev = await createDev()
 			await (dev.devL2 as DevArbitrumInstance).bridgeMint(deployer, 100)
 			expect((await dev.devL2.totalSupply()).toNumber()).to.equal(100)
 			expect((await dev.devL2.balanceOf(deployer)).toNumber()).to.equal(100)
@@ -86,7 +98,6 @@ contract('DevArbitrum', ([deployer, user1, user2]) => {
 			).to.equal(100)
 		})
 		it('generate event', async () => {
-			const dev = await createDev()
 			const tmp = dev.devL2 as DevArbitrumInstance
 			tmp.bridgeMint(deployer, 100)
 			const [account, amount] = await Promise.all([
@@ -97,7 +108,6 @@ contract('DevArbitrum', ([deployer, user1, user2]) => {
 			expect(amount).to.equal('100')
 		})
 		it('running with 0', async () => {
-			const dev = await createDev()
 			await (dev.devL2 as DevArbitrumInstance).bridgeMint(deployer, 100)
 			expect((await dev.devL2.totalSupply()).toNumber()).to.equal(100)
 			expect((await dev.devL2.balanceOf(deployer)).toNumber()).to.equal(100)
@@ -112,7 +122,6 @@ contract('DevArbitrum', ([deployer, user1, user2]) => {
 			).to.equal(100)
 		})
 		it('Additional minting', async () => {
-			const dev = await createDev()
 			await (dev.devL2 as DevArbitrumInstance).bridgeMint(deployer, 100)
 			expect((await dev.devL2.totalSupply()).toNumber()).to.equal(100)
 			expect((await dev.devL2.balanceOf(deployer)).toNumber()).to.equal(100)
@@ -127,7 +136,6 @@ contract('DevArbitrum', ([deployer, user1, user2]) => {
 			).to.equal(300)
 		})
 		it('should fail to run mint when sent from other than minter', async () => {
-			const dev = await createDev()
 			const res = await (dev.devL2 as DevArbitrumInstance)
 				.bridgeMint(deployer, 100, { from: user1 })
 				.catch(err)
@@ -136,7 +144,6 @@ contract('DevArbitrum', ([deployer, user1, user2]) => {
 			expect((await dev.devL2.balanceOf(deployer)).toNumber()).to.equal(0)
 		})
 		it('if the sender has role of granting roles, can add a new minter', async () => {
-			const dev = await createDev()
 			const mintRoleKey = await dev.devL2.MINTER_ROLE()
 			await dev.devL2.grantRole(mintRoleKey, user1)
 			expect(await dev.devL2.hasRole(mintRoleKey, user1)).to.equal(true)
@@ -148,7 +155,6 @@ contract('DevArbitrum', ([deployer, user1, user2]) => {
 			).to.equal(true)
 		})
 		it('renounce minter by running renounceRole', async () => {
-			const dev = await createDev()
 			const mintRoleKey = await dev.devL2.MINTER_ROLE()
 			await dev.devL2.grantRole(mintRoleKey, user1)
 			expect(await dev.devL2.hasRole(mintRoleKey, user1)).to.equal(true)
@@ -158,7 +164,6 @@ contract('DevArbitrum', ([deployer, user1, user2]) => {
 	})
 	describe('DevArbitrum; bridgeBurn', () => {
 		it('decrease the balance by running the burn', async () => {
-			const dev = await createDev()
 			await (dev.devL2 as DevArbitrumInstance).bridgeMint(deployer, 100)
 			expect((await dev.devL2.totalSupply()).toNumber()).to.equal(100)
 			expect((await dev.devL2.balanceOf(deployer)).toNumber()).to.equal(100)
@@ -178,7 +183,6 @@ contract('DevArbitrum', ([deployer, user1, user2]) => {
 			).to.equal(50)
 		})
 		it('running with 0', async () => {
-			const dev = await createDev()
 			await (dev.devL2 as DevArbitrumInstance).bridgeMint(deployer, 100)
 			expect((await dev.devL2.totalSupply()).toNumber()).to.equal(100)
 			expect((await dev.devL2.balanceOf(deployer)).toNumber()).to.equal(100)
@@ -197,7 +201,6 @@ contract('DevArbitrum', ([deployer, user1, user2]) => {
 			).to.equal(100)
 		})
 		it('should fail to decrease the balance when sent from no balance account', async () => {
-			const dev = await createDev()
 			await (dev.devL2 as DevArbitrumInstance).bridgeMint(deployer, 100)
 			expect((await dev.devL2.totalSupply()).toNumber()).to.equal(100)
 			expect((await dev.devL2.balanceOf(deployer)).toNumber()).to.equal(100)
@@ -213,7 +216,6 @@ contract('DevArbitrum', ([deployer, user1, user2]) => {
 			validateErrorMessage(res, 'must have burner role to burn')
 		})
 		it('should fail to if over decrease the balance by running the burnFrom from another account after approved', async () => {
-			const dev = await createDev()
 			await (dev.devL2 as DevArbitrumInstance).bridgeMint(deployer, 100)
 			expect((await dev.devL2.totalSupply()).toNumber()).to.equal(100)
 			expect((await dev.devL2.balanceOf(deployer)).toNumber()).to.equal(100)
@@ -236,7 +238,6 @@ contract('DevArbitrum', ([deployer, user1, user2]) => {
 			expect(res).to.be.an.instanceof(Error)
 		})
 		it('When the bidge balance is exceeded, it becomes zero', async () => {
-			const dev = await createDev()
 			await (dev.devL2 as DevArbitrumInstance).bridgeMint(deployer, 100)
 			await dev.devL2.mint(deployer, 100)
 			await (dev.devL2 as DevArbitrumInstance).bridgeBurn(deployer, 150)
@@ -247,7 +248,6 @@ contract('DevArbitrum', ([deployer, user1, user2]) => {
 			).to.equal(0)
 		})
 		it('generate BridgeBurn event', async () => {
-			const dev = await createDev()
 			await (dev.devL2 as DevArbitrumInstance).bridgeMint(deployer, 100)
 			expect(
 				(
@@ -269,7 +269,6 @@ contract('DevArbitrum', ([deployer, user1, user2]) => {
 			).to.equal(50)
 		})
 		it('generate TxToL1 event', async () => {
-			const dev = await createDev()
 			await dev.devL2.mint(deployer, 100)
 			expect(
 				(
@@ -295,7 +294,6 @@ contract('DevArbitrum', ([deployer, user1, user2]) => {
 			).to.equal(0)
 		})
 		it('generate L1EscrowMint event', async () => {
-			const dev = await createDev()
 			await dev.devL2.mint(deployer, 100)
 			expect(
 				(
@@ -322,7 +320,6 @@ contract('DevArbitrum', ([deployer, user1, user2]) => {
 		})
 
 		it('call sendTxToL1 func', async () => {
-			const dev = await createDev()
 			await dev.devL2.mint(deployer, 100)
 			expect(
 				(
