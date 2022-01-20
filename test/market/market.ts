@@ -19,7 +19,7 @@ contract(
 		const marketContract = artifacts.require('Market')
 
 		let snapshot: Snapshot
-	    let snapshotId: string
+		let snapshotId: string
 
 		beforeEach(async () => {
 			snapshot = (await takeSnapshot()) as Snapshot
@@ -540,7 +540,7 @@ contract(
 			let propertyAddress: string
 
 			before(async () => {
-				[dev, marketInstance, propertyAddress] = await init()
+				;[dev, marketInstance, propertyAddress] = await init()
 			})
 
 			it('If none of the properties are authenticated, an empty array will be returned.', async () => {
