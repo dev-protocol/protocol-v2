@@ -30,7 +30,7 @@ contract(
 		let snapshotId: string
 
 		before(async () => {
-			[dev] = await init()
+			;[dev] = await init()
 		})
 
 		beforeEach(async () => {
