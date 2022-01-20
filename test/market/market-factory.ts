@@ -44,13 +44,13 @@ contract('MarketFactoryTest', ([deployer, user, dummyMarketAddress]) => {
 	let dev: DevProtocolInstance
 	let market: string
 	let marketBehavior: string
-    let marketAddress: string
+	let marketAddress: string
 	let fromAddress: string
 	let snapshot: Snapshot
 	let snapshotId: string
 
 	before(async () => {
-		[dev, market, marketBehavior, [marketAddress, fromAddress]] = await init()
+		;[dev, market, marketBehavior, [marketAddress, fromAddress]] = await init()
 	})
 
 	beforeEach(async () => {
