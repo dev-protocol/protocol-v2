@@ -5,6 +5,11 @@ import {
 	validateErrorMessage,
 	validateAddressErrorMessage,
 } from '../test-lib/utils/error'
+import {
+	takeSnapshot,
+	revertToSnapshot,
+	Snapshot,
+} from '../test-lib/utils/snapshot'
 
 contract(
 	'MetricsFactoryTest',
@@ -20,9 +25,25 @@ contract(
 			return [dev]
 		}
 
+		let dev: DevProtocolInstance
+		let snapshot: Snapshot
+		let snapshotId: string
+
+		before(async () => {
+			[dev] = await init()
+		})
+
+		beforeEach(async () => {
+			snapshot = (await takeSnapshot()) as Snapshot
+			snapshotId = snapshot.result
+		})
+
+		afterEach(async () => {
+			await revertToSnapshot(snapshotId)
+		})
+
 		describe('MetircsFactory; create', () => {
 			it('Adds a new metrics contract address', async () => {
-				const [dev] = await init()
 				dev.metricsFactory
 					.create(property1, {
 						from: market,
@@ -42,7 +63,6 @@ contract(
 				expect(result).to.be.equal(true)
 			})
 			it('Cannot be executed from other than market contract.', async () => {
-				const [dev] = await init()
 				const result = await dev.metricsFactory
 					.create(property2, {
 						from: user,
@@ -51,7 +71,6 @@ contract(
 				validateAddressErrorMessage(result)
 			})
 			it('Should to be increased metricsCount always', async () => {
-				const [dev] = await init()
 				expect(
 					await dev.metricsFactory.metricsCount().then((x) => x.toNumber())
 				).to.be.equal(0)
@@ -70,7 +89,6 @@ contract(
 				).to.be.equal(2)
 			})
 			it('Should to be increased metricsOfProperty always', async () => {
-				const [dev] = await init()
 				expect(
 					await dev.metricsFactory
 						.metricsOfProperty(property1)
@@ -102,7 +120,6 @@ contract(
 				)
 			})
 			it('Should to be increased metricsCountPerProperty always', async () => {
-				const [dev] = await init()
 				expect(
 					await dev.metricsFactory
 						.metricsCountPerProperty(property1)
@@ -127,7 +144,6 @@ contract(
 				).to.be.equal(2)
 			})
 			it('Should to be increased authenticatedPropertiesCount when the create Metrics is the first of Metrics for the Property', async () => {
-				const [dev] = await init()
 				expect(
 					await dev.metricsFactory
 						.authenticatedPropertiesCount()
@@ -154,7 +170,6 @@ contract(
 		})
 		describe('MetircsFactory; destroy', () => {
 			it('Should fail to destroy when passed other than metrics address.', async () => {
-				const [dev] = await init()
 				const result = await dev.metricsFactory
 					.destroy(dummyMetrics, {
 						from: market,
@@ -163,7 +178,6 @@ contract(
 				validateErrorMessage(result, 'address is not metrics')
 			})
 			it('Should fail to destroy when sent from other than a Market. ', async () => {
-				const [dev] = await init()
 				const m1 = await dev.metricsFactory
 					.create(property1, {
 						from: market,
@@ -177,7 +191,6 @@ contract(
 				validateAddressErrorMessage(result)
 			})
 			it('When call the destroy, remove the metrics, emit Destroy event.', async () => {
-				const [dev] = await init()
 				const m1 = await dev.metricsFactory
 					.create(property1, {
 						from: market,
@@ -205,7 +218,6 @@ contract(
 				expect(m1).to.be.equal(metrics)
 			})
 			it('can not also run the destroy method in owner.', async () => {
-				const [dev] = await init()
 				const m1 = await dev.metricsFactory
 					.create(property1, {
 						from: market,
@@ -221,7 +233,6 @@ contract(
 				validateAddressErrorMessage(destroｙResult)
 			})
 			it('Should to be decerased metricsCount always', async () => {
-				const [dev] = await init()
 				const m1 = await dev.metricsFactory
 					.create(property1, {
 						from: market,
@@ -251,7 +262,6 @@ contract(
 				).to.be.equal(0)
 			})
 			it('Should to be decerased metricsOfProperty always', async () => {
-				const [dev] = await init()
 				const m1 = await dev.metricsFactory
 					.create(property1, {
 						from: market,
@@ -290,7 +300,6 @@ contract(
 				)
 			})
 			it('Should to be decreased metricsCountPerProperty always', async () => {
-				const [dev] = await init()
 				const m1 = await dev.metricsFactory
 					.create(property1, {
 						from: market,
@@ -326,7 +335,6 @@ contract(
 				).to.be.equal(0)
 			})
 			it('Should to be decreased authenticatedPropertiesCount when the destroyed Metrics is the last of Metrics for the Property', async () => {
-				const [dev] = await init()
 				const m1 = await dev.metricsFactory
 					.create(property1, {
 						from: market,
