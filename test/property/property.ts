@@ -6,6 +6,11 @@ import {
 } from '../test-lib/utils/error'
 import { DEFAULT_ADDRESS } from '../test-lib/const'
 import { toBigNumber, splitValue } from '../test-lib/utils/common'
+import {
+	takeSnapshot,
+	revertToSnapshot,
+	Snapshot,
+} from '../test-lib/utils/snapshot'
 
 contract(
 	'PropertyTest',
@@ -28,9 +33,25 @@ contract(
 			return dev
 		}
 
+        let dev: DevProtocolInstance
+		let snapshot: Snapshot
+		let snapshotId: string
+
+		before(async () => {
+			;dev = await init()
+		})
+
+		beforeEach(async () => {
+			snapshot = (await takeSnapshot()) as Snapshot
+			snapshotId = snapshot.result
+		})
+
+		afterEach(async () => {
+			await revertToSnapshot(snapshotId)
+		})
+
 		describe('Property; getBalances', () => {
 			it('author and treasury hold the balance.', async () => {
-				const dev = await init()
 				await dev.generatePropertyFactory()
 				const transaction = await dev.propertyFactory.create(
 					'sample',
@@ -50,7 +71,6 @@ contract(
 				)
 			})
 			it('The balance will be transferred(transfer).', async () => {
-				const dev = await init()
 				await dev.generatePropertyFactory()
 				await dev.generateWithdraw()
 				const transaction = await dev.propertyFactory.create(
@@ -78,7 +98,6 @@ contract(
 				)
 			})
 			it('The balance will be transferred(transferFrom).', async () => {
-				const dev = await init()
 				await dev.generatePropertyFactory()
 				await dev.generateWithdraw()
 				const transaction = await dev.propertyFactory.create(
@@ -114,7 +133,6 @@ contract(
 
 		describe('Property; constructor', () => {
 			it('Cannot be created from other than factory', async () => {
-				const dev = await init()
 				const result = await propertyContract
 					.new(dev.addressRegistry.address, author, 'sample', 'SAMPLE', {
 						from: deployer,
@@ -123,7 +141,6 @@ contract(
 				validateAddressErrorMessage(result)
 			})
 			it('The author, decimal places, and number of issues are fixed values', async () => {
-				const dev = await init()
 				await dev.addressRegistry.setRegistry(
 					'PropertyFactory',
 					propertyFactory
@@ -161,7 +178,6 @@ contract(
 		})
 		describe('Property; changeAuthor', () => {
 			it('Executing a changeAuthor function with a non-Author.', async () => {
-				const dev = await init()
 				await dev.addressRegistry.setRegistry(
 					'PropertyFactory',
 					propertyFactory
@@ -181,7 +197,6 @@ contract(
 				validateErrorMessage(result, 'illegal sender')
 			})
 			it('Author is changed.', async () => {
-				const dev = await init()
 				await dev.generatePropertyFactory()
 				const transaction = await dev.propertyFactory.create(
 					'sample',
@@ -197,7 +212,6 @@ contract(
 				expect(await propertyInstance.author()).to.be.equal(nextAuthor)
 			})
 			it('Should emit ChangeAuthor event', async () => {
-				const dev = await init()
 				await dev.generatePropertyFactory()
 				await dev.addressRegistry.setRegistry(
 					'PropertyFactory',
@@ -223,7 +237,6 @@ contract(
 		})
 		describe('Property; changeName', () => {
 			it('Should fail to call when the sender is not author', async () => {
-				const dev = await init()
 				await dev.addressRegistry.setRegistry(
 					'PropertyFactory',
 					propertyFactory
@@ -243,7 +256,6 @@ contract(
 				validateErrorMessage(result, 'illegal sender')
 			})
 			it('Change the name', async () => {
-				const dev = await init()
 				await dev.generatePropertyFactory()
 				const transaction = await dev.propertyFactory.create(
 					'sample',
@@ -259,7 +271,6 @@ contract(
 				expect(await propertyInstance.name()).to.be.equal('next-name')
 			})
 			it('Should emit ChangeName event', async () => {
-				const dev = await init()
 				await dev.generatePropertyFactory()
 				await dev.addressRegistry.setRegistry(
 					'PropertyFactory',
@@ -285,7 +296,6 @@ contract(
 		})
 		describe('Property; changeSymbol', () => {
 			it('Should fail to call when the sender is not author', async () => {
-				const dev = await init()
 				await dev.addressRegistry.setRegistry(
 					'PropertyFactory',
 					propertyFactory
@@ -305,7 +315,6 @@ contract(
 				validateErrorMessage(result, 'illegal sender')
 			})
 			it('Change the symbol', async () => {
-				const dev = await init()
 				await dev.generatePropertyFactory()
 				const transaction = await dev.propertyFactory.create(
 					'sample',
@@ -321,7 +330,6 @@ contract(
 				expect(await propertyInstance.symbol()).to.be.equal('NEXTSYMBOL')
 			})
 			it('Should emit ChangeSymbol event', async () => {
-				const dev = await init()
 				await dev.generatePropertyFactory()
 				await dev.addressRegistry.setRegistry(
 					'PropertyFactory',
@@ -348,7 +356,7 @@ contract(
 		describe('Property; withdraw', () => {
 			const dev = new DevProtocolInstance(deployer)
 			let propertyAddress: string
-			beforeEach(async () => {
+			before(async () => {
 				await dev.generateAddressRegistry()
 				await dev.generateDev()
 				await dev.generateDevBridge()
@@ -398,7 +406,7 @@ contract(
 		describe('Property; transfer', () => {
 			const dev = new DevProtocolInstance(deployer)
 			let propertyAddress: string
-			beforeEach(async () => {
+			before(async () => {
 				await dev.generateAddressRegistry()
 				await dev.generateDev()
 				await dev.generateDevBridge()
@@ -448,7 +456,7 @@ contract(
 		describe('Property; transferFrom', () => {
 			const dev = new DevProtocolInstance(deployer)
 			let propertyAddress: string
-			beforeEach(async () => {
+			before(async () => {
 				await dev.generateAddressRegistry()
 				await dev.generateDev()
 				await dev.generateDevBridge()
