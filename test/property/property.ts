@@ -33,12 +33,12 @@ contract(
 			return dev
 		}
 
-        let dev: DevProtocolInstance
+		let dev: DevProtocolInstance
 		let snapshot: Snapshot
 		let snapshotId: string
 
 		before(async () => {
-			;dev = await init()
+			dev = await init()
 		})
 
 		beforeEach(async () => {
