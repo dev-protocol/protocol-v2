@@ -1,11 +1,6 @@
 import { init } from './withdraw-common'
 import { DevProtocolInstance } from '../test-lib/instance'
-import {
-	MetricsInstance,
-	PropertyInstance,
-	IPolicyInstance,
-	MarketInstance,
-} from '../../types/truffle-contracts'
+import { PropertyInstance } from '../../types/truffle-contracts'
 import BigNumber from 'bignumber.js'
 import {
 	toBigNumber,
@@ -14,13 +9,9 @@ import {
 	forwardBlockTimestamp,
 	getBlockTimestamp,
 } from '../test-lib/utils/common'
-import { getPropertyAddress, getMarketAddress } from '../test-lib/utils/log'
+import { getPropertyAddress } from '../test-lib/utils/log'
 import { SHARE_OF_TREASURY } from '../test-lib/const'
-import { getEventValue } from '../test-lib/utils/event'
-import {
-	validateErrorMessage,
-	validateAddressErrorMessage,
-} from '../test-lib/utils/error'
+import { validateAddressErrorMessage } from '../test-lib/utils/error'
 
 contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 	describe('Withdraw; withdraw', () => {
