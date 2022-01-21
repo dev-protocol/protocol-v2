@@ -2,6 +2,11 @@
 import { deployProxy, DevProtocolInstance } from '../test-lib/instance'
 import { DevInstance, DevBridgeInstance } from '../../types/truffle-contracts'
 import { validateErrorMessage } from '../test-lib/utils/error'
+import {
+	takeSnapshot,
+	revertToSnapshot,
+	Snapshot,
+} from '../test-lib/utils/snapshot'
 
 contract('DevBridge', ([deployer, user1, lockup, withdraw, market]) => {
 	const createDevInstance = async (): Promise<DevProtocolInstance> => {
@@ -55,10 +60,29 @@ contract('DevBridge', ([deployer, user1, lockup, withdraw, market]) => {
 		return [dev, devBridge]
 	}
 
+	let dev: DevProtocolInstance
+	let devInstance: DevInstance
+	let devBridge: DevBridgeInstance
+	let snapshot: Snapshot
+	let snapshotId: string
+
+	before(async () => {
+		dev = await createDevInstance()
+		;[devInstance, devBridge] = await createDevInstanceNotAddRole()
+	})
+
+	beforeEach(async () => {
+		snapshot = (await takeSnapshot()) as Snapshot
+		snapshotId = snapshot.result
+	})
+
+	afterEach(async () => {
+		await revertToSnapshot(snapshotId)
+	})
+
 	describe('mint', () => {
 		describe('success', () => {
 			it('If devBridge has minter privileges, it can mint Dev tokens.(Lockup)', async () => {
-				const dev = await createDevInstance()
 				const before = await dev.dev.balanceOf(user1)
 				expect(before.toString()).to.equal('0')
 				await dev.devBridge.mint(user1, 100, { from: lockup })
@@ -66,7 +90,6 @@ contract('DevBridge', ([deployer, user1, lockup, withdraw, market]) => {
 				expect(after.toString()).to.equal('100')
 			})
 			it('If devBridge has minter privileges, it can mint Dev tokens.(withdraw)', async () => {
-				const dev = await createDevInstance()
 				const before = await dev.dev.balanceOf(user1)
 				expect(before.toString()).to.equal('0')
 				await dev.devBridge.mint(user1, 100, { from: withdraw })
@@ -76,14 +99,12 @@ contract('DevBridge', ([deployer, user1, lockup, withdraw, market]) => {
 		})
 		describe('fail', () => {
 			it('If devBridge does not has minter privileges, it can not mint Dev tokens', async () => {
-				const [, devBridge] = await createDevInstanceNotAddRole()
 				const result = await devBridge
 					.mint(user1, 100, { from: withdraw })
 					.catch((err: Error) => err)
 				validateErrorMessage(result, 'must have minter role to mint')
 			})
 			it('Error when minting from other than Lockup and Withdraw contracts', async () => {
-				const dev = await createDevInstance()
 				const result = await dev.devBridge
 					.mint(user1, 100)
 					.catch((err: Error) => err)
@@ -94,7 +115,6 @@ contract('DevBridge', ([deployer, user1, lockup, withdraw, market]) => {
 	describe('burn', () => {
 		describe('success', () => {
 			it('If devBridge has burner privileges, it can burn Dev tokens.(MarketFactory)', async () => {
-				const dev = await createDevInstance()
 				await dev.dev.mint(user1, 100)
 				const before = await dev.dev.balanceOf(user1)
 				expect(before.toString()).to.equal('100')
@@ -105,15 +125,13 @@ contract('DevBridge', ([deployer, user1, lockup, withdraw, market]) => {
 		})
 		describe('fail', () => {
 			it('If devBridge does not has minter privileges, it can not mint Dev tokens', async () => {
-				const [dev, devBridge] = await createDevInstanceNotAddRole()
-				await dev.mint(user1, 100)
+				await devInstance.mint(user1, 100)
 				const result = await devBridge
 					.burn(user1, 100, { from: market })
 					.catch((err: Error) => err)
 				validateErrorMessage(result, 'must have burner role to burn')
 			})
 			it('Error when minting from other than MarketFactory contracts', async () => {
-				const dev = await createDevInstance()
 				await dev.dev.mint(user1, 100)
 				const result = await dev.devBridge
 					.mint(user1, 100)
@@ -125,7 +143,6 @@ contract('DevBridge', ([deployer, user1, lockup, withdraw, market]) => {
 	describe('renounceMinter', () => {
 		describe('success', () => {
 			it('we can remove mint privileges.', async () => {
-				const dev = await createDevInstance()
 				const role = await dev.dev.MINTER_ROLE()
 				const before = await dev.dev.hasRole(role, dev.devBridge.address)
 				expect(before).to.equal(true)
@@ -140,7 +157,6 @@ contract('DevBridge', ([deployer, user1, lockup, withdraw, market]) => {
 		})
 		describe('fail', () => {
 			it('Only the owner can run it.', async () => {
-				const dev = await createDevInstance()
 				const result = await dev.devBridge
 					.renounceMinter({ from: user1 })
 					.catch((err: Error) => err)
@@ -151,7 +167,6 @@ contract('DevBridge', ([deployer, user1, lockup, withdraw, market]) => {
 	describe('renounceBurner', () => {
 		describe('success', () => {
 			it('we can remove burn privileges.', async () => {
-				const dev = await createDevInstance()
 				const role = await dev.dev.BURNER_ROLE()
 				const before = await dev.dev.hasRole(role, dev.devBridge.address)
 				expect(before).to.equal(true)
@@ -166,7 +181,6 @@ contract('DevBridge', ([deployer, user1, lockup, withdraw, market]) => {
 		})
 		describe('fail', () => {
 			it('Only the owner can run it.', async () => {
-				const dev = await createDevInstance()
 				const result = await dev.devBridge
 					.renounceBurner({ from: user1 })
 					.catch((err: Error) => err)
