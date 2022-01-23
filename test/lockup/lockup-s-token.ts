@@ -1,7 +1,6 @@
 import { deployerBalance, err, init, init2 } from './lockup-s-token-common'
 import { DevProtocolInstance } from '../test-lib/instance'
 import { PropertyInstance } from '../../types/truffle-contracts'
-import BigNumber from 'bignumber.js'
 import {
 	toBigNumber,
 	forwardBlockTimestamp,
@@ -16,7 +15,7 @@ import {
 } from '../test-lib/utils/snapshot'
 import { validateErrorMessage } from '../test-lib/utils/error'
 
-contract('LockupTest', ([deployer, user1, user2, user3]) => {
+contract('LockupTest', ([deployer, , user2, user3]) => {
 	let dev: DevProtocolInstance
 	let property: PropertyInstance
 	let tokenId: number
@@ -32,9 +31,9 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 		await revertToSnapshot(snapshotId)
 	})
 
-    describe('Lockup; depositToProperty, getLockedupProperties', () => {
+	describe('Lockup; depositToProperty, getLockedupProperties', () => {
 		before(async () => {
-			[dev, property] = await init(deployer, user2)
+			;[dev, property] = await init(deployer, user2)
 		})
 		describe('success', () => {
 			it('get nft token.', async () => {
@@ -182,7 +181,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 	})
 	describe('Lockup; depositToPosition', () => {
 		before(async () => {
-			[dev, property, tokenId] = await init2(deployer, user2)
+			;[dev, property, tokenId] = await init2(deployer, user2)
 		})
 		describe('success', () => {
 			it('update nft.', async () => {
@@ -318,7 +317,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 	})
 	describe('Lockup; withdrawByPosition', () => {
 		before(async () => {
-			[dev, property, tokenId] = await init2(deployer, user2)
+			;[dev, property, tokenId] = await init2(deployer, user2)
 		})
 		describe('success', () => {
 			it('update nft position.', async () => {
