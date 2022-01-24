@@ -6,6 +6,11 @@ import {
 import BigNumber from 'bignumber.js'
 import { toBigNumber } from '../test-lib/utils/common'
 import { getPropertyAddress } from '../test-lib/utils/log'
+import {
+	takeSnapshot,
+	revertToSnapshot,
+	Snapshot,
+} from '../test-lib/utils/snapshot'
 import { validateErrorMessage } from '../test-lib/utils/error'
 
 contract('LockupTest', ([deployer, user1, user2]) => {
@@ -56,6 +61,24 @@ contract('LockupTest', ([deployer, user1, user2]) => {
 		return [dev, property, policy]
 	}
 
+	let dev: DevProtocolInstance
+	let property: PropertyInstance
+	let snapshot: Snapshot
+	let snapshotId: string
+
+	before(async () => {
+		;[dev, property] = await init()
+	})
+
+	beforeEach(async () => {
+		snapshot = (await takeSnapshot()) as Snapshot
+		snapshotId = snapshot.result
+	})
+
+	afterEach(async () => {
+		await revertToSnapshot(snapshotId)
+	})
+
 	const err = (error: Error): Error => error
 
 	describe('Lockup; calculateRewardAmount', () => {
@@ -101,7 +124,6 @@ contract('LockupTest', ([deployer, user1, user2]) => {
 		}
 
 		it('The reward is calculated and comes back to you.', async () => {
-			const [dev, property] = await init()
 			await dev.dev.approve(dev.lockup.address, '10000000000000000000000')
 			await dev.lockup.depositToProperty(
 				property.address,
@@ -132,7 +154,6 @@ contract('LockupTest', ([deployer, user1, user2]) => {
 
 		describe('success', () => {
 			it('Can set cap.', async () => {
-				const [dev] = await init()
 				const tx = await dev.lockup.updateCap(100)
 				const eventLogs = tx.logs.filter(
 					(log: { event: string }) => log.event === 'UpdateCap'
@@ -157,7 +178,6 @@ contract('LockupTest', ([deployer, user1, user2]) => {
 		})
 		describe('fail', () => {
 			it('Do not accept access from addresses other than the specified one.', async () => {
-				const [dev] = await init()
 				const res = await dev.lockup.updateCap(100, { from: user1 }).catch(err)
 				validateErrorMessage(res, 'illegal access')
 			})
