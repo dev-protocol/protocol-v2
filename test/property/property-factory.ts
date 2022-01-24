@@ -2,6 +2,11 @@ import { DevProtocolInstance } from '../test-lib/instance'
 import { getPropertyAddress, getMarketAddress } from '../test-lib/utils/log'
 import { toBigNumber } from '../test-lib/utils/common'
 import { getEventValue } from '../test-lib/utils/event'
+import {
+	takeSnapshot,
+	revertToSnapshot,
+	Snapshot,
+} from '../test-lib/utils/snapshot'
 
 contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 	describe('PropertyFactory; create', () => {
@@ -30,9 +35,25 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 			return [dev, propertyAddress]
 		}
 
-		it('Create a new property contract and emit Create event', async () => {
-			const [, property] = await init()
+		let dev: DevProtocolInstance
+		let property: string
+		let snapshot: Snapshot
+		let snapshotId: string
 
+		before(async () => {
+			;[dev, property] = await init()
+		})
+
+		beforeEach(async () => {
+			snapshot = (await takeSnapshot()) as Snapshot
+			snapshotId = snapshot.result
+		})
+
+		afterEach(async () => {
+			await revertToSnapshot(snapshotId)
+		})
+
+		it('Create a new property contract and emit Create event', async () => {
 			const deployedProperty = await artifacts.require('Property').at(property)
 			const name = await deployedProperty.name({ from: user2 })
 			const symbol = await deployedProperty.symbol({ from: user2 })
@@ -51,7 +72,6 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 		})
 
 		it('Should update to isProperty', async () => {
-			const [dev] = await init()
 			const property = await dev.propertyFactory
 				.create('sample', 'SAMPLE', user)
 				.then(getPropertyAddress)
