@@ -15,6 +15,11 @@ import {
 	getBlockTimestamp,
 	toBigNumber,
 } from '../test-lib/utils/common'
+import {
+	takeSnapshot,
+	revertToSnapshot,
+	Snapshot,
+} from '../test-lib/utils/snapshot'
 
 contract('STokensManager', ([deployer, user]) => {
 	const deployerBalance = new BigNumber(1e18).times(10000000)
@@ -57,6 +62,24 @@ contract('STokensManager', ([deployer, user]) => {
 
 		return [dev, property]
 	}
+
+	let dev: DevProtocolInstance
+	let property: PropertyInstance
+	let snapshot: Snapshot
+	let snapshotId: string
+
+	before(async () => {
+		[dev, property] = await init()
+	})
+
+	beforeEach(async () => {
+		snapshot = (await takeSnapshot()) as Snapshot
+		snapshotId = snapshot.result
+	})
+
+	afterEach(async () => {
+		await revertToSnapshot(snapshotId)
+	})
 
 	const checkTokenUri = (
 		tokenUri: string,
@@ -117,7 +140,6 @@ contract('STokensManager', ([deployer, user]) => {
 
 	describe('STokensManager; initialize', () => {
 		it('The initialize function can only be executed once.', async () => {
-			const [dev] = await init()
 			const result = await dev.sTokensManager
 				.initialize(dev.addressRegistry.address)
 				.catch((err: Error) => err)
@@ -129,14 +151,12 @@ contract('STokensManager', ([deployer, user]) => {
 	})
 	describe('name', () => {
 		it('get token name', async () => {
-			const [dev] = await init()
 			const name = await dev.sTokensManager.name()
 			expect(name).to.equal('Dev Protocol sTokens V1')
 		})
 	})
 	describe('symbol', () => {
 		it('get token symbol', async () => {
-			const [dev] = await init()
 			const symbol = await dev.sTokensManager.symbol()
 			expect(symbol).to.equal('DEV-STOKENS-V1')
 		})
@@ -144,13 +164,11 @@ contract('STokensManager', ([deployer, user]) => {
 	describe('tokenURI', () => {
 		describe('success', () => {
 			it('get token uri', async () => {
-				const [dev, property] = await init()
 				await dev.lockup.depositToProperty(property.address, '10000')
 				const uri = await dev.sTokensManager.tokenURI(1)
 				checkTokenUri(uri, property.address, 10000, 0)
 			})
 			it('get custom token uri', async () => {
-				const [dev, property] = await init()
 				await dev.lockup.depositToProperty(property.address, '10000')
 				await dev.sTokensManager.setTokenURIImage(1, 'ipfs://IPFS-CID', {
 					from: user,
@@ -161,7 +179,6 @@ contract('STokensManager', ([deployer, user]) => {
 		})
 		describe('fail', () => {
 			it('can not get token symbol', async () => {
-				const [dev] = await init()
 				const res = await dev.sTokensManager
 					.tokenURI(1)
 					.catch((err: Error) => err)
@@ -172,7 +189,6 @@ contract('STokensManager', ([deployer, user]) => {
 	describe('mint', () => {
 		describe('success', () => {
 			it('mint nft', async () => {
-				const [dev, property] = await init()
 				await dev.lockup.depositToProperty(property.address, '10000')
 				const tokenId = await dev.sTokensManager.balanceOf(deployer)
 				expect(tokenId.toString()).to.equal('1')
@@ -180,7 +196,6 @@ contract('STokensManager', ([deployer, user]) => {
 				expect(owner).to.equal(deployer)
 			})
 			it('generate minted event', async () => {
-				const [dev, property] = await init()
 				dev.lockup.depositToProperty(property.address, '10000')
 				const [_tokenId, _owner, _property, _amount, _price] =
 					await Promise.all([
@@ -197,7 +212,6 @@ contract('STokensManager', ([deployer, user]) => {
 				expect(_price).to.equal('0')
 			})
 			it('generate event', async () => {
-				const [dev, property] = await init()
 				dev.lockup.depositToProperty(property.address, '10000')
 				const [from, to, tokenId] = await Promise.all([
 					getEventValue(dev.sTokensManager)('Transfer', 'from'),
@@ -209,7 +223,6 @@ contract('STokensManager', ([deployer, user]) => {
 				expect(tokenId).to.equal('1')
 			})
 			it('The counter will be incremented.', async () => {
-				const [dev, property] = await init()
 				dev.lockup.depositToProperty(property.address, '10000')
 				const [_tokenId] = await Promise.all([
 					getEventValue(dev.sTokensManager)('Minted', 'tokenId'),
@@ -224,7 +237,6 @@ contract('STokensManager', ([deployer, user]) => {
 		})
 		describe('fail', () => {
 			it('If the owner runs it, an error will occur.', async () => {
-				const [dev, property] = await init()
 				const res = await dev.sTokensManager
 					.mint(deployer, property.address, 100, 10)
 					.catch((err: Error) => err)
@@ -235,7 +247,6 @@ contract('STokensManager', ([deployer, user]) => {
 	describe('update', () => {
 		describe('success', () => {
 			it('update data', async () => {
-				const [dev, property] = await init()
 				await dev.lockup.depositToProperty(property.address, '10000')
 				const t1 = await getBlockTimestamp()
 				await forwardBlockTimestamp(2)
@@ -271,7 +282,6 @@ contract('STokensManager', ([deployer, user]) => {
 			})
 
 			it('generate updated event data', async () => {
-				const [dev, property] = await init()
 				await dev.lockup.depositToProperty(property.address, '10000')
 				const t1 = await getBlockTimestamp()
 				await forwardBlockTimestamp(2)
@@ -307,7 +317,6 @@ contract('STokensManager', ([deployer, user]) => {
 		})
 		describe('fail', () => {
 			it('If the owner runs it, an error will occur.', async () => {
-				const [dev] = await init()
 				const res = await dev.sTokensManager
 					.update(1, 1, 1, 1, 1)
 					.catch((err: Error) => err)
@@ -319,7 +328,6 @@ contract('STokensManager', ([deployer, user]) => {
 	describe('setTokenURIImage', () => {
 		describe('success', () => {
 			it('get data', async () => {
-				const [dev, property] = await init()
 				await dev.lockup.depositToProperty(property.address, '10000')
 				await dev.sTokensManager.setTokenURIImage(1, 'ipfs://IPFS-CID', {
 					from: user,
@@ -328,7 +336,6 @@ contract('STokensManager', ([deployer, user]) => {
 				checkTokenUri(tokenUri, property.address, 10000, 0, 'ipfs://IPFS-CID')
 			})
 			it('get overwritten data', async () => {
-				const [dev, property] = await init()
 				await dev.lockup.depositToProperty(property.address, '10000')
 				await dev.sTokensManager.setTokenURIImage(1, 'ipfs://IPFS-CID', {
 					from: user,
@@ -342,7 +349,6 @@ contract('STokensManager', ([deployer, user]) => {
 		})
 		describe('fail', () => {
 			it('not author.', async () => {
-				const [dev, property] = await init()
 				await dev.lockup.depositToProperty(property.address, '10000')
 				const res = await dev.sTokensManager
 					.setTokenURIImage(1, '')
@@ -350,7 +356,6 @@ contract('STokensManager', ([deployer, user]) => {
 				validateErrorMessage(res, 'illegal access')
 			})
 			it('was freezed', async () => {
-				const [dev, property] = await init()
 				await dev.lockup.depositToProperty(property.address, '10000')
 				await dev.sTokensManager.setTokenURIImage(1, 'http://dummy', {
 					from: user,
@@ -367,7 +372,6 @@ contract('STokensManager', ([deployer, user]) => {
 	describe('freezeTokenURI', () => {
 		describe('success', () => {
 			it('data freezed', async () => {
-				const [dev, property] = await init()
 				await dev.lockup.depositToProperty(property.address, '10000')
 				await dev.sTokensManager.setTokenURIImage(1, 'http://dummy', {
 					from: user,
@@ -383,7 +387,6 @@ contract('STokensManager', ([deployer, user]) => {
 				validateErrorMessage(res, 'freezed')
 			})
 			it('generated event', async () => {
-				const [dev, property] = await init()
 				await dev.lockup.depositToProperty(property.address, '10000')
 				await dev.sTokensManager.setTokenURIImage(1, 'http://dummy', {
 					from: user,
@@ -399,7 +402,6 @@ contract('STokensManager', ([deployer, user]) => {
 		})
 		describe('fail', () => {
 			it('not author.', async () => {
-				const [dev, property] = await init()
 				await dev.lockup.depositToProperty(property.address, '10000')
 				await dev.sTokensManager.setTokenURIImage(1, 'http://dummy', {
 					from: user,
@@ -410,7 +412,6 @@ contract('STokensManager', ([deployer, user]) => {
 				validateErrorMessage(res, 'illegal access')
 			})
 			it('no uri data.', async () => {
-				const [dev, property] = await init()
 				await dev.lockup.depositToProperty(property.address, '10000')
 				const res = await dev.sTokensManager
 					.freezeTokenURI(1, { from: user })
@@ -418,7 +419,6 @@ contract('STokensManager', ([deployer, user]) => {
 				validateErrorMessage(res, 'no data')
 			})
 			it('already freezed.', async () => {
-				const [dev, property] = await init()
 				await dev.lockup.depositToProperty(property.address, '10000')
 				await dev.sTokensManager.setTokenURIImage(1, 'http://dummy', {
 					from: user,
@@ -435,7 +435,6 @@ contract('STokensManager', ([deployer, user]) => {
 	describe('position', () => {
 		describe('success', () => {
 			it('get data', async () => {
-				const [dev, property] = await init()
 				await dev.lockup.depositToProperty(property.address, '10000')
 				const position = await dev.sTokensManager.positions(1)
 				expect(position.property).to.equal(property.address)
@@ -447,7 +446,6 @@ contract('STokensManager', ([deployer, user]) => {
 		})
 		describe('fail', () => {
 			it('deta is not found', async () => {
-				const [dev] = await init()
 				const res = await dev.sTokensManager
 					.positions(12345)
 					.catch((err: Error) => err)
@@ -459,7 +457,6 @@ contract('STokensManager', ([deployer, user]) => {
 	describe('rewards', () => {
 		describe('success', () => {
 			it('get reward', async () => {
-				const [dev, property] = await init()
 				await dev.lockup.depositToProperty(property.address, '10000')
 				const t1 = await getBlockTimestamp()
 				await forwardBlockTimestamp(1)
@@ -478,7 +475,6 @@ contract('STokensManager', ([deployer, user]) => {
 				)
 			})
 			it('get updated reward', async () => {
-				const [dev, property] = await init()
 				await dev.lockup.depositToProperty(property.address, '10000')
 				const t1 = await getBlockTimestamp()
 				await forwardBlockTimestamp(1)
@@ -505,7 +501,6 @@ contract('STokensManager', ([deployer, user]) => {
 		})
 		describe('fail', () => {
 			it('deta is not found', async () => {
-				const [dev] = await init()
 				const res = await dev.sTokensManager
 					.rewards(12345)
 					.catch((err: Error) => err)
@@ -516,7 +511,6 @@ contract('STokensManager', ([deployer, user]) => {
 	describe('positionsOfProperty', () => {
 		describe('success', () => {
 			it('get token id', async () => {
-				const [dev, property] = await init()
 				await dev.lockup.depositToProperty(property.address, '10000')
 				const tokenIds = await dev.sTokensManager.positionsOfProperty(
 					property.address
@@ -525,7 +519,6 @@ contract('STokensManager', ([deployer, user]) => {
 				expect(tokenIds[0].toNumber()).to.equal(1)
 			})
 			it('get token by property', async () => {
-				const [dev, property] = await init()
 				await dev.lockup.depositToProperty(property.address, '10000')
 				const propertyAddress = getPropertyAddress(
 					await dev.propertyFactory.create('test', 'TEST', user, {
@@ -551,7 +544,6 @@ contract('STokensManager', ([deployer, user]) => {
 				expect(tokenIds2[0].toNumber()).to.equal(2)
 			})
 			it('get token list', async () => {
-				const [dev, property] = await init()
 				await dev.lockup.depositToProperty(property.address, '10000')
 				await dev.lockup.depositToProperty(property.address, '10000')
 
@@ -563,7 +555,6 @@ contract('STokensManager', ([deployer, user]) => {
 				expect(tokenIds[1].toNumber()).to.equal(2)
 			})
 			it('return empty array', async () => {
-				const [dev] = await init()
 				const tokenIds = await dev.sTokensManager.positionsOfProperty(
 					DEFAULT_ADDRESS
 				)
@@ -574,14 +565,12 @@ contract('STokensManager', ([deployer, user]) => {
 	describe('positionsOfOwner', () => {
 		describe('success', () => {
 			it('get token id', async () => {
-				const [dev, property] = await init()
 				await dev.lockup.depositToProperty(property.address, '10000')
 				const tokenIds = await dev.sTokensManager.positionsOfOwner(deployer)
 				expect(tokenIds.length).to.equal(1)
 				expect(tokenIds[0].toNumber()).to.equal(1)
 			})
 			it('get token by owners', async () => {
-				const [dev, property] = await init()
 				await dev.dev.mint(user, deployerBalance)
 				await dev.dev.approve(dev.lockup.address, '100000', { from: user })
 				await dev.lockup.depositToProperty(property.address, '10000')
@@ -596,7 +585,6 @@ contract('STokensManager', ([deployer, user]) => {
 				expect(tokenIds2[0].toNumber()).to.equal(2)
 			})
 			it('get token list', async () => {
-				const [dev, property] = await init()
 				await dev.lockup.depositToProperty(property.address, '10000')
 				await dev.lockup.depositToProperty(property.address, '10000')
 				const tokenIds = await dev.sTokensManager.positionsOfOwner(deployer)
@@ -605,14 +593,12 @@ contract('STokensManager', ([deployer, user]) => {
 				expect(tokenIds[1].toNumber()).to.equal(2)
 			})
 			it('return empty array', async () => {
-				const [dev] = await init()
 				const tokenIds = await dev.sTokensManager.positionsOfOwner(
 					DEFAULT_ADDRESS
 				)
 				expect(tokenIds.length).to.equal(0)
 			})
 			it('transfer token(index0)', async () => {
-				const [dev, property] = await init()
 				await dev.lockup.depositToProperty(property.address, '10000')
 				await dev.lockup.depositToProperty(property.address, '10000')
 				await dev.lockup.depositToProperty(property.address, '10000')
@@ -628,7 +614,6 @@ contract('STokensManager', ([deployer, user]) => {
 				expect(tokenIdsUser[0].toNumber()).to.equal(1)
 			})
 			it('transfer token(index1)', async () => {
-				const [dev, property] = await init()
 				await dev.lockup.depositToProperty(property.address, '10000')
 				await dev.lockup.depositToProperty(property.address, '10000')
 				await dev.lockup.depositToProperty(property.address, '10000')
@@ -644,7 +629,6 @@ contract('STokensManager', ([deployer, user]) => {
 				expect(tokenIdsUser[0].toNumber()).to.equal(2)
 			})
 			it('transfer token(index2)', async () => {
-				const [dev, property] = await init()
 				await dev.lockup.depositToProperty(property.address, '10000')
 				await dev.lockup.depositToProperty(property.address, '10000')
 				await dev.lockup.depositToProperty(property.address, '10000')
