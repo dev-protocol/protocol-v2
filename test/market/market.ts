@@ -2,6 +2,11 @@ import { DevProtocolInstance } from '../test-lib/instance'
 import { forwardBlockTimestamp } from '../test-lib/utils/common'
 import { MarketInstance } from '../../types/truffle-contracts'
 import { getPropertyAddress, getMarketAddress } from '../test-lib/utils/log'
+import {
+	takeSnapshot,
+	revertToSnapshot,
+	Snapshot,
+} from '../test-lib/utils/snapshot'
 import { watch } from '../test-lib/utils/event'
 import {
 	validateErrorMessage,
@@ -12,9 +17,21 @@ contract(
 	'MarketTest',
 	([deployer, marketFactory, behavuor, user, user1, propertyAuther]) => {
 		const marketContract = artifacts.require('Market')
+
+		let snapshot: Snapshot
+		let snapshotId: string
+
+		beforeEach(async () => {
+			snapshot = (await takeSnapshot()) as Snapshot
+			snapshotId = snapshot.result
+		})
+
+		afterEach(async () => {
+			await revertToSnapshot(snapshotId)
+		})
 		describe('Market; constructor', () => {
 			const dev = new DevProtocolInstance(deployer)
-			beforeEach(async () => {
+			before(async () => {
 				await dev.generateAddressRegistry()
 			})
 			it('Cannot be created from other than market factory', async () => {
@@ -41,7 +58,7 @@ contract(
 		describe('Market; toEnable', () => {
 			const dev = new DevProtocolInstance(deployer)
 			let market: MarketInstance
-			beforeEach(async () => {
+			before(async () => {
 				await dev.generateAddressRegistry()
 				await Promise.all([dev.generatePolicyFactory()])
 				await dev.addressRegistry.setRegistry('MarketFactory', marketFactory)
@@ -77,7 +94,7 @@ contract(
 		describe('Market; toDisable', () => {
 			const dev = new DevProtocolInstance(deployer)
 			let market: MarketInstance
-			beforeEach(async () => {
+			before(async () => {
 				await dev.generateAddressRegistry()
 				await Promise.all([dev.generatePolicyFactory()])
 				await dev.addressRegistry.setRegistry('MarketFactory', marketFactory)
@@ -161,7 +178,7 @@ contract(
 			let marketAddress1: string
 			let marketAddress2: string
 			let propertyAddress: string
-			beforeEach(async () => {
+			before(async () => {
 				await dev.generateAddressRegistry()
 				await dev.generateDev()
 				await dev.generateDevBridge()
@@ -350,7 +367,7 @@ contract(
 			let marketAddress2: string
 			let propertyAddress: string
 			const propertyFactory = user1
-			beforeEach(async () => {
+			before(async () => {
 				await dev.generateAddressRegistry()
 				await dev.generateDev()
 				await dev.generateDevBridge()
@@ -518,13 +535,19 @@ contract(
 				return [dev, marketInstance, propertyAddress]
 			}
 
+			let dev: DevProtocolInstance
+			let marketInstance: MarketInstance
+			let propertyAddress: string
+
+			before(async () => {
+				;[dev, marketInstance, propertyAddress] = await init()
+			})
+
 			it('If none of the properties are authenticated, an empty array will be returned.', async () => {
-				const [, marketInstance] = await init()
 				const properties = await marketInstance.getAuthenticatedProperties()
 				expect(properties.length).to.be.equal(0)
 			})
 			it('An array of authenticated properties will be returned.', async () => {
-				const [, marketInstance, propertyAddress] = await init()
 				await marketInstance.authenticate(propertyAddress, ['test'], {
 					from: propertyAuther,
 				})
@@ -533,7 +556,6 @@ contract(
 				expect(properties[0]).to.be.equal(propertyAddress)
 			})
 			it('An array of multiple authenticated properties will be returned.', async () => {
-				const [dev, marketInstance, propertyAddress] = await init()
 				await marketInstance.authenticate(propertyAddress, ['test'], {
 					from: propertyAuther,
 				})
@@ -552,7 +574,6 @@ contract(
 				expect(properties[1]).to.be.equal(propertyAddress2)
 			})
 			it('If property is deauthenticated', async () => {
-				const [, marketInstance, propertyAddress] = await init()
 				await marketInstance.authenticate(propertyAddress, ['test'], {
 					from: propertyAuther,
 				})
@@ -568,7 +589,6 @@ contract(
 				expect(properties.length).to.be.equal(0)
 			})
 			it('When multiple properties have been deauthenticated', async () => {
-				const [dev, marketInstance, propertyAddress] = await init()
 				await marketInstance.authenticate(propertyAddress, ['test'], {
 					from: propertyAuther,
 				})
