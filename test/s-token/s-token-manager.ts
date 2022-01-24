@@ -69,7 +69,7 @@ contract('STokensManager', ([deployer, user]) => {
 	let snapshotId: string
 
 	before(async () => {
-		[dev, property] = await init()
+		;[dev, property] = await init()
 	})
 
 	beforeEach(async () => {
