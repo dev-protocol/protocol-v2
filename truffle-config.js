@@ -13,7 +13,7 @@ const { INFURA_KEY, POLYGONSCAN_KEY, ETHERSCAN_KEY, MNEMONIC } = process.env
 
 module.exports = {
 	test_file_extension_regexp: /.*\.ts$/,
-	contracts_build_directory: './build/arbitrum-contracts',
+	contracts_build_directory: './build/contracts',
 	compilers: {
 		solc: {
 			version: '0.8.9',
@@ -26,7 +26,7 @@ module.exports = {
 	},
 
 	networks: {
-		arbitrum_local: {
+		local: {
 			network_id: '*',
 			gas: 8500000,
 			provider: function () {
