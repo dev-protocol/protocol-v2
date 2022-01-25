@@ -134,7 +134,7 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 		})
 	})
 
-	describe('PropertyFactory; getPropertiesByAuthor', () => {
+	describe('PropertyFactory; getPropertiesOfAuthor', () => {
 		const dev = new DevProtocolInstance(deployer)
 		let snapshot: Snapshot
 		let snapshotId: string
@@ -157,14 +157,14 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 			await revertToSnapshot(snapshotId)
 		})
 		it('The property has not been created.', async () => {
-			const result = await dev.propertyFactory.getPropertiesByAuthor(deployer)
+			const result = await dev.propertyFactory.getPropertiesOfAuthor(deployer)
 			expect(result.length).to.be.equal(0)
 		})
 		it('You can get a list of the properties you have created.', async () => {
 			const propertyAddress = await dev.propertyFactory
 				.create('test', 'TEST', deployer)
 				.then(getPropertyAddress)
-			const result = await dev.propertyFactory.getPropertiesByAuthor(deployer)
+			const result = await dev.propertyFactory.getPropertiesOfAuthor(deployer)
 			expect(result.length).to.be.equal(1)
 			expect(result[0]).to.be.equal(propertyAddress)
 		})
@@ -175,7 +175,7 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 			const propertyAddress2 = await dev.propertyFactory
 				.create('test2', 'TEST2', deployer)
 				.then(getPropertyAddress)
-			const result = await dev.propertyFactory.getPropertiesByAuthor(deployer)
+			const result = await dev.propertyFactory.getPropertiesOfAuthor(deployer)
 			expect(result.length).to.be.equal(2)
 			expect(result[0]).to.be.equal(propertyAddress)
 			expect(result[1]).to.be.equal(propertyAddress2)
@@ -187,10 +187,10 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 			const propertyAddress2 = await dev.propertyFactory
 				.create('test2', 'TEST2', user)
 				.then(getPropertyAddress)
-			const result = await dev.propertyFactory.getPropertiesByAuthor(deployer)
+			const result = await dev.propertyFactory.getPropertiesOfAuthor(deployer)
 			expect(result.length).to.be.equal(1)
 			expect(result[0]).to.be.equal(propertyAddress)
-			const result2 = await dev.propertyFactory.getPropertiesByAuthor(user)
+			const result2 = await dev.propertyFactory.getPropertiesOfAuthor(user)
 			expect(result2.length).to.be.equal(1)
 			expect(result2[0]).to.be.equal(propertyAddress2)
 		})

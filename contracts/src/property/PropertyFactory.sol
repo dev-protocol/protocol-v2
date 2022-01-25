@@ -100,7 +100,7 @@ contract PropertyFactory is InitializableUsingRegistry, IPropertyFactory {
 	 * @param _author property author
 	 * @return property address list by author.
 	 */
-	function getPropertiesByAuthor(address _author)
+	function getPropertiesOfAuthor(address _author)
 		external
 		view
 		override

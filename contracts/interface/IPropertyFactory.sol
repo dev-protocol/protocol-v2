@@ -20,7 +20,7 @@ interface IPropertyFactory {
 
 	function isProperty(address _addr) external view returns (bool);
 
-	function getPropertiesByAuthor(address _author)
+	function getPropertiesOfAuthor(address _author)
 		external
 		view
 		returns (address[] memory);
