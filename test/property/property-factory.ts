@@ -7,6 +7,7 @@ import {
 	revertToSnapshot,
 	Snapshot,
 } from '../test-lib/utils/snapshot'
+import { validateErrorMessage } from '../test-lib/utils/error'
 
 contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 	describe('PropertyFactory; create', () => {
@@ -130,6 +131,107 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 			expect(propertyAuthor).to.be.equal(user)
 			expect(property).to.be.equal(linkedProperty)
 			expect(market).to.be.equal(marketAddress)
+		})
+	})
+
+	describe('PropertyFactory; getPropertiesByAuthor', () => {
+		const dev = new DevProtocolInstance(deployer)
+		let snapshot: Snapshot
+		let snapshotId: string
+		before(async () => {
+			await dev.generateAddressRegistry()
+			await Promise.all([
+				dev.generatePolicyFactory(),
+				dev.generatePropertyFactory(),
+			])
+			await dev.generatePolicy('PolicyTest1')
+			await dev.generateTreasury()
+		})
+
+		beforeEach(async () => {
+			snapshot = (await takeSnapshot()) as Snapshot
+			snapshotId = snapshot.result
+		})
+
+		afterEach(async () => {
+			await revertToSnapshot(snapshotId)
+		})
+		it('The property has not been created.', async () => {
+			const result = await dev.propertyFactory.getPropertiesByAuthor(deployer)
+			expect(result.length).to.be.equal(0)
+		})
+		it('You can get a list of the properties you have created.', async () => {
+			const propertyAddress = await dev.propertyFactory
+				.create('test', 'TEST', deployer)
+				.then(getPropertyAddress)
+			const result = await dev.propertyFactory.getPropertiesByAuthor(deployer)
+			expect(result.length).to.be.equal(1)
+			expect(result[0]).to.be.equal(propertyAddress)
+		})
+		it('You can get a list of the properties you have created(multiple)', async () => {
+			const propertyAddress = await dev.propertyFactory
+				.create('test', 'TEST', deployer)
+				.then(getPropertyAddress)
+			const propertyAddress2 = await dev.propertyFactory
+				.create('test2', 'TEST2', deployer)
+				.then(getPropertyAddress)
+			const result = await dev.propertyFactory.getPropertiesByAuthor(deployer)
+			expect(result.length).to.be.equal(2)
+			expect(result[0]).to.be.equal(propertyAddress)
+			expect(result[1]).to.be.equal(propertyAddress2)
+		})
+		it('You can get a list of the properties you have created(other user)', async () => {
+			const propertyAddress = await dev.propertyFactory
+				.create('test', 'TEST', deployer)
+				.then(getPropertyAddress)
+			const propertyAddress2 = await dev.propertyFactory
+				.create('test2', 'TEST2', user)
+				.then(getPropertyAddress)
+			const result = await dev.propertyFactory.getPropertiesByAuthor(deployer)
+			expect(result.length).to.be.equal(1)
+			expect(result[0]).to.be.equal(propertyAddress)
+			const result2 = await dev.propertyFactory.getPropertiesByAuthor(user)
+			expect(result2.length).to.be.equal(1)
+			expect(result2[0]).to.be.equal(propertyAddress2)
+		})
+	})
+
+	describe('PropertyFactory; setPropertyAddress', () => {
+		const dev = new DevProtocolInstance(deployer)
+		let snapshot: Snapshot
+		let snapshotId: string
+		before(async () => {
+			await dev.generateAddressRegistry()
+			await Promise.all([
+				dev.generatePolicyFactory(),
+				dev.generatePropertyFactory(),
+			])
+			await dev.generatePolicy('PolicyTest1')
+			await dev.generateTreasury()
+		})
+
+		beforeEach(async () => {
+			snapshot = (await takeSnapshot()) as Snapshot
+			snapshotId = snapshot.result
+		})
+
+		afterEach(async () => {
+			await revertToSnapshot(snapshotId)
+		})
+		it('already set.', async () => {
+			const propertyAddress = await dev.propertyFactory
+				.create('test', 'TEST', deployer)
+				.then(getPropertyAddress)
+			const result = await dev.propertyFactory
+				.setPropertyAddress(propertyAddress)
+				.catch((err: Error) => err)
+			validateErrorMessage(result, 'already set')
+		})
+		it('not property.', async () => {
+			const result = await dev.propertyFactory
+				.setPropertyAddress(user)
+				.catch((err: Error) => err)
+			validateErrorMessage(result, 'not property')
 		})
 	})
 })
