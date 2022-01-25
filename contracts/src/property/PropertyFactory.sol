@@ -14,6 +14,8 @@ contract PropertyFactory is InitializableUsingRegistry, IPropertyFactory {
 	mapping(address => bool) public override isProperty;
 	mapping(address => EnumerableSet.AddressSet) private addressesMapOfAuthor;
 
+	using EnumerableSet for EnumerableSet.AddressSet;
+
 	/**
 	 * @dev Initialize the passed address as AddressRegistry address.
 	 * @param _registry AddressRegistry address.
@@ -101,6 +103,7 @@ contract PropertyFactory is InitializableUsingRegistry, IPropertyFactory {
 	function getPropertiesByAuthor(address _author)
 		external
 		view
+		override
 		returns (address[] memory)
 	{
 		return addressesMapOfAuthor[_author].values();
@@ -109,9 +112,9 @@ contract PropertyFactory is InitializableUsingRegistry, IPropertyFactory {
 	/**
 	 * @dev Set the propety address to an internal variable
 	 * @param _property property address
-	 * @deprecated TODO V3
+	 * deprecated TODO V3
 	 */
-	function setPropertyAddress(address _property) external {
+	function setPropertyAddress(address _property) external override {
 		require(isProperty[_property], "not property");
 		Property p = Property(_property);
 		address author = p.author();

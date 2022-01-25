@@ -20,8 +20,11 @@ interface IPropertyFactory {
 
 	function isProperty(address _addr) external view returns (bool);
 
-	function getPropertiesByAuthor() external view returns (address[] memory);
+	function getPropertiesByAuthor(address _author)
+		external
+		view
+		returns (address[] memory);
 
-	// @deprecated TODO V3
+	// deprecated TODO V3
 	function setPropertyAddress(address _property) external;
 }

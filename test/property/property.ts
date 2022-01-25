@@ -14,7 +14,7 @@ import {
 
 contract(
 	'PropertyTest',
-	([deployer, author, user, propertyFactory, lockup, transfer, nextAuthor]) => {
+	([deployer, author, user, propertyFactory, lockup, transfer]) => {
 		const propertyContract = artifacts.require('Property')
 		const init = async (): Promise<DevProtocolInstance> => {
 			const dev = new DevProtocolInstance(deployer)
@@ -174,65 +174,6 @@ contract(
 				expect(
 					(await propertyInstance.totalSupply().then(toBigNumber)).toFixed()
 				).to.be.equal(tenMillion.toFixed())
-			})
-		})
-		describe('Property; changeAuthor', () => {
-			it('Executing a changeAuthor function with a non-Author.', async () => {
-				await dev.addressRegistry.setRegistry(
-					'PropertyFactory',
-					propertyFactory
-				)
-				const propertyInstance = await propertyContract.new(
-					dev.addressRegistry.address,
-					author,
-					'sample',
-					'SAMPLE',
-					{
-						from: propertyFactory,
-					}
-				)
-				const result = await propertyInstance
-					.changeAuthor(nextAuthor)
-					.catch((err: Error) => err)
-				validateErrorMessage(result, 'illegal sender')
-			})
-			it('Author is changed.', async () => {
-				await dev.generatePropertyFactory()
-				const transaction = await dev.propertyFactory.create(
-					'sample',
-					'SAMPLE',
-					author
-				)
-				const propertyAddress = getPropertyAddress(transaction)
-				const propertyInstance = await propertyContract.at(propertyAddress)
-				expect(await propertyInstance.author()).to.be.equal(author)
-				await propertyInstance.changeAuthor(nextAuthor, {
-					from: author,
-				})
-				expect(await propertyInstance.author()).to.be.equal(nextAuthor)
-			})
-			it('Should emit ChangeAuthor event', async () => {
-				await dev.generatePropertyFactory()
-				await dev.addressRegistry.setRegistry(
-					'PropertyFactory',
-					propertyFactory
-				)
-				const propertyInstance = await propertyContract.new(
-					dev.addressRegistry.address,
-					author,
-					'sample',
-					'SAMPLE',
-					{
-						from: propertyFactory,
-					}
-				)
-				const result = await propertyInstance.changeAuthor(nextAuthor, {
-					from: author,
-				})
-				const event = result.logs[0].args as { _old: string; _new: string }
-				expect(result.logs[0].event).to.be.equal('ChangeAuthor')
-				expect(event._old).to.be.equal(author)
-				expect(event._new).to.be.equal(nextAuthor)
 			})
 		})
 		describe('Property; changeName', () => {
