@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity =0.8.9;
 
+import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "../../interface/IPropertyFactory.sol";
 import "../../interface/IMarket.sol";
 import "../common/registry/InitializableUsingRegistry.sol";
@@ -11,6 +12,7 @@ import "./Property.sol";
  */
 contract PropertyFactory is InitializableUsingRegistry, IPropertyFactory {
 	mapping(address => bool) public override isProperty;
+	mapping(address => EnumerableSet.AddressSet) private addressesMapOfAuthor;
 
 	/**
 	 * @dev Initialize the passed address as AddressRegistry address.
@@ -87,6 +89,36 @@ contract PropertyFactory is InitializableUsingRegistry, IPropertyFactory {
 		isProperty[propertyAddr] = true;
 
 		emit Create(msg.sender, propertyAddr);
+		addressesMapOfAuthor[_author].add(propertyAddr);
 		return propertyAddr;
+	}
+
+	/**
+	 * @dev get property address list by author
+	 * @param _author property author
+	 * @return property address list by author.
+	 */
+	function getPropertiesByAuthor(address _author)
+		external
+		view
+		returns (address[] memory)
+	{
+		return addressesMapOfAuthor[_author].values();
+	}
+
+	/**
+	 * @dev Set the propety address to an internal variable
+	 * @param _property property address
+	 * @deprecated TODO V3
+	 */
+	function setPropertyAddress(address _property) external {
+		require(isProperty[_property], "not property");
+		Property p = Property(_property);
+		address author = p.author();
+		require(
+			addressesMapOfAuthor[author].contains(_property) == false,
+			"already set"
+		);
+		addressesMapOfAuthor[author].add(_property);
 	}
 }

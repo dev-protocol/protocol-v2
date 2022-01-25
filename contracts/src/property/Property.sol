@@ -118,22 +118,6 @@ contract Property is ERC20, UsingRegistry, IProperty {
 	}
 
 	/**
-	 * @dev Changes the author.
-	 * @param _nextAuthor The new author address.
-	 */
-	function changeAuthor(address _nextAuthor) external override onlyAuthor {
-		/**
-		 * save author information
-		 */
-		emit ChangeAuthor(__author, _nextAuthor);
-
-		/**
-		 * Changes the author.
-		 */
-		__author = _nextAuthor;
-	}
-
-	/**
 	 * @dev Changes the name.
 	 * @param _name The new name.
 	 */
