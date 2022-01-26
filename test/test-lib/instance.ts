@@ -29,10 +29,9 @@ export const deployProxy = async <L extends ContractInstance>(
 	logic: L,
 	deployer: string
 ): Promise<[ReturnType<L['at']>, DevAdminInstance]> => {
-	const [admin, impl] = await Promise.all([
-		contract('DevAdmin').new(),
-		logic.new() as { address: string },
-	])
+	const admin = await contract('DevAdmin').new()
+	const impl = await logic.new() as { address: string }
+	
 	const proxy = await contract('DevProxy').new(
 		impl.address,
 		admin.address,
