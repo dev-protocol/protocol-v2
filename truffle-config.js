@@ -9,7 +9,8 @@ require('ts-node/register')
 require('dotenv').config()
 const wrapProvider = require('arb-ethers-web3-bridge').wrapProvider
 const HDWalletProvider = require('@truffle/hdwallet-provider')
-const { INFURA_KEY, POLYGONSCAN_KEY, ETHERSCAN_KEY, MNEMONIC } = process.env
+const { INFURA_KEY, POLYGONSCAN_KEY, ETHERSCAN_KEY, MNEMONIC, ARBISCAN_KEY } =
+	process.env
 
 module.exports = {
 	test_file_extension_regexp: /.*\.ts$/,
@@ -101,5 +102,6 @@ module.exports = {
 	api_keys: {
 		polygonscan: POLYGONSCAN_KEY,
 		etherscan: ETHERSCAN_KEY,
+		arbiscan: ARBISCAN_KEY,
 	},
 }
