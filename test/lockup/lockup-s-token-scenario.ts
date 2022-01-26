@@ -295,7 +295,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				expect(bobCalculated.toString()).to.be.equal('0')
 			})
 			it('Bob has huge staked, Alice has small amount of reward', async () => {
-				// const [property2] = await Promise.all([
+				// Const [property2] = await Promise.all([
 				// 	artifacts
 				// 		.require('Property')
 				// 		.at(
@@ -304,7 +304,13 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				// 			)
 				// 		),
 				// ])
-				const property2 = await artifacts.require('Property').at(getPropertyAddress(await dev.propertyFactory.create('test', 'TEST', deployer)))
+				const property2 = await artifacts
+					.require('Property')
+					.at(
+						getPropertyAddress(
+							await dev.propertyFactory.create('test', 'TEST', deployer)
+						)
+					)
 				await dev.metricsFactory.__setMetricsCountPerProperty(
 					property2.address,
 					1
@@ -811,9 +817,27 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				await dev.dev.approve(dev.lockup.address, aliceBalance, { from: alice })
 				await dev.dev.approve(dev.lockup.address, aliceBalance, { from: bob })
 
-				property2 = await artifacts.require('Property').at(getPropertyAddress(await dev.propertyFactory.create('test2', 'TEST2', user3)))
-				property3 = await artifacts.require('Property').at(getPropertyAddress(await dev.propertyFactory.create('test2', 'TEST2', user3)))
-				property4 = await artifacts.require('Property').at(getPropertyAddress(await dev.propertyFactory.create('test4', 'TEST4', user3)))
+				property2 = await artifacts
+					.require('Property')
+					.at(
+						getPropertyAddress(
+							await dev.propertyFactory.create('test2', 'TEST2', user3)
+						)
+					)
+				property3 = await artifacts
+					.require('Property')
+					.at(
+						getPropertyAddress(
+							await dev.propertyFactory.create('test2', 'TEST2', user3)
+						)
+					)
+				property4 = await artifacts
+					.require('Property')
+					.at(
+						getPropertyAddress(
+							await dev.propertyFactory.create('test4', 'TEST4', user3)
+						)
+					)
 				// ;[property2, property3, property4] = await Promise.all([
 				// 	artifacts
 				// 		.require('Property')
@@ -1021,7 +1045,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				}% of prev interest and ${
 					1975000 / 26000
 				}% of current interest`, async () => {
-					// const aliceAmount = await Promise.all([
+					// Const aliceAmount = await Promise.all([
 					// 	dev.lockup
 					// 		.calculateWithdrawableInterestAmountByPosition(aliceFirstTokenId)
 					// 		.then(toBigNumber),
@@ -1031,8 +1055,12 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 					// 		)
 					// 		.then(toBigNumber),
 					// ])
-					const aliceAmount1 = await dev.lockup.calculateWithdrawableInterestAmountByPosition(aliceFirstTokenId).then(toBigNumber)
-					const aliceAmount2 = await dev.lockup.calculateWithdrawableInterestAmountByPosition(aliceSecoundTokenId).then(toBigNumber)
+					const aliceAmount1 = await dev.lockup
+						.calculateWithdrawableInterestAmountByPosition(aliceFirstTokenId)
+						.then(toBigNumber)
+					const aliceAmount2 = await dev.lockup
+						.calculateWithdrawableInterestAmountByPosition(aliceSecoundTokenId)
+						.then(toBigNumber)
 
 					const res1 = await calc(aliceFirstTokenId)
 					const res2 = await calc(aliceSecoundTokenId)
@@ -1098,7 +1126,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 					await forwardBlockTimestamp(3)
 				})
 				it(`Alice's withdrawable interest`, async () => {
-					// const aliceAmount = await Promise.all([
+					// Const aliceAmount = await Promise.all([
 					// 	dev.lockup
 					// 		.calculateWithdrawableInterestAmountByPosition(aliceFirstTokenId)
 					// 		.then(toBigNumber),
@@ -1108,8 +1136,12 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 					// 		)
 					// 		.then(toBigNumber),
 					// ])
-					const aliceAmount1 = await dev.lockup.calculateWithdrawableInterestAmountByPosition(aliceFirstTokenId).then(toBigNumber)
-					const aliceAmount2 = await dev.lockup.calculateWithdrawableInterestAmountByPosition(aliceSecoundTokenId).then(toBigNumber)
+					const aliceAmount1 = await dev.lockup
+						.calculateWithdrawableInterestAmountByPosition(aliceFirstTokenId)
+						.then(toBigNumber)
+					const aliceAmount2 = await dev.lockup
+						.calculateWithdrawableInterestAmountByPosition(aliceSecoundTokenId)
+						.then(toBigNumber)
 
 					const res1 = await calc(aliceFirstTokenId)
 					const res2 = await calc(aliceSecoundTokenId)
