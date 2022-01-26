@@ -196,18 +196,20 @@ contract('STokensManager', ([deployer, user]) => {
 				expect(owner).to.equal(deployer)
 			})
 			it('generate minted event', async () => {
-				dev.lockup.depositToProperty(property.address, '10000')
+				const [devLocal, propertyLocal] = await init()
+
+				devLocal.lockup.depositToProperty(propertyLocal.address, '10000')
 				const [_tokenId, _owner, _property, _amount, _price] =
 					await Promise.all([
-						getEventValue(dev.sTokensManager)('Minted', 'tokenId'),
-						getEventValue(dev.sTokensManager)('Minted', 'owner'),
-						getEventValue(dev.sTokensManager)('Minted', 'property'),
-						getEventValue(dev.sTokensManager)('Minted', 'amount'),
-						getEventValue(dev.sTokensManager)('Minted', 'price'),
+						getEventValue(devLocal.sTokensManager)('Minted', 'tokenId'),
+						getEventValue(devLocal.sTokensManager)('Minted', 'owner'),
+						getEventValue(devLocal.sTokensManager)('Minted', 'property'),
+						getEventValue(devLocal.sTokensManager)('Minted', 'amount'),
+						getEventValue(devLocal.sTokensManager)('Minted', 'price'),
 					])
 				expect(_tokenId).to.equal('1')
 				expect(_owner).to.equal(deployer)
-				expect(_property).to.equal(property.address)
+				expect(_property).to.equal(propertyLocal.address)
 				expect(_amount).to.equal('10000')
 				expect(_price).to.equal('0')
 			})
@@ -223,14 +225,15 @@ contract('STokensManager', ([deployer, user]) => {
 				expect(tokenId).to.equal('1')
 			})
 			it('The counter will be incremented.', async () => {
-				dev.lockup.depositToProperty(property.address, '10000')
+				const [devLocal, propertyLocal] = await init()
+				devLocal.lockup.depositToProperty(propertyLocal.address, '10000')
 				const [_tokenId] = await Promise.all([
-					getEventValue(dev.sTokensManager)('Minted', 'tokenId'),
+					getEventValue(devLocal.sTokensManager)('Minted', 'tokenId'),
 				])
 				expect(_tokenId).to.equal('1')
-				dev.lockup.depositToProperty(property.address, '10000')
+				devLocal.lockup.depositToProperty(propertyLocal.address, '10000')
 				const [_tokenId2] = await Promise.all([
-					getEventValue(dev.sTokensManager)('Minted', 'tokenId'),
+					getEventValue(devLocal.sTokensManager)('Minted', 'tokenId'),
 				])
 				expect(_tokenId2).to.equal('2')
 			})
