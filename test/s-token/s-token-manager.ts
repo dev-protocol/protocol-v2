@@ -29,14 +29,15 @@ contract('STokensManager', ([deployer, user]) => {
 		await dev.generateDev()
 		await dev.generateDevBridge()
 		await dev.generateSTokensManager()
-		await Promise.all([
-			dev.generateMarketFactory(),
-			dev.generateMetricsFactory(),
-			dev.generateLockup(),
-			dev.generateWithdraw(),
-			dev.generatePropertyFactory(),
-			dev.generatePolicyFactory(),
-		])
+
+
+		await dev.generateMarketFactory()
+		await dev.generateMetricsFactory()
+		await dev.generateLockup()
+		await dev.generateWithdraw()
+		await dev.generatePropertyFactory()
+		await dev.generatePolicyFactory()
+
 		await dev.dev.mint(deployer, deployerBalance)
 		await dev.dev.approve(dev.lockup.address, '100000')
 		await dev.generatePolicy('PolicyTestBase')
