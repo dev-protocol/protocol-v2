@@ -24,14 +24,14 @@ contract('LockupTest', ([deployer, user1, user2]) => {
 		await dev.generateDev()
 		await dev.generateDevBridge()
 		await dev.generateSTokensManager()
-		await Promise.all([
-			dev.generateMarketFactory(),
-			dev.generateMetricsFactory(),
-			dev.generateLockup(),
-			dev.generateWithdraw(),
-			dev.generatePropertyFactory(),
-			dev.generatePolicyFactory(),
-		])
+
+		await dev.generateMarketFactory()
+		await dev.generateMetricsFactory()
+		await dev.generateLockup()
+		await dev.generateWithdraw()
+		await dev.generatePropertyFactory()
+		await dev.generatePolicyFactory()
+
 		await dev.dev.mint(deployer, new BigNumber(1e18).times(10000000))
 		const policyAddress = await dev.generatePolicy('PolicyTestBase')
 		await dev.generateTreasury()
@@ -44,9 +44,7 @@ contract('LockupTest', ([deployer, user1, user2]) => {
 				from: user2,
 			})
 		)
-		const [property] = await Promise.all([
-			artifacts.require('Property').at(propertyAddress),
-		])
+		const property = artifacts.require('Property').at(propertyAddress)
 
 		await dev.metricsFactory.__addMetrics(
 			(
