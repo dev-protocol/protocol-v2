@@ -16,12 +16,12 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 			await dev.generateDev()
 			await dev.generateDevBridge()
 			await dev.generateSTokensManager()
-			await Promise.all([
-				dev.generateMetricsFactory(),
-				dev.generatePropertyFactory(),
-				dev.generatePolicyFactory(),
-				dev.generateLockup(),
-			])
+
+			await dev.generateMetricsFactory()
+			await dev.generatePropertyFactory()
+			await dev.generatePolicyFactory()
+			await dev.generateLockup()
+
 			await dev.generatePolicy()
 			await dev.generateTreasury()
 			await dev.setCapSetter()
