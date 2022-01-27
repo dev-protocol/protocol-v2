@@ -30,7 +30,6 @@ contract('STokensManager', ([deployer, user]) => {
 		await dev.generateDevBridge()
 		await dev.generateSTokensManager()
 
-
 		await dev.generateMarketFactory()
 		await dev.generateMetricsFactory()
 		await dev.generateLockup()
