@@ -361,12 +361,12 @@ contract(
 				await dev.generateDev()
 				await dev.generateDevBridge()
 				await dev.generateSTokensManager()
-				await Promise.all([
-					dev.generatePropertyFactory(),
-					dev.generatePolicyFactory(),
-					dev.generateLockup(),
-					dev.generateMetricsFactory(),
-				])
+
+				await dev.generatePropertyFactory()
+				await dev.generatePolicyFactory()
+				await dev.generateLockup()
+				await dev.generateMetricsFactory()
+
 				await dev.generatePolicy()
 				await dev.generateTreasury()
 				await dev.setCapSetter()
@@ -411,13 +411,13 @@ contract(
 				await dev.generateDev()
 				await dev.generateDevBridge()
 				await dev.generateSTokensManager()
-				await Promise.all([
-					dev.generateWithdraw(),
-					dev.generatePropertyFactory(),
-					dev.generateLockup(),
-					dev.generatePolicyFactory(),
-					dev.generateMetricsFactory(),
-				])
+
+				await dev.generateWithdraw()
+				await dev.generatePropertyFactory()
+				await dev.generateLockup()
+				await dev.generatePolicyFactory()
+				await dev.generateMetricsFactory()
+
 				await dev.generatePolicy('PolicyTestForProperty')
 				await dev.generateTreasury()
 				await dev.setCapSetter()
@@ -461,13 +461,13 @@ contract(
 				await dev.generateDev()
 				await dev.generateDevBridge()
 				await dev.generateSTokensManager()
-				await Promise.all([
-					dev.generateWithdraw(),
-					dev.generatePropertyFactory(),
-					dev.generateLockup(),
-					dev.generatePolicyFactory(),
-					dev.generateMetricsFactory(),
-				])
+
+				await dev.generateWithdraw()
+				await dev.generatePropertyFactory()
+				await dev.generateLockup()
+				await dev.generatePolicyFactory()
+				await dev.generateMetricsFactory()
+
 				await dev.generatePolicy('PolicyTestForProperty')
 				await dev.generateTreasury()
 				await dev.setCapSetter()
