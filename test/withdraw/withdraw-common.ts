@@ -61,7 +61,9 @@ export const init = async (
 	market.authenticate(property.address, ['id1']).catch(console.error)
 	const metricsAddress = await (async () =>
 		getEventValue(dev.metricsFactory)('Create', '_metrics'))()
-	const metrics = await artifacts.require('Metrics').at(metricsAddress as string)
+	const metrics = await artifacts
+		.require('Metrics')
+		.at(metricsAddress as string)
 
 	await dev.lockup.update()
 
