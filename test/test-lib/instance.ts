@@ -30,15 +30,15 @@ export const deployProxy = async <L extends ContractInstance>(
 	deployer: string
 ): Promise<[ReturnType<L['at']>, DevAdminInstance]> => {
 	const admin = await contract('DevAdmin').new()
-	const impl = await logic.new() as { address: string }
-	
+	const impl = (await logic.new()) as { address: string }
+
 	const proxy = await contract('DevProxy').new(
 		impl.address,
 		admin.address,
 		web3.utils.fromUtf8(''),
 		{ from: deployer }
 	)
-	const wrap = await logic.at(proxy.address) as ReturnType<L['at']>
+	const wrap = (await logic.at(proxy.address)) as ReturnType<L['at']>
 
 	return [wrap, admin]
 }
