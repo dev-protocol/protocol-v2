@@ -38,9 +38,8 @@ export const deployProxy = async <L extends ContractInstance>(
 		web3.utils.fromUtf8(''),
 		{ from: deployer }
 	)
-	const [wrap] = await Promise.all([
-		logic.at(proxy.address) as ReturnType<L['at']>,
-	])
+	const wrap = await logic.at(proxy.address) as ReturnType<L['at']>
+
 	return [wrap, admin]
 }
 
