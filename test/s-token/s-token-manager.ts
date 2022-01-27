@@ -48,9 +48,7 @@ contract('STokensManager', ([deployer, user]) => {
 				from: user,
 			})
 		)
-		const [property] = await Promise.all([
-			artifacts.require('Property').at(propertyAddress),
-		])
+		const property = await artifacts.require('Property').at(propertyAddress)
 
 		await dev.metricsFactory.__addMetrics(
 			(
