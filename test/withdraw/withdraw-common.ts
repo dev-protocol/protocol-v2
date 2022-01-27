@@ -26,13 +26,13 @@ export const init = async (
 	await dev.generateDev()
 	await dev.generateDevBridge()
 	await dev.generateSTokensManager()
-	await Promise.all([
-		dev.generateMarketFactory(),
-		dev.generateMetricsFactory(),
-		dev.generateLockup(),
-		dev.generatePropertyFactory(),
-		dev.generatePolicyFactory(),
-	])
+
+	await dev.generateMarketFactory()
+	await dev.generateMetricsFactory()
+	await dev.generateLockup()
+	await dev.generatePropertyFactory()
+	await dev.generatePolicyFactory()
+
 	await dev.generateWithdraw()
 
 	await dev.dev.mint(deployer, new BigNumber(1e18).times(10000000))
@@ -49,23 +49,20 @@ export const init = async (
 	const propertyAddress = getPropertyAddress(
 		await dev.propertyFactory.create('test', 'TEST', deployer)
 	)
-	const [property] = await Promise.all([
-		artifacts.require('Property').at(propertyAddress),
-	])
+	const property = await artifacts.require('Property').at(propertyAddress)
+
 	await dev.metricsFactory.__setMetricsCountPerProperty(property.address, 1)
 	const marketBehavior = await dev.getMarket('MarketTest1', deployer)
 	const marketAddress = getMarketAddress(
 		await dev.marketFactory.create(marketBehavior.address)
 	)
-	const [market] = await Promise.all([
-		artifacts.require('Market').at(marketAddress),
-	])
+	const market = await artifacts.require('Market').at(marketAddress)
+
 	market.authenticate(property.address, ['id1']).catch(console.error)
 	const metricsAddress = await (async () =>
 		getEventValue(dev.metricsFactory)('Create', '_metrics'))()
-	const [metrics] = await Promise.all([
-		artifacts.require('Metrics').at(metricsAddress as string),
-	])
+	const metrics = await artifacts.require('Metrics').at(metricsAddress as string)
+
 	await dev.lockup.update()
 
 	return [dev, metrics, property, policy, market]
