@@ -86,6 +86,7 @@ contract STokensManager is
 			0,
 			0
 		);
+                // TODO V3 block number and history
 		setStoragePositions(tokenIdCounter.current(), newPosition);
 		tokenIdsMapOfProperty[_property].push(tokenIdCounter.current());
 		return tokenIdCounter.current();
