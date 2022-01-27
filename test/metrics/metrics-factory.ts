@@ -17,10 +17,10 @@ contract(
 		const init = async () => {
 			const dev = new DevProtocolInstance(deployer)
 			await dev.generateAddressRegistry()
-			await Promise.all([
-				dev.generateMarketFactory(),
-				dev.generateMetricsFactory(),
-			])
+
+			await dev.generateMarketFactory()
+			await dev.generateMetricsFactory()
+
 			await dev.marketFactory.__addMarket(market)
 			return [dev]
 		}
