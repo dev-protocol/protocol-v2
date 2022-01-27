@@ -23,10 +23,10 @@ contract('PolicyFactory', ([deployer, dummyPolicy, user1, ...accounts]) => {
 	const init = async (): Promise<[DevProtocolInstance, IPolicyInstance]> => {
 		const dev = new DevProtocolInstance(deployer)
 		await dev.generateAddressRegistry()
-		await Promise.all([
-			dev.generatePolicyFactory(),
-			dev.generateMarketFactory(),
-		])
+
+		await dev.generatePolicyFactory()
+		await dev.generateMarketFactory()
+
 		const policy = await dev.getPolicy('PolicyTestForPolicyFactory', user1)
 		return [dev, policy]
 	}
