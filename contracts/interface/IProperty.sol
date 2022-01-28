@@ -7,13 +7,11 @@ interface IProperty {
 		address account;
 		uint256 balance;
 	}
-	event ChangeAuthor(address _old, address _new);
+
 	event ChangeName(string _old, string _new);
 	event ChangeSymbol(string _old, string _new);
 
 	function author() external view returns (address);
-
-	function changeAuthor(address _nextAuthor) external;
 
 	function changeName(string memory _name) external;
 

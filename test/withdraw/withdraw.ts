@@ -1,3 +1,4 @@
+/* eslint-disable max-nested-callbacks */
 import { init } from './withdraw-common'
 import { DevProtocolInstance } from '../test-lib/instance'
 import { PropertyInstance } from '../../types/truffle-contracts'
