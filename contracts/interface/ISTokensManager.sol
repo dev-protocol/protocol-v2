@@ -120,7 +120,8 @@ interface ISTokensManager {
 	 * @param _property property address
 	 * @param _descriptor descriptor address
 	 */
-	function setTokenURIDescriptor(address _property, address _descriptor) external;
+	function setTokenURIDescriptor(address _property, address _descriptor)
+		external;
 
 	/*
 	 * @dev freeze token uri data
@@ -180,8 +181,10 @@ interface ISTokensManager {
 	 * @param _rewards rewards
 	 * @return string simulated token uri
 	 */
-	function tokenURISim(uint256 _tokenId, address _owner, StakingPositions memory _positions, Rewards memory _rewards)
-		external
-		view
-		returns (string memory);
+	function tokenURISim(
+		uint256 _tokenId,
+		address _owner,
+		StakingPositions memory _positions,
+		Rewards memory _rewards
+	) external view returns (string memory);
 }

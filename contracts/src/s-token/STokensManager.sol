@@ -69,12 +69,12 @@ contract STokensManager is
 		return _tokenURI(_tokenId, owner, positons, tokenRewards);
 	}
 
-	function tokenURISim(uint256 _tokenId, address _owner, StakingPositions memory _positions, Rewards memory _rewards)
-		external
-		view
-		override
-		returns (string memory)
-	{
+	function tokenURISim(
+		uint256 _tokenId,
+		address _owner,
+		StakingPositions memory _positions,
+		Rewards memory _rewards
+	) external view override returns (string memory) {
 		return _tokenURI(_tokenId, _owner, _positions, _rewards);
 	}
 
@@ -100,7 +100,7 @@ contract STokensManager is
 			0,
 			0
 		);
-                // TODO V3 block number and history
+		// TODO V3 block number and history
 		setStoragePositions(tokenIdCounter.current(), newPosition);
 		tokenIdsMapOfProperty[_property].push(tokenIdCounter.current());
 		return tokenIdCounter.current();
@@ -209,16 +209,24 @@ contract STokensManager is
 		return Rewards(entireReward, cumulativeReward, withdrawableReward);
 	}
 
-	function _tokenURI(uint256 _tokenId, address _owner, StakingPositions memory _positions, Rewards memory _rewards)
-		private
-		view
-		returns (string memory)
-	{
+	function _tokenURI(
+		uint256 _tokenId,
+		address _owner,
+		StakingPositions memory _positions,
+		Rewards memory _rewards
+	) private view returns (string memory) {
 		string memory _tokeUriImage = tokenUriImage[_tokenId];
 		if (bytes(_tokeUriImage).length == 0) {
-			address description = imageDescriptorOfProperty[_positions.property];
+			address description = imageDescriptorOfProperty[
+				_positions.property
+			];
 			if (description != address(0)) {
-				_tokeUriImage = ITokenURIDescriptor(description).image(_tokenId, _owner, _positions, _rewards);
+				_tokeUriImage = ITokenURIDescriptor(description).image(
+					_tokenId,
+					_owner,
+					_positions,
+					_rewards
+				);
 			}
 		}
 		return
