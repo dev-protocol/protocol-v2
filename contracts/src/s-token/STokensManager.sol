@@ -5,6 +5,7 @@ import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "../../interface/ISTokensManager.sol";
+import "../../interface/ITokenURIDescriptor.sol";
 import "../../interface/IAddressRegistry.sol";
 import "../../interface/ILockup.sol";
 import "../../interface/IProperty.sol";
@@ -23,6 +24,7 @@ contract STokensManager is
 	mapping(address => EnumerableSet.UintSet) private tokenIdsMapOfOwner;
 	mapping(uint256 => string) private tokenUriImage;
 	mapping(uint256 => bool) public override isFreezed;
+	mapping(address => address) private imageDescriptorOfProperty;
 
 	using Counters for Counters.Counter;
 	using EnumerableSet for EnumerableSet.UintSet;
@@ -42,6 +44,12 @@ contract STokensManager is
 		_;
 	}
 
+	modifier onlyPropertyAuthor(address _property) {
+		address author = IProperty(_property).author();
+		require(author == _msgSender(), "illegal access");
+		_;
+	}
+
 	function initialize(address _registry) external initializer {
 		__ERC721_init("Dev Protocol sTokens V1", "DEV-STOKENS-V1");
 		__UsingRegistry_init(_registry);
@@ -53,15 +61,21 @@ contract STokensManager is
 		override
 		returns (string memory)
 	{
-		string memory _tokeUriImage = tokenUriImage[_tokenId];
+		uint256 curretnTokenId = tokenIdCounter.current();
+		require(_tokenId <= curretnTokenId, "not found");
 		StakingPositions memory positons = getStoragePositions(_tokenId);
-		return
-			getTokenURI(
-				positons.property,
-				positons.amount,
-				positons.cumulativeReward,
-				_tokeUriImage
-			);
+		Rewards memory tokenRewards = _innerRewards(_tokenId);
+		address owner = IProperty(positons.property).author();
+		return _tokenURI(_tokenId, owner, positons, tokenRewards);
+	}
+
+	function tokenURISim(uint256 _tokenId, address _owner, StakingPositions memory _positions, Rewards memory _rewards)
+		external
+		view
+		override
+		returns (string memory)
+	{
+		return _tokenURI(_tokenId, _owner, _positions, _rewards);
 	}
 
 	function mint(
@@ -124,6 +138,14 @@ contract STokensManager is
 		tokenUriImage[_tokenId] = _data;
 	}
 
+	function setTokenURIDescriptor(address _property, address _descriptor)
+		external
+		override
+		onlyPropertyAuthor(_property)
+	{
+		imageDescriptorOfProperty[_property] = _descriptor;
+	}
+
 	function freezeTokenURI(uint256 _tokenId)
 		external
 		override
@@ -152,13 +174,7 @@ contract STokensManager is
 		override
 		returns (Rewards memory)
 	{
-		uint256 withdrawableReward = ILockup(registry().registries("Lockup"))
-			.calculateWithdrawableInterestAmountByPosition(_tokenId);
-		StakingPositions memory currentPosition = getStoragePositions(_tokenId);
-		uint256 cumulativeReward = currentPosition.cumulativeReward;
-		uint256 entireReward = cumulativeReward + withdrawableReward;
-
-		return Rewards(entireReward, cumulativeReward, withdrawableReward);
+		return _innerRewards(_tokenId);
 	}
 
 	function positionsOfProperty(address _property)
@@ -177,6 +193,41 @@ contract STokensManager is
 		returns (uint256[] memory)
 	{
 		return tokenIdsMapOfOwner[_owner].values();
+	}
+
+	function _innerRewards(uint256 _tokenId)
+		private
+		view
+		returns (Rewards memory)
+	{
+		uint256 withdrawableReward = ILockup(registry().registries("Lockup"))
+			.calculateWithdrawableInterestAmountByPosition(_tokenId);
+		StakingPositions memory currentPosition = getStoragePositions(_tokenId);
+		uint256 cumulativeReward = currentPosition.cumulativeReward;
+		uint256 entireReward = cumulativeReward + withdrawableReward;
+
+		return Rewards(entireReward, cumulativeReward, withdrawableReward);
+	}
+
+	function _tokenURI(uint256 _tokenId, address _owner, StakingPositions memory _positions, Rewards memory _rewards)
+		private
+		view
+		returns (string memory)
+	{
+		string memory _tokeUriImage = tokenUriImage[_tokenId];
+		if (bytes(_tokeUriImage).length == 0) {
+			address description = imageDescriptorOfProperty[_positions.property];
+			if (description != address(0)) {
+				_tokeUriImage = ITokenURIDescriptor(description).image(_tokenId, _owner, _positions, _rewards);
+			}
+		}
+		return
+			getTokenURI(
+				_positions.property,
+				_positions.amount,
+				_positions.cumulativeReward,
+				_tokeUriImage
+			);
 	}
 
 	function getStoragePositions(uint256 _tokenId)
