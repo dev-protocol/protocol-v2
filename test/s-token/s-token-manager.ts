@@ -182,6 +182,16 @@ contract('STokensManager', ([deployer, user]) => {
 				const uri = await dev.sTokensManager.tokenURI(1)
 				checkTokenUri(uri, property.address, 10000, 0, 'ipfs://IPFS-CID')
 			})
+			it('get descriptor token uri', async () => {
+				await dev.lockup.depositToProperty(property.address, '10000')
+				await dev.sTokensManager.setTokenURIDescriptor(
+					property.address,
+					descriptor.address,
+					{ from: user }
+				)
+				const uri = await dev.sTokensManager.tokenURI(1)
+				checkTokenUri(uri, property.address, 10000, 0, 'dummy-string')
+			})
 		})
 		describe('fail', () => {
 			it('can not get token symbol', async () => {
