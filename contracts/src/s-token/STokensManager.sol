@@ -24,7 +24,7 @@ contract STokensManager is
 	mapping(address => EnumerableSet.UintSet) private tokenIdsMapOfOwner;
 	mapping(uint256 => string) private tokenUriImage;
 	mapping(uint256 => bool) public override isFreezed;
-	mapping(address => address) private imageDescriptorOfProperty;
+	mapping(address => address) public override descriptorOf;
 
 	using Counters for Counters.Counter;
 	using EnumerableSet for EnumerableSet.UintSet;
@@ -64,8 +64,8 @@ contract STokensManager is
 		uint256 curretnTokenId = tokenIdCounter.current();
 		require(_tokenId <= curretnTokenId, "not found");
 		StakingPositions memory positons = getStoragePositions(_tokenId);
-		Rewards memory tokenRewards = _innerRewards(_tokenId);
-		address owner = IProperty(positons.property).author();
+		Rewards memory tokenRewards = _rewards(_tokenId);
+		address owner = ownerOf(_tokenId);
 		return _tokenURI(_tokenId, owner, positons, tokenRewards);
 	}
 
@@ -73,9 +73,13 @@ contract STokensManager is
 		uint256 _tokenId,
 		address _owner,
 		StakingPositions memory _positions,
-		Rewards memory _rewards
+		Rewards memory _rewardsArg
 	) external view override returns (string memory) {
-		return _tokenURI(_tokenId, _owner, _positions, _rewards);
+		return _tokenURI(_tokenId, _owner, _positions, _rewardsArg);
+	}
+
+	function current() external view override returns (uint256) {
+		return tokenIdCounter.current();
 	}
 
 	function mint(
@@ -143,7 +147,7 @@ contract STokensManager is
 		override
 		onlyPropertyAuthor(_property)
 	{
-		imageDescriptorOfProperty[_property] = _descriptor;
+		descriptorOf[_property] = _descriptor;
 	}
 
 	function freezeTokenURI(uint256 _tokenId)
@@ -174,7 +178,7 @@ contract STokensManager is
 		override
 		returns (Rewards memory)
 	{
-		return _innerRewards(_tokenId);
+		return _rewards(_tokenId);
 	}
 
 	function positionsOfProperty(address _property)
@@ -195,11 +199,7 @@ contract STokensManager is
 		return tokenIdsMapOfOwner[_owner].values();
 	}
 
-	function _innerRewards(uint256 _tokenId)
-		private
-		view
-		returns (Rewards memory)
-	{
+	function _rewards(uint256 _tokenId) private view returns (Rewards memory) {
 		uint256 withdrawableReward = ILockup(registry().registries("Lockup"))
 			.calculateWithdrawableInterestAmountByPosition(_tokenId);
 		StakingPositions memory currentPosition = getStoragePositions(_tokenId);
@@ -213,19 +213,17 @@ contract STokensManager is
 		uint256 _tokenId,
 		address _owner,
 		StakingPositions memory _positions,
-		Rewards memory _rewards
+		Rewards memory _rewardsArg
 	) private view returns (string memory) {
 		string memory _tokeUriImage = tokenUriImage[_tokenId];
 		if (bytes(_tokeUriImage).length == 0) {
-			address description = imageDescriptorOfProperty[
-				_positions.property
-			];
-			if (description != address(0)) {
-				_tokeUriImage = ITokenURIDescriptor(description).image(
+			address descriptor = descriptorOf[_positions.property];
+			if (descriptor != address(0)) {
+				_tokeUriImage = ITokenURIDescriptor(descriptor).image(
 					_tokenId,
 					_owner,
 					_positions,
-					_rewards
+					_rewardsArg
 				);
 			}
 		}

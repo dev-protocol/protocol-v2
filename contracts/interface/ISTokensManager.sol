@@ -187,4 +187,17 @@ interface ISTokensManager {
 		StakingPositions memory _positions,
 		Rewards memory _rewards
 	) external view returns (string memory);
+
+	/*
+	 * @dev get descriptor address
+	 * @param _property property address
+	 * @return address descriptor address
+	 */
+	function descriptorOf(address _property) external view returns (address);
+
+	/*
+	 * @dev get current token id
+	 * @return uint256 current token id
+	 */
+	function current() external view returns (uint256);
 }
