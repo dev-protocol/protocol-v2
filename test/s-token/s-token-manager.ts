@@ -695,15 +695,15 @@ contract('STokensManager', ([deployer, user]) => {
 		})
 	})
 
-	describe('current', () => {
+	describe('currentIndex', () => {
 		describe('success', () => {
 			it('get initial token id number', async () => {
-				const tmp = await dev.sTokensManager.current()
+				const tmp = await dev.sTokensManager.currentIndex()
 				expect(tmp.toString()).to.equal('0')
 			})
-			it('get current token id number', async () => {
+			it('get currentIndex token id number', async () => {
 				await dev.lockup.depositToProperty(property.address, '10000')
-				const tmp = await dev.sTokensManager.current()
+				const tmp = await dev.sTokensManager.currentIndex()
 				expect(tmp.toString()).to.equal('1')
 			})
 		})
