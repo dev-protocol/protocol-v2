@@ -9,6 +9,7 @@ import "../../interface/ITokenURIDescriptor.sol";
 import "../../interface/IAddressRegistry.sol";
 import "../../interface/ILockup.sol";
 import "../../interface/IProperty.sol";
+import "../../interface/IPropertyFactory.sol";
 import "../common/registry/InitializableUsingRegistry.sol";
 import "./STokensDescriptor.sol";
 
@@ -45,6 +46,11 @@ contract STokensManager is
 	}
 
 	modifier onlyPropertyAuthor(address _property) {
+		address propertyFacpry = registry().registries("PropertyFactory");
+		require(
+			IPropertyFactory(propertyFacpry).isProperty(_property),
+			"illegal property"
+		);
 		address author = IProperty(_property).author();
 		require(author == _msgSender(), "illegal access");
 		_;
