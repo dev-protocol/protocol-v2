@@ -84,7 +84,7 @@ contract STokensManager is
 		return _tokenURI(_tokenId, _owner, _positions, _rewardsArg);
 	}
 
-	function current() external view override returns (uint256) {
+	function currentIndex() external view override returns (uint256) {
 		return tokenIdCounter.current();
 	}
 

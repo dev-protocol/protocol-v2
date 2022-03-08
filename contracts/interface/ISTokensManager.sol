@@ -199,5 +199,5 @@ interface ISTokensManager {
 	 * @dev get current token id
 	 * @return uint256 current token id
 	 */
-	function current() external view returns (uint256);
+	function currentIndex() external view returns (uint256);
 }
