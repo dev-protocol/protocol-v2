@@ -71,7 +71,7 @@ contract STokensManager is
 		uint256 _price
 	) external override onlyLockup returns (uint256 tokenId_) {
 		tokenIdCounter.increment();
-		_safeMint(_owner, tokenIdCounter.current());
+		_mint(_owner, tokenIdCounter.current());
 		emit Minted(
 			tokenIdCounter.current(),
 			_owner,
