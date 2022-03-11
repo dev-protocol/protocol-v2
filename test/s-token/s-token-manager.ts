@@ -680,14 +680,6 @@ contract('STokensManager', ([deployer, user]) => {
 		describe('fail', () => {
 			it('illegal property', async () => {
 				const res = await dev.sTokensManager
-					.setTokenURIDescriptor(DEFAULT_ADDRESS, descriptor.address, {
-						from: user,
-					})
-					.catch((err: Error) => err)
-				validateErrorMessage(res, 'illegal property')
-			})
-			it('illegal property', async () => {
-				const res = await dev.sTokensManager
 					.setTokenURIDescriptor(property.address, descriptor.address)
 					.catch((err: Error) => err)
 				validateErrorMessage(res, 'illegal access')
