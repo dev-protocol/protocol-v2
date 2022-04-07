@@ -16925,6 +16925,19 @@ web3-utils@1.7.1:
     randombytes "^2.1.0"
     utf8 "3.0.0"
 
+web3-utils@1.7.2:
+  version "1.7.2"
+  resolved "https://registry.yarnpkg.com/web3-utils/-/web3-utils-1.7.2.tgz#5abfff3fdcf5c6ab5c94e6fba27ab8eeb3ac5393"
+  integrity sha512-BFBbyReeGrwVTV9eX4o6yblHHbdRJXtsN9NIqzDAeG7+qAv+rtyYxTTrknbOJ8w3egY1F73entA1Qt5XYrdeZQ==
+  dependencies:
+    bn.js "^4.11.9"
+    ethereum-bloom-filters "^1.0.6"
+    ethereumjs-util "^7.1.0"
+    ethjs-unit "0.1.6"
+    number-to-bn "1.7.0"
+    randombytes "^2.1.0"
+    utf8 "3.0.0"
+
 web3@*:
   version "1.6.0"
   resolved "https://registry.yarnpkg.com/web3/-/web3-1.6.0.tgz#d8fa0cd9e7bf252f9fe43bb77dc42bc6671affde"
