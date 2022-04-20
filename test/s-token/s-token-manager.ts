@@ -2,7 +2,10 @@
 import { encode } from 'js-base64'
 import BigNumber from 'bignumber.js'
 import { DevProtocolInstance } from '../test-lib/instance'
-import { PropertyInstance } from '../../types/truffle-contracts'
+import {
+	TokenURIDescriptorTestInstance,
+	PropertyInstance,
+} from '../../types/truffle-contracts'
 import { getPropertyAddress } from '../test-lib/utils/log'
 import {
 	validateErrorMessage,
@@ -23,7 +26,9 @@ import {
 
 contract('STokensManager', ([deployer, user]) => {
 	const deployerBalance = new BigNumber(1e18).times(10000000)
-	const init = async (): Promise<[DevProtocolInstance, PropertyInstance]> => {
+	const init = async (): Promise<
+		[DevProtocolInstance, PropertyInstance, TokenURIDescriptorTestInstance]
+	> => {
 		const dev = new DevProtocolInstance(deployer)
 		await dev.generateAddressRegistry()
 		await dev.generateDev()
@@ -59,17 +64,18 @@ contract('STokensManager', ([deployer, user]) => {
 		)
 
 		await dev.lockup.update()
-
-		return [dev, property]
+		const descriptor = await dev.getTokenUriDescriptor()
+		return [dev, property, descriptor]
 	}
 
 	let dev: DevProtocolInstance
 	let property: PropertyInstance
+	let descriptor: TokenURIDescriptorTestInstance
 	let snapshot: Snapshot
 	let snapshotId: string
 
 	before(async () => {
-		;[dev, property] = await init()
+		;[dev, property, descriptor] = await init()
 	})
 
 	beforeEach(async () => {
@@ -175,6 +181,16 @@ contract('STokensManager', ([deployer, user]) => {
 				})
 				const uri = await dev.sTokensManager.tokenURI(1)
 				checkTokenUri(uri, property.address, 10000, 0, 'ipfs://IPFS-CID')
+			})
+			it('get descriptor token uri', async () => {
+				await dev.lockup.depositToProperty(property.address, '10000')
+				await dev.sTokensManager.setTokenURIDescriptor(
+					property.address,
+					descriptor.address,
+					{ from: user }
+				)
+				const uri = await dev.sTokensManager.tokenURI(1)
+				checkTokenUri(uri, property.address, 10000, 0, 'dummy-string')
 			})
 		})
 		describe('fail', () => {
@@ -646,6 +662,117 @@ contract('STokensManager', ([deployer, user]) => {
 				expect(tokenIdsUser.length).to.equal(1)
 				expect(tokenIdsUser[0].toNumber()).to.equal(3)
 			})
+		})
+	})
+
+	describe('setTokenURIDescriptor', () => {
+		describe('success', () => {
+			it('set descriptor address', async () => {
+				await dev.sTokensManager.setTokenURIDescriptor(
+					property.address,
+					descriptor.address,
+					{ from: user }
+				)
+				const tmp = await dev.sTokensManager.descriptorOf(property.address)
+				expect(tmp).to.equal(descriptor.address)
+			})
+		})
+		describe('fail', () => {
+			it('illegal property', async () => {
+				const res = await dev.sTokensManager
+					.setTokenURIDescriptor(property.address, descriptor.address)
+					.catch((err: Error) => err)
+				validateErrorMessage(res, 'illegal access')
+			})
+		})
+	})
+
+	describe('currentIndex', () => {
+		describe('success', () => {
+			it('get initial token id number', async () => {
+				const tmp = await dev.sTokensManager.currentIndex()
+				expect(tmp.toString()).to.equal('0')
+			})
+			it('get currentIndex token id number', async () => {
+				await dev.lockup.depositToProperty(property.address, '10000')
+				const tmp = await dev.sTokensManager.currentIndex()
+				expect(tmp.toString()).to.equal('1')
+			})
+		})
+	})
+
+	describe('tokenURISim', () => {
+		const generateParams = (): [any, any] => {
+			const positions = {
+				property: property.address,
+				amount: 10,
+				price: 100,
+				cumulativeReward: 1000,
+				pendingReward: 10000,
+			}
+			const reward = {
+				entireReward: 100,
+				cumulativeReward: 1000,
+				withdrawableReward: 10000,
+			}
+			return [positions, reward]
+		}
+
+		it('default token uri', async () => {
+			const [positions, rewards] = generateParams()
+			const tmp = await dev.sTokensManager.tokenURISim(
+				1,
+				DEFAULT_ADDRESS,
+				positions,
+				rewards
+			)
+			checkTokenUri(
+				tmp,
+				positions.property,
+				positions.amount,
+				positions.cumulativeReward
+			)
+		})
+		it('set token uri image', async () => {
+			await dev.lockup.depositToProperty(property.address, '10000')
+			await dev.sTokensManager.setTokenURIImage(1, 'ipfs://IPFS-CID', {
+				from: user,
+			})
+			const [positions, rewards] = generateParams()
+			const tokenUri = await dev.sTokensManager.tokenURISim(
+				1,
+				DEFAULT_ADDRESS,
+				positions,
+				rewards
+			)
+			checkTokenUri(
+				tokenUri,
+				positions.property,
+				positions.amount,
+				positions.cumulativeReward,
+				'ipfs://IPFS-CID'
+			)
+		})
+		it('default descriptor', async () => {
+			const [positions, rewards] = generateParams()
+			await dev.sTokensManager.setTokenURIDescriptor(
+				property.address,
+				descriptor.address,
+				{ from: user }
+			)
+			const tmp = await dev.sTokensManager.tokenURISim(
+				1,
+				DEFAULT_ADDRESS,
+				positions,
+				rewards
+			)
+			checkTokenUri(
+				tmp,
+				positions.property,
+				positions.amount,
+				positions.cumulativeReward,
+				'dummy-string'
+			)
 		})
 	})
 })

@@ -116,6 +116,14 @@ interface ISTokensManager {
 	function setTokenURIImage(uint256 _tokenId, string memory _data) external;
 
 	/*
+	 * @dev set token uri descriptor
+	 * @param _property property address
+	 * @param _descriptor descriptor address
+	 */
+	function setTokenURIDescriptor(address _property, address _descriptor)
+		external;
+
+	/*
 	 * @dev freeze token uri data
 	 * @param _tokenId The ID of the staking position
 	 */
@@ -164,4 +172,32 @@ interface ISTokensManager {
 		external
 		view
 		returns (uint256[] memory);
+
+	/*
+	 * @dev get simulated token uri
+	 * @param _tokenId token id
+	 * @param _owner owner address
+	 * @param _positions staking positions
+	 * @param _rewards rewards
+	 * @return string simulated token uri
+	 */
+	function tokenURISim(
+		uint256 _tokenId,
+		address _owner,
+		StakingPositions memory _positions,
+		Rewards memory _rewards
+	) external view returns (string memory);
+
+	/*
+	 * @dev get descriptor address
+	 * @param _property property address
+	 * @return address descriptor address
+	 */
+	function descriptorOf(address _property) external view returns (address);
+
+	/*
+	 * @dev get current token id
+	 * @return uint256 current token id
+	 */
+	function currentIndex() external view returns (uint256);
 }
