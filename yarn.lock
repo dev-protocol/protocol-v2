@@ -2281,10 +2281,10 @@
   resolved "https://registry.yarnpkg.com/@truffle/expect/-/expect-0.0.18.tgz#022353a212942437e1a57ac1191d692347367bb5"
   integrity sha512-ZcYladRCgwn3bbhK3jIORVHcUOBk/MXsUxjfzcw+uD+0H1Kodsvcw1AAIaqd5tlyFhdOb7YkOcH0kUES7F8d1A==
 
-"@truffle/hdwallet-provider@2.0.6":
-  version "2.0.6"
-  resolved "https://registry.yarnpkg.com/@truffle/hdwallet-provider/-/hdwallet-provider-2.0.6.tgz#3c5e258b0a149916ad9fb7c6044092dbe8a985d7"
-  integrity sha512-w0JaxN1efX32BCCi0SF/lkJLyNEYMhvK6u62l/4hRtY++lC7JfP6vkoGN8py1Tqdt2phczZMULht8UdDi/vSZQ==
+"@truffle/hdwallet-provider@2.0.7":
+  version "2.0.7"
+  resolved "https://registry.yarnpkg.com/@truffle/hdwallet-provider/-/hdwallet-provider-2.0.7.tgz#4fd84988a8adbb0b5da4da4ed887f0bb025ef0d2"
+  integrity sha512-ddkVUPfBjbxtlvhO7hc2DbqSZ+PrICgI44EIWZwFg5v6Zam+qPVLnfrEnXSVoJzw4j+usFzTIxvpiid+AzKdLw==
   dependencies:
     "@ethereumjs/common" "^2.4.0"
     "@ethereumjs/tx" "^3.3.0"
