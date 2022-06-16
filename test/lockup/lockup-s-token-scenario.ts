@@ -1116,6 +1116,61 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 					expect(bobAmount.toFixed()).to.be.equal(expected)
 				})
 			})
+
+			describe('scenario; single lockup with gateway fee', () => {
+				let dev: DevProtocolInstance
+				let property: PropertyInstance
+				let lastTimestamp: number
+
+				const alice = deployer
+				const bob = user1
+
+				const aliceFirstTokenId = 1
+
+				before(async () => {
+					;[dev, property] = await init(deployer, user2)
+					const aliceBalance = await dev.dev.balanceOf(alice).then(toBigNumber)
+					await dev.dev.approve(dev.lockup.address, aliceBalance, {
+						from: alice,
+					})
+
+					lastTimestamp = await getBlockTimestamp()
+				})
+
+				/*
+				 * PolicyTestBase returns 100 as rewards
+				 * And stakers share is 10%
+				 */
+
+				it(`Alice should deposit to property and send Bob a gateway fee`, async () => {
+					const basisPoints = 300 // 3%
+					const depositAmount = 10000
+					const gatewayAddress = bob
+
+					await dev.lockup.gatedDepositToProperty(
+						property.address,
+						depositAmount,
+						gatewayAddress,
+						basisPoints,
+						{
+							from: alice,
+						}
+					)
+
+					const bobBalance = await dev.dev.balanceOf(bob).then(toBigNumber)
+
+					/**
+					 * Bob should get his gateway fee
+					 */
+					expect(bobBalance.toNumber()).to.be.equal(
+						(depositAmount * basisPoints) / 10000
+					)
+
+					/**
+					 * TODO - Alice should have (amount - fee) locked up
+					 */
+				})
+			})
 		})
 	})
 })

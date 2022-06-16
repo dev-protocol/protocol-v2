@@ -99,21 +99,9 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 	}
 
 	/**
-	 * @dev deposit dev token to dev protocol and generate s-token
-	 * @param _property target property address
-	 * @param _amount staking value
-	 * @return tokenId The ID of the created new staking position
+	 *
 	 */
-	function depositToProperty(address _property, uint256 _amount)
-		external
-		override
-		onlyAuthenticatedProperty(_property)
-		returns (uint256)
-	{
-		/**
-		 * Validates _amount is not 0.
-		 */
-		require(_amount != 0, "illegal deposit amount");
+	function _deposit(address _property, uint256 _amount) private returns (uint256) {
 		/**
 		 * Gets the latest cumulative sum of the interest price.
 		 */
@@ -161,6 +149,61 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		emit Lockedup(msg.sender, _property, _amount, tokenId);
 
 		return tokenId;
+	}
+
+	/**
+	 * @dev deposit dev token to dev protocol and generate s-token
+	 * @param _property target property address
+	 * @param _amount staking value
+	 * @return tokenId The ID of the created new staking position
+	 */
+	function depositToProperty(address _property, uint256 _amount)
+		external
+		override
+		onlyAuthenticatedProperty(_property)
+		returns (uint256)
+	{
+		/**
+		 * Validates _amount is not 0.
+		 */
+		require(_amount != 0, "illegal deposit amount");
+
+		return _deposit(_property, _amount);
+	}
+
+	/**
+	 * @dev deposit dev token to dev protocol and generate s-token
+	 * @param _property target property address
+	 * @param _amount staking value
+	 * @param _gatewayAddress is the address to which the liquidity provider fee will be directed
+	 * @param _gatewayFee is the basis points to pass. For example 10000 is 100%
+	 * @return tokenId The ID of the created new staking position
+	 */
+	function gatedDepositToProperty(address _property, uint256 _amount, address _gatewayAddress, uint256 _gatewayFee)
+		external
+		onlyAuthenticatedProperty(_property)
+		returns (uint256)
+	{
+		/**
+		 * Validates _amount is not 0.
+		 */
+		require(_amount != 0, "illegal deposit amount");
+
+		uint256 feeAmount = _amount * _gatewayFee / 10000;
+
+		/**
+		 * transfer feeAmount to _gatewayAddress
+		 */
+		require(
+			IERC20(registry().registries("Dev")).transferFrom(
+				msg.sender,
+				_gatewayAddress,
+				feeAmount
+			),
+			"dev transfer failed"
+		);
+
+		return _deposit(_property, _amount - feeAmount);
 	}
 
 	/**
