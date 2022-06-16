@@ -101,7 +101,10 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 	/**
 	 *
 	 */
-	function _deposit(address _property, uint256 _amount) private returns (uint256) {
+	function _deposit(address _property, uint256 _amount)
+		private
+		returns (uint256)
+	{
 		/**
 		 * Gets the latest cumulative sum of the interest price.
 		 */
@@ -179,17 +182,18 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 	 * @param _gatewayFee is the basis points to pass. For example 10000 is 100%
 	 * @return tokenId The ID of the created new staking position
 	 */
-	function gatedDepositToProperty(address _property, uint256 _amount, address _gatewayAddress, uint256 _gatewayFee)
-		external
-		onlyAuthenticatedProperty(_property)
-		returns (uint256)
-	{
+	function gatedDepositToProperty(
+		address _property,
+		uint256 _amount,
+		address _gatewayAddress,
+		uint256 _gatewayFee
+	) external onlyAuthenticatedProperty(_property) returns (uint256) {
 		/**
 		 * Validates _amount is not 0.
 		 */
 		require(_amount != 0, "illegal deposit amount");
 
-		uint256 feeAmount = _amount * _gatewayFee / 10000;
+		uint256 feeAmount = (_amount * _gatewayFee) / 10000;
 
 		/**
 		 * transfer feeAmount to _gatewayAddress
