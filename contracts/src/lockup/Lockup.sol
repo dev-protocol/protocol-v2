@@ -192,6 +192,7 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		 * Validates _amount is not 0.
 		 */
 		require(_amount != 0, "illegal deposit amount");
+		require(_gatewayFee <= 10000, "must be below 10000");
 
 		uint256 feeAmount = (_amount * _gatewayFee) / 10000;
 
