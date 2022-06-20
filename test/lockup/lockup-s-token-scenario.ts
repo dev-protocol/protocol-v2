@@ -1158,17 +1158,23 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 					)
 
 					const bobBalance = await dev.dev.balanceOf(bob).then(toBigNumber)
+					const feeAmount = (depositAmount * basisPoints) / 10000;
 
 					/**
 					 * Bob should get his gateway fee
 					 */
-					expect(bobBalance.toNumber()).to.be.equal(
-						(depositAmount * basisPoints) / 10000
-					)
+					expect(bobBalance.toNumber()).to.be.equal(feeAmount)
 
 					/**
-					 * TODO - Alice should have (amount - fee) locked up
+					 * Alice should have (amount - fee) locked up
 					 */
+					const propertyPosition = await dev.sTokensManager.positions(
+						aliceFirstTokenId
+					)
+					const propertyBalance = toBigNumber(
+						propertyPosition.amount
+					)
+					expect(propertyBalance.toNumber()).to.eq(new BigNumber(depositAmount).minus(feeAmount).toNumber());
 				})
 			})
 		})
