@@ -101,7 +101,7 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 	/**
 	 *
 	 */
-	function _deposit(address _property, uint256 _amount)
+	function _depositToProperty(address _property, uint256 _amount)
 		private
 		returns (uint256)
 	{
@@ -171,7 +171,7 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		 */
 		require(_amount != 0, "illegal deposit amount");
 
-		return _deposit(_property, _amount);
+		return _depositToProperty(_property, _amount);
 	}
 
 	/**
@@ -208,7 +208,7 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 			"dev transfer failed"
 		);
 
-		return _deposit(_property, _amount - feeAmount);
+		return _depositToProperty(_property, _amount - feeAmount);
 	}
 
 	/**
