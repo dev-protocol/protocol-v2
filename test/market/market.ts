@@ -221,7 +221,7 @@ contract(
 			it('Proxy to mapped Behavior Contract.', async () => {
 				// @ts-expect-error overloading functions aren't working
 				// pulled from https://github.com/trufflesuite/truffle/issues/3506
-				await dev.lockup.methods['depositToProperty(uint256,uint256)'](
+				await dev.lockup.methods['depositToProperty(address,uint256)'](
 					propertyAddress,
 					100000,
 					{
