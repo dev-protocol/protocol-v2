@@ -1324,8 +1324,6 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 						.balanceOf(bob)
 						.then(toBigNumber)
 
-					console.log('beforeBobBalance: ', beforeBobBalance.toNumber())
-
 					const t1 = await getBlockTimestamp()
 					const gatewayBasisFee = 300 // 3%
 					const expected = toBigNumber(10) // In PolicyTestBase, the max staker reward per block is 10.
@@ -1333,8 +1331,6 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 						.times(t1 - lastTimestamp)
 
 					const feeAmount = (expected.toNumber() * gatewayBasisFee) / 10000
-
-					console.log('fee amount is: ', feeAmount)
 
 					const expectedMinusFee = expected.minus(feeAmount)
 					const position = await dev.sTokensManager.positions(aliceFirstTokenId)
@@ -1353,7 +1349,6 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 						.then(toBigNumber)
 
 					const afterBobBalance = await dev.dev.balanceOf(bob).then(toBigNumber)
-					console.log('after bob balance is: ', afterBobBalance.toNumber())
 
 					expect(afterAliceBalance.toNumber()).to.eq(
 						beforeAliceBalance.plus(expectedMinusFee).toNumber()

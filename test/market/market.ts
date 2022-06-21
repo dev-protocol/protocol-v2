@@ -219,7 +219,11 @@ contract(
 				})
 			})
 			it('Proxy to mapped Behavior Contract.', async () => {
-				await dev.lockup.depositToProperty(propertyAddress, 100000, {
+				// @ts-expect-error overloading functions aren't working
+				// pulled from https://github.com/trufflesuite/truffle/issues/3506
+				await dev.lockup.methods[
+					'withdrawByPosition(uint256,uint256,address,uint256)'
+				](propertyAddress, 100000, {
 					from: propertyAuther,
 				})
 
@@ -412,7 +416,11 @@ contract(
 				})
 			})
 			it('Proxy to mapped Behavior Contract.', async () => {
-				await dev.lockup.depositToProperty(propertyAddress, 100000, {
+				// @ts-expect-error overloading functions aren't working
+				// pulled from https://github.com/trufflesuite/truffle/issues/3506
+				await dev.lockup.methods[
+					'withdrawByPosition(uint256,uint256,address,uint256)'
+				](propertyAddress, 100000, {
 					from: propertyAuther,
 				})
 
