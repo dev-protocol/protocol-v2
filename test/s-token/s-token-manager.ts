@@ -238,7 +238,7 @@ contract('STokensManager', ([deployer, user]) => {
 
 				// @ts-expect-error overloading functions aren't working
 				// pulled from https://github.com/trufflesuite/truffle/issues/3506
-				await dev.lockup.methods['depositToProperty(address,uint256)'](
+				devLocal.lockup.methods['depositToProperty(address,uint256)'](
 					propertyLocal.address,
 					'10000'
 				)
@@ -259,7 +259,7 @@ contract('STokensManager', ([deployer, user]) => {
 			it('generate event', async () => {
 				// @ts-expect-error overloading functions aren't working
 				// pulled from https://github.com/trufflesuite/truffle/issues/3506
-				await dev.lockup.methods['depositToProperty(address,uint256)'](
+				dev.lockup.methods['depositToProperty(address,uint256)'](
 					property.address,
 					'10000'
 				)
@@ -278,7 +278,7 @@ contract('STokensManager', ([deployer, user]) => {
 
 				// @ts-expect-error overloading functions aren't working
 				// pulled from https://github.com/trufflesuite/truffle/issues/3506
-				await dev.lockup.methods['depositToProperty(address,uint256)'](
+				devLocal.lockup.methods['depositToProperty(address,uint256)'](
 					propertyLocal.address,
 					'10000'
 				)
@@ -289,7 +289,7 @@ contract('STokensManager', ([deployer, user]) => {
 				expect(_tokenId).to.equal('1')
 				// @ts-expect-error overloading functions aren't working
 				// pulled from https://github.com/trufflesuite/truffle/issues/3506
-				await dev.lockup.methods['depositToProperty(address,uint256)'](
+				devLocal.lockup.methods['depositToProperty(address,uint256)'](
 					propertyLocal.address,
 					'10000'
 				)
