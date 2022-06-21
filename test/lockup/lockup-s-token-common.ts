@@ -55,7 +55,14 @@ export const init2 = async (
 ): Promise<[DevProtocolInstance, PropertyInstance, number]> => {
 	const [dev, property] = await init(deployer, user)
 	await dev.dev.approve(dev.lockup.address, 600)
-	await dev.lockup.depositToProperty(property.address, 100)
+
+	// @ts-expect-error overloading functions aren't working
+	// pulled from https://github.com/trufflesuite/truffle/issues/3506
+	await dev.lockup.methods['depositToProperty(address,uint256)'](
+		property.address,
+		100
+	)
+
 	const tokenIds = await dev.sTokensManager.positionsOfOwner(deployer)
 
 	return [dev, property, tokenIds[0].toNumber()]

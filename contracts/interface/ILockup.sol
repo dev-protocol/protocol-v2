@@ -35,7 +35,7 @@ interface ILockup {
 		external
 		returns (uint256);
 
-	function gatedDepositToProperty(
+	function depositToProperty(
 		address _property,
 		uint256 _amount,
 		address _gatewayAddress,

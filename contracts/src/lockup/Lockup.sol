@@ -155,39 +155,19 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 	}
 
 	/**
-	 * @dev deposit dev token to dev protocol and generate s-token
-	 * @param _property target property address
-	 * @param _amount staking value
-	 * @return tokenId The ID of the created new staking position
-	 */
-	function depositToProperty(address _property, uint256 _amount)
-		external
-		override
-		onlyAuthenticatedProperty(_property)
-		returns (uint256)
-	{
-		/**
-		 * Validates _amount is not 0.
-		 */
-		require(_amount != 0, "illegal deposit amount");
-
-		return _depositToProperty(_property, _amount);
-	}
-
-	/**
-	 * @dev deposit dev token to dev protocol and generate s-token
+	 * @dev overloaded depositToProperty with gateway fee params
 	 * @param _property target property address
 	 * @param _amount staking value
 	 * @param _gatewayAddress is the address to which the liquidity provider fee will be directed
 	 * @param _gatewayFee is the basis points to pass. For example 10000 is 100%
 	 * @return tokenId The ID of the created new staking position
 	 */
-	function gatedDepositToProperty(
+	function depositToProperty(
 		address _property,
 		uint256 _amount,
 		address _gatewayAddress,
 		uint256 _gatewayFee
-	) external onlyAuthenticatedProperty(_property) returns (uint256) {
+	) external override onlyAuthenticatedProperty(_property) returns (uint256) {
 		/**
 		 * Validates _amount is not 0.
 		 */
@@ -209,6 +189,26 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		);
 
 		return _depositToProperty(_property, _amount - feeAmount);
+	}
+
+	/**
+	 * @dev deposit dev token to dev protocol and generate s-token
+	 * @param _property target property address
+	 * @param _amount staking value
+	 * @return tokenId The ID of the created new staking position
+	 */
+	function depositToProperty(address _property, uint256 _amount)
+		external
+		override
+		onlyAuthenticatedProperty(_property)
+		returns (uint256)
+	{
+		/**
+		 * Validates _amount is not 0.
+		 */
+		require(_amount != 0, "illegal deposit amount");
+
+		return _depositToProperty(_property, _amount);
 	}
 
 	/**
