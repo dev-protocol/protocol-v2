@@ -404,9 +404,10 @@ contract('STokensManager', ([deployer, user]) => {
 			it('get data', async () => {
 				// @ts-expect-error overloading functions aren't working
 				// pulled from https://github.com/trufflesuite/truffle/issues/3506
-				await dev.lockup.methods[
-					'depositToProperty(uint256,uint256,address,uint256)'
-				](property.address, '10000')
+				await dev.lockup.methods['depositToProperty(address,uint256)'](
+					property.address,
+					'10000'
+				)
 				await dev.sTokensManager.setTokenURIImage(1, 'ipfs://IPFS-CID', {
 					from: user,
 				})
@@ -435,9 +436,10 @@ contract('STokensManager', ([deployer, user]) => {
 			it('not author.', async () => {
 				// @ts-expect-error overloading functions aren't working
 				// pulled from https://github.com/trufflesuite/truffle/issues/3506
-				await dev.lockup.methods[
-					'depositToProperty(uint256,uint256,address,uint256)'
-				](property.address, '10000')
+				await dev.lockup.methods['depositToProperty(address,uint256)'](
+					property.address,
+					'10000'
+				)
 
 				const res = await dev.sTokensManager
 					.setTokenURIImage(1, '')

@@ -221,11 +221,13 @@ contract(
 			it('Proxy to mapped Behavior Contract.', async () => {
 				// @ts-expect-error overloading functions aren't working
 				// pulled from https://github.com/trufflesuite/truffle/issues/3506
-				await dev.lockup.methods[
-					'withdrawByPosition(uint256,uint256,address,uint256)'
-				](propertyAddress, 100000, {
-					from: propertyAuther,
-				})
+				await dev.lockup.methods['depositToProperty(uint256,uint256)'](
+					propertyAddress,
+					100000,
+					{
+						from: propertyAuther,
+					}
+				)
 
 				const marketInstance = await marketContract.at(marketAddress1)
 				marketInstance
@@ -418,11 +420,13 @@ contract(
 			it('Proxy to mapped Behavior Contract.', async () => {
 				// @ts-expect-error overloading functions aren't working
 				// pulled from https://github.com/trufflesuite/truffle/issues/3506
-				await dev.lockup.methods[
-					'withdrawByPosition(uint256,uint256,address,uint256)'
-				](propertyAddress, 100000, {
-					from: propertyAuther,
-				})
+				await dev.lockup.methods['depositToProperty(address,uint256)'](
+					propertyAddress,
+					100000,
+					{
+						from: propertyAuther,
+					}
+				)
 
 				const marketInstance = await marketContract.at(marketAddress1)
 				void marketInstance.authenticateFromPropertyFactory(
