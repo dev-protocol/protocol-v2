@@ -1177,6 +1177,71 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 					)
 				})
 			})
+
+
+
+			describe('scenario; gateway fees', () => {
+				let dev: DevProtocolInstance
+				let property: PropertyInstance
+				let lastTimestamp: number
+	
+				const alice = deployer
+				const bob = user1
+				const depositAmount = 10000;
+	
+				const aliceFirstTokenId = 1
+	
+				before(async () => {
+					;[dev, property] = await init(deployer, user2)
+					const aliceBalance = await dev.dev.balanceOf(alice).then(toBigNumber)
+					await dev.dev.mint(bob, aliceBalance)
+					await dev.dev.approve(dev.lockup.address, aliceBalance, { from: alice })
+					await dev.lockup.depositToProperty(property.address, depositAmount, {
+						from: alice,
+					})
+	
+					lastTimestamp = await getBlockTimestamp()
+				})
+	
+				it(`Alice's withdrawable interest is 100% of the Property's interest`, async () => {
+
+					await forwardBlockTimestamp(9)
+
+					const beforeAliceBalance = await dev.dev
+						.balanceOf(alice)
+						.then(toBigNumber)
+
+					const beforeBobBalance = await dev.dev
+						.balanceOf(bob)
+						.then(toBigNumber)
+
+					const t1 = await getBlockTimestamp()
+					const gatewayBasisFee = 300 // 3%
+					const expected = toBigNumber(10) // In PolicyTestBase, the max staker reward per block is 10.
+						.times(1e18)
+						.times(t1 - lastTimestamp)
+
+					const feeAmount = expected.toNumber() * gatewayBasisFee / 10000;
+					const expectedMinusFee = expected.minus(feeAmount)
+					const position = await dev.sTokensManager.positions(aliceFirstTokenId)
+					const aliceLocked = toBigNumber(position.amount)
+
+					// @ts-expect-error overloading functions aren't working
+					// pulled from https://github.com/trufflesuite/truffle/issues/3506
+					await dev.lockup.methods['withdrawByPosition(uint256,uint256,address,uint256)'](aliceFirstTokenId, aliceLocked, bob, gatewayBasisFee, { from: alice })
+
+					const afterAliceBalance = await dev.dev
+						.balanceOf(alice)
+						.then(toBigNumber)
+
+					const afterBobBalance = await dev.dev
+						.balanceOf(bob)
+						.then(toBigNumber)
+
+					expect(afterAliceBalance.toNumber()).to.eq(beforeAliceBalance.plus(expectedMinusFee).toNumber())
+					expect(afterBobBalance.toNumber()).to.eq(beforeBobBalance.plus(feeAmount).toNumber())
+				})
+			})
 		})
 	})
 })

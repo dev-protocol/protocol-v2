@@ -53,6 +53,13 @@ interface ILockup {
 
 	function update() external;
 
+	function withdrawByPosition(
+		uint256 _tokenId,
+		uint256 _amount,
+		address _gatewayAddress,
+		uint256 _gatewayBasisFee
+	) external returns (bool);
+
 	function withdrawByPosition(uint256 _tokenId, uint256 _amount)
 		external
 		returns (bool);
