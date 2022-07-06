@@ -59,11 +59,13 @@ contract('LockupTest', ([deployer, , user2, user3]) => {
 				const owner = await dev.sTokensManager.ownerOf(1)
 				expect(owner).to.be.equal(deployer)
 				const position = await dev.sTokensManager.positions(1)
+				const payload = await dev.sTokensManager.payloadOf(1)
 				expect(position.property).to.be.equal(property.address)
 				expect(toBigNumber(position.amount).toNumber()).to.be.equal(100)
 				expect(toBigNumber(position.price).toNumber()).to.be.equal(0)
 				expect(toBigNumber(position.cumulativeReward).toNumber()).to.be.equal(0)
 				expect(toBigNumber(position.pendingReward).toNumber()).to.be.equal(0)
+				expect(payload).to.be.equal(web3.utils.keccak256('ADDITIONAL_BYTES'))
 			})
 			it('0 dev staking', async () => {
 				await dev.lockup.depositToProperty(property.address, 0)

@@ -676,7 +676,7 @@ contract('STokensManager', ([deployer, user]) => {
 				const tmp = await dev.sTokensManager.descriptorOf(property.address)
 				expect(tmp).to.equal(descriptor.address)
 			})
-			it('stores the passed bytes', async () => {
+			it('stores the passed payload', async () => {
 				await dev.sTokensManager.setTokenURIDescriptor(
 					property.address,
 					descriptor.address,
@@ -699,7 +699,7 @@ contract('STokensManager', ([deployer, user]) => {
 					.catch((err: Error) => err)
 				validateErrorMessage(res, 'illegal access')
 			})
-			it('revert on hooksBeforeMinted', async () => {
+			it('revert on onBeforeMint', async () => {
 				await dev.sTokensManager.setTokenURIDescriptor(
 					property.address,
 					descriptor.address,
@@ -714,7 +714,7 @@ contract('STokensManager', ([deployer, user]) => {
 						web3.utils.keccak256('ADDITIONAL_BYTES')
 					)
 					.catch((err: Error) => err)
-				validateErrorMessage(res, 'failed to call hooksBeforeMinted')
+				validateErrorMessage(res, 'failed to call onBeforeMint')
 			})
 		})
 	})

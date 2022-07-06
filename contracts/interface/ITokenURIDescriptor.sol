@@ -11,6 +11,7 @@ interface ITokenURIDescriptor {
 	 * @param _owner owner address
 	 * @param _positions staking position
 	 * @param _rewards rewards
+	 * @param _payload token payload
 	 * @return string image information
 	 */
 	function image(
@@ -18,7 +19,7 @@ interface ITokenURIDescriptor {
 		address _owner,
 		ISTokensManager.StakingPositions memory _positions,
 		ISTokensManager.Rewards memory _rewards,
-		bytes32 _data
+		bytes32 _payload
 	) external view returns (string memory);
 
 	/*
@@ -26,13 +27,13 @@ interface ITokenURIDescriptor {
 	 * @param _tokenId token id
 	 * @param _owner owner address
 	 * @param _positions staking position
-	 * @param _data user-passed bytes
+	 * @param _payload token payload
 	 * @return bool success or failure
 	 */
-	function hooksBeforeMinted(
+	function onBeforeMint(
 		uint256 _tokenId,
 		address _owner,
 		ISTokensManager.StakingPositions memory _positions,
-		bytes32 _data
+		bytes32 _payload
 	) external returns (bool);
 }

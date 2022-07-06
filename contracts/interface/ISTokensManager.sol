@@ -80,6 +80,7 @@ interface ISTokensManager {
 	 * @param _property The address of the Property as the staking destination
 	 * @param _amount The amount of the new staking position
 	 * @param _price The latest unit price of the cumulative staking reward
+	 * @param _payload additional payload
 	 * @return uint256 The ID of the created new staking position
 	 */
 	function mint(
@@ -87,7 +88,7 @@ interface ISTokensManager {
 		address _property,
 		uint256 _amount,
 		uint256 _price,
-		bytes32 _data
+		bytes32 _payload
 	) external returns (uint256);
 
 	/*
@@ -180,6 +181,7 @@ interface ISTokensManager {
 	 * @param _owner owner address
 	 * @param _positions staking positions
 	 * @param _rewards rewards
+	 * @param _payload token payload
 	 * @return string simulated token uri
 	 */
 	function tokenURISim(
@@ -187,7 +189,7 @@ interface ISTokensManager {
 		address _owner,
 		StakingPositions memory _positions,
 		Rewards memory _rewards,
-		bytes32 _data
+		bytes32 _payload
 	) external view returns (string memory);
 
 	/*
@@ -196,6 +198,13 @@ interface ISTokensManager {
 	 * @return address descriptor address
 	 */
 	function descriptorOf(address _property) external view returns (address);
+
+	/*
+	 * @dev get the payload
+	 * @param _tokenId token id
+	 * @return bytes32 stored payload
+	 */
+	function payloadOf(uint256 _tokenId) external view returns (bytes32);
 
 	/*
 	 * @dev get current token id

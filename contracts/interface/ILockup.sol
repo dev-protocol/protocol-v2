@@ -34,7 +34,7 @@ interface ILockup {
 	function depositToProperty(
 		address _property,
 		uint256 _amount,
-		bytes32 _data
+		bytes32 _payload
 	) external returns (uint256);
 
 	function depositToProperty(address _property, uint256 _amount)

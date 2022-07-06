@@ -17,13 +17,13 @@ contract TokenURIDescriptorTest is ITokenURIDescriptor {
 		return "dummy-string";
 	}
 
-	function hooksBeforeMinted(
+	function onBeforeMint(
 		uint256 _tokenId,
 		address,
 		ISTokensManager.StakingPositions memory,
-		bytes32 _data
+		bytes32 _payload
 	) external returns (bool) {
-		_dataOf[_tokenId] = _data;
+		_dataOf[_tokenId] = _payload;
 		return shouldBe;
 	}
 
