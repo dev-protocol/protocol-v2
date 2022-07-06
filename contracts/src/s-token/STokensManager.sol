@@ -66,16 +66,17 @@ contract STokensManager is
 		StakingPositions memory positons = getStoragePositions(_tokenId);
 		Rewards memory tokenRewards = _rewards(_tokenId);
 		address owner = ownerOf(_tokenId);
-		return _tokenURI(_tokenId, owner, positons, tokenRewards);
+		return _tokenURI(_tokenId, owner, positons, tokenRewards, "");
 	}
 
 	function tokenURISim(
 		uint256 _tokenId,
 		address _owner,
 		StakingPositions memory _positions,
-		Rewards memory _rewardsArg
+		Rewards memory _rewardsArg,
+		bytes32 _data
 	) external view override returns (string memory) {
-		return _tokenURI(_tokenId, _owner, _positions, _rewardsArg);
+		return _tokenURI(_tokenId, _owner, _positions, _rewardsArg, _data);
 	}
 
 	function currentIndex() external view override returns (uint256) {
@@ -86,17 +87,13 @@ contract STokensManager is
 		address _owner,
 		address _property,
 		uint256 _amount,
-		uint256 _price
+		uint256 _price,
+		bytes32 _data
 	) external override onlyLockup returns (uint256 tokenId_) {
 		tokenIdCounter.increment();
-		_mint(_owner, tokenIdCounter.current());
-		emit Minted(
-			tokenIdCounter.current(),
-			_owner,
-			_property,
-			_amount,
-			_price
-		);
+		uint256 currentId = tokenIdCounter.current();
+		_mint(_owner, currentId);
+		emit Minted(currentId, _owner, _property, _amount, _price);
 		StakingPositions memory newPosition = StakingPositions(
 			_property,
 			_amount,
@@ -105,9 +102,23 @@ contract STokensManager is
 			0
 		);
 		// TODO V3 block number and history
-		setStoragePositions(tokenIdCounter.current(), newPosition);
-		tokenIdsMapOfProperty[_property].push(tokenIdCounter.current());
-		return tokenIdCounter.current();
+		setStoragePositions(currentId, newPosition);
+		tokenIdsMapOfProperty[_property].push(currentId);
+
+		address descriptor = descriptorOf[_property];
+		if (descriptor != address(0)) {
+			require(
+				ITokenURIDescriptor(descriptor).hooksBeforeMinted(
+					currentId,
+					_owner,
+					newPosition,
+					_data
+				),
+				"failed to call hooksBeforeMinted"
+			);
+		}
+
+		return currentId;
 	}
 
 	function update(
@@ -213,7 +224,8 @@ contract STokensManager is
 		uint256 _tokenId,
 		address _owner,
 		StakingPositions memory _positions,
-		Rewards memory _rewardsArg
+		Rewards memory _rewardsArg,
+		bytes32 _data
 	) private view returns (string memory) {
 		string memory _tokeUriImage = tokenUriImage[_tokenId];
 		if (bytes(_tokeUriImage).length == 0) {
@@ -223,7 +235,8 @@ contract STokensManager is
 					_tokenId,
 					_owner,
 					_positions,
-					_rewardsArg
+					_rewardsArg,
+					_data
 				);
 			}
 		}

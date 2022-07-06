@@ -257,7 +257,7 @@ contract('STokensManager', ([deployer, user]) => {
 		describe('fail', () => {
 			it('If the owner runs it, an error will occur.', async () => {
 				const res = await dev.sTokensManager
-					.mint(deployer, property.address, 100, 10)
+					.mint(deployer, property.address, 100, 10, '')
 					.catch((err: Error) => err)
 				validateErrorMessage(res, 'illegal access')
 			})
@@ -676,6 +676,21 @@ contract('STokensManager', ([deployer, user]) => {
 				const tmp = await dev.sTokensManager.descriptorOf(property.address)
 				expect(tmp).to.equal(descriptor.address)
 			})
+			it('stores the passed bytes', async () => {
+				await dev.sTokensManager.setTokenURIDescriptor(
+					property.address,
+					descriptor.address,
+					{ from: user }
+				)
+				// @ts-ignore
+				await dev.lockup.depositToProperty(
+					property.address,
+					'10000',
+					web3.utils.keccak256('ADDITIONAL_BYTES')
+				)
+				const key = await descriptor.dataOf(1)
+				expect(key).to.equal(web3.utils.keccak256('ADDITIONAL_BYTES'))
+			})
 		})
 		describe('fail', () => {
 			it('illegal property', async () => {
@@ -683,6 +698,23 @@ contract('STokensManager', ([deployer, user]) => {
 					.setTokenURIDescriptor(property.address, descriptor.address)
 					.catch((err: Error) => err)
 				validateErrorMessage(res, 'illegal access')
+			})
+			it('revert on hooksBeforeMinted', async () => {
+				await dev.sTokensManager.setTokenURIDescriptor(
+					property.address,
+					descriptor.address,
+					{ from: user }
+				)
+				await descriptor.__shouldBe(false)
+				// @ts-ignore
+				const res = await dev.lockup
+					.depositToProperty(
+						property.address,
+						'10000',
+						web3.utils.keccak256('ADDITIONAL_BYTES')
+					)
+					.catch((err: Error) => err)
+				validateErrorMessage(res, 'failed to call hooksBeforeMinted')
 			})
 		})
 	})
@@ -724,7 +756,8 @@ contract('STokensManager', ([deployer, user]) => {
 				1,
 				DEFAULT_ADDRESS,
 				positions,
-				rewards
+				rewards,
+				''
 			)
 			checkTokenUri(
 				tmp,
@@ -743,7 +776,8 @@ contract('STokensManager', ([deployer, user]) => {
 				1,
 				DEFAULT_ADDRESS,
 				positions,
-				rewards
+				rewards,
+				''
 			)
 			checkTokenUri(
 				tokenUri,
@@ -764,7 +798,8 @@ contract('STokensManager', ([deployer, user]) => {
 				1,
 				DEFAULT_ADDRESS,
 				positions,
-				rewards
+				rewards,
+				''
 			)
 			checkTokenUri(
 				tmp,

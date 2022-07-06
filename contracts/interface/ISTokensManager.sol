@@ -86,7 +86,8 @@ interface ISTokensManager {
 		address _owner,
 		address _property,
 		uint256 _amount,
-		uint256 _price
+		uint256 _price,
+		bytes32 _data
 	) external returns (uint256);
 
 	/*
@@ -185,7 +186,8 @@ interface ISTokensManager {
 		uint256 _tokenId,
 		address _owner,
 		StakingPositions memory _positions,
-		Rewards memory _rewards
+		Rewards memory _rewards,
+		bytes32 _data
 	) external view returns (string memory);
 
 	/*
