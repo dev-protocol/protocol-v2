@@ -257,7 +257,7 @@ contract('STokensManager', ([deployer, user]) => {
 		describe('fail', () => {
 			it('If the owner runs it, an error will occur.', async () => {
 				const res = await dev.sTokensManager
-					.mint(deployer, property.address, 100, 10, '')
+					.mint(deployer, property.address, 100, 10, '0x')
 					.catch((err: Error) => err)
 				validateErrorMessage(res, 'illegal access')
 			})
@@ -757,7 +757,7 @@ contract('STokensManager', ([deployer, user]) => {
 				DEFAULT_ADDRESS,
 				positions,
 				rewards,
-				''
+				'0x'
 			)
 			checkTokenUri(
 				tmp,
@@ -777,7 +777,7 @@ contract('STokensManager', ([deployer, user]) => {
 				DEFAULT_ADDRESS,
 				positions,
 				rewards,
-				''
+				'0x'
 			)
 			checkTokenUri(
 				tokenUri,
@@ -799,7 +799,7 @@ contract('STokensManager', ([deployer, user]) => {
 				DEFAULT_ADDRESS,
 				positions,
 				rewards,
-				''
+				'0x'
 			)
 			checkTokenUri(
 				tmp,
