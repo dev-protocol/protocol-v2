@@ -64,9 +64,16 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 			 * And stakers share is 10%
 			 */
 			it('Alice has a 100% of interests', async () => {
-				await dev.lockup.depositToProperty(property.address, 1000000000000, {
-					from: alice,
-				})
+				// @ts-expect-error overloading functions aren't working
+				// pulled from https://github.com/trufflesuite/truffle/issues/3506
+				await dev.lockup.methods['depositToProperty(address,uint256)'](
+					property.address,
+					1000000000000,
+					{
+						from: alice,
+					}
+				)
+
 				const t1 = await getBlockTimestamp()
 				await forwardBlockTimestamp(1)
 
@@ -101,9 +108,15 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				expect(result.toFixed()).to.be.equal(calculated)
 			})
 			it('Alice has a 50% of interests', async () => {
-				await dev.lockup.depositToProperty(property.address, 1000000000000, {
-					from: bob,
-				})
+				// @ts-expect-error overloading functions aren't working
+				// pulled from https://github.com/trufflesuite/truffle/issues/3506
+				await dev.lockup.methods['depositToProperty(address,uint256)'](
+					property.address,
+					1000000000000,
+					{
+						from: bob,
+					}
+				)
 				timestamps.set('a1', await getBlockTimestamp())
 				await dev.lockup.withdrawByPosition(aliceFirstTokenId, 0, {
 					from: alice,
@@ -237,9 +250,16 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 					bobPosition.amount.toString(),
 					{ from: bob }
 				)
-				await dev.lockup.depositToProperty(property.address, 1000000000000, {
-					from: alice,
-				})
+				// @ts-expect-error overloading functions aren't working
+				// pulled from https://github.com/trufflesuite/truffle/issues/3506
+				await dev.lockup.methods['depositToProperty(address,uint256)'](
+					property.address,
+					1000000000000,
+					{
+						from: alice,
+					}
+				)
+
 				const t1 = await getBlockTimestamp()
 				await forwardBlockTimestamp(1)
 				const result = await dev.lockup
@@ -258,9 +278,17 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				await dev.lockup.depositToPosition(aliceSecoundTokenId, 1000000000000, {
 					from: alice,
 				})
-				await dev.lockup.depositToProperty(property.address, 1000000000000, {
-					from: bob,
-				})
+
+				// @ts-expect-error overloading functions aren't working
+				// pulled from https://github.com/trufflesuite/truffle/issues/3506
+				await dev.lockup.methods['depositToProperty(address,uint256)'](
+					property.address,
+					1000000000000,
+					{
+						from: bob,
+					}
+				)
+
 				await forwardBlockTimestamp(2)
 				const alicePosition = await dev.sTokensManager.positions(
 					aliceSecoundTokenId
@@ -311,14 +339,29 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 
 				const bobBalance = toBigNumber(10000000).times(1e18)
 				await dev.dev.mint(bob, bobBalance)
-				await dev.lockup.depositToProperty(property.address, bobBalance, {
-					from: bob,
-				})
+
+				// @ts-expect-error overloading functions aren't working
+				// pulled from https://github.com/trufflesuite/truffle/issues/3506
+				await dev.lockup.methods['depositToProperty(address,uint256)'](
+					property.address,
+					bobBalance,
+					{
+						from: bob,
+					}
+				)
+
 				await forwardBlockTimestamp(10)
 
-				await dev.lockup.depositToProperty(property2.address, 10000000, {
-					from: alice,
-				})
+				// @ts-expect-error overloading functions aren't working
+				// pulled from https://github.com/trufflesuite/truffle/issues/3506
+				await dev.lockup.methods['depositToProperty(address,uint256)'](
+					property2.address,
+					10000000,
+					{
+						from: alice,
+					}
+				)
+
 				const t1 = await getBlockTimestamp()
 				await forwardBlockTimestamp(1)
 				const result = await dev.lockup
@@ -344,9 +387,17 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 					propertyAddress,
 					1
 				)
-				await dev.lockup.depositToProperty(propertyAddress, 1000000000000, {
-					from: alice,
-				})
+
+				// @ts-expect-error overloading functions aren't working
+				// pulled from https://github.com/trufflesuite/truffle/issues/3506
+				await dev.lockup.methods['depositToProperty(address,uint256)'](
+					propertyAddress,
+					1000000000000,
+					{
+						from: alice,
+					}
+				)
+
 				await forwardBlockTimestamp(1)
 				await dev.lockup.depositToPosition(aliceFourthTokenId, 1000000000000, {
 					from: alice,
@@ -380,9 +431,16 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				const aliceBalance = await dev.dev.balanceOf(alice).then(toBigNumber)
 				await dev.dev.mint(bob, aliceBalance)
 				await dev.dev.approve(dev.lockup.address, aliceBalance, { from: alice })
-				await dev.lockup.depositToProperty(property.address, 10000, {
-					from: alice,
-				})
+
+				// @ts-expect-error overloading functions aren't working
+				// pulled from https://github.com/trufflesuite/truffle/issues/3506
+				await dev.lockup.methods['depositToProperty(address,uint256)'](
+					property.address,
+					10000,
+					{
+						from: alice,
+					}
+				)
 
 				lastTimestamp = await getBlockTimestamp()
 			})
@@ -495,9 +553,16 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				const aliceBalance = await dev.dev.balanceOf(alice).then(toBigNumber)
 				await dev.dev.mint(bob, aliceBalance)
 				await dev.dev.approve(dev.lockup.address, aliceBalance, { from: alice })
-				await dev.lockup.depositToProperty(property.address, 10000, {
-					from: alice,
-				})
+
+				// @ts-expect-error overloading functions aren't working
+				// pulled from https://github.com/trufflesuite/truffle/issues/3506
+				await dev.lockup.methods['depositToProperty(address,uint256)'](
+					property.address,
+					10000,
+					{
+						from: alice,
+					}
+				)
 
 				lastTimestamp = await getBlockTimestamp()
 			})
@@ -616,9 +681,16 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				await dev.dev.mint(bob, aliceBalance)
 				await dev.dev.approve(dev.lockup.address, aliceBalance, { from: alice })
 				await dev.dev.approve(dev.lockup.address, aliceBalance, { from: bob })
-				await dev.lockup.depositToProperty(property.address, 10000, {
-					from: alice,
-				})
+
+				// @ts-expect-error overloading functions aren't working
+				// pulled from https://github.com/trufflesuite/truffle/issues/3506
+				await dev.lockup.methods['depositToProperty(address,uint256)'](
+					property.address,
+					10000,
+					{
+						from: alice,
+					}
+				)
 			})
 
 			describe('before second run', () => {
@@ -631,9 +703,16 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 					expect(aliceBalance.toFixed()).to.be.equal(total.toFixed())
 				})
 				it(`Bob does staking 25% of the Property's total lockups, Alice's share become 80%`, async () => {
-					await dev.lockup.depositToProperty(property.address, 10000 * 0.25, {
-						from: bob,
-					})
+					// @ts-expect-error overloading functions aren't working
+					// pulled from https://github.com/trufflesuite/truffle/issues/3506
+					await dev.lockup.methods['depositToProperty(address,uint256)'](
+						property.address,
+						10000 * 0.25,
+						{
+							from: bob,
+						}
+					)
+
 					const total = await dev.lockup
 						.totalLockedForProperty(property.address)
 						.then(toBigNumber)
@@ -845,9 +924,16 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 					1
 				)
 
-				await dev.lockup.depositToProperty(property1.address, 10000, {
-					from: alice,
-				})
+				// @ts-expect-error overloading functions aren't working
+				// pulled from https://github.com/trufflesuite/truffle/issues/3506
+				await dev.lockup.methods['depositToProperty(address,uint256)'](
+					property1.address,
+					10000,
+					{
+						from: alice,
+					}
+				)
+
 				await forwardBlockTimestamp(3)
 			})
 
@@ -861,9 +947,16 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 					expect(aliceBalance.toFixed()).to.be.equal(total.toFixed())
 				})
 				it(`Bob does staking 100% of the Property2 total lockups, Property2 is 20% of the total rewards`, async () => {
-					await dev.lockup.depositToProperty(property2.address, 2500, {
-						from: bob,
-					})
+					// @ts-expect-error overloading functions aren't working
+					// pulled from https://github.com/trufflesuite/truffle/issues/3506
+					await dev.lockup.methods['depositToProperty(address,uint256)'](
+						property2.address,
+						2500,
+						{
+							from: bob,
+						}
+					)
+
 					const total = await dev.lockup.totalLocked().then(toBigNumber)
 					const p1 = await dev.lockup
 						.totalLockedForProperty(property1.address)
@@ -973,9 +1066,16 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 			})
 			describe('additional staking', () => {
 				before(async () => {
-					await dev.lockup.depositToProperty(property3.address, 16250 * 0.6, {
-						from: alice,
-					})
+					// @ts-expect-error overloading functions aren't working
+					// pulled from https://github.com/trufflesuite/truffle/issues/3506
+					await dev.lockup.methods['depositToProperty(address,uint256)'](
+						property3.address,
+						16250 * 0.6,
+						{
+							from: alice,
+						}
+					)
+
 					await forwardBlockTimestamp(3)
 				})
 				it(`Alice does staking 60% of the all Property's total lockups, Alice's share become ${
@@ -1116,6 +1216,149 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 					expect(bobAmount.toFixed()).to.be.equal(expected)
 				})
 			})
+
+			describe('scenario; single lockup with gateway fee', () => {
+				let dev: DevProtocolInstance
+				let property: PropertyInstance
+				let lastTimestamp: number
+
+				const alice = deployer
+				const bob = user1
+
+				const aliceFirstTokenId = 1
+
+				before(async () => {
+					;[dev, property] = await init(deployer, user2)
+					const aliceBalance = await dev.dev.balanceOf(alice).then(toBigNumber)
+					await dev.dev.approve(dev.lockup.address, aliceBalance, {
+						from: alice,
+					})
+
+					lastTimestamp = await getBlockTimestamp()
+				})
+
+				/*
+				 * PolicyTestBase returns 100 as rewards
+				 * And stakers share is 10%
+				 */
+
+				it(`Alice should deposit to property and send Bob a gateway fee`, async () => {
+					const basisPoints = 300 // 3%
+					const depositAmount = 10000
+					const gatewayAddress = bob
+
+					await dev.lockup.depositToProperty(
+						property.address,
+						depositAmount,
+						gatewayAddress,
+						basisPoints,
+						{
+							from: alice,
+						}
+					)
+
+					const bobBalance = await dev.dev.balanceOf(bob).then(toBigNumber)
+					const feeAmount = (depositAmount * basisPoints) / 10000
+
+					/**
+					 * Bob should get his gateway fee
+					 */
+					expect(bobBalance.toNumber()).to.be.equal(feeAmount)
+
+					/**
+					 * Alice should have (amount - fee) locked up
+					 */
+					const propertyPosition = await dev.sTokensManager.positions(
+						aliceFirstTokenId
+					)
+					const propertyBalance = toBigNumber(propertyPosition.amount)
+					expect(propertyBalance.toNumber()).to.eq(
+						new BigNumber(depositAmount).minus(feeAmount).toNumber()
+					)
+				})
+			})
+
+			describe('scenario; gateway fees withdraw', () => {
+				let dev: DevProtocolInstance
+				let property: PropertyInstance
+				let lastTimestamp: number
+
+				const alice = deployer
+				const bob = user1
+				const depositAmount = 10000
+
+				const aliceFirstTokenId = 1
+
+				before(async () => {
+					;[dev, property] = await init(deployer, user2)
+					const aliceBalance = await dev.dev.balanceOf(alice).then(toBigNumber)
+					await dev.dev.mint(bob, aliceBalance)
+					await dev.dev.approve(dev.lockup.address, aliceBalance, {
+						from: alice,
+					})
+					// Await dev.lockup.depositToProperty(property.address, depositAmount, {
+					// 	from: alice,
+					// })
+
+					// @ts-expect-error overloading functions aren't working
+					// pulled from https://github.com/trufflesuite/truffle/issues/3506
+					await dev.lockup.methods['depositToProperty(address,uint256)'](
+						property.address,
+						depositAmount,
+						{
+							from: alice,
+						}
+					)
+
+					lastTimestamp = await getBlockTimestamp()
+				})
+
+				it(`Alice's withdrawable interest is 100% of the Property's interest`, async () => {
+					await forwardBlockTimestamp(9)
+
+					const beforeAliceBalance = await dev.dev
+						.balanceOf(alice)
+						.then(toBigNumber)
+
+					const beforeBobBalance = await dev.dev
+						.balanceOf(bob)
+						.then(toBigNumber)
+
+					const t1 = await getBlockTimestamp()
+					const gatewayBasisFee = 300 // 3%
+					const expected = toBigNumber(10) // In PolicyTestBase, the max staker reward per block is 10.
+						.times(1e18)
+						.times(t1 - lastTimestamp)
+
+					const feeAmount = (expected.toNumber() * gatewayBasisFee) / 10000
+
+					const expectedMinusFee = expected.minus(feeAmount)
+					const position = await dev.sTokensManager.positions(aliceFirstTokenId)
+					const aliceLocked = toBigNumber(position.amount)
+
+					// @ts-expect-error overloading functions aren't working
+					// pulled from https://github.com/trufflesuite/truffle/issues/3506
+					await dev.lockup.methods[
+						'withdrawByPosition(uint256,uint256,address,uint256)'
+					](aliceFirstTokenId, aliceLocked, bob, gatewayBasisFee, {
+						from: alice,
+					})
+
+					const afterAliceBalance = await dev.dev
+						.balanceOf(alice)
+						.then(toBigNumber)
+
+					const afterBobBalance = await dev.dev.balanceOf(bob).then(toBigNumber)
+
+					expect(afterAliceBalance.toNumber()).to.eq(
+						beforeAliceBalance.plus(expectedMinusFee).toNumber()
+					)
+					expect(afterBobBalance.toNumber()).to.eq(
+						beforeBobBalance.plus(feeAmount).toNumber()
+					)
+				})
+			})
+			// TODO - ensure passing 0 gateway fee and 0 address don't charge anything
 		})
 	})
 })

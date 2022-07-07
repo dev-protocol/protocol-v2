@@ -38,7 +38,14 @@ contract('LockupTest', ([deployer, , user2, user3]) => {
 		describe('success', () => {
 			it('get nft token.', async () => {
 				await dev.dev.approve(dev.lockup.address, 100)
-				await dev.lockup.depositToProperty(property.address, 100)
+
+				// @ts-expect-error overloading functions aren't working
+				// pulled from https://github.com/trufflesuite/truffle/issues/3506
+				await dev.lockup.methods['depositToProperty(address,uint256)'](
+					property.address,
+					100
+				)
+
 				const owner = await dev.sTokensManager.ownerOf(1)
 				expect(owner).to.be.equal(deployer)
 				const position = await dev.sTokensManager.positions(1)
@@ -50,11 +57,25 @@ contract('LockupTest', ([deployer, , user2, user3]) => {
 			})
 			it('get 2 nft token.', async () => {
 				await dev.dev.approve(dev.lockup.address, 100)
-				await dev.lockup.depositToProperty(property.address, 100)
+
+				// @ts-expect-error overloading functions aren't working
+				// pulled from https://github.com/trufflesuite/truffle/issues/3506
+				await dev.lockup.methods['depositToProperty(address,uint256)'](
+					property.address,
+					100
+				)
+
 				const t1 = await getBlockTimestamp()
 				await forwardBlockTimestamp(1)
 				await dev.dev.approve(dev.lockup.address, 200)
-				await dev.lockup.depositToProperty(property.address, 200)
+
+				// @ts-expect-error overloading functions aren't working
+				// pulled from https://github.com/trufflesuite/truffle/issues/3506
+				await dev.lockup.methods['depositToProperty(address,uint256)'](
+					property.address,
+					200
+				)
+
 				const t2 = await getBlockTimestamp()
 				const owner = await dev.sTokensManager.ownerOf(2)
 				expect(owner).to.be.equal(deployer)
@@ -73,7 +94,14 @@ contract('LockupTest', ([deployer, , user2, user3]) => {
 				let info = await dev.lockup.getLockedupProperties()
 				expect(info.length).to.be.equal(0)
 				await dev.dev.approve(dev.lockup.address, 100)
-				await dev.lockup.depositToProperty(property.address, 100)
+
+				// @ts-expect-error overloading functions aren't working
+				// pulled from https://github.com/trufflesuite/truffle/issues/3506
+				await dev.lockup.methods['depositToProperty(address,uint256)'](
+					property.address,
+					100
+				)
+
 				info = await dev.lockup.getLockedupProperties()
 				expect(info.length).to.be.equal(1)
 				expect(info[0].property).to.be.equal(property.address)
@@ -81,8 +109,20 @@ contract('LockupTest', ([deployer, , user2, user3]) => {
 			})
 			it('get lockup info plus value.', async () => {
 				await dev.dev.approve(dev.lockup.address, 300)
-				await dev.lockup.depositToProperty(property.address, 100)
-				await dev.lockup.depositToProperty(property.address, 200)
+
+				// @ts-expect-error overloading functions aren't working
+				// pulled from https://github.com/trufflesuite/truffle/issues/3506
+				await dev.lockup.methods['depositToProperty(address,uint256)'](
+					property.address,
+					100
+				)
+
+				// @ts-expect-error overloading functions aren't working
+				await dev.lockup.methods['depositToProperty(address,uint256)'](
+					property.address,
+					200
+				)
+
 				const info = await dev.lockup.getLockedupProperties()
 				expect(info.length).to.be.equal(1)
 				expect(info[0].property).to.be.equal(property.address)
@@ -100,8 +140,21 @@ contract('LockupTest', ([deployer, , user2, user3]) => {
 					).address
 				)
 				await dev.dev.approve(dev.lockup.address, 300)
-				await dev.lockup.depositToProperty(property.address, 100)
-				await dev.lockup.depositToProperty(propertyAddress, 200)
+
+				// @ts-expect-error overloading functions aren't working
+				// pulled from https://github.com/trufflesuite/truffle/issues/3506
+				await dev.lockup.methods['depositToProperty(address,uint256)'](
+					property.address,
+					100
+				)
+
+				// @ts-expect-error overloading functions aren't working
+				// pulled from https://github.com/trufflesuite/truffle/issues/3506
+				await dev.lockup.methods['depositToProperty(address,uint256)'](
+					propertyAddress,
+					200
+				)
+
 				const info = await dev.lockup.getLockedupProperties()
 				expect(info.length).to.be.equal(2)
 				for (const lockupInfo of info) {
@@ -114,7 +167,14 @@ contract('LockupTest', ([deployer, , user2, user3]) => {
 			})
 			it('generate event.', async () => {
 				await dev.dev.approve(dev.lockup.address, 100)
-				dev.lockup.depositToProperty(property.address, 100)
+
+				// @ts-expect-error overloading functions aren't working
+				// pulled from https://github.com/trufflesuite/truffle/issues/3506
+				dev.lockup.methods['depositToProperty(address,uint256)'](
+					property.address,
+					100
+				)
+
 				const [_from, _property, _value, _tokenId] = await Promise.all([
 					getEventValue(dev.lockup)('Lockedup', '_from'),
 					getEventValue(dev.lockup)('Lockedup', '_property'),
@@ -128,7 +188,14 @@ contract('LockupTest', ([deployer, , user2, user3]) => {
 			})
 			it('set storage value.', async () => {
 				await dev.dev.approve(dev.lockup.address, 100)
-				await dev.lockup.depositToProperty(property.address, 100)
+
+				// @ts-expect-error overloading functions aren't working
+				// pulled from https://github.com/trufflesuite/truffle/issues/3506
+				await dev.lockup.methods['depositToProperty(address,uint256)'](
+					property.address,
+					100
+				)
+
 				const allValue = await dev.lockup.totalLocked()
 				expect(allValue.toString()).to.be.equal('100')
 				const propertyValue = await dev.lockup.totalLockedForProperty(
@@ -144,7 +211,14 @@ contract('LockupTest', ([deployer, , user2, user3]) => {
 				const beforePropertyBalance = await dev.dev.balanceOf(property.address)
 				expect(beforeBalance.toString()).to.be.equal(deployerBalance.toString())
 				expect(beforePropertyBalance.toString()).to.be.equal('0')
-				await dev.lockup.depositToProperty(property.address, 100)
+
+				// @ts-expect-error overloading functions aren't working
+				// pulled from https://github.com/trufflesuite/truffle/issues/3506
+				await dev.lockup.methods['depositToProperty(address,uint256)'](
+					property.address,
+					100
+				)
+
 				const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
 				const afterPropertyBalance = await dev.dev.balanceOf(property.address)
 				expect(afterBalance.toString()).to.be.equal(
@@ -160,21 +234,31 @@ contract('LockupTest', ([deployer, , user2, user3]) => {
 						from: user2,
 					})
 				)
-				const res = await dev.lockup
-					.depositToProperty(propertyAddress, 100)
-					.catch(err)
+
+				// @ts-expect-error overloading functions aren't working
+				// pulled from https://github.com/trufflesuite/truffle/issues/3506
+				const res = await dev.lockup.methods[
+					'depositToProperty(address,uint256)'
+				](propertyAddress, 100).catch(err)
+
 				validateErrorMessage(res, 'unable to stake to unauthenticated property')
 			})
 			it('0 dev staking is not possible.', async () => {
-				const res = await dev.lockup
-					.depositToProperty(property.address, 0)
-					.catch(err)
+				// @ts-expect-error overloading functions aren't working
+				// pulled from https://github.com/trufflesuite/truffle/issues/3506
+				const res = await dev.lockup.methods[
+					'depositToProperty(address,uint256)'
+				](property.address, 0).catch(err)
+
 				validateErrorMessage(res, 'illegal deposit amount')
 			})
 			it('user is not holding dev.', async () => {
-				const res = await dev.lockup
-					.depositToProperty(property.address, 100, { from: user3 })
-					.catch(err)
+				// @ts-expect-error overloading functions aren't working
+				// pulled from https://github.com/trufflesuite/truffle/issues/3506
+				const res = await dev.lockup.methods[
+					'depositToProperty(address,uint256)'
+				](property.address, 100, { from: user3 }).catch(err)
+
 				validateErrorMessage(res, 'ERC20: transfer amount exceeds balance')
 			})
 		})
@@ -286,7 +370,14 @@ contract('LockupTest', ([deployer, , user2, user3]) => {
 						await dev.createMetrics(deployer, propertyAddress)
 					).address
 				)
-				await dev.lockup.depositToProperty(propertyAddress, 200)
+
+				// @ts-expect-error overloading functions aren't working
+				// pulled from https://github.com/trufflesuite/truffle/issues/3506
+				await dev.lockup.methods['depositToProperty(address,uint256)'](
+					propertyAddress,
+					200
+				)
+
 				const info = await dev.lockup.getLockedupProperties()
 				expect(info.length).to.be.equal(2)
 				for (const lockupInfo of info) {
@@ -442,7 +533,14 @@ contract('LockupTest', ([deployer, , user2, user3]) => {
 						await dev.createMetrics(deployer, propertyAddress)
 					).address
 				)
-				await dev.lockup.depositToProperty(propertyAddress, 200)
+
+				// @ts-expect-error overloading functions aren't working
+				// pulled from https://github.com/trufflesuite/truffle/issues/3506
+				await dev.lockup.methods['depositToProperty(address,uint256)'](
+					propertyAddress,
+					200
+				)
+
 				await dev.lockup.withdrawByPosition(tokenId, 100)
 				const info = await dev.lockup.getLockedupProperties()
 				expect(info.length).to.be.equal(1)

@@ -35,6 +35,13 @@ interface ILockup {
 		external
 		returns (uint256);
 
+	function depositToProperty(
+		address _property,
+		uint256 _amount,
+		address _gatewayAddress,
+		uint256 _gatewayFee
+	) external returns (uint256);
+
 	function depositToPosition(uint256 _tokenId, uint256 _amount)
 		external
 		returns (bool);
@@ -45,6 +52,13 @@ interface ILockup {
 		returns (LockedupProperty[] memory);
 
 	function update() external;
+
+	function withdrawByPosition(
+		uint256 _tokenId,
+		uint256 _amount,
+		address _gatewayAddress,
+		uint256 _gatewayBasisFee
+	) external returns (bool);
 
 	function withdrawByPosition(uint256 _tokenId, uint256 _amount)
 		external

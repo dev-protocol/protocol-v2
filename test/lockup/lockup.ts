@@ -125,10 +125,14 @@ contract('LockupTest', ([deployer, user1, user2]) => {
 
 		it('The reward is calculated and comes back to you.', async () => {
 			await dev.dev.approve(dev.lockup.address, '10000000000000000000000')
-			await dev.lockup.depositToProperty(
+
+			// @ts-expect-error overloading functions aren't working
+			// pulled from https://github.com/trufflesuite/truffle/issues/3506
+			await dev.lockup.methods['depositToProperty(address,uint256)'](
 				property.address,
 				'10000000000000000000000'
 			)
+
 			await dev.updateCap()
 			const [reword, cap] = await calculate(dev, property)
 			const result = await dev.lockup.calculateRewardAmount(property.address)

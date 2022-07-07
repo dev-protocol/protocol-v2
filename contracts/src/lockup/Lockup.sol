@@ -99,21 +99,12 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 	}
 
 	/**
-	 * @dev deposit dev token to dev protocol and generate s-token
-	 * @param _property target property address
-	 * @param _amount staking value
-	 * @return tokenId The ID of the created new staking position
+	 *
 	 */
-	function depositToProperty(address _property, uint256 _amount)
-		external
-		override
-		onlyAuthenticatedProperty(_property)
+	function _depositToProperty(address _property, uint256 _amount)
+		private
 		returns (uint256)
 	{
-		/**
-		 * Validates _amount is not 0.
-		 */
-		require(_amount != 0, "illegal deposit amount");
 		/**
 		 * Gets the latest cumulative sum of the interest price.
 		 */
@@ -161,6 +152,63 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		emit Lockedup(msg.sender, _property, _amount, tokenId);
 
 		return tokenId;
+	}
+
+	/**
+	 * @dev overloaded depositToProperty with gateway fee params
+	 * @param _property target property address
+	 * @param _amount staking value
+	 * @param _gatewayAddress is the address to which the liquidity provider fee will be directed
+	 * @param _gatewayFee is the basis points to pass. For example 10000 is 100%
+	 * @return tokenId The ID of the created new staking position
+	 */
+	function depositToProperty(
+		address _property,
+		uint256 _amount,
+		address _gatewayAddress,
+		uint256 _gatewayFee
+	) external override onlyAuthenticatedProperty(_property) returns (uint256) {
+		/**
+		 * Validates _amount is not 0.
+		 */
+		require(_amount != 0, "illegal deposit amount");
+		require(_gatewayFee <= 10000, "must be below 10000");
+
+		uint256 feeAmount = (_amount * _gatewayFee) / 10000;
+
+		/**
+		 * transfer feeAmount to _gatewayAddress
+		 */
+		require(
+			IERC20(registry().registries("Dev")).transferFrom(
+				msg.sender,
+				_gatewayAddress,
+				feeAmount
+			),
+			"dev transfer failed"
+		);
+
+		return _depositToProperty(_property, _amount - feeAmount);
+	}
+
+	/**
+	 * @dev deposit dev token to dev protocol and generate s-token
+	 * @param _property target property address
+	 * @param _amount staking value
+	 * @return tokenId The ID of the created new staking position
+	 */
+	function depositToProperty(address _property, uint256 _amount)
+		external
+		override
+		onlyAuthenticatedProperty(_property)
+		returns (uint256)
+	{
+		/**
+		 * Validates _amount is not 0.
+		 */
+		require(_amount != 0, "illegal deposit amount");
+
+		return _depositToProperty(_property, _amount);
 	}
 
 	/**
@@ -228,15 +276,20 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 	}
 
 	/**
-	 * Withdraw staking.(NFT)
+	 * @dev Withdraw staking.(NFT)
 	 * Releases staking, withdraw rewards, and transfer the staked and withdraw rewards amount to the sender.
+	 * @param _tokenId s-token id
+	 * @param _amount staking value
+	 * @param _gatewayAddress optional gateway fee address - set address(0) for no fee
+	 * @param _gatewayBasisFee is the basis points fee. For example 10000 is a 100% fee
+	 * @return bool On success, true will be returned
 	 */
-	function withdrawByPosition(uint256 _tokenId, uint256 _amount)
-		external
-		override
-		onlyPositionOwner(_tokenId)
-		returns (bool)
-	{
+	function _withdrawByPosition(
+		uint256 _tokenId,
+		uint256 _amount,
+		address _gatewayAddress,
+		uint256 _gatewayBasisFee
+	) private returns (bool) {
 		ISTokensManager sTokenManager = ISTokensManager(
 			registry().registries("STokensManager")
 		);
@@ -253,7 +306,9 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		 * Withdraws the staking reward
 		 */
 		(uint256 value, RewardPrices memory prices) = _withdrawInterest(
-			positions
+			positions,
+			_gatewayAddress,
+			_gatewayBasisFee
 		);
 		/**
 		 * Transfer the staked amount to the sender.
@@ -265,7 +320,6 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		 * Saves variables that should change due to the canceling staking..
 		 */
 		updateValues(false, positions.property, _amount, prices);
-		uint256 cumulative = positions.cumulativeReward + value;
 
 		/**
 		 * update position information
@@ -274,7 +328,7 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 			_tokenId,
 			positions.amount - _amount,
 			prices.interest,
-			cumulative,
+			positions.cumulativeReward + value,
 			0
 		);
 		if (totalLockedForProperty[positions.property] == 0) {
@@ -286,6 +340,45 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		 * update position information
 		 */
 		return result;
+	}
+
+	/**
+	 * @dev Withdraw staking.(NFT)
+	 * Releases staking, withdraw rewards, and transfer the staked and withdraw rewards amount to the sender.
+	 * @param _tokenId s-token id
+	 * @param _amount staking value
+	 * @return bool On success, true will be returned
+	 */
+	function withdrawByPosition(uint256 _tokenId, uint256 _amount)
+		external
+		override
+		onlyPositionOwner(_tokenId)
+		returns (bool)
+	{
+		return _withdrawByPosition(_tokenId, _amount, address(0), 0);
+	}
+
+	/**
+	 * @dev withdrawByPosition overloaded with _gatewayAddress and _gatewayBasisFee
+	 * @param _tokenId s-token id
+	 * @param _amount staking value
+	 * @param _gatewayAddress optional gateway fee address - set address(0) for no fee
+	 * @param _gatewayBasisFee is the basis points fee. For example 10000 is a 100% fee
+	 * @return bool On success, true will be returned
+	 */
+	function withdrawByPosition(
+		uint256 _tokenId,
+		uint256 _amount,
+		address _gatewayAddress,
+		uint256 _gatewayBasisFee
+	) external override onlyPositionOwner(_tokenId) returns (bool) {
+		return
+			_withdrawByPosition(
+				_tokenId,
+				_amount,
+				_gatewayAddress,
+				_gatewayBasisFee
+			);
 	}
 
 	/**
@@ -658,7 +751,9 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 	 * Withdraws staking reward as an interest.
 	 */
 	function _withdrawInterest(
-		ISTokensManager.StakingPositions memory positions
+		ISTokensManager.StakingPositions memory positions,
+		address _gatewayAddress,
+		uint256 _gatewayBasisFee
 	) private returns (uint256 value_, RewardPrices memory prices_) {
 		/**
 		 * Gets the withdrawable amount.
@@ -668,16 +763,32 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 			RewardPrices memory prices
 		) = _calculateWithdrawableInterestAmount(positions);
 
+		IDevBridge devBridge = IDevBridge(registry().registries("DevBridge"));
+
 		/**
-		 * Mints the reward.
+		 * Gateway Fee exists
+		 * send fee to gateway address and the remainder to msg.sender
 		 */
-		require(
-			IDevBridge(registry().registries("DevBridge")).mint(
-				msg.sender,
-				value
-			),
-			"dev mint failed"
-		);
+		if (_gatewayAddress != address(0) && _gatewayBasisFee > 0) {
+			uint256 feeValue = (value * _gatewayBasisFee) / 10000;
+
+			require(
+				devBridge.mint(msg.sender, value - feeValue),
+				"dev mint failed"
+			);
+
+			require(
+				devBridge.mint(_gatewayAddress, feeValue),
+				"fee dev mint failed"
+			);
+		}
+		/**
+		 * No gateway fee
+		 * send the entirety to msg.sender
+		 */
+		else {
+			require(devBridge.mint(msg.sender, value), "dev mint failed");
+		}
 
 		/**
 		 * Since the total supply of tokens has changed, updates the latest maximum mint amount.

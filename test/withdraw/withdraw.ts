@@ -60,13 +60,17 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 				await dev.dev.approve(dev.lockup.address, '10000000000000000000000', {
 					from: alis,
 				})
-				await dev.lockup.depositToProperty(
+
+				// @ts-expect-error overloading functions aren't working
+				// pulled from https://github.com/trufflesuite/truffle/issues/3506
+				await dev.lockup.methods['depositToProperty(address,uint256)'](
 					property.address,
 					'10000000000000000000000',
 					{
 						from: alis,
 					}
 				)
+
 				await forwardBlockTimestamp(1)
 				const prev = await dev.dev.totalSupply().then(toBigNumber)
 				const balance = await dev.dev.balanceOf(deployer).then(toBigNumber)
@@ -88,13 +92,17 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 				await dev.dev.approve(dev.lockup.address, '10000000000000000000000', {
 					from: user3,
 				})
-				await dev.lockup.depositToProperty(
+
+				// @ts-expect-error overloading functions aren't working
+				// pulled from https://github.com/trufflesuite/truffle/issues/3506
+				await dev.lockup.methods['depositToProperty(address,uint256)'](
 					property.address,
 					'10000000000000000000000',
 					{
 						from: user3,
 					}
 				)
+
 				const t1 = await getBlockTimestamp()
 				await forwardBlockTimestamp(1)
 				const totalSupply = await property.totalSupply().then(toBigNumber)
@@ -142,13 +150,17 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 				await dev.dev.approve(dev.lockup.address, '10000000000000000000000', {
 					from: user3,
 				})
-				await dev.lockup.depositToProperty(
+
+				// @ts-expect-error overloading functions aren't working
+				// pulled from https://github.com/trufflesuite/truffle/issues/3506
+				await dev.lockup.methods['depositToProperty(address,uint256)'](
 					property.address,
 					'10000000000000000000000',
 					{
 						from: user3,
 					}
 				)
+
 				const t1 = await getBlockTimestamp()
 				await forwardBlockTimestamp(1)
 
@@ -299,21 +311,30 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 
 		it(`cap`, async () => {
 			const [dev, [property1, property2, property3]] = await prepare()
-			await dev.lockup.depositToProperty(
+
+			// @ts-expect-error overloading functions aren't working
+			// pulled from https://github.com/trufflesuite/truffle/issues/3506
+			await dev.lockup.methods['depositToProperty(address,uint256)'](
 				property1.address,
 				toBigNumber(1000000000),
 				{
 					from: alis,
 				}
 			)
-			await dev.lockup.depositToProperty(
+
+			// @ts-expect-error overloading functions aren't working
+			// pulled from https://github.com/trufflesuite/truffle/issues/3506
+			await dev.lockup.methods['depositToProperty(address,uint256)'](
 				property2.address,
 				toBigNumber(2000000000),
 				{
 					from: alis,
 				}
 			)
-			await dev.lockup.depositToProperty(
+
+			// @ts-expect-error overloading functions aren't working
+			// pulled from https://github.com/trufflesuite/truffle/issues/3506
+			await dev.lockup.methods['depositToProperty(address,uint256)'](
 				property3.address,
 				toBigNumber(3000000000),
 				{
