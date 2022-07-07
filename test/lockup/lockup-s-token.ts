@@ -48,6 +48,33 @@ contract('LockupTest', ([deployer, , user2, user3]) => {
 				expect(toBigNumber(position.cumulativeReward).toNumber()).to.be.equal(0)
 				expect(toBigNumber(position.pendingReward).toNumber()).to.be.equal(0)
 			})
+			it('passe the 3rd option', async () => {
+				await dev.dev.approve(dev.lockup.address, 100)
+				// @ts-ignore
+				await dev.lockup.depositToProperty(
+					property.address,
+					100,
+					web3.utils.keccak256('ADDITIONAL_BYTES')
+				)
+				const owner = await dev.sTokensManager.ownerOf(1)
+				expect(owner).to.be.equal(deployer)
+				const position = await dev.sTokensManager.positions(1)
+				const payload = await dev.sTokensManager.payloadOf(1)
+				expect(position.property).to.be.equal(property.address)
+				expect(toBigNumber(position.amount).toNumber()).to.be.equal(100)
+				expect(toBigNumber(position.price).toNumber()).to.be.equal(0)
+				expect(toBigNumber(position.cumulativeReward).toNumber()).to.be.equal(0)
+				expect(toBigNumber(position.pendingReward).toNumber()).to.be.equal(0)
+				expect(payload).to.be.equal(web3.utils.keccak256('ADDITIONAL_BYTES'))
+			})
+			it('0 dev staking', async () => {
+				await dev.lockup.depositToProperty(property.address, 0)
+				const owner = await dev.sTokensManager.ownerOf(1)
+				expect(owner).to.be.equal(deployer)
+				const position = await dev.sTokensManager.positions(1)
+				expect(position.property).to.be.equal(property.address)
+				expect(toBigNumber(position.amount).toNumber()).to.be.equal(0)
+			})
 			it('get 2 nft token.', async () => {
 				await dev.dev.approve(dev.lockup.address, 100)
 				await dev.lockup.depositToProperty(property.address, 100)
@@ -164,12 +191,6 @@ contract('LockupTest', ([deployer, , user2, user3]) => {
 					.depositToProperty(propertyAddress, 100)
 					.catch(err)
 				validateErrorMessage(res, 'unable to stake to unauthenticated property')
-			})
-			it('0 dev staking is not possible.', async () => {
-				const res = await dev.lockup
-					.depositToProperty(property.address, 0)
-					.catch(err)
-				validateErrorMessage(res, 'illegal deposit amount')
 			})
 			it('user is not holding dev.', async () => {
 				const res = await dev.lockup

@@ -25,6 +25,7 @@ contract STokensManager is
 	mapping(uint256 => string) private tokenUriImage;
 	mapping(uint256 => bool) public override isFreezed;
 	mapping(address => address) public override descriptorOf;
+	mapping(uint256 => bytes32) public override payloadOf;
 
 	using Counters for Counters.Counter;
 	using EnumerableSet for EnumerableSet.UintSet;
@@ -66,16 +67,24 @@ contract STokensManager is
 		StakingPositions memory positons = getStoragePositions(_tokenId);
 		Rewards memory tokenRewards = _rewards(_tokenId);
 		address owner = ownerOf(_tokenId);
-		return _tokenURI(_tokenId, owner, positons, tokenRewards);
+		return
+			_tokenURI(
+				_tokenId,
+				owner,
+				positons,
+				tokenRewards,
+				payloadOf[_tokenId]
+			);
 	}
 
 	function tokenURISim(
 		uint256 _tokenId,
 		address _owner,
 		StakingPositions memory _positions,
-		Rewards memory _rewardsArg
+		Rewards memory _rewardsArg,
+		bytes32 _payload
 	) external view override returns (string memory) {
-		return _tokenURI(_tokenId, _owner, _positions, _rewardsArg);
+		return _tokenURI(_tokenId, _owner, _positions, _rewardsArg, _payload);
 	}
 
 	function currentIndex() external view override returns (uint256) {
@@ -86,17 +95,13 @@ contract STokensManager is
 		address _owner,
 		address _property,
 		uint256 _amount,
-		uint256 _price
+		uint256 _price,
+		bytes32 _payload
 	) external override onlyLockup returns (uint256 tokenId_) {
 		tokenIdCounter.increment();
-		_mint(_owner, tokenIdCounter.current());
-		emit Minted(
-			tokenIdCounter.current(),
-			_owner,
-			_property,
-			_amount,
-			_price
-		);
+		uint256 currentId = tokenIdCounter.current();
+		_mint(_owner, currentId);
+		emit Minted(currentId, _owner, _property, _amount, _price);
 		StakingPositions memory newPosition = StakingPositions(
 			_property,
 			_amount,
@@ -105,9 +110,24 @@ contract STokensManager is
 			0
 		);
 		// TODO V3 block number and history
-		setStoragePositions(tokenIdCounter.current(), newPosition);
-		tokenIdsMapOfProperty[_property].push(tokenIdCounter.current());
-		return tokenIdCounter.current();
+		setStoragePositions(currentId, newPosition);
+		tokenIdsMapOfProperty[_property].push(currentId);
+
+		address descriptor = descriptorOf[_property];
+		if (descriptor != address(0)) {
+			require(
+				ITokenURIDescriptor(descriptor).onBeforeMint(
+					currentId,
+					_owner,
+					newPosition,
+					_payload
+				),
+				"failed to call onBeforeMint"
+			);
+		}
+		payloadOf[currentId] = _payload;
+
+		return currentId;
 	}
 
 	function update(
@@ -213,7 +233,8 @@ contract STokensManager is
 		uint256 _tokenId,
 		address _owner,
 		StakingPositions memory _positions,
-		Rewards memory _rewardsArg
+		Rewards memory _rewardsArg,
+		bytes32 _payload
 	) private view returns (string memory) {
 		string memory _tokeUriImage = tokenUriImage[_tokenId];
 		if (bytes(_tokeUriImage).length == 0) {
@@ -223,7 +244,8 @@ contract STokensManager is
 					_tokenId,
 					_owner,
 					_positions,
-					_rewardsArg
+					_rewardsArg,
+					_payload
 				);
 			}
 		}

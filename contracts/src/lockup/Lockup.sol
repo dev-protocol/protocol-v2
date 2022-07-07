@@ -107,13 +107,31 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 	function depositToProperty(address _property, uint256 _amount)
 		external
 		override
-		onlyAuthenticatedProperty(_property)
 		returns (uint256)
 	{
-		/**
-		 * Validates _amount is not 0.
-		 */
-		require(_amount != 0, "illegal deposit amount");
+		return _implDepositToProperty(_property, _amount, "");
+	}
+
+	/**
+	 * @dev deposit dev token to dev protocol and generate s-token
+	 * @param _property target property address
+	 * @param _amount staking value
+	 * @param _payload additional bytes for s-token
+	 * @return tokenId The ID of the created new staking position
+	 */
+	function depositToProperty(
+		address _property,
+		uint256 _amount,
+		bytes32 _payload
+	) external override returns (uint256) {
+		return _implDepositToProperty(_property, _amount, _payload);
+	}
+
+	function _implDepositToProperty(
+		address _property,
+		uint256 _amount,
+		bytes32 _payload
+	) private onlyAuthenticatedProperty(_property) returns (uint256) {
 		/**
 		 * Gets the latest cumulative sum of the interest price.
 		 */
@@ -156,7 +174,8 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 			msg.sender,
 			_property,
 			_amount,
-			interest
+			interest,
+			_payload
 		);
 		emit Lockedup(msg.sender, _property, _amount, tokenId);
 
