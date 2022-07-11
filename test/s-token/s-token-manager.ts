@@ -33,7 +33,7 @@ type Attributes = Array<{
 contract('STokensManager', ([deployer, user]) => {
 	const MAX_UINT256 =
 		'115792089237316195423570985008687907853269984665640564039457584007913129639935'
-	const deployerBalance = new BigNumber(MAX_UINT256)
+	const deployerBalance = new BigNumber(1e18).times(10000000)
 	const init = async (): Promise<
 		[DevProtocolInstance, PropertyInstance, TokenURIDescriptorTestInstance]
 	> => {
@@ -51,7 +51,7 @@ contract('STokensManager', ([deployer, user]) => {
 			dev.generatePolicyFactory(),
 		])
 		await dev.dev.mint(deployer, deployerBalance)
-		await dev.dev.approve(dev.lockup.address, deployerBalance)
+		await dev.dev.approve(dev.lockup.address, '100000')
 		await dev.generatePolicy('PolicyTestBase')
 		await dev.generateTreasury()
 		await dev.setCapSetter()
@@ -202,6 +202,10 @@ contract('STokensManager', ([deployer, user]) => {
 				checkTokenUri(uri, property.address, 10000, 0)
 			})
 			it('get token uri with big staked amount', async () => {
+				await dev.dev.burn(deployer, await dev.dev.balanceOf(deployer))
+				await dev.dev.mint(deployer, MAX_UINT256)
+				await dev.dev.approve(dev.lockup.address, MAX_UINT256)
+
 				await dev.lockup.depositToProperty(property.address, MAX_UINT256)
 				const uri = await dev.sTokensManager.tokenURI(1)
 				checkTokenUri(uri, property.address, MAX_UINT256, 0)
