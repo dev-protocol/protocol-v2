@@ -24,8 +24,16 @@ import {
 	Snapshot,
 } from '../test-lib/utils/snapshot'
 
+type Attributes = Array<{
+	trait_type: string
+	value: string | number
+	display_type?: string
+}>
+
 contract('STokensManager', ([deployer, user]) => {
-	const deployerBalance = new BigNumber(1e18).times(10000000)
+	const MAX_UINT256 =
+		'115792089237316195423570985008687907853269984665640564039457584007913129639935'
+	const deployerBalance = new BigNumber(MAX_UINT256)
 	const init = async (): Promise<
 		[DevProtocolInstance, PropertyInstance, TokenURIDescriptorTestInstance]
 	> => {
@@ -43,7 +51,7 @@ contract('STokensManager', ([deployer, user]) => {
 			dev.generatePolicyFactory(),
 		])
 		await dev.dev.mint(deployer, deployerBalance)
-		await dev.dev.approve(dev.lockup.address, '100000')
+		await dev.dev.approve(dev.lockup.address, deployerBalance)
 		await dev.generatePolicy('PolicyTestBase')
 		await dev.generateTreasury()
 		await dev.setCapSetter()
@@ -90,7 +98,7 @@ contract('STokensManager', ([deployer, user]) => {
 	const checkTokenUri = (
 		tokenUri: string,
 		property: string,
-		amount: number,
+		amount: number | string,
 		cumulativeReward: number,
 		tokenUriImage = ''
 	): void => {
@@ -102,10 +110,12 @@ contract('STokensManager', ([deployer, user]) => {
 			name: string
 			description: string
 			image: string
+			attributes: Attributes
 		}
 		const { name, description, image } = details
 		checkName(name, property, amount, cumulativeReward)
 		checkDescription(description, property)
+		checkAttributes(details.attributes, property, amount)
 		// eslint-disable-next-line @typescript-eslint/no-unused-expressions
 		tokenUriImage === ''
 			? checkImage(image, property)
@@ -115,11 +125,13 @@ contract('STokensManager', ([deployer, user]) => {
 	const checkName = (
 		name: string,
 		property: string,
-		amount: number,
+		amount: number | string,
 		cumulativeReward: number
 	): void => {
 		expect(name).to.equal(
-			`Dev Protocol sTokens - ${property} - ${amount} DEV - ${cumulativeReward}`
+			`Dev Protocol sTokens - ${property} - ${toBigNumber(amount)
+				.div(1e18)
+				.toFixed()} DEV - ${cumulativeReward}`
 		)
 	}
 
@@ -142,6 +154,21 @@ contract('STokensManager', ([deployer, user]) => {
 
 	const checkTokenImageUri = (image: string, tokenUriImage: string): void => {
 		expect(image).to.equal(tokenUriImage)
+	}
+
+	const checkAttributes = (
+		attributes: Attributes,
+		property: string,
+		amount: number | string
+	): void => {
+		expect(attributes).to.deep.equal([
+			{ trait_type: 'Destination', value: property },
+			{
+				trait_type: 'Amount',
+				display_type: 'number',
+				value: toBigNumber(amount).div(1e18).toNumber(),
+			},
+		])
 	}
 
 	describe('STokensManager; initialize', () => {
@@ -173,6 +200,11 @@ contract('STokensManager', ([deployer, user]) => {
 				await dev.lockup.depositToProperty(property.address, '10000')
 				const uri = await dev.sTokensManager.tokenURI(1)
 				checkTokenUri(uri, property.address, 10000, 0)
+			})
+			it('get token uri with big staked amount', async () => {
+				await dev.lockup.depositToProperty(property.address, MAX_UINT256)
+				const uri = await dev.sTokensManager.tokenURI(1)
+				checkTokenUri(uri, property.address, MAX_UINT256, 0)
 			})
 			it('get custom token uri', async () => {
 				await dev.lockup.depositToProperty(property.address, '10000')
