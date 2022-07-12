@@ -164,7 +164,7 @@ contract('STokensManager', ([deployer, user]) => {
 		expect(attributes).to.deep.equal([
 			{ trait_type: 'Destination', value: property },
 			{
-				trait_type: 'Amount',
+				trait_type: 'Locked Amount',
 				display_type: 'number',
 				value: toBigNumber(amount).div(1e18).toNumber(),
 			},

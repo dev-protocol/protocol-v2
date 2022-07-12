@@ -152,7 +152,7 @@ contract STokensDescriptor {
 				// solhint-disable-next-line quotes
 				'"},',
 				// solhint-disable-next-line quotes
-				'{"trait_type":"Amount", "display_type":"number", "value":',
+				'{"trait_type":"Locked Amount", "display_type":"number", "value":',
 				amount,
 				// solhint-disable-next-line quotes
 				"}",
