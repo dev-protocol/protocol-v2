@@ -133,11 +133,14 @@ contract(
 
 		describe('Property; constructor', () => {
 			it('Cannot be created from other than factory', async () => {
-				const result = await propertyContract
-					.new(dev.addressRegistry.address, author, 'sample', 'SAMPLE', {
+				const propertyInstance = await propertyContract.new()
+
+				const result = await propertyInstance
+					.initialize(dev.addressRegistry.address, author, 'sample', 'SAMPLE', {
 						from: deployer,
 					})
 					.catch((err: Error) => err)
+
 				validateAddressErrorMessage(result)
 			})
 			it('The author, decimal places, and number of issues are fixed values', async () => {
@@ -145,7 +148,8 @@ contract(
 					'PropertyFactory',
 					propertyFactory
 				)
-				const propertyInstance = await propertyContract.new(
+				const propertyInstance = await propertyContract.new()
+				await propertyInstance.initialize(
 					dev.addressRegistry.address,
 					author,
 					'sample',
@@ -182,7 +186,8 @@ contract(
 					'PropertyFactory',
 					propertyFactory
 				)
-				const propertyInstance = await propertyContract.new(
+				const propertyInstance = await propertyContract.new()
+				await propertyInstance.initialize(
 					dev.addressRegistry.address,
 					author,
 					'sample',
@@ -217,7 +222,8 @@ contract(
 					'PropertyFactory',
 					propertyFactory
 				)
-				const propertyInstance = await propertyContract.new(
+				const propertyInstance = await propertyContract.new()
+				await propertyInstance.initialize(
 					dev.addressRegistry.address,
 					author,
 					'sample',
@@ -241,7 +247,8 @@ contract(
 					'PropertyFactory',
 					propertyFactory
 				)
-				const propertyInstance = await propertyContract.new(
+				const propertyInstance = await propertyContract.new()
+				await propertyInstance.initialize(
 					dev.addressRegistry.address,
 					author,
 					'sample',
@@ -276,7 +283,8 @@ contract(
 					'PropertyFactory',
 					propertyFactory
 				)
-				const propertyInstance = await propertyContract.new(
+				const propertyInstance = await propertyContract.new()
+				await propertyInstance.initialize(
 					dev.addressRegistry.address,
 					author,
 					'sample',

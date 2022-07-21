@@ -6,6 +6,7 @@ import "../../interface/IPropertyFactory.sol";
 import "../../interface/IMarket.sol";
 import "../common/registry/InitializableUsingRegistry.sol";
 import "./Property.sol";
+import "@openzeppelin/contracts/proxy/Clones.sol";
 
 /**
  * A factory contract that creates a new Property contract.
@@ -15,6 +16,7 @@ contract PropertyFactory is InitializableUsingRegistry, IPropertyFactory {
 	mapping(address => EnumerableSet.AddressSet) private addressesMapOfAuthor;
 
 	using EnumerableSet for EnumerableSet.AddressSet;
+	address private property;
 
 	/**
 	 * @dev Initialize the passed address as AddressRegistry address.
@@ -22,6 +24,7 @@ contract PropertyFactory is InitializableUsingRegistry, IPropertyFactory {
 	 */
 	function initialize(address _registry) external initializer {
 		__UsingRegistry_init(_registry);
+		property = address(new Property());
 	}
 
 	/**
@@ -77,13 +80,13 @@ contract PropertyFactory is InitializableUsingRegistry, IPropertyFactory {
 		/**
 		 * Creates a new Property contract.
 		 */
-		Property _property = new Property(
+		address propertyAddr = Clones.clone(property);
+		Property(propertyAddr).initialize(
 			address(registry()),
 			_author,
 			_name,
 			_symbol
 		);
-		address propertyAddr = address(_property);
 
 		/**
 		 * Adds the new Property contract to the Property address set.

@@ -204,7 +204,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 		describe('Withdraw; Alice has sent 10% tokens to Bob after 20% tokens sent. Bob has increased from 20% tokens to 30% tokens.', () => {
 			let dev: DevProtocolInstance
 			let property: PropertyInstance
-			const timestamps: Map<string, number> = new Map()
+			const timestamps = new Map<string, number>()
 			const alice = deployer
 			const bob = user1
 			const TRANSFERD_PROPERTY_TOKEN_PERCENT = 10
