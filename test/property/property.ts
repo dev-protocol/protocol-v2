@@ -29,6 +29,7 @@ contract(
 			await dev.generateTreasury()
 			await dev.setCapSetter()
 			await dev.updateCap()
+			await dev.generateProperty()
 
 			return dev
 		}

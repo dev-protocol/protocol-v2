@@ -19,6 +19,7 @@ import {
 	ArbSysTestInstance,
 	DevPolygonInstance,
 	TokenURIDescriptorTestInstance,
+	PropertyInstance,
 } from '../../types/truffle-contracts'
 
 type ContractInstance = {
@@ -56,6 +57,7 @@ export class DevProtocolInstance {
 	private _devL2!: DevArbitrumInstance | DevPolygonInstance
 	private _arbSys!: ArbSysTestInstance
 	private _lockup!: LockupInstance
+	private _property!: PropertyInstance
 	private _propertyFactory!: PropertyFactoryInstance
 	private _policyFactory!: PolicyFactoryTestInstance
 	private _marketFactory!: MarketFactoryTestInstance
@@ -246,16 +248,17 @@ export class DevProtocolInstance {
 		)
 	}
 
-	public async generatePropertyFactory(): Promise<void> {
-		const [propertyProxy] = await deployProxy(
-			contract('Property'),
-			this._deployer
-		)
+	public async generateProperty(): Promise<void> {
+		const [proxfied] = await deployProxy(contract('Property'), this._deployer)
+		this._property = proxfied
 		await this.addressRegistry.setRegistry(
 			'Property',
-			propertyProxy.address,
+			this._property.address,
 			this.fromDeployer
 		)
+	}
+
+	public async generatePropertyFactory(): Promise<void> {
 		const [proxfied] = await deployProxy(
 			contract('PropertyFactory'),
 			this._deployer

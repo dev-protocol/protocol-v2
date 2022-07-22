@@ -28,6 +28,7 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 			await dev.setCapSetter()
 			await dev.updateCap()
 			await dev.addressRegistry.setRegistry('MarketFactory', marketFactory)
+			await dev.generateProperty()
 			const propertyAddress = await dev.propertyFactory
 				.create('sample', 'SAMPLE', user, {
 					from: user2,
