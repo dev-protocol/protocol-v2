@@ -7,21 +7,15 @@ import "../../interface/IMarket.sol";
 import "../common/registry/InitializableUsingRegistry.sol";
 import "./Property.sol";
 import "@openzeppelin/contracts/proxy/Clones.sol";
-import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 /**
  * A factory contract that creates a new Property contract.
  */
-contract PropertyFactory is
-	InitializableUsingRegistry,
-	IPropertyFactory,
-	OwnableUpgradeable
-{
+contract PropertyFactory is InitializableUsingRegistry, IPropertyFactory {
 	mapping(address => bool) public override isProperty;
 	mapping(address => EnumerableSet.AddressSet) private addressesMapOfAuthor;
 
 	using EnumerableSet for EnumerableSet.AddressSet;
-	address private property;
 
 	/**
 	 * @dev Initialize the passed address as AddressRegistry address.
@@ -29,14 +23,6 @@ contract PropertyFactory is
 	 */
 	function initialize(address _registry) external initializer {
 		__UsingRegistry_init(_registry);
-		property = address(new Property());
-	}
-
-	/**
-	 * @dev This is a separate function because this contract is currently deployed, so it won't be initialized again
-	 */
-	function initializeProperty() external onlyOwner {
-		property = address(new Property());
 	}
 
 	/**
@@ -92,7 +78,7 @@ contract PropertyFactory is
 		/**
 		 * Creates a new Property contract.
 		 */
-		address propertyAddr = Clones.clone(property);
+		address propertyAddr = Clones.clone(registry().property());
 		Property(propertyAddr).initialize(
 			address(registry()),
 			_author,

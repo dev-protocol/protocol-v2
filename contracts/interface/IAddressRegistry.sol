@@ -6,4 +6,6 @@ interface IAddressRegistry {
 	function setRegistry(string memory _key, address _addr) external;
 
 	function registries(string memory _key) external view returns (address);
+
+	function property() external view returns (address);
 }

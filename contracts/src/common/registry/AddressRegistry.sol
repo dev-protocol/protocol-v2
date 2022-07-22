@@ -3,6 +3,7 @@ pragma solidity =0.8.9;
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "../../../interface/IAddressRegistry.sol";
+import "../../property/Property.sol";
 
 /**
  * A registry contract to hold the latest contract addresses.
@@ -10,9 +11,22 @@ import "../../../interface/IAddressRegistry.sol";
  */
 contract AddressRegistry is OwnableUpgradeable, IAddressRegistry {
 	mapping(bytes32 => address) private reg;
+	address private _property;
 
 	function initialize() external initializer {
 		__Ownable_init();
+		_property = address(new Property());
+	}
+
+	/**
+	 * @dev This is a separate function because this contract is currently deployed, so it won't be initialized again
+	 */
+	function initializeProperty() external onlyOwner {
+		_property = address(new Property());
+	}
+
+	function property() external view returns (address) {
+		return _property;
 	}
 
 	function setRegistry(string memory _key, address _addr) external override {
