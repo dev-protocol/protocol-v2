@@ -53,6 +53,7 @@ contract(
 
 		describe('Property; getBalances', () => {
 			it('author and treasury hold the balance.', async () => {
+				await dev.generateProperty()
 				await dev.generatePropertyFactory()
 				const transaction = await dev.propertyFactory.create(
 					'sample',
@@ -72,6 +73,7 @@ contract(
 				)
 			})
 			it('The balance will be transferred(transfer).', async () => {
+				await dev.generateProperty()
 				await dev.generatePropertyFactory()
 				await dev.generateWithdraw()
 				const transaction = await dev.propertyFactory.create(
@@ -99,6 +101,7 @@ contract(
 				)
 			})
 			it('The balance will be transferred(transferFrom).', async () => {
+				await dev.generateProperty()
 				await dev.generatePropertyFactory()
 				await dev.generateWithdraw()
 				const transaction = await dev.propertyFactory.create(
@@ -203,6 +206,7 @@ contract(
 				validateErrorMessage(result, 'illegal sender')
 			})
 			it('Change the name', async () => {
+				await dev.generateProperty()
 				await dev.generatePropertyFactory()
 				const transaction = await dev.propertyFactory.create(
 					'sample',
@@ -218,6 +222,7 @@ contract(
 				expect(await propertyInstance.name()).to.be.equal('next-name')
 			})
 			it('Should emit ChangeName event', async () => {
+				await dev.generateProperty()
 				await dev.generatePropertyFactory()
 				await dev.addressRegistry.setRegistry(
 					'PropertyFactory',
@@ -264,6 +269,7 @@ contract(
 				validateErrorMessage(result, 'illegal sender')
 			})
 			it('Change the symbol', async () => {
+				await dev.generateProperty()
 				await dev.generatePropertyFactory()
 				const transaction = await dev.propertyFactory.create(
 					'sample',
@@ -279,6 +285,7 @@ contract(
 				expect(await propertyInstance.symbol()).to.be.equal('NEXTSYMBOL')
 			})
 			it('Should emit ChangeSymbol event', async () => {
+				await dev.generateProperty()
 				await dev.generatePropertyFactory()
 				await dev.addressRegistry.setRegistry(
 					'PropertyFactory',
@@ -312,6 +319,7 @@ contract(
 				await dev.generateDevBridge()
 				await dev.generateSTokensManager()
 				await Promise.all([
+					dev.generateProperty(),
 					dev.generatePropertyFactory(),
 					dev.generatePolicyFactory(),
 					dev.generateLockup(),
@@ -363,6 +371,7 @@ contract(
 				await dev.generateSTokensManager()
 				await Promise.all([
 					dev.generateWithdraw(),
+					dev.generateProperty(),
 					dev.generatePropertyFactory(),
 					dev.generateLockup(),
 					dev.generatePolicyFactory(),
@@ -413,6 +422,7 @@ contract(
 				await dev.generateSTokensManager()
 				await Promise.all([
 					dev.generateWithdraw(),
+					dev.generateProperty(),
 					dev.generatePropertyFactory(),
 					dev.generateLockup(),
 					dev.generatePolicyFactory(),
