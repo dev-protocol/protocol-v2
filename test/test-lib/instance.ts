@@ -247,6 +247,15 @@ export class DevProtocolInstance {
 	}
 
 	public async generatePropertyFactory(): Promise<void> {
+		const [propertyProxy] = await deployProxy(
+			contract('Property'),
+			this._deployer
+		)
+		await this.addressRegistry.setRegistry(
+			'Property',
+			propertyProxy.address,
+			this.fromDeployer
+		)
 		const [proxfied] = await deployProxy(
 			contract('PropertyFactory'),
 			this._deployer

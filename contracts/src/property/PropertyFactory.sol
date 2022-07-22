@@ -78,7 +78,7 @@ contract PropertyFactory is InitializableUsingRegistry, IPropertyFactory {
 		/**
 		 * Creates a new Property contract.
 		 */
-		address propertyAddr = Clones.clone(registry().property());
+		address propertyAddr = Clones.clone(registry().registries("Property"));
 		Property(propertyAddr).initialize(
 			address(registry()),
 			_author,

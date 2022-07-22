@@ -11,22 +11,9 @@ import "../../property/Property.sol";
  */
 contract AddressRegistry is OwnableUpgradeable, IAddressRegistry {
 	mapping(bytes32 => address) private reg;
-	address private _property;
 
 	function initialize() external initializer {
 		__Ownable_init();
-		_property = address(new Property());
-	}
-
-	/**
-	 * @dev This is a separate function because this contract is currently deployed, so it won't be initialized again
-	 */
-	function initializeProperty() external onlyOwner {
-		_property = address(new Property());
-	}
-
-	function property() external view returns (address) {
-		return _property;
 	}
 
 	function setRegistry(string memory _key, address _addr) external override {
