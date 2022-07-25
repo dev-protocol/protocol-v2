@@ -57,7 +57,6 @@ export class DevProtocolInstance {
 	private _devL2!: DevArbitrumInstance | DevPolygonInstance
 	private _arbSys!: ArbSysTestInstance
 	private _lockup!: LockupInstance
-	private _property!: PropertyInstance
 	private _propertyFactory!: PropertyFactoryInstance
 	private _policyFactory!: PolicyFactoryTestInstance
 	private _marketFactory!: MarketFactoryTestInstance
@@ -249,17 +248,19 @@ export class DevProtocolInstance {
 	}
 
 	public async generateProperty(): Promise<void> {
-		const [proxfied] = await deployProxy(contract('Property'), this._deployer)
-		this._property = proxfied
+		const Property = contract('Property')
+		const property = await Property.new(this.fromDeployer)
+
 		await this.addressRegistry.setRegistry(
 			'Property',
-			this._property.address,
+			property.address,
 			this.fromDeployer
 		)
 	}
 
 	public async generatePropertyFactory(): Promise<void> {
 		await this.generateProperty()
+
 		const [proxfied] = await deployProxy(
 			contract('PropertyFactory'),
 			this._deployer
