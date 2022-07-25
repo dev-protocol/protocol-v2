@@ -3,7 +3,6 @@ pragma solidity =0.8.9;
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "../../../interface/IAddressRegistry.sol";
-import "../../property/Property.sol";
 
 /**
  * A registry contract to hold the latest contract addresses.

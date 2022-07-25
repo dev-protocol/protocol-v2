@@ -19,7 +19,6 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 			await dev.generateSTokensManager()
 			await Promise.all([
 				dev.generateMetricsFactory(),
-				dev.generateProperty(),
 				dev.generatePropertyFactory(),
 				dev.generatePolicyFactory(),
 				dev.generateLockup(),
@@ -29,7 +28,6 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 			await dev.setCapSetter()
 			await dev.updateCap()
 			await dev.addressRegistry.setRegistry('MarketFactory', marketFactory)
-			await dev.generateProperty()
 			const propertyAddress = await dev.propertyFactory
 				.create('sample', 'SAMPLE', user, {
 					from: user2,
@@ -94,7 +92,6 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 				dev.generateMarketFactory(),
 				dev.generateMetricsFactory(),
 				dev.generatePolicyFactory(),
-				dev.generateProperty(),
 				dev.generatePropertyFactory(),
 				dev.generateLockup(),
 				dev.generateWithdraw(),
@@ -145,7 +142,6 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 			await dev.generateAddressRegistry()
 			await Promise.all([
 				dev.generatePolicyFactory(),
-				dev.generateProperty(),
 				dev.generatePropertyFactory(),
 			])
 			await dev.generatePolicy('PolicyTest1')
@@ -208,7 +204,6 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 			await dev.generateAddressRegistry()
 			await Promise.all([
 				dev.generatePolicyFactory(),
-				dev.generateProperty(),
 				dev.generatePropertyFactory(),
 			])
 			await dev.generatePolicy('PolicyTest1')
