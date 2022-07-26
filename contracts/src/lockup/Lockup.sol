@@ -636,7 +636,13 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 				positions.property
 			) == false
 		) {
-			return (0, RewardPrices(0, 0, 0, 0));
+			(
+				uint256 reward,
+				uint256 holders,
+				uint256 interest,
+				uint256 holdersCap
+			) = calculateCumulativeRewardPrices();
+			return (0, RewardPrices(reward, holders, interest, holdersCap));
 		}
 
 		/**
