@@ -35,7 +35,7 @@
 		"arb-ethers-web3-bridge": "0.7.3",
 		"bent": "7.3.12",
 		"bignumber.js": "9.0.2",
-		"del-cli": "4.0.1",
+		"del-cli": "5.0.0",
 		"dotenv": "16.0.1",
 		"eslint": "8.20.0",
 		"eslint-config-prettier": "8.5.0",
