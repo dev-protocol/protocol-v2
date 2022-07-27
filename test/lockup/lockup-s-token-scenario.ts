@@ -35,7 +35,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 			let dev: DevProtocolInstance
 			let property: PropertyInstance
 			let calc: Calculator
-			const timestamps: Map<string, number> = new Map()
+			const timestamps = new Map<string, number>()
 
 			const alice = deployer
 			const bob = user1
