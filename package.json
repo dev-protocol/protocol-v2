@@ -34,7 +34,7 @@
 		"@typescript-eslint/parser": "5.33.0",
 		"arb-ethers-web3-bridge": "0.7.3",
 		"bent": "7.3.12",
-		"bignumber.js": "9.0.2",
+		"bignumber.js": "9.1.0",
 		"del-cli": "4.0.1",
 		"dotenv": "16.0.1",
 		"eslint": "8.21.0",
