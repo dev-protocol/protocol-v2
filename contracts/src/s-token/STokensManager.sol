@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity =0.8.9;
 
+import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/utils/introspection/IERC165Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
@@ -16,6 +18,7 @@ contract STokensManager is
 	ISTokensManager,
 	STokensDescriptor,
 	ERC721Upgradeable,
+	IERC721EnumerableUpgradeable,
 	InitializableUsingRegistry
 {
 	Counters.Counter private tokenIdCounter;
@@ -54,6 +57,64 @@ contract STokensManager is
 	function initialize(address _registry) external initializer {
 		__ERC721_init("Dev Protocol sTokens V1", "DEV-STOKENS-V1");
 		__UsingRegistry_init(_registry);
+	}
+
+	/**
+	 * @dev See {IERC165-supportsInterface}.
+	 */
+	function supportsInterface(bytes4 interfaceId)
+		public
+		view
+		virtual
+		override(IERC165Upgradeable, ERC721Upgradeable)
+		returns (bool)
+	{
+		return
+			interfaceId == type(IERC721EnumerableUpgradeable).interfaceId ||
+			super.supportsInterface(interfaceId);
+	}
+
+	/**
+	 * @dev See {IERC721Enumerable-totalSupply}.
+	 */
+	function totalSupply() public view virtual override returns (uint256) {
+		return tokenIdCounter.current();
+	}
+
+	/**
+	 * @dev See {IERC721Enumerable-tokenOfOwnerByIndex}.
+	 */
+	function tokenOfOwnerByIndex(address owner, uint256 index)
+		public
+		view
+		virtual
+		override
+		returns (uint256)
+	{
+		// solhint-disable-next-line reason-string
+		require(
+			index < tokenIdsMapOfOwner[owner].length(),
+			"ERC721Enumerable: owner index out of bounds"
+		);
+		return tokenIdsMapOfOwner[owner].at(index);
+	}
+
+	/**
+	 * @dev See {IERC721Enumerable-tokenByIndex}.
+	 */
+	function tokenByIndex(uint256 index)
+		public
+		view
+		virtual
+		override
+		returns (uint256)
+	{
+		// solhint-disable-next-line reason-string
+		require(
+			index < tokenIdCounter.current(),
+			"ERC721Enumerable: global index out of bounds"
+		);
+		return index + 1;
 	}
 
 	function tokenURI(uint256 _tokenId)
