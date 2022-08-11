@@ -846,4 +846,115 @@ contract('STokensManager', ([deployer, user]) => {
 			)
 		})
 	})
+
+	describe('totalSupply', () => {
+		it('initial value is 0', async () => {
+			const totalSupply = await dev.sTokensManager.totalSupply()
+			expect(totalSupply.toString()).to.equal('0')
+		})
+		it('increace totalSupply after minted', async () => {
+			await dev.lockup.depositToProperty(property.address, '1')
+			const totalSupply1 = await dev.sTokensManager.totalSupply()
+			expect(totalSupply1.toString()).to.equal('1')
+
+			await dev.lockup.depositToProperty(property.address, '2')
+			const totalSupply2 = await dev.sTokensManager.totalSupply()
+			expect(totalSupply2.toString()).to.equal('2')
+		})
+	})
+	describe('tokenOfOwnerByIndex', () => {
+		describe('success', () => {
+			it('increace tokenOfOwnerByIndex after minted', async () => {
+				await dev.lockup.depositToProperty(property.address, '1')
+				const tokenOfOwnerByIndex1 =
+					await dev.sTokensManager.tokenOfOwnerByIndex(deployer, 0)
+				expect(tokenOfOwnerByIndex1.toString()).to.equal('1')
+
+				await dev.lockup.depositToProperty(property.address, '1')
+				const tokenOfOwnerByIndex2 =
+					await dev.sTokensManager.tokenOfOwnerByIndex(deployer, 1)
+				expect(tokenOfOwnerByIndex2.toString()).to.equal('2')
+			})
+			it('[multiple persons] increace tokenOfOwnerByIndex after minted', async () => {
+				await dev.lockup.depositToProperty(property.address, '1')
+				await dev.lockup.depositToProperty(property.address, '1')
+				const tokenOfOwnerByIndex1 =
+					await dev.sTokensManager.tokenOfOwnerByIndex(deployer, 1)
+				expect(tokenOfOwnerByIndex1.toString()).to.equal('2')
+
+				await dev.dev.mint(user, deployerBalance)
+				await dev.dev.approve(dev.lockup.address, '100000', { from: user })
+
+				await dev.lockup.depositToProperty(property.address, '1', {
+					from: user,
+				})
+				const tokenOfOwnerByIndex2 =
+					await dev.sTokensManager.tokenOfOwnerByIndex(user, 0)
+				expect(tokenOfOwnerByIndex2.toString()).to.equal('3')
+			})
+		})
+		describe('fail', () => {
+			it('throws the error when the passed index is over than the holding index', async () => {
+				const res = await dev.sTokensManager
+					.tokenOfOwnerByIndex(deployer, 0)
+					.catch((err: Error) => err)
+				validateErrorMessage(
+					res,
+					'ERC721Enumerable: owner index out of bounds',
+					false
+				)
+			})
+			it('[after minted] throws the error when the passed index is over than the holding index', async () => {
+				await dev.lockup.depositToProperty(property.address, '1')
+
+				const res = await dev.sTokensManager
+					.tokenOfOwnerByIndex(deployer, 1)
+					.catch((err: Error) => err)
+				validateErrorMessage(
+					res,
+					'ERC721Enumerable: owner index out of bounds',
+					false
+				)
+			})
+		})
+	})
+	describe('tokenByIndex', () => {
+		describe('success', () => {
+			it('increace tokenByIndex after minted', async () => {
+				await dev.lockup.depositToProperty(property.address, '1')
+				const tokenByIndex1 = await dev.sTokensManager.tokenByIndex(0)
+				expect(tokenByIndex1.toString()).to.equal('1')
+
+				await dev.lockup.depositToProperty(property.address, '1')
+				const tokenByIndex2 = await dev.sTokensManager.tokenByIndex(1)
+				expect(tokenByIndex2.toString()).to.equal('2')
+			})
+		})
+		describe('fail', () => {
+			it('throws the error when the passed index is over than the minted amount', async () => {
+				const res = await dev.sTokensManager
+					.tokenByIndex('0')
+					.catch((err: Error) => err)
+
+				validateErrorMessage(
+					res,
+					'ERC721Enumerable: global index out of bounds',
+					false
+				)
+			})
+			it('[after minted] throws the error when the passed index is over than the minted amount', async () => {
+				await dev.lockup.depositToProperty(property.address, '1')
+
+				const res = await dev.sTokensManager
+					.tokenByIndex('1')
+					.catch((err: Error) => err)
+
+				validateErrorMessage(
+					res,
+					'ERC721Enumerable: global index out of bounds',
+					false
+				)
+			})
+		})
+	})
 })
