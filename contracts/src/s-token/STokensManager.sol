@@ -18,8 +18,8 @@ import "./STokensDescriptor.sol";
 contract STokensManager is
 	ISTokensManager,
 	STokensDescriptor,
-	ERC721Upgradeable,
 	IERC721EnumerableUpgradeable,
+	ERC721Upgradeable,
 	InitializableUsingRegistry
 {
 	Counters.Counter private tokenIdCounter;
