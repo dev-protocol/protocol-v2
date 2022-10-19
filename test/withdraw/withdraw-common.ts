@@ -1,5 +1,5 @@
 import { DevProtocolInstance } from '../test-lib/instance'
-import {
+import type {
 	MetricsInstance,
 	PropertyInstance,
 	IPolicyInstance,

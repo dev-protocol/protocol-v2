@@ -1,4 +1,4 @@
-import {
+import type {
 	DevAdminInstance,
 	UpgradeabilityLibraryV1Instance,
 } from '../../../types/truffle-contracts'

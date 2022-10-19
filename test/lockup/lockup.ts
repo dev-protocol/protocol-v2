@@ -1,16 +1,13 @@
 import { DevProtocolInstance } from '../test-lib/instance'
-import {
+import type {
 	PropertyInstance,
 	PolicyTestBaseInstance,
 } from '../../types/truffle-contracts'
 import BigNumber from 'bignumber.js'
 import { toBigNumber } from '../test-lib/utils/common'
 import { getPropertyAddress } from '../test-lib/utils/log'
-import {
-	takeSnapshot,
-	revertToSnapshot,
-	Snapshot,
-} from '../test-lib/utils/snapshot'
+import type { Snapshot } from '../test-lib/utils/snapshot'
+import { takeSnapshot, revertToSnapshot } from '../test-lib/utils/snapshot'
 import { validateErrorMessage } from '../test-lib/utils/error'
 
 contract('LockupTest', ([deployer, user1, user2]) => {

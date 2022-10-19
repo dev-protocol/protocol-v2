@@ -1,5 +1,5 @@
 /* eslint-disable new-cap */
-import {
+import type {
 	AddressRegistryInstance,
 	DevInstance,
 	DevArbitrumInstance,

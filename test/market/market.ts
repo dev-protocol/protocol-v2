@@ -1,12 +1,9 @@
 import { DevProtocolInstance } from '../test-lib/instance'
 import { forwardBlockTimestamp } from '../test-lib/utils/common'
-import { MarketInstance } from '../../types/truffle-contracts'
+import type { MarketInstance } from '../../types/truffle-contracts'
 import { getPropertyAddress, getMarketAddress } from '../test-lib/utils/log'
-import {
-	takeSnapshot,
-	revertToSnapshot,
-	Snapshot,
-} from '../test-lib/utils/snapshot'
+import type { Snapshot } from '../test-lib/utils/snapshot'
+import { takeSnapshot, revertToSnapshot } from '../test-lib/utils/snapshot'
 import { watch } from '../test-lib/utils/event'
 import {
 	validateErrorMessage,

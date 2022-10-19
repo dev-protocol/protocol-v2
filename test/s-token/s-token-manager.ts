@@ -2,7 +2,7 @@
 import { encode } from 'js-base64'
 import BigNumber from 'bignumber.js'
 import { DevProtocolInstance } from '../test-lib/instance'
-import {
+import type {
 	TokenURIDescriptorTestInstance,
 	PropertyInstance,
 } from '../../types/truffle-contracts'
@@ -18,11 +18,8 @@ import {
 	getBlockTimestamp,
 	toBigNumber,
 } from '../test-lib/utils/common'
-import {
-	takeSnapshot,
-	revertToSnapshot,
-	Snapshot,
-} from '../test-lib/utils/snapshot'
+import type { Snapshot } from '../test-lib/utils/snapshot'
+import { takeSnapshot, revertToSnapshot } from '../test-lib/utils/snapshot'
 
 type Attributes = Array<{
 	trait_type: string
