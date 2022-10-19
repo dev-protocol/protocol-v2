@@ -350,7 +350,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 		})
 	})
 
-	describe('Withdraw; calculateonlyRewardAmount', () => {
+	describe('Withdraw; calculateRewardAmount', () => {
 		type calcResult = {
 			readonly value: BigNumber
 			readonly reword: BigNumber
