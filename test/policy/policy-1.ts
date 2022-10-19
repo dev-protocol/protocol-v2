@@ -1,4 +1,4 @@
-import {
+import type {
 	Policy1Instance,
 	CurveTestInstance,
 } from '../../types/truffle-contracts'

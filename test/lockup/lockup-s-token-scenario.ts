@@ -1,6 +1,6 @@
 import { err, init } from './lockup-s-token-common'
-import { DevProtocolInstance } from '../test-lib/instance'
-import { PropertyInstance } from '../../types/truffle-contracts'
+import type { DevProtocolInstance } from '../test-lib/instance'
+import type { PropertyInstance } from '../../types/truffle-contracts'
 import BigNumber from 'bignumber.js'
 import {
 	toBigNumber,
@@ -35,7 +35,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 			let dev: DevProtocolInstance
 			let property: PropertyInstance
 			let calc: Calculator
-			const timestamps: Map<string, number> = new Map()
+			const timestamps = new Map<string, number>()
 
 			const alice = deployer
 			const bob = user1

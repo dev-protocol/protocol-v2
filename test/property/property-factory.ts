@@ -2,11 +2,8 @@ import { DevProtocolInstance } from '../test-lib/instance'
 import { getPropertyAddress, getMarketAddress } from '../test-lib/utils/log'
 import { toBigNumber } from '../test-lib/utils/common'
 import { getEventValue } from '../test-lib/utils/event'
-import {
-	takeSnapshot,
-	revertToSnapshot,
-	Snapshot,
-} from '../test-lib/utils/snapshot'
+import type { Snapshot } from '../test-lib/utils/snapshot'
+import { takeSnapshot, revertToSnapshot } from '../test-lib/utils/snapshot'
 import { validateErrorMessage } from '../test-lib/utils/error'
 
 contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {

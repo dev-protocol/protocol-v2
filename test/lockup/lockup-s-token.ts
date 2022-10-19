@@ -1,6 +1,6 @@
 import { deployerBalance, err, init, init2 } from './lockup-s-token-common'
-import { DevProtocolInstance } from '../test-lib/instance'
-import { PropertyInstance } from '../../types/truffle-contracts'
+import type { DevProtocolInstance } from '../test-lib/instance'
+import type { PropertyInstance } from '../../types/truffle-contracts'
 import {
 	toBigNumber,
 	forwardBlockTimestamp,
@@ -8,11 +8,8 @@ import {
 } from '../test-lib/utils/common'
 import { getPropertyAddress } from '../test-lib/utils/log'
 import { getEventValue } from '../test-lib/utils/event'
-import {
-	takeSnapshot,
-	revertToSnapshot,
-	Snapshot,
-} from '../test-lib/utils/snapshot'
+import type { Snapshot } from '../test-lib/utils/snapshot'
+import { takeSnapshot, revertToSnapshot } from '../test-lib/utils/snapshot'
 import { validateErrorMessage } from '../test-lib/utils/error'
 
 contract('LockupTest', ([deployer, , user2, user3]) => {

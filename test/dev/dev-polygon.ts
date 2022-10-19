@@ -1,12 +1,9 @@
 /* eslint-disable new-cap */
-import { DevPolygonInstance } from '../../types/truffle-contracts'
+import type { DevPolygonInstance } from '../../types/truffle-contracts'
 import { DevProtocolInstance } from '../test-lib/instance'
 import { validateErrorMessage } from '../test-lib/utils/error'
-import {
-	takeSnapshot,
-	revertToSnapshot,
-	Snapshot,
-} from '../test-lib/utils/snapshot'
+import type { Snapshot } from '../test-lib/utils/snapshot'
+import { takeSnapshot, revertToSnapshot } from '../test-lib/utils/snapshot'
 
 contract('DevPolygon', ([deployer, depositer, user]) => {
 	const createDev = async (): Promise<DevProtocolInstance> => {

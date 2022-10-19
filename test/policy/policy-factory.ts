@@ -1,15 +1,12 @@
-import { IPolicyInstance } from '../../types/truffle-contracts'
+import type { IPolicyInstance } from '../../types/truffle-contracts'
 import { DevProtocolInstance } from '../test-lib/instance'
 import {
 	collectsEth,
 	forwardBlockTimestamp,
 	getBlockTimestamp,
 } from '../test-lib/utils/common'
-import {
-	revertToSnapshot,
-	Snapshot,
-	takeSnapshot,
-} from '../test-lib/utils/snapshot'
+import type { Snapshot } from '../test-lib/utils/snapshot'
+import { revertToSnapshot, takeSnapshot } from '../test-lib/utils/snapshot'
 import {
 	validateNotOwnerErrorMessage,
 	validateAddressErrorMessage,
