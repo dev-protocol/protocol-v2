@@ -204,7 +204,7 @@ contract Withdraw is InitializableUsingRegistry, IWithdraw {
 		uint256 totalSupply = property.totalSupply();
 		uint256 unitPriceCap = _cap >= _lastRewardCap
 			? (_cap - _lastRewardCap) / totalSupply
-			: _cap / totalSupply; // If this user has held this tokens since before this tokens got its first staking, _lastRewardCap is expected to bigger than _cap. In this case, it can treat _cap as the latest range of the value.
+			: _cap / totalSupply; // If this user has held this tokens since before this tokens got its first staking, _lastRewardCap is expected to larger than _cap. In this case, it can treat _cap as the latest range of the value.
 		return (unitPriceCap * balance).divBasis();
 	}
 
