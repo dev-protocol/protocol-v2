@@ -202,7 +202,9 @@ contract Withdraw is InitializableUsingRegistry, IWithdraw {
 		IERC20 property = IERC20(_property);
 		uint256 balance = property.balanceOf(_user);
 		uint256 totalSupply = property.totalSupply();
-		uint256 unitPriceCap = (_cap - _lastRewardCap) / totalSupply;
+		uint256 unitPriceCap = _cap >= _lastRewardCap
+			? (_cap - _lastRewardCap) / totalSupply
+			: _cap / totalSupply; // If this user has held this tokens since before this tokens got its first staking, _lastRewardCap is expected to larger than _cap. In this case, it can treat _cap as the latest range of the value.
 		return (unitPriceCap * balance).divBasis();
 	}
 
