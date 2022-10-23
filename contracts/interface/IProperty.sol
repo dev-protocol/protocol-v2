@@ -20,4 +20,6 @@ interface IProperty {
 	function withdraw(address _sender, uint256 _value) external;
 
 	function getBalances() external view returns (PropertyBalance[] memory);
+	
+	function transfer(address _to, uint256 _value) public override returns (bool);
 }
