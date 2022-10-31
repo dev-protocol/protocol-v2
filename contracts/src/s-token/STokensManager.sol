@@ -30,6 +30,7 @@ contract STokensManager is
 	mapping(uint256 => bool) public override isFreezed;
 	mapping(address => address) public override descriptorOf;
 	mapping(uint256 => bytes32) public override payloadOf;
+	mapping(address => uint24) public royaltyOf;
 	address private proxyAdmin;
 
 	using Counters for Counters.Counter;
@@ -375,4 +376,29 @@ contract STokensManager is
 			tokenIdsMapOfOwner[to].add(tokenId);
 		}
 	}
+	/// @dev Sets a resale royalty for the passed Property Tokens's STokens
+    /// @param _property the property for which we register the royalties
+    /// @param _percentage percentage (using 2 decimals - 10000 = 100, 0 = 0)
+	
+	function setSTokenRoyaltyForProperty(address _property, uint256 _percentage)
+	external
+	onlyPropertyAuthor(_property)
+	{
+		require(_percentage <= 10000, "ERC2981Royalties: Too high");
+		royaltyOf[_property] = uint24(_percentage);
+	}
+	/**
+	 * @dev See {IERC2981Royalties}
+	 */
+    function royaltyInfo(uint256 tokenId, uint256 value)
+        external
+        view
+        returns (address receiver, uint256 royaltyAmount)
+    {
+		StakingPositions memory currentPosition = getStoragePositions(
+			tokenId
+		);
+		receiver = IProperty(currentPosition.property).author();
+        royaltyAmount = (value * royaltyOf[currentPosition.property]) / 10000;
+    }
 }

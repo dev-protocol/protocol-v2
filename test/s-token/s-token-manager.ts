@@ -954,4 +954,34 @@ contract('STokensManager', ([deployer, user]) => {
 			})
 		})
 	})
+	describe('setSTokenRoyaltyForProperty', () => {
+		describe('success', () => {
+			it('set sToken royalty for property', async () => {
+				await dev.sTokensManager.setSTokenRoyaltyForProperty(
+					property.address,
+					'1000',
+					{ from: user }
+				)
+				const royalty = await dev.sTokensManager.royaltyOf(
+					property.address
+				)
+				expect(royalty.toString()).to.equal('1000')
+			})
+		})
+		describe('fail', () => {
+			it('not authorized', async () => {
+				const res = await dev.sTokensManager
+					.setSTokenRoyaltyForProperty(property.address, '1000')
+					.catch((err: Error) => err)
+				validateErrorMessage(res, 'illegal access', false)
+			})
+			it('throws the error when the passed royalty is over than 100%', async () => {
+				const res = await dev.sTokensManager
+					.setSTokenRoyaltyForProperty(property.address, '10001', {from: user})
+					.catch((err: Error) => err)
+
+				validateErrorMessage(res, 'ERC2981Royalties: Too high', false)
+			})
+		})
+	})
 })
