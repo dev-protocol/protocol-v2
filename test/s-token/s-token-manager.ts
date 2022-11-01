@@ -983,5 +983,22 @@ contract('STokensManager', ([deployer, user]) => {
 				validateErrorMessage(res, 'ERC2981Royalties: Too high', false)
 			})
 		})
+		describe('royaltyInfo', () => {
+			describe('success', () => {
+				it('get royalty info', async () => {
+					await dev.sTokensManager.setSTokenRoyaltyForProperty(
+						property.address,
+						'1000',
+						{ from: user }
+					)
+					const royaltyInfo = await dev.sTokensManager.royaltyInfo(
+						property.address,
+						'100'
+					)
+					expect(royaltyInfo[0]).to.equal(user)
+					expect(royaltyInfo[1].toString()).to.equal('10')
+				})
+			})
+		})
 	})
 })
