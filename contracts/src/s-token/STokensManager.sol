@@ -358,11 +358,11 @@ contract STokensManager is
 		return keccak256(abi.encodePacked("_positions", _tokenId));
 	}
 
-	function _beforeTokenTransfer(
-		address from,
-		address to,
-		uint256 tokenId
-	) internal virtual override {
+	function _beforeTokenTransfer(address from, address to, uint256 tokenId)
+		internal
+		virtual
+		override
+	{
 		super._beforeTokenTransfer(from, to, tokenId);
 
 		if (from == address(0)) {
@@ -376,29 +376,29 @@ contract STokensManager is
 			tokenIdsMapOfOwner[to].add(tokenId);
 		}
 	}
+
 	/// @dev Sets a resale royalty for the passed Property Tokens's STokens
-    /// @param _property the property for which we register the royalties
-    /// @param _percentage percentage (using 2 decimals - 10000 = 100, 0 = 0)
-	
+	/// @param _property the property for which we register the royalties
+	/// @param _percentage percentage (using 2 decimals - 10000 = 100, 0 = 0)
+
 	function setSTokenRoyaltyForProperty(address _property, uint256 _percentage)
-	external
-	onlyPropertyAuthor(_property)
+		external
+		onlyPropertyAuthor(_property)
 	{
 		require(_percentage <= 10000, "ERC2981Royalties: Too high");
 		royaltyOf[_property] = uint24(_percentage);
 	}
+
 	/**
 	 * @dev See {IERC2981Royalties}
 	 */
-    function royaltyInfo(uint256 tokenId, uint256 value)
-        external
-        view
-        returns (address receiver, uint256 royaltyAmount)
-    {
-		StakingPositions memory currentPosition = getStoragePositions(
-			tokenId
-		);
+	function royaltyInfo(uint256 tokenId, uint256 value)
+		external
+		view
+		returns (address receiver, uint256 royaltyAmount)
+	{
+		StakingPositions memory currentPosition = getStoragePositions(tokenId);
 		receiver = IProperty(currentPosition.property).author();
-        royaltyAmount = (value * royaltyOf[currentPosition.property]) / 10000;
-    }
+		royaltyAmount = (value * royaltyOf[currentPosition.property]) / 10000;
+	}
 }

@@ -190,11 +190,11 @@ contract Withdraw is InitializableUsingRegistry, IWithdraw {
 	/**
 	 * Return the reward cap
 	 */
-	function _calculateCapped(
-		address _property,
-		address _user,
-		uint256 _cap
-	) private view returns (uint256) {
+	function _calculateCapped(address _property, address _user, uint256 _cap)
+		private
+		view
+		returns (uint256)
+	{
 		/**
 		 * Gets the cumulative sum of the holder reward price recorded the last time you withdrew.
 		 */
