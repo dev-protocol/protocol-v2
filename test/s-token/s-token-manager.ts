@@ -992,10 +992,7 @@ contract('STokensManager', ([deployer, user]) => {
 						{ from: user }
 					)
 					await dev.lockup.depositToProperty(property.address, '10000')
-					const royaltyInfo = await dev.sTokensManager.royaltyInfo(
-						1,
-						'100'
-					)
+					const royaltyInfo = await dev.sTokensManager.royaltyInfo(1, '100')
 					expect(royaltyInfo[0]).to.equal(user)
 					expect(royaltyInfo[1].toString()).to.equal('10')
 				})
