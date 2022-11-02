@@ -5,11 +5,9 @@ pragma solidity ^0.8.0;
 interface IPropertyFactory {
 	event Create(address indexed _from, address _property);
 
-	function create(
-		string memory _name,
-		string memory _symbol,
-		address _author
-	) external returns (address);
+	function create(string memory _name, string memory _symbol, address _author)
+		external
+		returns (address);
 
 	function createAndAuthenticate(
 		string memory _name,

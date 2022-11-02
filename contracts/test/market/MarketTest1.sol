@@ -23,11 +23,11 @@ contract MarketTest1 is IMarketBehavior, UsingRegistry {
 		return "MarketTest1";
 	}
 
-	function authenticate(
-		address _prop,
-		string[] memory _args,
-		address
-	) external override returns (bool) {
+	function authenticate(address _prop, string[] memory _args, address)
+		external
+		override
+		returns (bool)
+	{
 		{
 			require(msg.sender == associatedMarket, "Invalid sender");
 		}

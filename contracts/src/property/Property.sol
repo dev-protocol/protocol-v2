@@ -175,11 +175,11 @@ contract Property is ERC20, UsingRegistry, IProperty {
 	 * @param _to The recipient address.
 	 * @param _value The transfer amount.
 	 */
-	function transferFrom(
-		address _from,
-		address _to,
-		uint256 _value
-	) public override returns (bool) {
+	function transferFrom(address _from, address _to, uint256 _value)
+		public
+		override
+		returns (bool)
+	{
 		/**
 		 * Validates the source and destination is not 0 address.
 		 */
@@ -257,11 +257,11 @@ contract Property is ERC20, UsingRegistry, IProperty {
 	 * @param _to where to send the token
 	 * @param _amount amount of tokens sent
 	 */
-	function _afterTokenTransfer(
-		address _from,
-		address _to,
-		uint256 _amount
-	) internal virtual override {
+	function _afterTokenTransfer(address _from, address _to, uint256 _amount)
+		internal
+		virtual
+		override
+	{
 		super._afterTokenTransfer(_from, _to, _amount);
 		// not burned
 		holders.add(_to);
