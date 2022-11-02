@@ -1154,7 +1154,7 @@
   resolved "https://registry.yarnpkg.com/@sinonjs/text-encoding/-/text-encoding-0.7.2.tgz#5981a8db18b56ba38ef0efb7d995b12aa7b51918"
   integrity sha512-sXXKG+uL9IrKqViTtao2Ws6dy0znu9sOaP1di/jKGW1M6VssO8vlpXCQcpZ+jisQ1tTFAC5Jo/EOzFbggBagFQ==
 
-"@solidity-parser/parser@^0.14.1", "@solidity-parser/parser@^0.14.3":
+"@solidity-parser/parser@^0.14.1", "@solidity-parser/parser@^0.14.5":
   version "0.14.5"
   resolved "https://registry.yarnpkg.com/@solidity-parser/parser/-/parser-0.14.5.tgz#87bc3cc7b068e08195c219c91cd8ddff5ef1a804"
   integrity sha512-6dKnHZn7fg/iQATVEzqyUOyEidbn05q7YA2mQ9hC0MMXhhV3/JrsxmFSYZAcr7j1yUP700LLhTruvJ3MiQmjJg==
@@ -10297,12 +10297,12 @@ prepend-http@^2.0.0:
   resolved "https://registry.yarnpkg.com/prepend-http/-/prepend-http-2.0.0.tgz#e92434bfa5ea8c19f41cdfd401d741a3c819d897"
   integrity sha512-ravE6m9Atw9Z/jjttRUZ+clIXogdghyZAuWJ3qEzjT+jI/dL1ifAqhZeC5VHzQp1MSt1+jxKkFNemj/iO7tVUA==
 
-prettier-plugin-solidity@1.0.0-dev.24:
-  version "1.0.0-dev.24"
-  resolved "https://registry.yarnpkg.com/prettier-plugin-solidity/-/prettier-plugin-solidity-1.0.0-dev.24.tgz#96ca546043339f2dfcb41680abcb8e4c4949316d"
-  integrity sha512-T56TExNNyUZ82wCtqx3Ai8VSIaCg6YSHwiVjHiZjjbT7FXNVh8R1XaGBPWJoK/BFMjda2jYRHKcBH4xAI9Ufuw==
+prettier-plugin-solidity@1.0.0-rc.1:
+  version "1.0.0-rc.1"
+  resolved "https://registry.yarnpkg.com/prettier-plugin-solidity/-/prettier-plugin-solidity-1.0.0-rc.1.tgz#97b6129430b262cb0b25cc4c865f9515be9c6ede"
+  integrity sha512-horUGyCBbfNHWvJ44UVEcsfVySEoG2gxGs7TcBfTZWNvD4VU6rjzwAkrUtKV6VvRZWn9dh01XZ2UhhB3eVnMXQ==
   dependencies:
-    "@solidity-parser/parser" "^0.14.3"
+    "@solidity-parser/parser" "^0.14.5"
     emoji-regex "^10.1.0"
     escape-string-regexp "^4.0.0"
     semver "^7.3.7"
