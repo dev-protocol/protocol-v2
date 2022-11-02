@@ -13618,7 +13618,7 @@ web3-utils@1.8.0, web3-utils@^1.0.0-beta.31:
     randombytes "^2.1.0"
     utf8 "3.0.0"
 
-web3@*:
+web3@*, web3@1.8.0:
   version "1.8.0"
   resolved "https://registry.yarnpkg.com/web3/-/web3-1.8.0.tgz#3ca5f0b32de6a1f626407740411219035b5fde64"
   integrity sha512-sldr9stK/SALSJTgI/8qpnDuBJNMGjVR84hJ+AcdQ+MLBGLMGsCDNubCoyO6qgk1/Y9SQ7ignegOI/7BPLoiDA==
