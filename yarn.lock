@@ -1605,15 +1605,15 @@
     emittery "^0.4.1"
     web3-utils "1.7.4"
 
-"@truffle/hdwallet-provider@2.1.1":
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/@truffle/hdwallet-provider/-/hdwallet-provider-2.1.1.tgz#7d0d9d34c51412e139b51d7cf186a8898b008e7a"
-  integrity sha512-fz7dLJF6f84fQVrMhmVvtzYXwsn4O1kXIrAldEBp7Qa11Wx1P4sGTec0yx9FhCD07SXxduwvZkq7eyHcw/3i5Q==
+"@truffle/hdwallet-provider@2.1.2":
+  version "2.1.2"
+  resolved "https://registry.yarnpkg.com/@truffle/hdwallet-provider/-/hdwallet-provider-2.1.2.tgz#c1e554717d10898a5f921a2e67b4c141a3331352"
+  integrity sha512-nVkGeQBtgMO8tj3DSGFAKv/T8pgPyu62pWycvgWRSXps8cwlqQ+0YfqYG7Tw3ivbXifCtQ2HkwZH+6jDESi4UQ==
   dependencies:
     "@ethereumjs/common" "^2.4.0"
     "@ethereumjs/tx" "^3.3.0"
     "@metamask/eth-sig-util" "4.0.1"
-    "@truffle/hdwallet" "^0.1.0"
+    "@truffle/hdwallet" "^0.1.1"
     "@types/web3" "^1.0.20"
     ethereum-cryptography "1.1.2"
     ethereum-protocol "^1.0.1"
@@ -1621,10 +1621,10 @@
     web3 "1.7.4"
     web3-provider-engine "16.0.3"
 
-"@truffle/hdwallet@^0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@truffle/hdwallet/-/hdwallet-0.1.0.tgz#b224d3a8dc6047d174ce7e266239c8d44c3cd0f4"
-  integrity sha512-tRqx7Kn5SbQoe56S5pWrIN3/aM9YMK2bFR8iD5gHGv6uXHRCL7b+PkeI1gyKk09SRWkY11YjRw+Up/V0x6tw6A==
+"@truffle/hdwallet@^0.1.1":
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/@truffle/hdwallet/-/hdwallet-0.1.1.tgz#52f33cdd53502397c09ebf7215b4207c4473362f"
+  integrity sha512-hKAZbB6HBo0L4hV/IsulCDiHF5eXCle8TuAhxe1auCIkwS6Dz6Z4BoA3JzekRwcj+dc1bibjdP1A4XOTo2ayqw==
   dependencies:
     ethereum-cryptography "1.1.2"
     keccak "3.0.2"
