@@ -114,12 +114,10 @@ contract Market is UsingRegistry, IMarket {
 	/**
 	 * Authenticates the new asset and proves that the Property author is the owner of the asset.
 	 */
-	function authenticate(address _prop, string[] memory _args)
-		public
-		override
-		onlyPropertyAuthor(_prop)
-		returns (bool)
-	{
+	function authenticate(
+		address _prop,
+		string[] memory _args
+	) public override onlyPropertyAuthor(_prop) returns (bool) {
 		return _authenticate(_prop, msg.sender, _args);
 	}
 
@@ -164,11 +162,9 @@ contract Market is UsingRegistry, IMarket {
 	 * Calculates by gets the staking amount of the Property to be authenticated
 	 * and the total number of authenticated assets on the protocol, and calling `Policy.authenticationFee`.
 	 */
-	function getAuthenticationFee(address _property)
-		private
-		view
-		returns (uint256)
-	{
+	function getAuthenticationFee(
+		address _property
+	) private view returns (uint256) {
 		uint256 tokenValue = ILockup(registry().registries("Lockup"))
 			.totalLockedForProperty(_property);
 		IPolicy policy = IPolicy(registry().registries("Policy"));
@@ -183,11 +179,10 @@ contract Market is UsingRegistry, IMarket {
 	 * A function that will be called back when the asset is successfully authenticated.
 	 * There are cases where oracle is required for the authentication process, so the function is used callback style.
 	 */
-	function authenticatedCallback(address _property, bytes32 _idHash)
-		external
-		override
-		returns (address)
-	{
+	function authenticatedCallback(
+		address _property,
+		bytes32 _idHash
+	) external override returns (address) {
 		/**
 		 * Validates the sender is the saved IMarketBehavior address.
 		 */
@@ -236,11 +231,9 @@ contract Market is UsingRegistry, IMarket {
 	/**
 	 * Release the authenticated asset.
 	 */
-	function deauthenticate(address _metrics)
-		external
-		override
-		onlyLinkedPropertyAuthor(_metrics)
-	{
+	function deauthenticate(
+		address _metrics
+	) external override onlyLinkedPropertyAuthor(_metrics) {
 		/**
 		 * Validates the passed Metrics address is authenticated in this Market.
 		 */

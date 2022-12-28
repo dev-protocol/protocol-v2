@@ -22,15 +22,13 @@ interface IMetricsFactory {
 
 	function metricsCount() external view returns (uint256);
 
-	function metricsCountPerProperty(address _addr)
-		external
-		view
-		returns (uint256);
+	function metricsCountPerProperty(
+		address _addr
+	) external view returns (uint256);
 
-	function metricsOfProperty(address _property)
-		external
-		view
-		returns (address[] memory);
+	function metricsOfProperty(
+		address _property
+	) external view returns (address[] memory);
 
 	function hasAssets(address _property) external view returns (bool);
 

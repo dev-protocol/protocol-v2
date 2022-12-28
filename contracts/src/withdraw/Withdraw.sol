@@ -155,7 +155,10 @@ contract Withdraw is InitializableUsingRegistry, IWithdraw {
 	/**
 	 * Returns the holder reward.
 	 */
-	function _calculateAmount(address _property, address _user)
+	function _calculateAmount(
+		address _property,
+		address _user
+	)
 		private
 		view
 		returns (
@@ -190,11 +193,11 @@ contract Withdraw is InitializableUsingRegistry, IWithdraw {
 	/**
 	 * Return the reward cap
 	 */
-	function _calculateCapped(address _property, address _user, uint256 _cap)
-		private
-		view
-		returns (uint256)
-	{
+	function _calculateCapped(
+		address _property,
+		address _user,
+		uint256 _cap
+	) private view returns (uint256) {
 		/**
 		 * Gets the cumulative sum of the holder reward price recorded the last time you withdrew.
 		 */
@@ -230,7 +233,10 @@ contract Withdraw is InitializableUsingRegistry, IWithdraw {
 	/**
 	 * Returns the total rewards currently available for withdrawal. (For calling from inside the contract)
 	 */
-	function _calculateWithdrawableAmount(address _property, address _user)
+	function _calculateWithdrawableAmount(
+		address _property,
+		address _user
+	)
 		private
 		view
 		returns (
@@ -271,7 +277,10 @@ contract Withdraw is InitializableUsingRegistry, IWithdraw {
 	/**
 	 * Returns the rewards amount
 	 */
-	function calculateRewardAmount(address _property, address _user)
+	function calculateRewardAmount(
+		address _property,
+		address _user
+	)
 		external
 		view
 		override

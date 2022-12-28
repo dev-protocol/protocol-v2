@@ -77,12 +77,9 @@ contract PolicyFactory is
 		closeVoteAt[_addr] = votingEndTimestamp;
 	}
 
-	function isDuringVotingPeriod(address _policy)
-		public
-		view
-		override
-		returns (bool)
-	{
+	function isDuringVotingPeriod(
+		address _policy
+	) public view override returns (bool) {
 		return block.timestamp < closeVoteAt[_policy];
 	}
 }

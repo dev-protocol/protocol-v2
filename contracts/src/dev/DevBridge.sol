@@ -22,11 +22,10 @@ contract DevBridge is
 	/**
 	 * Mint Dev token
 	 */
-	function mint(address _account, uint256 _amount)
-		external
-		override
-		returns (bool)
-	{
+	function mint(
+		address _account,
+		uint256 _amount
+	) external override returns (bool) {
 		IAddressRegistry reg = registry();
 		require(
 			msg.sender == reg.registries("Lockup") ||
@@ -40,11 +39,10 @@ contract DevBridge is
 	/**
 	 * Burn Dev token
 	 */
-	function burn(address _account, uint256 _amount)
-		external
-		override
-		returns (bool)
-	{
+	function burn(
+		address _account,
+		uint256 _amount
+	) external override returns (bool) {
 		require(
 			IMarketFactory(registry().registries("MarketFactory")).isMarket(
 				msg.sender

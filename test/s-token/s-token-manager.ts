@@ -784,7 +784,7 @@ contract('STokensManager', ([deployer, user]) => {
 				})
 			})
 		})
-		// describe('without payloaed', () => {
+		// Describe('without payloaed', () => {
 		// 	describe('success', () => {
 		// 		it('set descriptor address', async () => {
 		// 			await dev.sTokensManager.setTokenURIDescriptor(
