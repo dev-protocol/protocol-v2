@@ -34,4 +34,20 @@ contract TokenURIDescriptorTest is ITokenURIDescriptor {
 	function __shouldBe(bool _bool) public {
 		shouldBe = _bool;
 	}
+
+	function name(
+		uint256 _tokenId,
+		address _owner,
+		ISTokensManager.StakingPositions memory _positions,
+		ISTokensManager.Rewards memory _rewards,
+		bytes32 _payload
+	) external view override returns (string memory) {}
+
+	function description(
+		uint256 _tokenId,
+		address _owner,
+		ISTokensManager.StakingPositions memory _positions,
+		ISTokensManager.Rewards memory _rewards,
+		bytes32 _payload
+	) external view override returns (string memory) {}
 }

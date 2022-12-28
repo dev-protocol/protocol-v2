@@ -6,7 +6,7 @@ import "./ISTokensManager.sol";
 
 interface ITokenURIDescriptor {
 	/*
-	 * @dev get image from custom descriopro
+	 * @dev get image from custom descriptor
 	 * @param _tokenId token id
 	 * @param _owner owner address
 	 * @param _positions staking position
@@ -15,6 +15,40 @@ interface ITokenURIDescriptor {
 	 * @return string image information
 	 */
 	function image(
+		uint256 _tokenId,
+		address _owner,
+		ISTokensManager.StakingPositions memory _positions,
+		ISTokensManager.Rewards memory _rewards,
+		bytes32 _payload
+	) external view returns (string memory);
+
+	/*
+	 * @dev get name from custom descriptor
+	 * @param _tokenId token id
+	 * @param _owner owner address
+	 * @param _positions staking position
+	 * @param _rewards rewards
+	 * @param _payload token payload
+	 * @return string image information
+	 */
+	function name(
+		uint256 _tokenId,
+		address _owner,
+		ISTokensManager.StakingPositions memory _positions,
+		ISTokensManager.Rewards memory _rewards,
+		bytes32 _payload
+	) external view returns (string memory);
+
+	/*
+	 * @dev get name from custom descriptor
+	 * @param _tokenId token id
+	 * @param _owner owner address
+	 * @param _positions staking position
+	 * @param _rewards rewards
+	 * @param _payload token payload
+	 * @return string image information
+	 */
+	function description(
 		uint256 _tokenId,
 		address _owner,
 		ISTokensManager.StakingPositions memory _positions,
