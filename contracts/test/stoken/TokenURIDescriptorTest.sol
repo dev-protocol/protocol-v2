@@ -6,6 +6,9 @@ import "../../interface/ITokenURIDescriptor.sol";
 contract TokenURIDescriptorTest is ITokenURIDescriptor {
 	mapping(uint256 => bytes32) public _dataOf;
 	bool public shouldBe = true;
+	string public newName = "";
+	string public newDescription = "";
+	
 
 	function image(
 		uint256,
@@ -35,19 +38,31 @@ contract TokenURIDescriptorTest is ITokenURIDescriptor {
 		shouldBe = _bool;
 	}
 
+	function _setName(string memory _name) public {
+		newName = _name;
+	}
+	
+	function _setDescription(string memory _description) public {
+		newDescription = _description;
+	}
+	
 	function name(
-		uint256 _tokenId,
-		address _owner,
-		ISTokensManager.StakingPositions memory _positions,
-		ISTokensManager.Rewards memory _rewards,
-		bytes32 _payload
-	) external view override returns (string memory) {}
+		uint256,
+		address,
+		ISTokensManager.StakingPositions memory,
+		ISTokensManager.Rewards memory,
+		bytes32
+	) external view override returns (string memory) {
+		return newName;
+	}
 
 	function description(
-		uint256 _tokenId,
-		address _owner,
-		ISTokensManager.StakingPositions memory _positions,
-		ISTokensManager.Rewards memory _rewards,
-		bytes32 _payload
-	) external view override returns (string memory) {}
+		uint256,
+		address,
+		ISTokensManager.StakingPositions memory,
+		ISTokensManager.Rewards memory,
+		bytes32
+	) external view override returns (string memory) {
+		return newDescription;
+	}
 }

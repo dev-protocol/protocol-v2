@@ -26,6 +26,12 @@ type Attributes = Array<{
 	value: string | number
 	display_type?: string
 }>
+type Details = {
+	name: string;
+	description: string;
+	image: string;
+	attributes: Attributes;
+  };
 
 contract('STokensManager', ([deployer, user]) => {
 	const MAX_UINT256 =
@@ -118,6 +124,21 @@ contract('STokensManager', ([deployer, user]) => {
 			? checkImage(image, property)
 			: checkTokenImageUri(image, tokenUriImage)
 	}
+
+	const getdetails = (tokenUri: string): Details => {
+		const uriInfo = tokenUri.split(',')
+		expect(uriInfo.length).to.equal(2)
+		expect(uriInfo[0]).to.equal('data:application/json;base64')
+		const decodedData = Buffer.from(uriInfo[1], 'base64').toString()
+		const details = JSON.parse(decodedData) as {
+			name: string
+			description: string
+			image: string
+			attributes: Attributes
+		}
+		return details
+	}
+
 
 	const checkName = (
 		name: string,
@@ -215,7 +236,7 @@ contract('STokensManager', ([deployer, user]) => {
 				const uri = await dev.sTokensManager.tokenURI(1)
 				checkTokenUri(uri, property.address, 10000, 0, 'ipfs://IPFS-CID')
 			})
-			it('get descriptor token uri', async () => {
+			it('get descriptor token uri; with custom name & description check', async () => {
 				// @ts-ignore
 				await dev.lockup.depositToProperty(
 					property.address,
@@ -229,7 +250,16 @@ contract('STokensManager', ([deployer, user]) => {
 					{ from: user }
 				)
 				const uri = await dev.sTokensManager.tokenURI(1)
+				// This checks for default name & description
 				checkTokenUri(uri, property.address, 10000, 0, 'dummy-string')
+				// This checks for custom name & description
+				await descriptor._setName('new-name')
+				await descriptor._setDescription('new-description')
+				const recheckURI = await dev.sTokensManager.tokenURI(1)
+				const { name, description} = getdetails(recheckURI)
+				expect(name).to.equal('new-name')
+				expect(description).to.equal('new-description')
+
 			})
 		})
 		describe('fail', () => {
