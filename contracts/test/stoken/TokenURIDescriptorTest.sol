@@ -8,7 +8,6 @@ contract TokenURIDescriptorTest is ITokenURIDescriptor {
 	bool public shouldBe = true;
 	string public newName = "";
 	string public newDescription = "";
-	
 
 	function image(
 		uint256,
@@ -41,11 +40,11 @@ contract TokenURIDescriptorTest is ITokenURIDescriptor {
 	function _setName(string memory _name) public {
 		newName = _name;
 	}
-	
+
 	function _setDescription(string memory _description) public {
 		newDescription = _description;
 	}
-	
+
 	function name(
 		uint256,
 		address,

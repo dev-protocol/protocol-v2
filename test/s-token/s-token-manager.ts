@@ -27,11 +27,11 @@ type Attributes = Array<{
 	display_type?: string
 }>
 type Details = {
-	name: string;
-	description: string;
-	image: string;
-	attributes: Attributes;
-  };
+	name: string
+	description: string
+	image: string
+	attributes: Attributes
+}
 
 contract('STokensManager', ([deployer, user]) => {
 	const MAX_UINT256 =
@@ -138,7 +138,6 @@ contract('STokensManager', ([deployer, user]) => {
 		}
 		return details
 	}
-
 
 	const checkName = (
 		name: string,
@@ -256,10 +255,9 @@ contract('STokensManager', ([deployer, user]) => {
 				await descriptor._setName('new-name')
 				await descriptor._setDescription('new-description')
 				const recheckURI = await dev.sTokensManager.tokenURI(1)
-				const { name, description} = getdetails(recheckURI)
+				const { name, description } = getdetails(recheckURI)
 				expect(name).to.equal('new-name')
 				expect(description).to.equal('new-description')
-
 			})
 		})
 		describe('fail', () => {
