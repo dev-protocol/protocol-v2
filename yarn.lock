@@ -1796,10 +1796,10 @@
   dependencies:
     "@types/node" "*"
 
-"@types/bent@7.3.2":
-  version "7.3.2"
-  resolved "https://registry.yarnpkg.com/@types/bent/-/bent-7.3.2.tgz#07b4f7bcec577be27cdb9e9034eb0de0242481a7"
-  integrity sha512-wtE/+NIk55jVUHJFt//kxmq8cQ7ef4J2U9HO7lZqKW4lvvPYTd7KfAEKZLsFmDgmzzMvfd4cPSdv3blqVWmqSQ==
+"@types/bent@7.3.3":
+  version "7.3.3"
+  resolved "https://registry.yarnpkg.com/@types/bent/-/bent-7.3.3.tgz#b8daa06e72219045b3f67f968d590d3df3875d96"
+  integrity sha512-5NEIhVzHiZ6wMjFBmJ3gwjxwGug6amMoAn93rtDBttwrODxm+bt63u+MJA7H9NGGM4X1m73sJrAxDapktl036Q==
   dependencies:
     "@types/node" "*"
 
