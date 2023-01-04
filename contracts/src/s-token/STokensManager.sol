@@ -29,12 +29,13 @@ contract STokensManager is
 	mapping(uint256 => string) private tokenUriImage;
 	mapping(uint256 => bool) public override isFreezed;
 	mapping(address => address) public override descriptorOf;
-	mapping(address => mapping(bytes32 => address))
-		public
-		override descriptorOfPropertyByPayload;
 	mapping(uint256 => bytes32) public override payloadOf;
 	mapping(address => uint24) public royaltyOf;
 	address private proxyAdmin;
+
+	mapping(address => mapping(bytes32 => address))
+		public
+		override descriptorOfPropertyByPayload;
 
 	using Counters for Counters.Counter;
 	using EnumerableSet for EnumerableSet.UintSet;
