@@ -1102,6 +1102,7 @@ contract('STokensManager', ([deployer, user]) => {
 				validateErrorMessage(res, 'ERC2981Royalties: Too high', false)
 			})
 		})
+
 		describe('royaltyInfo', () => {
 			describe('success', () => {
 				it('get royalty info', async () => {
