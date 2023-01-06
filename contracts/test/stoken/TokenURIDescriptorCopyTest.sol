@@ -3,7 +3,7 @@ pragma solidity =0.8.9;
 
 import "../../interface/ITokenURIDescriptor.sol";
 
-contract TokenURIDescriptorTest is ITokenURIDescriptor {
+contract TokenURIDescriptorCopyTest is ITokenURIDescriptor {
 	mapping(uint256 => bytes32) public _dataOf;
 	bool public shouldBe = true;
 	string public newName = "";

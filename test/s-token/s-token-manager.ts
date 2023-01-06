@@ -4,6 +4,7 @@ import BigNumber from 'bignumber.js'
 import { DevProtocolInstance } from '../test-lib/instance'
 import type {
 	TokenURIDescriptorTestInstance,
+	TokenURIDescriptorCopyTestInstance,
 	PropertyInstance,
 } from '../../types/truffle-contracts'
 import { getPropertyAddress } from '../test-lib/utils/log'
@@ -38,7 +39,12 @@ contract('STokensManager', ([deployer, user]) => {
 		'115792089237316195423570985008687907853269984665640564039457584007913129639935'
 	const deployerBalance = new BigNumber(1e18).times(10000000)
 	const init = async (): Promise<
-		[DevProtocolInstance, PropertyInstance, TokenURIDescriptorTestInstance]
+		[
+			DevProtocolInstance,
+			PropertyInstance,
+			TokenURIDescriptorTestInstance,
+			TokenURIDescriptorCopyTestInstance
+		]
 	> => {
 		const dev = new DevProtocolInstance(deployer)
 		await dev.generateAddressRegistry()
@@ -76,17 +82,19 @@ contract('STokensManager', ([deployer, user]) => {
 
 		await dev.lockup.update()
 		const descriptor = await dev.getTokenUriDescriptor()
-		return [dev, property, descriptor]
+		const descriptorCopy = await dev.getTokenUriDescriptorCopy()
+		return [dev, property, descriptor, descriptorCopy]
 	}
 
 	let dev: DevProtocolInstance
 	let property: PropertyInstance
 	let descriptor: TokenURIDescriptorTestInstance
+	let descriptorCopy: TokenURIDescriptorCopyTestInstance
 	let snapshot: Snapshot
 	let snapshotId: string
 
 	before(async () => {
-		;[dev, property, descriptor] = await init()
+		;[dev, property, descriptor, descriptorCopy] = await init()
 	})
 
 	beforeEach(async () => {
@@ -319,6 +327,24 @@ contract('STokensManager', ([deployer, user]) => {
 					getEventValue(devLocal.sTokensManager)('Minted', 'tokenId'),
 				])
 				expect(_tokenId2).to.equal('2')
+			})
+			it('gives priority to payload based descriptor', async () => {
+				await dev.sTokensManager.setTokenURIDescriptor(
+					property.address,
+					descriptor.address,
+					[web3.utils.keccak256('PAYLOAD')],
+					{ from: user }
+				)
+				await (dev.sTokensManager as any).methods[
+					'setTokenURIDescriptor(address,address)'
+				](property.address, descriptorCopy.address, { from: user })
+				await descriptorCopy.__shouldBe(false)
+				// @ts-ignore
+				await dev.lockup.depositToProperty(
+					property.address,
+					'10000',
+					web3.utils.keccak256('PAYLOAD')
+				)
 			})
 		})
 		describe('fail', () => {
@@ -732,141 +758,128 @@ contract('STokensManager', ([deployer, user]) => {
 		})
 	})
 
-	describe('setTokenURIDescriptor', () => {
-		describe('with payloaed', () => {
-			describe('success', () => {
-				const payload1: string[] = [web3.utils.keccak256('FIRST_PAYLOAD')]
-				const payload2: string[] = [web3.utils.keccak256('SECOND_PAYLOAD')]
-				it('set descriptor address', async () => {
-					await dev.sTokensManager.setTokenURIDescriptor(
-						property.address,
-						descriptor.address,
-						payload1,
-						{ from: user }
-					)
-					await dev.sTokensManager.setTokenURIDescriptor(
-						property.address,
-						descriptor.address,
-						payload2,
-						{ from: user }
-					)
-					const tmp = await dev.sTokensManager.descriptorOfPropertyByPayload(
-						property.address,
-						payload1[0]
-					)
-					const tmp2 = await dev.sTokensManager.descriptorOfPropertyByPayload(
-						property.address,
-						payload2[0]
-					)
-					expect(tmp).to.equal(descriptor.address)
-					expect(tmp2).to.equal(descriptor.address)
-				})
-				it('stores the passed payload', async () => {
-					const payload: string[] = [web3.utils.keccak256('ADDITIONAL_BYTES')]
-					await dev.sTokensManager.setTokenURIDescriptor(
-						property.address,
-						descriptor.address,
-						payload,
-						{ from: user }
-					)
-					// @ts-ignore
-					await dev.lockup.depositToProperty(
+	describe('setTokenURIDescriptor: with payload', () => {
+		describe('success', () => {
+			const payload1: string[] = [web3.utils.keccak256('FIRST_PAYLOAD')]
+			const payload2: string[] = [web3.utils.keccak256('SECOND_PAYLOAD')]
+			it('set descriptor address', async () => {
+				await dev.sTokensManager.setTokenURIDescriptor(
+					property.address,
+					descriptor.address,
+					payload1,
+					{ from: user }
+				)
+				await dev.sTokensManager.setTokenURIDescriptor(
+					property.address,
+					descriptor.address,
+					payload2,
+					{ from: user }
+				)
+				const tmp = await dev.sTokensManager.descriptorOfPropertyByPayload(
+					property.address,
+					payload1[0]
+				)
+				const tmp2 = await dev.sTokensManager.descriptorOfPropertyByPayload(
+					property.address,
+					payload2[0]
+				)
+				expect(tmp).to.equal(descriptor.address)
+				expect(tmp2).to.equal(descriptor.address)
+			})
+			it('stores the passed payload', async () => {
+				const payload: string[] = [web3.utils.keccak256('ADDITIONAL_BYTES')]
+				await dev.sTokensManager.setTokenURIDescriptor(
+					property.address,
+					descriptor.address,
+					payload,
+					{ from: user }
+				)
+				// @ts-ignore
+				await dev.lockup.depositToProperty(
+					property.address,
+					'10000',
+					web3.utils.keccak256('ADDITIONAL_BYTES')
+				)
+				const key = await descriptor.dataOf(1)
+				expect(key).to.equal(web3.utils.keccak256('ADDITIONAL_BYTES'))
+			})
+		})
+		describe('fail', () => {
+			it('illegal property', async () => {
+				const payload: string[] = [web3.utils.keccak256('ADDITIONAL_BYTES')]
+				const res = await dev.sTokensManager
+					.setTokenURIDescriptor(property.address, descriptor.address, payload)
+					.catch((err: Error) => err)
+				validateErrorMessage(res, 'illegal access')
+			})
+			it('revert on onBeforeMint', async () => {
+				const payload: string[] = [web3.utils.keccak256('ADDITIONAL_BYTES')]
+				await dev.sTokensManager.setTokenURIDescriptor(
+					property.address,
+					descriptor.address,
+					payload,
+					{ from: user }
+				)
+				await descriptor.__shouldBe(false)
+				// @ts-ignore
+				const res = await dev.lockup
+					.depositToProperty(
 						property.address,
 						'10000',
 						web3.utils.keccak256('ADDITIONAL_BYTES')
 					)
-					const key = await descriptor.dataOf(1)
-					expect(key).to.equal(web3.utils.keccak256('ADDITIONAL_BYTES'))
-				})
-			})
-			describe('fail', () => {
-				it('illegal property', async () => {
-					const payload: string[] = [web3.utils.keccak256('ADDITIONAL_BYTES')]
-					const res = await dev.sTokensManager
-						.setTokenURIDescriptor(
-							property.address,
-							descriptor.address,
-							payload
-						)
-						.catch((err: Error) => err)
-					validateErrorMessage(res, 'illegal access')
-				})
-				it('revert on onBeforeMint', async () => {
-					const payload: string[] = [web3.utils.keccak256('ADDITIONAL_BYTES')]
-					await dev.sTokensManager.setTokenURIDescriptor(
-						property.address,
-						descriptor.address,
-						payload,
-						{ from: user }
-					)
-					await descriptor.__shouldBe(false)
-					// @ts-ignore
-					const res = await dev.lockup
-						.depositToProperty(
-							property.address,
-							'10000',
-							web3.utils.keccak256('ADDITIONAL_BYTES')
-						)
-						.catch((err: Error) => err)
-					validateErrorMessage(res, 'failed to call onBeforeMint')
-				})
+					.catch((err: Error) => err)
+				validateErrorMessage(res, 'failed to call onBeforeMint')
 			})
 		})
-		// Describe('without payloaed', () => {
-		// 	describe('success', () => {
-		// 		it('set descriptor address', async () => {
-		// 			await dev.sTokensManager.setTokenURIDescriptor(
-		// 				property.address,
-		// 				descriptor.address,
-		// 				{ from: user}
-		// 			)
-		// 			const tmp = await dev.sTokensManager.descriptorOf(
-		// 				property.address
-		// 			)
-		// 			expect(tmp).to.equal(descriptor.address)
-		// 		})
-		// 		it('stores the passed payload', async () => {
-		// 			await dev.sTokensManager.setTokenURIDescriptor(
-		// 				property.address,
-		// 				descriptor.address,
-		// 				{ from: user}
-		// 			)
-		// 			// @ts-ignore
-		// 			await dev.lockup.depositToProperty(
-		// 				property.address,
-		// 				'10000',
-		// 				web3.utils.keccak256('ADDITIONAL_BYTES')
-		// 			)
-		// 			const key = await descriptor.dataOf(1)
-		// 			expect(key).to.equal(web3.utils.keccak256('ADDITIONAL_BYTES'))
-		// 		})
-		// 	})
-		// 	describe('fail', () => {
-		// 		it('illegal property', async () => {
-		// 			const res = await dev.sTokensManager
-		// 				.setTokenURIDescriptor(property.address, descriptor.address, { from: user})
-		// 				.catch((err: Error) => err)
-		// 			validateErrorMessage(res, 'illegal access')
-		// 		})
-		// 		it('revert on onBeforeMint', async () => {
-		// 			await dev.sTokensManager.setTokenURIDescriptor(
-		// 				property.address,
-		// 				descriptor.address,
-		// 				{ from: user }
-		// 			)
-		// 			await descriptor.__shouldBe(false)
-		// 			// @ts-ignore
-		// 			const res = await dev.lockup
-		// 				.depositToProperty(
-		// 					property.address,
-		// 					'10000',
-		// 					web3.utils.keccak256('ADDITIONAL_BYTES')
-		// 				)
-		// 				.catch((err: Error) => err)
-		// 			validateErrorMessage(res, 'failed to call onBeforeMint')
-		// 		})
-		// 	})
-		// })
+	})
+
+	describe('setTokenURIDescriptor: without payload', () => {
+		describe('success', () => {
+			it('set descriptor address', async () => {
+				await (dev.sTokensManager as any).methods[
+					'setTokenURIDescriptor(address,address)'
+				](property.address, descriptor.address, { from: user })
+				const tmp = await dev.sTokensManager.descriptorOf(property.address)
+				expect(tmp).to.equal(descriptor.address)
+			})
+			it('stores the passed payload', async () => {
+				await (dev.sTokensManager as any).methods[
+					'setTokenURIDescriptor(address,address)'
+				](property.address, descriptor.address, { from: user })
+				// @ts-ignore
+				await dev.lockup.depositToProperty(
+					property.address,
+					'10000',
+					web3.utils.keccak256('ADDITIONAL_BYTES')
+				)
+				const key = await descriptor.dataOf(1)
+				expect(key).to.equal(web3.utils.keccak256('ADDITIONAL_BYTES'))
+			})
+		})
+		describe('fail', () => {
+			it('illegal property', async () => {
+				const res = await (dev.sTokensManager as any).methods[
+					'setTokenURIDescriptor(address,address)'
+				](property.address, descriptor.address).catch((err: Error) => err)
+				validateErrorMessage(res, 'illegal access')
+			})
+			it('revert on onBeforeMint', async () => {
+				await (dev.sTokensManager as any).methods[
+					'setTokenURIDescriptor(address,address)'
+				](property.address, descriptor.address, { from: user })
+				await descriptor.__shouldBe(false)
+				// @ts-ignore
+				const res = await dev.lockup
+					.depositToProperty(
+						property.address,
+						'10000',
+						web3.utils.keccak256('ADDITIONAL_BYTES')
+					)
+					.catch((err: Error) => err)
+				validateErrorMessage(res, 'failed to call onBeforeMint')
+			})
+		})
 	})
 
 	describe('currentIndex', () => {
@@ -937,7 +950,7 @@ contract('STokensManager', ([deployer, user]) => {
 				'ipfs://IPFS-CID'
 			)
 		})
-		it('default descriptor', async () => {
+		it('default descriptor: with payload', async () => {
 			const [positions, rewards] = generateParams()
 			const payload: string[] = [web3.utils.keccak256('PAYLOAD')]
 			await dev.sTokensManager.setTokenURIDescriptor(
@@ -952,6 +965,26 @@ contract('STokensManager', ([deployer, user]) => {
 				positions,
 				rewards,
 				web3.utils.keccak256('PAYLOAD')
+			)
+			checkTokenUri(
+				tmp,
+				positions.property,
+				positions.amount,
+				positions.cumulativeReward,
+				'dummy-string'
+			)
+		})
+		it('default descriptor: without payload', async () => {
+			const [positions, rewards] = generateParams()
+			await (dev.sTokensManager as any).methods[
+				'setTokenURIDescriptor(address,address)'
+			](property.address, descriptor.address, { from: user })
+			const tmp = await dev.sTokensManager.tokenURISim(
+				1,
+				DEFAULT_ADDRESS,
+				positions,
+				rewards,
+				'0x'
 			)
 			checkTokenUri(
 				tmp,
