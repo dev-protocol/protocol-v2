@@ -1,7 +1,7 @@
 /* eslint-disable max-nested-callbacks */
 import { init } from './withdraw-common'
-import { DevProtocolInstance } from '../test-lib/instance'
-import { PropertyInstance } from '../../types/truffle-contracts'
+import type { DevProtocolInstance } from '../test-lib/instance'
+import type { PropertyInstance } from '../../types/truffle-contracts'
 import BigNumber from 'bignumber.js'
 import {
 	toBigNumber,
@@ -350,7 +350,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 		})
 	})
 
-	describe('Withdraw; calculateonlyRewardAmount', () => {
+	describe('Withdraw; calculateRewardAmount', () => {
 		type calcResult = {
 			readonly value: BigNumber
 			readonly reword: BigNumber
@@ -385,11 +385,13 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 					.div(1e18)
 					.div(1e18)
 					.integerValue(BigNumber.ROUND_DOWN)
-				const unitPriceCap = cap
-					.minus(lastRewardCap)
-					.times(1e18)
-					.div(totalSupply)
-					.integerValue(BigNumber.ROUND_DOWN)
+				const unitPriceCap = cap.isGreaterThanOrEqualTo(lastRewardCap)
+					? cap
+							.minus(lastRewardCap)
+							.times(1e18)
+							.div(totalSupply)
+							.integerValue(BigNumber.ROUND_DOWN)
+					: cap.times(1e18).div(totalSupply).integerValue(BigNumber.ROUND_DOWN)
 				const capped = unitPriceCap
 					.times(balanceOfUser)
 					.div(1e18)
@@ -1355,6 +1357,70 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 					)
 					expect(toBigNumber(carolAmount[0]).toFixed()).to.be.equal('0')
 				})
+			})
+		})
+
+		describe('scenario: multiple properties: transfer tokens before got its first staking', () => {
+			let dev: DevProtocolInstance
+			let property1: PropertyInstance
+			let property2: PropertyInstance
+			let calc: Calculator
+
+			const alice = deployer
+			const bob = user1
+			const carol = user2
+			const dave = user4
+
+			before(async () => {
+				;[dev, , property1] = await init(deployer, user3)
+				calc = createCalculator(dev)
+				const aliceBalance = await dev.dev.balanceOf(alice).then(toBigNumber)
+				await dev.dev.mint(bob, aliceBalance)
+				await dev.dev.mint(carol, aliceBalance)
+				await dev.dev.mint(dave, aliceBalance)
+				property2 = await artifacts
+					.require('Property')
+					.at(
+						getPropertyAddress(
+							await dev.propertyFactory.create('test2', 'TEST2', bob)
+						)
+					)
+				await dev.metricsFactory.__setMetricsCountPerProperty(
+					property2.address,
+					1
+				)
+				await dev.dev.approve(dev.lockup.address, '50000000000000000000000', {
+					from: dave,
+				})
+				await dev.lockup.depositToProperty(
+					property1.address,
+					'10000000000000000000000',
+					{
+						from: dave,
+					}
+				)
+				await forwardBlockTimestamp(3)
+			})
+
+			it('transfer tokens before got its first staking', async () => {
+				await property2.transfer(alice, '3000000000000000000000000', {
+					from: bob,
+				})
+				await dev.lockup.depositToProperty(
+					property2.address,
+					'10000000000000000000000',
+					{
+						from: dave,
+					}
+				)
+				await forwardBlockTimestamp(3)
+				const calcResult = await calc(property2, alice)
+				await validateCalculateRewardAmountData(
+					dev,
+					property2,
+					alice,
+					calcResult
+				)
 			})
 		})
 	})

@@ -21,11 +21,11 @@ contract MarketTest3 is IMarketBehavior, UsingRegistry {
 		return "MarketTest3";
 	}
 
-	function authenticate(
-		address _prop,
-		string[] memory _args,
-		address account
-	) external override returns (bool) {
+	function authenticate(address _prop, string[] memory _args, address account)
+		external
+		override
+		returns (bool)
+	{
 		require(msg.sender == associatedMarket, "Invalid sender");
 
 		bytes32 idHash = keccak256(abi.encodePacked(_args[0]));

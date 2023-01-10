@@ -1,7 +1,7 @@
 import Web3 from 'web3'
 import BigNumber from 'bignumber.js'
 import { SHARE_OF_TREASURY } from './../const'
-import { DevProtocolInstance } from '../instance'
+import type { DevProtocolInstance } from '../instance'
 
 export async function mine(count: number): Promise<void> {
 	for (let i = 0; i < count; i++) {

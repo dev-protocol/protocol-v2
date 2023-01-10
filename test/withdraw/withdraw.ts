@@ -1,7 +1,7 @@
 /* eslint-disable max-nested-callbacks */
 import { init } from './withdraw-common'
-import { DevProtocolInstance } from '../test-lib/instance'
-import { PropertyInstance } from '../../types/truffle-contracts'
+import type { DevProtocolInstance } from '../test-lib/instance'
+import type { PropertyInstance } from '../../types/truffle-contracts'
 import BigNumber from 'bignumber.js'
 import {
 	toBigNumber,
@@ -11,11 +11,8 @@ import {
 } from '../test-lib/utils/common'
 import { getPropertyAddress } from '../test-lib/utils/log'
 import { SHARE_OF_TREASURY } from '../test-lib/const'
-import {
-	takeSnapshot,
-	revertToSnapshot,
-	Snapshot,
-} from '../test-lib/utils/snapshot'
+import type { Snapshot } from '../test-lib/utils/snapshot'
+import { takeSnapshot, revertToSnapshot } from '../test-lib/utils/snapshot'
 import {
 	validateErrorMessage,
 	validateAddressErrorMessage,

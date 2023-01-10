@@ -2,7 +2,7 @@
 import { encode } from 'js-base64'
 import BigNumber from 'bignumber.js'
 import { DevProtocolInstance } from '../test-lib/instance'
-import {
+import type {
 	TokenURIDescriptorTestInstance,
 	PropertyInstance,
 } from '../../types/truffle-contracts'
@@ -18,11 +18,8 @@ import {
 	getBlockTimestamp,
 	toBigNumber,
 } from '../test-lib/utils/common'
-import {
-	takeSnapshot,
-	revertToSnapshot,
-	Snapshot,
-} from '../test-lib/utils/snapshot'
+import type { Snapshot } from '../test-lib/utils/snapshot'
+import { takeSnapshot, revertToSnapshot } from '../test-lib/utils/snapshot'
 
 type Attributes = Array<{
 	trait_type: string
@@ -844,6 +841,162 @@ contract('STokensManager', ([deployer, user]) => {
 				positions.cumulativeReward,
 				'dummy-string'
 			)
+		})
+	})
+
+	describe('totalSupply', () => {
+		it('initial value is 0', async () => {
+			const totalSupply = await dev.sTokensManager.totalSupply()
+			expect(totalSupply.toString()).to.equal('0')
+		})
+		it('increace totalSupply after minted', async () => {
+			await dev.lockup.depositToProperty(property.address, '1')
+			const totalSupply1 = await dev.sTokensManager.totalSupply()
+			expect(totalSupply1.toString()).to.equal('1')
+
+			await dev.lockup.depositToProperty(property.address, '2')
+			const totalSupply2 = await dev.sTokensManager.totalSupply()
+			expect(totalSupply2.toString()).to.equal('2')
+		})
+	})
+	describe('tokenOfOwnerByIndex', () => {
+		describe('success', () => {
+			it('increace tokenOfOwnerByIndex after minted', async () => {
+				await dev.lockup.depositToProperty(property.address, '1')
+				const tokenOfOwnerByIndex1 =
+					await dev.sTokensManager.tokenOfOwnerByIndex(deployer, 0)
+				expect(tokenOfOwnerByIndex1.toString()).to.equal('1')
+
+				await dev.lockup.depositToProperty(property.address, '1')
+				const tokenOfOwnerByIndex2 =
+					await dev.sTokensManager.tokenOfOwnerByIndex(deployer, 1)
+				expect(tokenOfOwnerByIndex2.toString()).to.equal('2')
+			})
+			it('[multiple persons] increace tokenOfOwnerByIndex after minted', async () => {
+				await dev.lockup.depositToProperty(property.address, '1')
+				await dev.lockup.depositToProperty(property.address, '1')
+				const tokenOfOwnerByIndex1 =
+					await dev.sTokensManager.tokenOfOwnerByIndex(deployer, 1)
+				expect(tokenOfOwnerByIndex1.toString()).to.equal('2')
+
+				await dev.dev.mint(user, deployerBalance)
+				await dev.dev.approve(dev.lockup.address, '100000', { from: user })
+
+				await dev.lockup.depositToProperty(property.address, '1', {
+					from: user,
+				})
+				const tokenOfOwnerByIndex2 =
+					await dev.sTokensManager.tokenOfOwnerByIndex(user, 0)
+				expect(tokenOfOwnerByIndex2.toString()).to.equal('3')
+			})
+		})
+		describe('fail', () => {
+			it('throws the error when the passed index is over than the holding index', async () => {
+				const res = await dev.sTokensManager
+					.tokenOfOwnerByIndex(deployer, 0)
+					.catch((err: Error) => err)
+				validateErrorMessage(
+					res,
+					'ERC721Enumerable: owner index out of bounds',
+					false
+				)
+			})
+			it('[after minted] throws the error when the passed index is over than the holding index', async () => {
+				await dev.lockup.depositToProperty(property.address, '1')
+
+				const res = await dev.sTokensManager
+					.tokenOfOwnerByIndex(deployer, 1)
+					.catch((err: Error) => err)
+				validateErrorMessage(
+					res,
+					'ERC721Enumerable: owner index out of bounds',
+					false
+				)
+			})
+		})
+	})
+	describe('tokenByIndex', () => {
+		describe('success', () => {
+			it('increace tokenByIndex after minted', async () => {
+				await dev.lockup.depositToProperty(property.address, '1')
+				const tokenByIndex1 = await dev.sTokensManager.tokenByIndex(0)
+				expect(tokenByIndex1.toString()).to.equal('1')
+
+				await dev.lockup.depositToProperty(property.address, '1')
+				const tokenByIndex2 = await dev.sTokensManager.tokenByIndex(1)
+				expect(tokenByIndex2.toString()).to.equal('2')
+			})
+		})
+		describe('fail', () => {
+			it('throws the error when the passed index is over than the minted amount', async () => {
+				const res = await dev.sTokensManager
+					.tokenByIndex('0')
+					.catch((err: Error) => err)
+
+				validateErrorMessage(
+					res,
+					'ERC721Enumerable: global index out of bounds',
+					false
+				)
+			})
+			it('[after minted] throws the error when the passed index is over than the minted amount', async () => {
+				await dev.lockup.depositToProperty(property.address, '1')
+
+				const res = await dev.sTokensManager
+					.tokenByIndex('1')
+					.catch((err: Error) => err)
+
+				validateErrorMessage(
+					res,
+					'ERC721Enumerable: global index out of bounds',
+					false
+				)
+			})
+		})
+	})
+	describe('setSTokenRoyaltyForProperty', () => {
+		describe('success', () => {
+			it('set sToken royalty for property', async () => {
+				await dev.sTokensManager.setSTokenRoyaltyForProperty(
+					property.address,
+					'1000',
+					{ from: user }
+				)
+				const royalty = await dev.sTokensManager.royaltyOf(property.address)
+				expect(royalty.toString()).to.equal('1000')
+			})
+		})
+		describe('fail', () => {
+			it('not authorized', async () => {
+				const res = await dev.sTokensManager
+					.setSTokenRoyaltyForProperty(property.address, '1000')
+					.catch((err: Error) => err)
+				validateErrorMessage(res, 'illegal access', false)
+			})
+			it('throws the error when the passed royalty is over than 100%', async () => {
+				const res = await dev.sTokensManager
+					.setSTokenRoyaltyForProperty(property.address, '10001', {
+						from: user,
+					})
+					.catch((err: Error) => err)
+
+				validateErrorMessage(res, 'ERC2981Royalties: Too high', false)
+			})
+		})
+		describe('royaltyInfo', () => {
+			describe('success', () => {
+				it('get royalty info', async () => {
+					await dev.sTokensManager.setSTokenRoyaltyForProperty(
+						property.address,
+						'1000',
+						{ from: user }
+					)
+					await dev.lockup.depositToProperty(property.address, '10000')
+					const royaltyInfo = await dev.sTokensManager.royaltyInfo(1, '100')
+					expect(royaltyInfo[0]).to.equal(user)
+					expect(royaltyInfo[1].toString()).to.equal('10')
+				})
+			})
 		})
 	})
 })

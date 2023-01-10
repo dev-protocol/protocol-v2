@@ -1,5 +1,5 @@
 import { DevProtocolInstance } from '../test-lib/instance'
-import { PropertyInstance } from '../../types/truffle-contracts'
+import type { PropertyInstance } from '../../types/truffle-contracts'
 import BigNumber from 'bignumber.js'
 import { getPropertyAddress } from '../test-lib/utils/log'
 

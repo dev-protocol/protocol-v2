@@ -1,4 +1,4 @@
-import { CurveTestInstance } from '../../../types/truffle-contracts'
+import type { CurveTestInstance } from '../../../types/truffle-contracts'
 import { toBigNumber } from '../../test-lib/utils/common'
 import BigNumber from 'bignumber.js'
 

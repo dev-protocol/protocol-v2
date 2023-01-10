@@ -6,11 +6,8 @@ import {
 } from '../test-lib/utils/error'
 import { DEFAULT_ADDRESS } from '../test-lib/const'
 import { toBigNumber, splitValue } from '../test-lib/utils/common'
-import {
-	takeSnapshot,
-	revertToSnapshot,
-	Snapshot,
-} from '../test-lib/utils/snapshot'
+import type { Snapshot } from '../test-lib/utils/snapshot'
+import { takeSnapshot, revertToSnapshot } from '../test-lib/utils/snapshot'
 
 contract(
 	'PropertyTest',

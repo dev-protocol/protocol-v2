@@ -1,15 +1,12 @@
 /* eslint-disable @typescript-eslint/restrict-plus-operands */
 /* eslint-disable new-cap */
-import { DevArbitrumInstance } from '../../types/truffle-contracts'
+import type { DevArbitrumInstance } from '../../types/truffle-contracts'
 import { DevProtocolInstance } from '../test-lib/instance'
 import { validateErrorMessage } from '../test-lib/utils/error'
 import { getEventValue } from '../test-lib/utils/event'
-import {
-	takeSnapshot,
-	revertToSnapshot,
-	Snapshot,
-} from '../test-lib/utils/snapshot'
-import BigNumber from 'bignumber.js'
+import type { Snapshot } from '../test-lib/utils/snapshot'
+import { takeSnapshot, revertToSnapshot } from '../test-lib/utils/snapshot'
+import type BigNumber from 'bignumber.js'
 
 contract('DevArbitrum', ([deployer, user1, user2]) => {
 	const createDev = async (): Promise<DevProtocolInstance> => {

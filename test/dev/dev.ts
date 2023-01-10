@@ -1,12 +1,9 @@
 /* eslint-disable new-cap */
-import { DevInstance } from '../../types/truffle-contracts'
+import type { DevInstance } from '../../types/truffle-contracts'
 import { DevProtocolInstance } from '../test-lib/instance'
 import { validateErrorMessage } from '../test-lib/utils/error'
-import {
-	takeSnapshot,
-	revertToSnapshot,
-	Snapshot,
-} from '../test-lib/utils/snapshot'
+import type { Snapshot } from '../test-lib/utils/snapshot'
+import { takeSnapshot, revertToSnapshot } from '../test-lib/utils/snapshot'
 
 contract('Dev', ([deployer, user1, user2]) => {
 	const createDev = async (): Promise<DevProtocolInstance> => {

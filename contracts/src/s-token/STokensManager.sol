@@ -1,7 +1,10 @@
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity =0.8.9;
 
+import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/utils/introspection/IERC165Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
+import "@openzeppelin/contracts/proxy/transparent/ProxyAdmin.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "../../interface/ISTokensManager.sol";
@@ -15,6 +18,7 @@ import "./STokensDescriptor.sol";
 contract STokensManager is
 	ISTokensManager,
 	STokensDescriptor,
+	IERC721EnumerableUpgradeable,
 	ERC721Upgradeable,
 	InitializableUsingRegistry
 {
@@ -26,6 +30,8 @@ contract STokensManager is
 	mapping(uint256 => bool) public override isFreezed;
 	mapping(address => address) public override descriptorOf;
 	mapping(uint256 => bytes32) public override payloadOf;
+	mapping(address => uint24) public royaltyOf;
+	address private proxyAdmin;
 
 	using Counters for Counters.Counter;
 	using EnumerableSet for EnumerableSet.UintSet;
@@ -56,6 +62,73 @@ contract STokensManager is
 		__UsingRegistry_init(_registry);
 	}
 
+	/**
+	 * @dev See {IERC165-supportsInterface}.
+	 */
+	function supportsInterface(bytes4 interfaceId)
+		public
+		view
+		virtual
+		override(IERC165Upgradeable, ERC721Upgradeable)
+		returns (bool)
+	{
+		return
+			interfaceId == type(IERC721EnumerableUpgradeable).interfaceId ||
+			super.supportsInterface(interfaceId);
+	}
+
+	/**
+	 * @dev See {IERC721Enumerable-totalSupply}.
+	 */
+	function totalSupply() public view virtual override returns (uint256) {
+		return tokenIdCounter.current();
+	}
+
+	/**
+	 * @dev See {IERC721Enumerable-tokenOfOwnerByIndex}.
+	 */
+	function tokenOfOwnerByIndex(address _owner, uint256 index)
+		public
+		view
+		virtual
+		override
+		returns (uint256)
+	{
+		// solhint-disable-next-line reason-string
+		require(
+			index < tokenIdsMapOfOwner[_owner].length(),
+			"ERC721Enumerable: owner index out of bounds"
+		);
+		return tokenIdsMapOfOwner[_owner].at(index);
+	}
+
+	/**
+	 * @dev See {IERC721Enumerable-tokenByIndex}.
+	 */
+	function tokenByIndex(uint256 index)
+		public
+		view
+		virtual
+		override
+		returns (uint256)
+	{
+		// solhint-disable-next-line reason-string
+		require(
+			index < tokenIdCounter.current(),
+			"ERC721Enumerable: global index out of bounds"
+		);
+		return index + 1;
+	}
+
+	function owner() external view returns (address) {
+		return ProxyAdmin(proxyAdmin).owner();
+	}
+
+	function setProxyAdmin(address _proxyAdmin) external {
+		require(proxyAdmin == address(0), "already set");
+		proxyAdmin = _proxyAdmin;
+	}
+
 	function tokenURI(uint256 _tokenId)
 		public
 		view
@@ -66,11 +139,11 @@ contract STokensManager is
 		require(_tokenId <= curretnTokenId, "not found");
 		StakingPositions memory positons = getStoragePositions(_tokenId);
 		Rewards memory tokenRewards = _rewards(_tokenId);
-		address owner = ownerOf(_tokenId);
+		address _owner = ownerOf(_tokenId);
 		return
 			_tokenURI(
 				_tokenId,
-				owner,
+				_owner,
 				positons,
 				tokenRewards,
 				payloadOf[_tokenId]
@@ -285,11 +358,11 @@ contract STokensManager is
 		return keccak256(abi.encodePacked("_positions", _tokenId));
 	}
 
-	function _beforeTokenTransfer(
-		address from,
-		address to,
-		uint256 tokenId
-	) internal virtual override {
+	function _beforeTokenTransfer(address from, address to, uint256 tokenId)
+		internal
+		virtual
+		override
+	{
 		super._beforeTokenTransfer(from, to, tokenId);
 
 		if (from == address(0)) {
@@ -302,5 +375,30 @@ contract STokensManager is
 			tokenIdsMapOfOwner[from].remove(tokenId);
 			tokenIdsMapOfOwner[to].add(tokenId);
 		}
+	}
+
+	/// @dev Sets a resale royalty for the passed Property Tokens's STokens
+	/// @param _property the property for which we register the royalties
+	/// @param _percentage percentage (using 2 decimals - 10000 = 100, 0 = 0)
+
+	function setSTokenRoyaltyForProperty(address _property, uint256 _percentage)
+		external
+		onlyPropertyAuthor(_property)
+	{
+		require(_percentage <= 10000, "ERC2981Royalties: Too high");
+		royaltyOf[_property] = uint24(_percentage);
+	}
+
+	/**
+	 * @dev See {IERC2981Royalties}
+	 */
+	function royaltyInfo(uint256 tokenId, uint256 value)
+		external
+		view
+		returns (address receiver, uint256 royaltyAmount)
+	{
+		StakingPositions memory currentPosition = getStoragePositions(tokenId);
+		receiver = IProperty(currentPosition.property).author();
+		royaltyAmount = (value * royaltyOf[currentPosition.property]) / 10000;
 	}
 }

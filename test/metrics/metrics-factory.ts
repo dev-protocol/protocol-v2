@@ -5,11 +5,8 @@ import {
 	validateErrorMessage,
 	validateAddressErrorMessage,
 } from '../test-lib/utils/error'
-import {
-	takeSnapshot,
-	revertToSnapshot,
-	Snapshot,
-} from '../test-lib/utils/snapshot'
+import type { Snapshot } from '../test-lib/utils/snapshot'
+import { takeSnapshot, revertToSnapshot } from '../test-lib/utils/snapshot'
 
 contract(
 	'MetricsFactoryTest',

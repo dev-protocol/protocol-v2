@@ -1,4 +1,4 @@
-import BigNumber from 'bignumber.js'
+import type BigNumber from 'bignumber.js'
 
 contract('Policy', () => {
 	const policyContract = artifacts.require('PolicyTest1')

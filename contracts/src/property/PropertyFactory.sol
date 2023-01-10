@@ -32,11 +32,11 @@ contract PropertyFactory is InitializableUsingRegistry, IPropertyFactory {
 	 * @param _author Author address of the new Property.
 	 * @return Address of the new Property.
 	 */
-	function create(
-		string memory _name,
-		string memory _symbol,
-		address _author
-	) external override returns (address) {
+	function create(string memory _name, string memory _symbol, address _author)
+		external
+		override
+		returns (address)
+	{
 		return _create(_name, _symbol, _author);
 	}
 
