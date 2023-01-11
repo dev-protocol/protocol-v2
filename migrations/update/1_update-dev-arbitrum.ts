@@ -1,25 +1,27 @@
-const handler = async function (deployer, network) {
+import { upgradeProxy } from '@openzeppelin/truffle-upgrades'
+import { type ContractClass } from '@openzeppelin/truffle-upgrades/dist/utils'
+
+const handler = async function (_, network) {
 	if (network === 'test') {
 		return
 	}
 
-	const logic = artifacts.require('DevArbitrum')
-	await deployer.deploy(logic)
-	const logicInstance = await logic.deployed()
-	console.log(`logic address:${logicInstance.address}`)
+	const adminAddress = process.env.ADMIN!
+	const proxyAddress = process.env.DEV_PROXY!
+	console.log('Admin address:', adminAddress)
+	console.log('DevArbitrum proxy address:', proxyAddress)
 
-	const adminInstance = await artifacts
-		.require('DevAdmin')
-		.at('0xa3de020256816b3E2C18Fdc3e849Eed4c5e93C62')
-	console.log(`admin address:${adminInstance.address}`)
-
-	const proxy = '0x91F5dC90979b058eBA3be6B7B7e523df7e84e137'
-
-	await adminInstance.upgrade(proxy, logicInstance.address)
-
-	const implAddress = await adminInstance.getProxyImplementation(proxy)
-
-	console.log(`impl address:${implAddress}`)
+	await upgradeProxy(
+		proxyAddress,
+		artifacts.require('DevArbitrum') as unknown as ContractClass
+	)
+	console.log(
+		'New implementation:',
+		await artifacts
+			.require('DevAdmin')
+			.at(adminAddress)
+			.getProxyImplementation(proxyAddress)
+	)
 } as Truffle.Migration
 
 export = handler
