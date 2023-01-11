@@ -345,6 +345,20 @@ contract('STokensManager', ([deployer, user]) => {
 					'10000',
 					web3.utils.keccak256('PAYLOAD')
 				)
+				const latestTokenId = 1
+				const position = await dev.sTokensManager.positions(latestTokenId)
+				expect(position.property).to.equal(property.address)
+				expect(toBigNumber(position.amount).toNumber()).to.equal(10000)
+				expect(
+					await dev.sTokensManager.descriptorOf(position.property)
+				).to.equal(descriptorCopy.address)
+				expect(
+					await dev.sTokensManager.descriptorOfPropertyByPayload(
+						position.property,
+						web3.utils.keccak256('PAYLOAD')
+					)
+				).to.equal(descriptor.address)
+				expect(await descriptorCopy.shouldBe()).to.equal(false)
 			})
 		})
 		describe('fail', () => {
