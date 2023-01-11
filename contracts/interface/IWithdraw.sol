@@ -7,7 +7,10 @@ interface IWithdraw {
 
 	function beforeBalanceChange(address _from, address _to) external;
 
-	function calculateRewardAmount(address _property, address _user)
+	function calculateRewardAmount(
+		address _property,
+		address _user
+	)
 		external
 		view
 		returns (

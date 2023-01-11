@@ -6,11 +6,10 @@ import "../../../src/common/libs/Decimals.sol";
 contract DecimalsTest {
 	using Decimals for uint256;
 
-	function outOf(uint256 _a, uint256 _b)
-		external
-		pure
-		returns (uint256 result)
-	{
+	function outOf(
+		uint256 _a,
+		uint256 _b
+	) external pure returns (uint256 result) {
 		return _a.outOf(_b);
 	}
 

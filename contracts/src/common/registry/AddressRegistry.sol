@@ -31,12 +31,9 @@ contract AddressRegistry is OwnableUpgradeable, IAddressRegistry {
 		reg[key] = _addr;
 	}
 
-	function registries(string memory _key)
-		external
-		view
-		override
-		returns (address)
-	{
+	function registries(
+		string memory _key
+	) external view override returns (address) {
 		bytes32 key = keccak256(abi.encodePacked(_key));
 		return reg[key];
 	}

@@ -89,21 +89,15 @@ contract MetricsFactory is InitializableUsingRegistry, IMetricsFactory {
 		emit Destroy(msg.sender, IMetrics(_metrics).property(), _metrics);
 	}
 
-	function metricsCountPerProperty(address _property)
-		external
-		view
-		override
-		returns (uint256)
-	{
+	function metricsCountPerProperty(
+		address _property
+	) external view override returns (uint256) {
 		return metricsOfProperty_[_property].length();
 	}
 
-	function metricsOfProperty(address _property)
-		external
-		view
-		override
-		returns (address[] memory)
-	{
+	function metricsOfProperty(
+		address _property
+	) external view override returns (address[] memory) {
 		return metricsOfProperty_[_property].values();
 	}
 
@@ -129,13 +123,9 @@ contract MetricsFactory is InitializableUsingRegistry, IMetricsFactory {
 		metricsOfProperty_[property].remove(_addr);
 	}
 
-	function hasAssets(address _property)
-		external
-		view
-		virtual
-		override
-		returns (bool)
-	{
+	function hasAssets(
+		address _property
+	) external view virtual override returns (bool) {
 		return metricsOfProperty_[_property].length() > 0;
 	}
 }

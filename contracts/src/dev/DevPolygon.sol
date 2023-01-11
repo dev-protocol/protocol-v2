@@ -33,11 +33,10 @@ contract DevPolygon is Dev, IDevPolygon, InitializableUsingRegistry {
 	 * @param user user address for whom deposit is being done
 	 * @param depositData abi encoded amount
 	 */
-	function deposit(address user, bytes calldata depositData)
-		external
-		override
-		onlyRole(DEPOSITOR_ROLE)
-	{
+	function deposit(
+		address user,
+		bytes calldata depositData
+	) external override onlyRole(DEPOSITOR_ROLE) {
 		uint256 amount = abi.decode(depositData, (uint256));
 		_mint(user, amount);
 	}
