@@ -30,9 +30,9 @@ contract STokensManager is
 	mapping(uint256 => bool) public override isFreezed;
 	mapping(address => address) public override descriptorOf;
 	mapping(uint256 => bytes32) public override payloadOf;
-	mapping(address => uint24) public royaltyOf;
 	address private proxyAdmin;
 
+	mapping(address => uint24) public royaltyOf;
 	mapping(address => mapping(bytes32 => address))
 		public
 		override descriptorOfPropertyByPayload;
