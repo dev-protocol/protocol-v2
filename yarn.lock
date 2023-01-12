@@ -1812,10 +1812,10 @@
   resolved "https://registry.yarnpkg.com/@tsconfig/node16/-/node16-1.0.3.tgz#472eaab5f15c1ffdd7f8628bd4c4f753995ec79e"
   integrity sha512-yOlFc+7UtL/89t2ZhjPvvB/DeAr3r+Dq58IgzsFkOAvVC6NMJXmCGjbptdXdR9qsX7pKcTL+s87FtYREi2dEEQ==
 
-"@typechain/truffle-v5@8.0.2":
-  version "8.0.2"
-  resolved "https://registry.yarnpkg.com/@typechain/truffle-v5/-/truffle-v5-8.0.2.tgz#d899710b24705edb3eee5c3d8eb44ef68412d9a2"
-  integrity sha512-bjp1V/U0ow9lnqANcn8rfGf0yR+Ivogk6dMoY9gljLX3Vkd7jWfhvb4crKvvj92SpW65FQWsjoyZJnJzioOKiQ==
+"@typechain/truffle-v4@4.1.0":
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/@typechain/truffle-v4/-/truffle-v4-4.1.0.tgz#4f72606d2212c93c47c3ce03a6d9389f336da67e"
+  integrity sha512-mj9OjrXUIondFuTdJfwpNYncNZ3UmBdfRIrt60jXxjPFmJso0DU34UolG/idJf4NUbI2XP7Alz/GpsY/vnmsRA==
   dependencies:
     lodash "^4.17.15"
 
@@ -10407,6 +10407,13 @@ type@^2.7.2:
   version "2.7.2"
   resolved "https://registry.yarnpkg.com/type/-/type-2.7.2.tgz#2376a15a3a28b1efa0f5350dcf72d24df6ef98d0"
   integrity sha512-dzlvlNlt6AXU7EBSfpAscydQ7gXB+pPGsPnfJnZpiNJBDj7IaJzQlBZYGdEi4R9HmPdBv2XmWJ6YUtoTa7lmCw==
+
+typechain-target-truffle@1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/typechain-target-truffle/-/typechain-target-truffle-1.0.2.tgz#52ecbd8b7a854960567ad223660d60fcb42eaa17"
+  integrity sha512-XF3Iq2IzR+Pqvx6fcKIKGXNEk3lEcY24vYv9VqoVPfPB6vUM09PRLJCeLm1/ag6Pr2PICKUA0f4Es+YTR3ESKA==
+  dependencies:
+    lodash "^4.17.15"
 
 typechain@8.1.1:
   version "8.1.1"

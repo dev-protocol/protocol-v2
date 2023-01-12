@@ -1,5 +1,5 @@
 export function getMarketAddress(
-	transaction: Truffle.TransactionResponse<any>
+	transaction: Truffle.TransactionResponse
 ): string {
 	const tmp = transaction.logs.filter(
 		(e: { event: string }) => e.event === 'Create'
@@ -8,7 +8,7 @@ export function getMarketAddress(
 }
 
 export function getMetricsAddress(
-	transaction: Truffle.TransactionResponse<any>
+	transaction: Truffle.TransactionResponse
 ): string {
 	const tmp = transaction.logs.filter(
 		(e: { event: string }) => e.event === 'Create'
@@ -17,7 +17,7 @@ export function getMetricsAddress(
 }
 
 export function getPropertyAddress(
-	transaction: Truffle.TransactionResponse<any>
+	transaction: Truffle.TransactionResponse
 ): string {
 	const tmp = transaction.logs.filter(
 		(e: { event: string }) => e.event === 'Create'
@@ -26,7 +26,7 @@ export function getPropertyAddress(
 }
 
 export function getTransferToAddress(
-	transaction: Truffle.TransactionResponse<any>
+	transaction: Truffle.TransactionResponse
 ): string {
 	const tmp = transaction.logs.filter(
 		(e: { event: string }) => e.event === 'Transfer'

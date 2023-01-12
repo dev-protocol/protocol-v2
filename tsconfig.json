@@ -10,10 +10,7 @@
 		"skipLibCheck": true,
 		"resolveJsonModule": true,
 		"typeRoots": ["./node_modules/@types", "./types"],
-		"types": ["node", "truffle-typings"],
-		"paths": {
-			"bn.js": ["./.typings/bn.js.ts"]
-		}
+		"types": ["node", "truffle-typings"]
 	},
 	"include": ["**/*"]
 }

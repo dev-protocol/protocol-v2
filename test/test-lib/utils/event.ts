@@ -1,5 +1,4 @@
 import Web3 from 'web3'
-import type { HttpProvider } from 'web3-core'
 
 export const watch =
 	(deployedContract: any) =>
@@ -9,9 +8,7 @@ export const watch =
 	): void => {
 		const { contract: deployed } = deployedContract
 		const web3WithWebsockets = new Web3(
-			new Web3.providers.WebsocketProvider(
-				(web3.eth.currentProvider as HttpProvider).host
-			)
+			new Web3.providers.WebsocketProvider(web3.eth.currentProvider.host)
 		)
 		const { events } = new web3WithWebsockets.eth.Contract(
 			deployed._jsonInterface,

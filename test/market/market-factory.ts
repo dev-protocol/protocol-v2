@@ -28,11 +28,9 @@ contract('MarketFactoryTest', ([deployer, user, dummyMarketAddress]) => {
 		})
 		const eventFrom = result.logs.filter(
 			(log: { event: string }) => log.event === 'Create'
-			// @ts-ignore
 		)[0].args._from as string
 		const eventMarket = result.logs.filter(
 			(log: { event: string }) => log.event === 'Create'
-			// @ts-ignore
 		)[0].args._market as string
 		const marketAddress = getMarketAddress(result)
 		return [dev, marketAddress, marketBehaviorAddress, [eventMarket, eventFrom]]
