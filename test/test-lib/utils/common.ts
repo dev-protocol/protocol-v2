@@ -2,12 +2,13 @@ import Web3 from 'web3'
 import BigNumber from 'bignumber.js'
 import { SHARE_OF_TREASURY } from './../const'
 import type { DevProtocolInstance } from '../instance'
+import type { HttpProvider } from 'web3-core'
 
 export async function mine(count: number): Promise<void> {
 	for (let i = 0; i < count; i++) {
 		// eslint-disable-next-line no-await-in-loop
 		await new Promise((resolve) => {
-			web3.currentProvider.send(
+			;(web3.currentProvider as HttpProvider).send(
 				{
 					jsonrpc: '2.0',
 					method: 'evm_mine',
@@ -22,7 +23,7 @@ export async function mine(count: number): Promise<void> {
 
 export const forwardBlockTimestamp = async (seconds: number): Promise<void> => {
 	await new Promise((resolve) => {
-		web3.currentProvider.send(
+		;(web3.currentProvider as HttpProvider).send(
 			{
 				jsonrpc: '2.0',
 				method: 'evm_increaseTime',
@@ -51,7 +52,9 @@ export const collectsEth =
 		const getBalance = async (address: string): Promise<BigNumber> =>
 			web3.eth.getBalance(address).then(toBigNumber)
 		const web3Client = new Web3(
-			new Web3.providers.WebsocketProvider(web3.eth.currentProvider.host)
+			new Web3.providers.WebsocketProvider(
+				(web3.eth.currentProvider as HttpProvider).host
+			)
 		)
 		const minimum = toBigNumber(Web3.utils.toWei(`${min}`, 'ether'))
 		accounts.map(async (account) => {
@@ -73,12 +76,12 @@ export const collectsEth =
 
 export const getBlock = async (): Promise<number> => web3.eth.getBlockNumber()
 
-export function gasLogger(txRes: Truffle.TransactionResponse) {
+export function gasLogger(txRes: Truffle.TransactionResponse<any>) {
 	console.log(txRes.receipt.gasUsed)
 }
 
 export function keccak256(...values: string[]): string {
-	return (web3 as Web3).utils.soliditySha3(...values)!
+	return web3.utils.soliditySha3(...values)!
 }
 
 export function splitValue(

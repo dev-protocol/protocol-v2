@@ -3,7 +3,7 @@ import type {
 	AddressRegistryInstance,
 	DevInstance,
 	DevArbitrumInstance,
-	LockupInstance,
+	LockupInstance as _LockupInstance,
 	PropertyFactoryInstance,
 	PolicyFactoryTestInstance,
 	MarketFactoryTestInstance,
@@ -13,7 +13,7 @@ import type {
 	WithdrawTestInstance,
 	MetricsInstance,
 	TreasuryTestInstance,
-	STokensManagerInstance,
+	STokensManagerInstance as _STokensManagerInstance,
 	DevBridgeInstance,
 	DevAdminInstance,
 	ArbSysTestInstance,
@@ -25,6 +25,16 @@ import type {
 type ContractInstance = {
 	at: any
 	new: any
+}
+
+type LockupInstance = _LockupInstance & {
+	depositToProperty: _LockupInstance['methods']['depositToProperty(address,uint256)'] &
+		_LockupInstance['methods']['depositToProperty(address,uint256,bytes32)']
+}
+
+type STokensManagerInstance = _STokensManagerInstance & {
+	setTokenURIDescriptor: _STokensManagerInstance['methods']['setTokenURIDescriptor(address,address,bytes32[])']
+	safeTransferFrom: _STokensManagerInstance['methods']['safeTransferFrom(address,address,uint256)']
 }
 
 export const deployProxy = async <L extends ContractInstance>(
