@@ -1,5 +1,6 @@
 build
 contracts/modules
+.openzeppelin/
 *.js
 !truffle-config.js
 !truffle-config.arbitrum.js
