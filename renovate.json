@@ -12,6 +12,10 @@
 		{
 			"packageNames": ["@devprotocol/util-contracts"],
 			"allowedVersions": "3.3.0"
+		},
+		{
+			"packageNames": ["p-queue"],
+			"allowedVersions": "< 7.0.0"
 		}
 	]
 }
