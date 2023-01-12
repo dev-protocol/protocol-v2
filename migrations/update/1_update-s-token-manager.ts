@@ -1,26 +1,30 @@
-import { upgradeProxy } from '@openzeppelin/truffle-upgrades'
+import { upgradeProxy, validateUpgrade } from '@openzeppelin/truffle-upgrades'
 import { type ContractClass } from '@openzeppelin/truffle-upgrades/dist/utils'
+
+const STokensManager = artifacts.require('STokensManager')
 
 const handler = async function (_, network) {
 	if (network === 'test') {
 		return
 	}
 
-	const adminAddress = process.env.ADMIN!
 	const proxyAddress = process.env.S_TOKEN_MANAGER_PROXY!
-	console.log('Admin address:', adminAddress)
-	console.log('STokensManager proxy address:', proxyAddress)
+	const existing = await STokensManager.deployed().catch(() =>
+		STokensManager.at(proxyAddress)
+	)
+
+	console.log('proxy:', existing.address)
+
+	await validateUpgrade(
+		existing.address,
+		STokensManager as unknown as ContractClass
+	)
+
+	console.log('New implementation is valid')
 
 	await upgradeProxy(
-		proxyAddress,
-		artifacts.require('STokensManager') as unknown as ContractClass
-	)
-	console.log(
-		'New implementation:',
-		await artifacts
-			.require('DevAdmin')
-			.at(adminAddress)
-			.getProxyImplementation(proxyAddress)
+		existing.address,
+		STokensManager as unknown as ContractClass
 	)
 } as Truffle.Migration
 
