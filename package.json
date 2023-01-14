@@ -46,7 +46,7 @@
 		"husky": "8.0.3",
 		"js-base64": "3.7.4",
 		"p-queue": "6.6.2",
-		"prettier": "2.8.2",
+		"prettier": "2.8.3",
 		"prettier-plugin-solidity": "1.1.1",
 		"solhint": "3.3.7",
 		"truffle": "5.4.1",
