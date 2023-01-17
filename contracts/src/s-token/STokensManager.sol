@@ -309,7 +309,7 @@ contract STokensManager is
 			_payload
 		] == address(0)
 			? descriptorOf[_positions.property]
-			: descriptorOfPropertyByPayload[_positions.property][_payload]; 
+			: descriptorOfPropertyByPayload[_positions.property][_payload];
 		if (descriptor != address(0)) {
 			if (bytes(_tokenUriImage).length == 0) {
 				try
