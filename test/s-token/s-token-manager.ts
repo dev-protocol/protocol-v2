@@ -5,6 +5,7 @@ import { DevProtocolInstance } from '../test-lib/instance'
 import type {
 	TokenURIDescriptorTestInstance,
 	TokenURIDescriptorCopyTestInstance,
+	TokenURIDescriptorLegacyTestInstance,
 	PropertyInstance,
 } from '../../types/truffle-contracts'
 import { getPropertyAddress } from '../test-lib/utils/log'
@@ -43,7 +44,8 @@ contract('STokensManager', ([deployer, user]) => {
 			DevProtocolInstance,
 			PropertyInstance,
 			TokenURIDescriptorTestInstance,
-			TokenURIDescriptorCopyTestInstance
+			TokenURIDescriptorCopyTestInstance,
+			TokenURIDescriptorLegacyTestInstance
 		]
 	> => {
 		const dev = new DevProtocolInstance(deployer)
@@ -83,18 +85,21 @@ contract('STokensManager', ([deployer, user]) => {
 		await dev.lockup.update()
 		const descriptor = await dev.getTokenUriDescriptor()
 		const descriptorCopy = await dev.getTokenUriDescriptorCopy()
-		return [dev, property, descriptor, descriptorCopy]
+		const descriptorLegacy = await dev.getTokenUriDescriptorLegacy()
+		return [dev, property, descriptor, descriptorCopy, descriptorLegacy]
 	}
 
 	let dev: DevProtocolInstance
 	let property: PropertyInstance
 	let descriptor: TokenURIDescriptorTestInstance
 	let descriptorCopy: TokenURIDescriptorCopyTestInstance
+	let descriptorLegacy: TokenURIDescriptorLegacyTestInstance
 	let snapshot: Snapshot
 	let snapshotId: string
 
 	before(async () => {
-		;[dev, property, descriptor, descriptorCopy] = await init()
+		;[dev, property, descriptor, descriptorCopy, descriptorLegacy] =
+			await init()
 	})
 
 	beforeEach(async () => {
@@ -266,6 +271,22 @@ contract('STokensManager', ([deployer, user]) => {
 				const { name, description } = getdetails(recheckURI)
 				expect(name).to.equal('new-name')
 				expect(description).to.equal('new-description')
+			})
+			it('get token uri for legacy descriptors; without custom name & description', async () => {
+				// @ts-ignore
+				await dev.lockup.depositToProperty(
+					property.address,
+					'10000',
+					web3.utils.keccak256('ADDITIONAL_BYTES')
+				)
+				await dev.sTokensManager.setTokenURIDescriptor(
+					property.address,
+					descriptorLegacy.address,
+					[web3.utils.keccak256('ADDITIONAL_BYTES')],
+					{ from: user }
+				)
+				const uri = await dev.sTokensManager.tokenURI(1)
+				checkTokenUri(uri, property.address, 10000, 0, 'dummy-string')
 			})
 		})
 		describe('fail', () => {

@@ -307,34 +307,51 @@ contract STokensManager is
 		string memory _tokenUriDescription;
 		address descriptor = descriptorOfPropertyByPayload[_positions.property][
 			_payload
-		];
-		if (descriptor == address(0)) {
-			descriptor = descriptorOf[_positions.property];
-		}
+		] == address(0)
+			? descriptorOf[_positions.property]
+			: descriptorOfPropertyByPayload[_positions.property][_payload]; 
 		if (descriptor != address(0)) {
 			if (bytes(_tokenUriImage).length == 0) {
-				_tokenUriImage = ITokenURIDescriptor(descriptor).image(
+				try
+					ITokenURIDescriptor(descriptor).image(
+						_tokenId,
+						_owner,
+						_positions,
+						_rewardsArg,
+						_payload
+					)
+				returns (string memory _image) {
+					_tokenUriImage = _image;
+				} catch {
+					_tokenUriImage = "";
+				}
+			}
+			try
+				ITokenURIDescriptor(descriptor).name(
 					_tokenId,
 					_owner,
 					_positions,
 					_rewardsArg,
 					_payload
-				);
+				)
+			returns (string memory _name) {
+				_tokenUriName = _name;
+			} catch {
+				_tokenUriName = "";
 			}
-			_tokenUriName = ITokenURIDescriptor(descriptor).name(
-				_tokenId,
-				_owner,
-				_positions,
-				_rewardsArg,
-				_payload
-			);
-			_tokenUriDescription = ITokenURIDescriptor(descriptor).description(
-				_tokenId,
-				_owner,
-				_positions,
-				_rewardsArg,
-				_payload
-			);
+			try
+				ITokenURIDescriptor(descriptor).description(
+					_tokenId,
+					_owner,
+					_positions,
+					_rewardsArg,
+					_payload
+				)
+			returns (string memory _description) {
+				_tokenUriDescription = _description;
+			} catch {
+				_tokenUriDescription = "";
+			}
 		}
 		return
 			getTokenURI(
