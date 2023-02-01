@@ -1893,6 +1893,93 @@
           }
         }
       }
+    },
+    "c79ac2f0528df5b66c9092ec50870fdbe03a5e9dd1f336d4045c0e8d6195cc48": {
+      "address": "0x8030207B147e8A71A023305f0200787A98017d4C",
+      "txHash": "0xb54069f970e9a4c6d2ba348979038f5f4a5efbbcfba97ba3f49c32135ff55f9a",
+      "layout": {
+        "solcVersion": "0.8.9",
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "_initialized",
+            "type": "t_bool",
+            "src": "../@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:21"
+          },
+          {
+            "contract": "Initializable",
+            "label": "_initializing",
+            "type": "t_bool",
+            "src": "../@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:26"
+          },
+          {
+            "contract": "InitializableUsingRegistry",
+            "label": "_registry",
+            "type": "t_address",
+            "src": "../project:/contracts/src/common/registry/InitializableUsingRegistry.sol:11"
+          },
+          {
+            "contract": "PropertyFactory",
+            "label": "isProperty",
+            "type": "t_mapping(t_address,t_bool)",
+            "src": "../project:/contracts/src/property/PropertyFactory.sol:15"
+          },
+          {
+            "contract": "PropertyFactory",
+            "label": "addressesMapOfAuthor",
+            "type": "t_mapping(t_address,t_struct(AddressSet)7248_storage)",
+            "src": "../project:/contracts/src/property/PropertyFactory.sol:16"
+          }
+        ],
+        "types": {
+          "t_mapping(t_address,t_bool)": {
+            "label": "mapping(address => bool)"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_bool": {
+            "label": "bool"
+          },
+          "t_mapping(t_address,t_struct(AddressSet)7248_storage)": {
+            "label": "mapping(address => struct EnumerableSet.AddressSet)"
+          },
+          "t_struct(AddressSet)7248_storage": {
+            "label": "struct EnumerableSet.AddressSet",
+            "members": [
+              {
+                "label": "_inner",
+                "type": "t_struct(Set)6947_storage"
+              }
+            ]
+          },
+          "t_struct(Set)6947_storage": {
+            "label": "struct EnumerableSet.Set",
+            "members": [
+              {
+                "label": "_values",
+                "type": "t_array(t_bytes32)dyn_storage"
+              },
+              {
+                "label": "_indexes",
+                "type": "t_mapping(t_bytes32,t_uint256)"
+              }
+            ]
+          },
+          "t_array(t_bytes32)dyn_storage": {
+            "label": "bytes32[]"
+          },
+          "t_bytes32": {
+            "label": "bytes32"
+          },
+          "t_mapping(t_bytes32,t_uint256)": {
+            "label": "mapping(bytes32 => uint256)"
+          },
+          "t_uint256": {
+            "label": "uint256"
+          }
+        }
+      }
     }
   }
 }
