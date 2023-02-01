@@ -1,20 +1,21 @@
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity =0.8.9;
 
+import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "../../interface/IWithdraw.sol";
 import "../../interface/IProperty.sol";
 import "../../interface/IPropertyFactory.sol";
 import "../../interface/IPolicy.sol";
-import "../common/registry/UsingRegistry.sol";
+import "../common/registry/InitializableUsingRegistry.sol";
 
 /**
  * A contract that represents the assets of the user and collects staking from the stakers.
  * Property contract inherits ERC20.
  * Holders of Property contracts(tokens) receive holder rewards according to their share.
  */
-contract Property is ERC20, UsingRegistry, IProperty {
+contract Property is ERC20Upgradeable, InitializableUsingRegistry, IProperty {
 	uint8 private constant PROPERTY_DECIMALS = 18;
 	uint8 private __decimals;
 	uint256 private constant SUPPLY = 10000000000000000000000000;
@@ -32,12 +33,15 @@ contract Property is ERC20, UsingRegistry, IProperty {
 	 * @param _name The name of the new Property.
 	 * @param _symbol The symbol of the new Property.
 	 */
-	constructor(
+	function initialize(
 		address _registry,
 		address _own,
 		string memory _name,
 		string memory _symbol
-	) ERC20(_name, _symbol) UsingRegistry(_registry) {
+	) public initializer {
+		__ERC20_init(_name, _symbol);
+		__UsingRegistry_init(_registry);
+
 		/**
 		 * Validates the sender is PropertyFactory contract.
 		 */
