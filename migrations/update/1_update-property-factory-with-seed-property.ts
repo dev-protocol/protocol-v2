@@ -10,21 +10,14 @@ const handler = async function (_, network) {
 	}
 
 	const proxyAddress = process.env.PROPERTY_FACTORY_PROXY!
-	const proxyAddressAddressRegistry = process.env.ADDRESS_REGISTRY_PROXY!
-
-	const newProperty = artifacts.require('Property')
-	_.deploy(newProperty)
-	const deployedNewProperty = await newProperty.deployed()
-	console.log(`[CONFIRMED] new seed Property: ${deployedNewProperty.address}`)
+	const proxyAddressRegistry = process.env.ADDRESS_REGISTRY_PROXY!
+	const propertyAddress = process.env.PROPERTY!
 
 	const existingAddressRegistry = await AddressRegistry.deployed().catch(() =>
-		AddressRegistry.at(proxyAddressAddressRegistry)
+		AddressRegistry.at(proxyAddressRegistry)
 	)
 
-	await existingAddressRegistry.setRegistry(
-		'Property',
-		deployedNewProperty.address
-	)
+	await existingAddressRegistry.setRegistry('Property', propertyAddress)
 	console.log('[CONFIRMED] set the seed Property to Registry')
 
 	const existing = await PropertyFactory.deployed().catch(() =>
