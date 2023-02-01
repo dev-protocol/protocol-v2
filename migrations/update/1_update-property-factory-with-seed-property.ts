@@ -1,44 +1,48 @@
-const handler = async function (deployer, network) {
+import { upgradeProxy, validateUpgrade } from '@openzeppelin/truffle-upgrades'
+import { type ContractClass } from '@openzeppelin/truffle-upgrades/dist/utils'
+
+const PropertyFactory = artifacts.require('PropertyFactory')
+const AddressRegistry = artifacts.require('AddressRegistry')
+
+const handler = async function (_, network) {
 	if (network === 'test') {
 		return
 	}
 
-	const a_admin = process.env.ADMIN!
-	const a_propertyFactoryProxy = process.env.PROPERTY_FACTORY_PROXY!
-	const a_registryProxy = process.env.ADDRESS_REGISTRY_PROXY!
-	console.log(`Admin: ${a_admin}`)
-	console.log(`PropertyFactory proxy: ${a_propertyFactoryProxy}`)
-	console.log(`Registry proxy: ${a_registryProxy}`)
+	const proxyAddress = process.env.PROPERTY_FACTORY_PROXY!
+	const proxyAddressAddressRegistry = process.env.ADDRESS_REGISTRY_PROXY!
 
-	const c_new_property = artifacts.require('Property')
-	await deployer.deploy(c_new_property)
-	const i_new_property = await c_new_property.deployed()
-	console.log(`[CONFIRMED] new seed Property: ${i_new_property.address}`)
+	const newProperty = artifacts.require('Property')
+	_.deploy(newProperty)
+	const deployedNewProperty = await newProperty.deployed()
+	console.log(`[CONFIRMED] new seed Property: ${deployedNewProperty.address}`)
 
-	const registry = await artifacts
-		.require('AddressRegistry')
-		.at(a_registryProxy)
+	const existingAddressRegistry = await AddressRegistry.deployed().catch(() =>
+		AddressRegistry.at(proxyAddressAddressRegistry)
+	)
 
-	await registry.setRegistry('Property', i_new_property.address)
+	await existingAddressRegistry.setRegistry(
+		'Property',
+		deployedNewProperty.address
+	)
 	console.log('[CONFIRMED] set the seed Property to Registry')
 
-	const c_new_propertyFactory = artifacts.require('PropertyFactory')
-	await deployer.deploy(c_new_propertyFactory)
-	const i_new_propertyFactory = await c_new_propertyFactory.deployed()
-	console.log(
-		`[CONFIRMED] new PropertyFactory implementation: ${i_new_propertyFactory.address}`
+	const existing = await PropertyFactory.deployed().catch(() =>
+		PropertyFactory.at(proxyAddress)
 	)
 
-	const i_admin = await artifacts.require('DevAdmin').at(a_admin)
-	await i_admin.upgrade(a_propertyFactoryProxy, i_new_propertyFactory.address)
-	console.log(
-		`[CONFIRMED] set the new PropertyFactory implementation to its proxy`
+	console.log('proxy:', existing.address)
+
+	await validateUpgrade(
+		existing.address,
+		PropertyFactory as unknown as ContractClass
 	)
 
-	console.log(
-		`impl address: ${await i_admin.getProxyImplementation(
-			a_propertyFactoryProxy
-		)}`
+	console.log('New implementation is valid')
+
+	await upgradeProxy(
+		existing.address,
+		PropertyFactory as unknown as ContractClass
 	)
 } as Truffle.Migration
 
