@@ -14,10 +14,9 @@ abstract contract InitializableUsingRegistry is Initializable {
 	 * Initialize the argument as AddressRegistry address.
 	 */
 	/* solhint-disable func-name-mixedcase */
-	function __UsingRegistry_init(address _addressRegistry)
-		internal
-		initializer
-	{
+	function __UsingRegistry_init(
+		address _addressRegistry
+	) internal initializer {
 		_registry = _addressRegistry;
 	}
 

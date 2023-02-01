@@ -104,11 +104,10 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 	 * @param _amount staking value
 	 * @return tokenId The ID of the created new staking position
 	 */
-	function depositToProperty(address _property, uint256 _amount)
-		external
-		override
-		returns (uint256)
-	{
+	function depositToProperty(
+		address _property,
+		uint256 _amount
+	) external override returns (uint256) {
 		return _implDepositToProperty(_property, _amount, "");
 	}
 
@@ -188,12 +187,10 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 	 * @param _amount staking value
 	 * @return bool On success, true will be returned
 	 */
-	function depositToPosition(uint256 _tokenId, uint256 _amount)
-		external
-		override
-		onlyPositionOwner(_tokenId)
-		returns (bool)
-	{
+	function depositToPosition(
+		uint256 _tokenId,
+		uint256 _amount
+	) external override onlyPositionOwner(_tokenId) returns (bool) {
 		/**
 		 * Validates _amount is not 0.
 		 */
@@ -250,12 +247,10 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 	 * Withdraw staking.(NFT)
 	 * Releases staking, withdraw rewards, and transfer the staked and withdraw rewards amount to the sender.
 	 */
-	function withdrawByPosition(uint256 _tokenId, uint256 _amount)
-		external
-		override
-		onlyPositionOwner(_tokenId)
-		returns (bool)
-	{
+	function withdrawByPosition(
+		uint256 _tokenId,
+		uint256 _amount
+	) external override onlyPositionOwner(_tokenId) returns (bool) {
 		ISTokensManager sTokenManager = ISTokensManager(
 			registry().registries("STokensManager")
 		);
@@ -355,11 +350,9 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 	/**
 	 * Returns the latest cap
 	 */
-	function _calculateLatestCap(uint256 _holdersPrice)
-		private
-		view
-		returns (uint256)
-	{
+	function _calculateLatestCap(
+		uint256 _holdersPrice
+	) private view returns (uint256) {
 		uint256 cCap = cumulativeHoldersRewardCap;
 		uint256 lastHoldersPrice = lastCumulativeHoldersPriceCap;
 		uint256 additionalCap = (_holdersPrice - lastHoldersPrice) * cap;
@@ -369,9 +362,10 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 	/**
 	 * Store staking states as a snapshot.
 	 */
-	function beforeStakesChanged(address _property, RewardPrices memory _prices)
-		private
-	{
+	function beforeStakesChanged(
+		address _property,
+		RewardPrices memory _prices
+	) private {
 		/**
 		 * Gets latest cumulative holders reward for the passed Property.
 		 */
@@ -481,12 +475,9 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 	/**
 	 * Calculates holders reward and cap per Property.
 	 */
-	function calculateRewardAmount(address _property)
-		external
-		view
-		override
-		returns (uint256, uint256)
-	{
+	function calculateRewardAmount(
+		address _property
+	) external view override returns (uint256, uint256) {
 		(
 			,
 			uint256 holders,
@@ -590,7 +581,10 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 	/**
 	 * Returns the staker reward as interest.
 	 */
-	function _calculateInterestAmount(uint256 _amount, uint256 _price)
+	function _calculateInterestAmount(
+		uint256 _amount,
+		uint256 _price
+	)
 		private
 		view
 		returns (
@@ -664,12 +658,9 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 	/**
 	 * Returns the total rewards currently available for withdrawal. (For calling from external of the contract)
 	 */
-	function calculateWithdrawableInterestAmountByPosition(uint256 _tokenId)
-		external
-		view
-		override
-		returns (uint256)
-	{
+	function calculateWithdrawableInterestAmountByPosition(
+		uint256 _tokenId
+	) external view override returns (uint256) {
 		ISTokensManager sTokensManagerInstance = ISTokensManager(
 			registry().registries("STokensManager")
 		);

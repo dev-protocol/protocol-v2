@@ -20,6 +20,8 @@ import type {
 	DevPolygonInstance,
 	TokenURIDescriptorTestInstance,
 	PropertyInstance,
+	TokenURIDescriptorCopyTestInstance,
+	TokenURIDescriptorLegacyTestInstance,
 } from '../../types/truffle-contracts'
 
 type ContractInstance = {
@@ -378,6 +380,16 @@ export class DevProtocolInstance {
 
 	public async getTokenUriDescriptor(): Promise<TokenURIDescriptorTestInstance> {
 		const tmp = await contract('TokenURIDescriptorTest').new()
+		return tmp
+	}
+
+	public async getTokenUriDescriptorCopy(): Promise<TokenURIDescriptorCopyTestInstance> {
+		const tmp = await contract('TokenURIDescriptorCopyTest').new()
+		return tmp
+	}
+
+	public async getTokenUriDescriptorLegacy(): Promise<TokenURIDescriptorLegacyTestInstance> {
+		const tmp = await contract('TokenURIDescriptorLegacyTest').new()
 		return tmp
 	}
 

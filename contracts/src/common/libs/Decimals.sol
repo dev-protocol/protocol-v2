@@ -13,11 +13,10 @@ library Decimals {
 	 * @param _b Fraction.
 	 * @return result Calculated ratio.
 	 */
-	function outOf(uint256 _a, uint256 _b)
-		internal
-		pure
-		returns (uint256 result)
-	{
+	function outOf(
+		uint256 _a,
+		uint256 _b
+	) internal pure returns (uint256 result) {
 		if (_a == 0) {
 			return 0;
 		}

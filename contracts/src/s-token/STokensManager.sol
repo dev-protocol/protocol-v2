@@ -30,8 +30,12 @@ contract STokensManager is
 	mapping(uint256 => bool) public override isFreezed;
 	mapping(address => address) public override descriptorOf;
 	mapping(uint256 => bytes32) public override payloadOf;
-	mapping(address => uint24) public royaltyOf;
 	address private proxyAdmin;
+
+	mapping(address => uint24) public royaltyOf;
+	mapping(address => mapping(bytes32 => address))
+		public
+		override descriptorOfPropertyByPayload;
 
 	using Counters for Counters.Counter;
 	using EnumerableSet for EnumerableSet.UintSet;
@@ -65,7 +69,9 @@ contract STokensManager is
 	/**
 	 * @dev See {IERC165-supportsInterface}.
 	 */
-	function supportsInterface(bytes4 interfaceId)
+	function supportsInterface(
+		bytes4 interfaceId
+	)
 		public
 		view
 		virtual
@@ -87,13 +93,10 @@ contract STokensManager is
 	/**
 	 * @dev See {IERC721Enumerable-tokenOfOwnerByIndex}.
 	 */
-	function tokenOfOwnerByIndex(address _owner, uint256 index)
-		public
-		view
-		virtual
-		override
-		returns (uint256)
-	{
+	function tokenOfOwnerByIndex(
+		address _owner,
+		uint256 index
+	) public view virtual override returns (uint256) {
 		// solhint-disable-next-line reason-string
 		require(
 			index < tokenIdsMapOfOwner[_owner].length(),
@@ -105,13 +108,9 @@ contract STokensManager is
 	/**
 	 * @dev See {IERC721Enumerable-tokenByIndex}.
 	 */
-	function tokenByIndex(uint256 index)
-		public
-		view
-		virtual
-		override
-		returns (uint256)
-	{
+	function tokenByIndex(
+		uint256 index
+	) public view virtual override returns (uint256) {
 		// solhint-disable-next-line reason-string
 		require(
 			index < tokenIdCounter.current(),
@@ -129,12 +128,9 @@ contract STokensManager is
 		proxyAdmin = _proxyAdmin;
 	}
 
-	function tokenURI(uint256 _tokenId)
-		public
-		view
-		override
-		returns (string memory)
-	{
+	function tokenURI(
+		uint256 _tokenId
+	) public view override returns (string memory) {
 		uint256 curretnTokenId = tokenIdCounter.current();
 		require(_tokenId <= curretnTokenId, "not found");
 		StakingPositions memory positons = getStoragePositions(_tokenId);
@@ -186,7 +182,10 @@ contract STokensManager is
 		setStoragePositions(currentId, newPosition);
 		tokenIdsMapOfProperty[_property].push(currentId);
 
-		address descriptor = descriptorOf[_property];
+		address descriptor = descriptorOfPropertyByPayload[_property][_payload];
+		if (descriptor == address(0)) {
+			descriptor = descriptorOf[_property];
+		}
 		if (descriptor != address(0)) {
 			require(
 				ITokenURIDescriptor(descriptor).onBeforeMint(
@@ -226,28 +225,34 @@ contract STokensManager is
 		return true;
 	}
 
-	function setTokenURIImage(uint256 _tokenId, string memory _data)
-		external
-		override
-		onlyAuthor(_tokenId)
-	{
+	function setTokenURIImage(
+		uint256 _tokenId,
+		string memory _data
+	) external override onlyAuthor(_tokenId) {
 		require(isFreezed[_tokenId] == false, "freezed");
 		tokenUriImage[_tokenId] = _data;
 	}
 
-	function setTokenURIDescriptor(address _property, address _descriptor)
-		external
-		override
-		onlyPropertyAuthor(_property)
-	{
+	function setTokenURIDescriptor(
+		address _property,
+		address _descriptor
+	) external override onlyPropertyAuthor(_property) {
 		descriptorOf[_property] = _descriptor;
 	}
 
-	function freezeTokenURI(uint256 _tokenId)
-		external
-		override
-		onlyAuthor(_tokenId)
-	{
+	function setTokenURIDescriptor(
+		address _property,
+		address _descriptor,
+		bytes32[] calldata _keys
+	) external override onlyPropertyAuthor(_property) {
+		for (uint256 i = 0; i < _keys.length; i++) {
+			descriptorOfPropertyByPayload[_property][_keys[i]] = _descriptor;
+		}
+	}
+
+	function freezeTokenURI(
+		uint256 _tokenId
+	) external override onlyAuthor(_tokenId) {
 		require(isFreezed[_tokenId] == false, "already freezed");
 		string memory tokeUri = tokenUriImage[_tokenId];
 		require(bytes(tokeUri).length != 0, "no data");
@@ -255,40 +260,28 @@ contract STokensManager is
 		emit Freezed(_tokenId, _msgSender());
 	}
 
-	function positions(uint256 _tokenId)
-		external
-		view
-		override
-		returns (StakingPositions memory)
-	{
+	function positions(
+		uint256 _tokenId
+	) external view override returns (StakingPositions memory) {
 		StakingPositions memory currentPosition = getStoragePositions(_tokenId);
 		return currentPosition;
 	}
 
-	function rewards(uint256 _tokenId)
-		external
-		view
-		override
-		returns (Rewards memory)
-	{
+	function rewards(
+		uint256 _tokenId
+	) external view override returns (Rewards memory) {
 		return _rewards(_tokenId);
 	}
 
-	function positionsOfProperty(address _property)
-		external
-		view
-		override
-		returns (uint256[] memory)
-	{
+	function positionsOfProperty(
+		address _property
+	) external view override returns (uint256[] memory) {
 		return tokenIdsMapOfProperty[_property];
 	}
 
-	function positionsOfOwner(address _owner)
-		external
-		view
-		override
-		returns (uint256[] memory)
-	{
+	function positionsOfOwner(
+		address _owner
+	) external view override returns (uint256[] memory) {
 		return tokenIdsMapOfOwner[_owner].values();
 	}
 
@@ -309,17 +302,55 @@ contract STokensManager is
 		Rewards memory _rewardsArg,
 		bytes32 _payload
 	) private view returns (string memory) {
-		string memory _tokeUriImage = tokenUriImage[_tokenId];
-		if (bytes(_tokeUriImage).length == 0) {
-			address descriptor = descriptorOf[_positions.property];
-			if (descriptor != address(0)) {
-				_tokeUriImage = ITokenURIDescriptor(descriptor).image(
+		string memory _tokenUriImage = tokenUriImage[_tokenId];
+		string memory _tokenUriName;
+		string memory _tokenUriDescription;
+		address descriptor = descriptorOfPropertyByPayload[_positions.property][
+			_payload
+		] == address(0)
+			? descriptorOf[_positions.property]
+			: descriptorOfPropertyByPayload[_positions.property][_payload];
+		if (descriptor != address(0)) {
+			if (bytes(_tokenUriImage).length == 0) {
+				try
+					ITokenURIDescriptor(descriptor).image(
+						_tokenId,
+						_owner,
+						_positions,
+						_rewardsArg,
+						_payload
+					)
+				returns (string memory _image) {
+					_tokenUriImage = _image;
+				} catch {
+					_tokenUriImage = "";
+				}
+			}
+			try
+				ITokenURIDescriptor(descriptor).name(
 					_tokenId,
 					_owner,
 					_positions,
 					_rewardsArg,
 					_payload
-				);
+				)
+			returns (string memory _name) {
+				_tokenUriName = _name;
+			} catch {
+				_tokenUriName = "";
+			}
+			try
+				ITokenURIDescriptor(descriptor).description(
+					_tokenId,
+					_owner,
+					_positions,
+					_rewardsArg,
+					_payload
+				)
+			returns (string memory _description) {
+				_tokenUriDescription = _description;
+			} catch {
+				_tokenUriDescription = "";
 			}
 		}
 		return
@@ -327,15 +358,15 @@ contract STokensManager is
 				_positions.property,
 				_positions.amount,
 				_positions.cumulativeReward,
-				_tokeUriImage
+				_tokenUriImage,
+				_tokenUriName,
+				_tokenUriDescription
 			);
 	}
 
-	function getStoragePositions(uint256 _tokenId)
-		private
-		view
-		returns (StakingPositions memory)
-	{
+	function getStoragePositions(
+		uint256 _tokenId
+	) private view returns (StakingPositions memory) {
 		bytes32 key = getStoragePositionsKey(_tokenId);
 		bytes memory tmp = bytesStorage[key];
 		return abi.decode(tmp, (StakingPositions));
@@ -350,19 +381,17 @@ contract STokensManager is
 		bytesStorage[key] = tmp;
 	}
 
-	function getStoragePositionsKey(uint256 _tokenId)
-		private
-		pure
-		returns (bytes32)
-	{
+	function getStoragePositionsKey(
+		uint256 _tokenId
+	) private pure returns (bytes32) {
 		return keccak256(abi.encodePacked("_positions", _tokenId));
 	}
 
-	function _beforeTokenTransfer(address from, address to, uint256 tokenId)
-		internal
-		virtual
-		override
-	{
+	function _beforeTokenTransfer(
+		address from,
+		address to,
+		uint256 tokenId
+	) internal virtual override {
 		super._beforeTokenTransfer(from, to, tokenId);
 
 		if (from == address(0)) {
@@ -381,10 +410,10 @@ contract STokensManager is
 	/// @param _property the property for which we register the royalties
 	/// @param _percentage percentage (using 2 decimals - 10000 = 100, 0 = 0)
 
-	function setSTokenRoyaltyForProperty(address _property, uint256 _percentage)
-		external
-		onlyPropertyAuthor(_property)
-	{
+	function setSTokenRoyaltyForProperty(
+		address _property,
+		uint256 _percentage
+	) external onlyPropertyAuthor(_property) {
 		require(_percentage <= 10000, "ERC2981Royalties: Too high");
 		royaltyOf[_property] = uint24(_percentage);
 	}
@@ -392,11 +421,10 @@ contract STokensManager is
 	/**
 	 * @dev See {IERC2981Royalties}
 	 */
-	function royaltyInfo(uint256 tokenId, uint256 value)
-		external
-		view
-		returns (address receiver, uint256 royaltyAmount)
-	{
+	function royaltyInfo(
+		uint256 tokenId,
+		uint256 value
+	) external view returns (address receiver, uint256 royaltyAmount) {
 		StakingPositions memory currentPosition = getStoragePositions(tokenId);
 		receiver = IProperty(currentPosition.property).author();
 		royaltyAmount = (value * royaltyOf[currentPosition.property]) / 10000;

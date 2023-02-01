@@ -26,10 +26,9 @@ interface IArbSys {
 	 * @param destination recipient address on L1
 	 * @return unique identifier for this L2-to-L1 transaction.
 	 */
-	function withdrawEth(address destination)
-		external
-		payable
-		returns (uint256);
+	function withdrawEth(
+		address destination
+	) external payable returns (uint256);
 
 	/**
 	 * @notice Send a transaction to L1
@@ -37,20 +36,19 @@ interface IArbSys {
 	 * @param calldataForL1 (optional) calldata for L1 contract call
 	 * @return a unique identifier for this L2-to-L1 transaction.
 	 */
-	function sendTxToL1(address destination, bytes calldata calldataForL1)
-		external
-		payable
-		returns (uint256);
+	function sendTxToL1(
+		address destination,
+		bytes calldata calldataForL1
+	) external payable returns (uint256);
 
 	/**
 	 * @notice get the number of transactions issued by the given external account or the account sequence number of the given contract
 	 * @param account target account
 	 * @return the number of transactions issued by the given external account or the account sequence number of the given contract
 	 */
-	function getTransactionCount(address account)
-		external
-		view
-		returns (uint256);
+	function getTransactionCount(
+		address account
+	) external view returns (uint256);
 
 	/**
 	 * @notice get the value of target L2 storage slot
@@ -59,10 +57,10 @@ interface IArbSys {
 	 * @param index target index of storage slot
 	 * @return stotage value for the given account at the given index
 	 */
-	function getStorageAt(address account, uint256 index)
-		external
-		view
-		returns (uint256);
+	function getStorageAt(
+		address account,
+		uint256 index
+	) external view returns (uint256);
 
 	/**
 	 * @notice check if current call is coming from l1

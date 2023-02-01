@@ -1,24 +1,31 @@
-const handler = async function (deployer, network) {
+import { upgradeProxy, validateUpgrade } from '@openzeppelin/truffle-upgrades'
+import { type ContractClass } from '@openzeppelin/truffle-upgrades/dist/utils'
+
+const PropertyFactory = artifacts.require('PropertyFactory')
+
+const handler = async function (_, network) {
 	if (network === 'test') {
 		return
 	}
 
-	const adminAddress = process.env.ADMIN!
 	const proxyAddress = process.env.PROPERTY_FACTORY_PROXY!
-	console.log(`admin address:${adminAddress}`)
-	console.log(`property factory proxy address:${proxyAddress}`)
+	const existing = await PropertyFactory.deployed().catch(() =>
+		PropertyFactory.at(proxyAddress)
+	)
 
-	const logic = artifacts.require('PropertyFactory')
-	await deployer.deploy(logic)
-	const logicInstance = await logic.deployed()
-	console.log(`logic address:${logicInstance.address}`)
+	console.log('proxy:', existing.address)
 
-	const adminInstance = await artifacts.require('DevAdmin').at(adminAddress)
-	await adminInstance.upgrade(proxyAddress, logicInstance.address)
+	await validateUpgrade(
+		existing.address,
+		PropertyFactory as unknown as ContractClass
+	)
 
-	const implAddress = await adminInstance.getProxyImplementation(proxyAddress)
+	console.log('New implementation is valid')
 
-	console.log(`impl address:${implAddress}`)
+	await upgradeProxy(
+		existing.address,
+		PropertyFactory as unknown as ContractClass
+	)
 } as Truffle.Migration
 
 export = handler

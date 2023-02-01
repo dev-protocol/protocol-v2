@@ -11,11 +11,10 @@ contract ArbSysTest {
 	using Counters for Counters.Counter;
 
 	// solhint-disable-next-line no-unused-vars
-	function sendTxToL1(address _arg1, bytes calldata _arg2)
-		external
-		payable
-		returns (uint256)
-	{
+	function sendTxToL1(
+		address _arg1,
+		bytes calldata _arg2
+	) external payable returns (uint256) {
 		latestSendTxToL1Arg1 = _arg1;
 		latestSendTxToL1Arg2 = _arg2;
 		idCounter.increment();

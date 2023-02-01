@@ -7,12 +7,11 @@ import "@devprotocol/util-contracts/contracts/utils/Base64.sol";
 import "../../interface/ISTokensManager.sol";
 
 library DecimalString {
-	function decimalString(uint256 number, uint8 decimals)
-		internal
-		pure
-		returns (string memory)
-	{
-		uint256 tenPowDecimals = 10**decimals;
+	function decimalString(
+		uint256 number,
+		uint8 decimals
+	) internal pure returns (string memory) {
+		uint256 tenPowDecimals = 10 ** decimals;
 
 		uint256 temp = number;
 		uint8 digits;
@@ -36,7 +35,7 @@ library DecimalString {
 			params.bufferLength = params.sigfigIndex;
 		} else {
 			// chop all trailing zeros for numbers with decimals
-			params.sigfigs = number / (10**(digits - numSigfigs));
+			params.sigfigs = number / (10 ** (digits - numSigfigs));
 			if (tenPowDecimals > number) {
 				// number is less tahn one
 				// in this case, there may be leading zeros after the decimal place
@@ -76,11 +75,9 @@ library DecimalString {
 		bool isLessThanOne;
 	}
 
-	function generateDecimalString(DecimalStringParams memory params)
-		private
-		pure
-		returns (string memory)
-	{
+	function generateDecimalString(
+		DecimalStringParams memory params
+	) private pure returns (string memory) {
 		bytes memory buffer = new bytes(params.bufferLength);
 		if (params.isLessThanOne) {
 			buffer[0] = "0";
@@ -122,27 +119,33 @@ contract STokensDescriptor {
 		address _property,
 		uint256 _amount,
 		uint256 _cumulativeReward,
-		string memory _tokeUriImage
+		string memory _tokenUriImage,
+		string memory _tokenUriName,
+		string memory _tokenUriDescription
 	) internal pure returns (string memory) {
 		string memory amount = _amount.decimalString(18);
-		string memory name = string(
-			abi.encodePacked(
-				"Dev Protocol sTokens - ",
-				_property.toChecksumString(),
-				" - ",
-				amount,
-				" DEV",
-				" - ",
-				_cumulativeReward.toString()
+		string memory name = bytes(_tokenUriName).length == 0
+			? string(
+				abi.encodePacked(
+					"Dev Protocol sTokens - ",
+					_property.toChecksumString(),
+					" - ",
+					amount,
+					" DEV",
+					" - ",
+					_cumulativeReward.toString()
+				)
 			)
-		);
-		string memory description = string(
-			abi.encodePacked(
-				"This NFT represents a staking position in a Dev Protocol Property tokens. The owner of this NFT can modify or redeem the position.\\nProperty Address: ",
-				_property.toChecksumString(),
-				"\\n\\n\xE2\x9A\xA0 DISCLAIMER: Due diligence is imperative when assessing this NFT. Make sure token addresses match the expected tokens, as token symbols may be imitated."
+			: _tokenUriName;
+		string memory description = bytes(_tokenUriDescription).length == 0
+			? string(
+				abi.encodePacked(
+					"This NFT represents a staking position in a Dev Protocol Property tokens. The owner of this NFT can modify or redeem the position.\\nProperty Address: ",
+					_property.toChecksumString(),
+					"\\n\\n\xE2\x9A\xA0 DISCLAIMER: Due diligence is imperative when assessing this NFT. Make sure token addresses match the expected tokens, as token symbols may be imitated."
+				)
 			)
-		);
+			: _tokenUriDescription;
 		string memory attributes = string(
 			abi.encodePacked(
 				"[",
@@ -159,7 +162,7 @@ contract STokensDescriptor {
 				"]"
 			)
 		);
-		string memory image = bytes(_tokeUriImage).length == 0
+		string memory image = bytes(_tokenUriImage).length == 0
 			? string(
 				abi.encodePacked(
 					"data:image/svg+xml;base64,",
@@ -176,7 +179,7 @@ contract STokensDescriptor {
 					)
 				)
 			)
-			: _tokeUriImage;
+			: _tokenUriImage;
 		return
 			string(
 				abi.encodePacked(

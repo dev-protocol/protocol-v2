@@ -122,8 +122,22 @@ interface ISTokensManager {
 	 * @param _property property address
 	 * @param _descriptor descriptor address
 	 */
-	function setTokenURIDescriptor(address _property, address _descriptor)
-		external;
+	function setTokenURIDescriptor(
+		address _property,
+		address _descriptor
+	) external;
+
+	/*
+	 * @dev set token uri descriptor
+	 * @param _property property address
+	 * @param _descriptor descriptor address
+	 * @param _keys[] bytes32[] keys
+	 */
+	function setTokenURIDescriptor(
+		address _property,
+		address _descriptor,
+		bytes32[] calldata _keys
+	) external;
 
 	/*
 	 * @dev freeze token uri data
@@ -136,10 +150,9 @@ interface ISTokensManager {
 	 * @param _tokenId The ID of the staking position
 	 * @return StakingPositions staking positions
 	 */
-	function positions(uint256 _tokenId)
-		external
-		view
-		returns (StakingPositions memory);
+	function positions(
+		uint256 _tokenId
+	) external view returns (StakingPositions memory);
 
 	/*
 	 * @dev Get the freezed status.
@@ -160,20 +173,18 @@ interface ISTokensManager {
 	 * @param _property property address
 	 * @return uint256[] token id list
 	 */
-	function positionsOfProperty(address _property)
-		external
-		view
-		returns (uint256[] memory);
+	function positionsOfProperty(
+		address _property
+	) external view returns (uint256[] memory);
 
 	/*
 	 * @dev get token ids by owner
 	 * @param _owner owner address
 	 * @return uint256[] token id list
 	 */
-	function positionsOfOwner(address _owner)
-		external
-		view
-		returns (uint256[] memory);
+	function positionsOfOwner(
+		address _owner
+	) external view returns (uint256[] memory);
 
 	/*
 	 * @dev get simulated token uri
@@ -198,6 +209,17 @@ interface ISTokensManager {
 	 * @return address descriptor address
 	 */
 	function descriptorOf(address _property) external view returns (address);
+
+	/*
+	 * @dev get descriptor address
+	 * @param _property property address
+	 * @param _payload token payload
+	 * @return address descriptor address
+	 */
+	function descriptorOfPropertyByPayload(
+		address _property,
+		bytes32 _payload
+	) external view returns (address);
 
 	/*
 	 * @dev get the payload

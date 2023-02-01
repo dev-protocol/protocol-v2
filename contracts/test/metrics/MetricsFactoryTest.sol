@@ -20,9 +20,10 @@ contract MetricsFactoryTest is MetricsFactory {
 		_removeMetrics(_addr);
 	}
 
-	function __setMetricsCountPerProperty(address _addr, uint8 _zeroOrOne)
-		public
-	{
+	function __setMetricsCountPerProperty(
+		address _addr,
+		uint8 _zeroOrOne
+	) public {
 		uint256 metricsCount = metricsOfProperty_[_addr].length();
 		address[] memory tmp = new address[](metricsCount);
 		for (uint256 i = 0; i < metricsCount; i++) {

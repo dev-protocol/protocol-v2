@@ -3,9 +3,10 @@
 pragma solidity ^0.8.0;
 
 interface IMarket {
-	function authenticate(address _prop, string[] memory _args)
-		external
-		returns (bool);
+	function authenticate(
+		address _prop,
+		string[] memory _args
+	) external returns (bool);
 
 	function authenticateFromPropertyFactory(
 		address _prop,
@@ -13,9 +14,10 @@ interface IMarket {
 		string[] memory _args
 	) external returns (bool);
 
-	function authenticatedCallback(address _property, bytes32 _idHash)
-		external
-		returns (address);
+	function authenticatedCallback(
+		address _property,
+		bytes32 _idHash
+	) external returns (address);
 
 	function deauthenticate(address _metrics) external;
 
