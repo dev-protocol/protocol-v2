@@ -1626,10 +1626,10 @@
     emittery "^0.4.1"
     web3-utils "1.7.4"
 
-"@truffle/hdwallet-provider@2.1.6":
-  version "2.1.6"
-  resolved "https://registry.yarnpkg.com/@truffle/hdwallet-provider/-/hdwallet-provider-2.1.6.tgz#9c016f96364ae1ff95bd22eeace83ba9c3980f0a"
-  integrity sha512-Yeouaycx/xzi9jtEIkD3CkaHRpEWD/UTuQSjhZD4N2LzK2AQqCwnbxKKcsPnZ+q+h2C/yWpMs5B1u09CJDeSZA==
+"@truffle/hdwallet-provider@2.1.7":
+  version "2.1.7"
+  resolved "https://registry.yarnpkg.com/@truffle/hdwallet-provider/-/hdwallet-provider-2.1.7.tgz#28ee51537ce6375e08ad2e61e3d4a47c03b9b3b5"
+  integrity sha512-mIB+ujDcmi3MNz1exXWs8MlHOh7NgwBDrzXJgyv+/PAHsk3shteGdQFhK2dKki0JkLe5FUwN2vSK4kb0Svf3Zg==
   dependencies:
     "@ethereumjs/common" "^2.4.0"
     "@ethereumjs/tx" "^3.3.0"
