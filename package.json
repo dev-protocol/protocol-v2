@@ -57,7 +57,7 @@
 		"typechain": "8.1.1",
 		"typechain-target-truffle": "1.0.2",
 		"typescript": "5.0.2",
-		"web3": "1.8.2",
+		"web3": "1.9.0",
 		"web3-utils": "1.8.2"
 	},
 	"dependencies": {
