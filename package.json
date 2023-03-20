@@ -23,7 +23,7 @@
 	"author": "aggre",
 	"license": "MPL-2.0",
 	"devDependencies": {
-		"@devprotocol/dev-kit": "7.3.0",
+		"@devprotocol/dev-kit": "7.3.1",
 		"@devprotocol/util-ts": "3.0.0",
 		"@openzeppelin/truffle-upgrades": "1.17.1",
 		"@truffle/hdwallet-provider": "2.1.9",
