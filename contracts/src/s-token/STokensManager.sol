@@ -360,7 +360,8 @@ contract STokensManager is
 				_positions.cumulativeReward,
 				_tokenUriImage,
 				_tokenUriName,
-				_tokenUriDescription
+				_tokenUriDescription,
+				_payload
 			);
 	}
 

@@ -121,7 +121,8 @@ contract STokensDescriptor {
 		uint256 _cumulativeReward,
 		string memory _tokenUriImage,
 		string memory _tokenUriName,
-		string memory _tokenUriDescription
+		string memory _tokenUriDescription,
+		bytes32 _payload
 	) internal pure returns (string memory) {
 		string memory amount = _amount.decimalString(18);
 		string memory name = bytes(_tokenUriName).length == 0
@@ -159,6 +160,11 @@ contract STokensDescriptor {
 				amount,
 				// solhint-disable-next-line quotes
 				"}",
+				// solhint-disable-next-line quotes
+				'{"trait_type":"Payload", "value":"',
+				_payload,
+				// solhint-disable-next-line quotes
+				'"},',
 				"]"
 			)
 		);
