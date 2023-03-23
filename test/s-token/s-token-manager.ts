@@ -235,7 +235,14 @@ contract('STokensManager', ([deployer, user]) => {
 			it('get token uri', async () => {
 				await dev.lockup.depositToProperty(property.address, '10000')
 				const uri = await dev.sTokensManager.tokenURI(1)
-				checkTokenUri(uri, property.address, 10000, 0, '0x')
+				checkTokenUri(
+					uri,
+					property.address,
+					10000,
+					0,
+					'0x0000000000000000000000000000000000000000000000000000000000000000',
+					''
+				)
 			})
 			it('get token uri with big staked amount', async () => {
 				await dev.dev.burn(deployer, await dev.dev.balanceOf(deployer))
@@ -252,7 +259,14 @@ contract('STokensManager', ([deployer, user]) => {
 					from: user,
 				})
 				const uri = await dev.sTokensManager.tokenURI(1)
-				checkTokenUri(uri, property.address, 10000, 0, '0x', 'ipfs://IPFS-CID')
+				checkTokenUri(
+					uri,
+					property.address,
+					10000,
+					0,
+					'0x0000000000000000000000000000000000000000000000000000000000000000',
+					'ipfs://IPFS-CID'
+				)
 			})
 			it('get descriptor token uri; with custom name & description check', async () => {
 				// @ts-ignore
@@ -268,6 +282,7 @@ contract('STokensManager', ([deployer, user]) => {
 					{ from: user }
 				)
 				const uri = await dev.sTokensManager.tokenURI(1)
+				console.log('uri => ', uri)
 				// This checks for default name & description
 				checkTokenUri(
 					uri,
@@ -505,7 +520,7 @@ contract('STokensManager', ([deployer, user]) => {
 					property.address,
 					10000,
 					0,
-					'0x',
+					'0x0000000000000000000000000000000000000000000000000000000000000000',
 					'ipfs://IPFS-CID'
 				)
 			})
@@ -523,7 +538,7 @@ contract('STokensManager', ([deployer, user]) => {
 					property.address,
 					10000,
 					0,
-					'0x',
+					'0x0000000000000000000000000000000000000000000000000000000000000000',
 					'ipfs://IPFS-CID2'
 				)
 			})
@@ -989,14 +1004,14 @@ contract('STokensManager', ([deployer, user]) => {
 				DEFAULT_ADDRESS,
 				positions,
 				rewards,
-				'0x'
+				'0x0000000000000000000000000000000000000000000000000000000000000000'
 			)
 			checkTokenUri(
 				tmp,
 				positions.property,
 				positions.amount,
 				positions.cumulativeReward,
-				'0x'
+				'0x0000000000000000000000000000000000000000000000000000000000000000'
 			)
 		})
 		it('set token uri image', async () => {
@@ -1010,14 +1025,14 @@ contract('STokensManager', ([deployer, user]) => {
 				DEFAULT_ADDRESS,
 				positions,
 				rewards,
-				'0x'
+				'0x0000000000000000000000000000000000000000000000000000000000000000'
 			)
 			checkTokenUri(
 				tokenUri,
 				positions.property,
 				positions.amount,
 				positions.cumulativeReward,
-				'0x',
+				'0x0000000000000000000000000000000000000000000000000000000000000000',
 				'ipfs://IPFS-CID'
 			)
 		})
@@ -1042,7 +1057,7 @@ contract('STokensManager', ([deployer, user]) => {
 				positions.property,
 				positions.amount,
 				positions.cumulativeReward,
-				'0x',
+				web3.utils.keccak256('PAYLOAD'),
 				'dummy-string'
 			)
 		})
