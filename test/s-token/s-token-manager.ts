@@ -248,10 +248,15 @@ contract('STokensManager', ([deployer, user]) => {
 				await dev.dev.burn(deployer, await dev.dev.balanceOf(deployer))
 				await dev.dev.mint(deployer, MAX_UINT256)
 				await dev.dev.approve(dev.lockup.address, MAX_UINT256)
-
 				await dev.lockup.depositToProperty(property.address, MAX_UINT256)
 				const uri = await dev.sTokensManager.tokenURI(1)
-				checkTokenUri(uri, property.address, MAX_UINT256, 0, '0x')
+				checkTokenUri(
+					uri,
+					property.address,
+					MAX_UINT256,
+					0,
+					'0x0000000000000000000000000000000000000000000000000000000000000000'
+				)
 			})
 			it('get custom token uri', async () => {
 				await dev.lockup.depositToProperty(property.address, '10000')
@@ -282,7 +287,6 @@ contract('STokensManager', ([deployer, user]) => {
 					{ from: user }
 				)
 				const uri = await dev.sTokensManager.tokenURI(1)
-				console.log('uri => ', uri)
 				// This checks for default name & description
 				checkTokenUri(
 					uri,
@@ -1078,7 +1082,7 @@ contract('STokensManager', ([deployer, user]) => {
 				positions.property,
 				positions.amount,
 				positions.cumulativeReward,
-				'0x',
+				'0x0000000000000000000000000000000000000000000000000000000000000000',
 				'dummy-string'
 			)
 		})

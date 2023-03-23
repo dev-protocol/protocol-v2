@@ -154,7 +154,7 @@ contract STokensDescriptor {
 					0x0606060606060606060606060606060606060606060606060606060606060606) >>
 					4) &
 					0x0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F) *
-				7
+				39
 		);
 	}
 
@@ -202,7 +202,9 @@ contract STokensDescriptor {
 			)
 			: _tokenUriDescription;
 
-		string memory payloadString = toHex(_payload);
+		string memory payloadString = bytes32(_payload).length == 0
+			? string(abi.encodePacked(toHex(0x0)))
+			: string(abi.encodePacked(toHex(_payload)));
 		string memory attributes = string(
 			abi.encodePacked(
 				"[",
