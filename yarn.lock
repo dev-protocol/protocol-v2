@@ -212,10 +212,10 @@
   dependencies:
     "@jridgewell/trace-mapping" "0.3.9"
 
-"@devprotocol/dev-kit@7.3.2":
-  version "7.3.2"
-  resolved "https://registry.yarnpkg.com/@devprotocol/dev-kit/-/dev-kit-7.3.2.tgz#332483b6adf506fa9aa9bc17dd39640b78d23fc5"
-  integrity sha512-qx01VoxrgkZYNQOwZhFaGNNt4yKj6XH8pnBaRrEe0nZkhy3u5wyhbOw7fBgP+yBlyfLhm+4WOrEwG0rnugIzIw==
+"@devprotocol/dev-kit@7.3.3":
+  version "7.3.3"
+  resolved "https://registry.yarnpkg.com/@devprotocol/dev-kit/-/dev-kit-7.3.3.tgz#bace6918a335570a0a14911b8ba2b6c93f82cb18"
+  integrity sha512-+kSZt9VC6D90KLv21FHONvNoaHnwkotD6zBVJ4LSk1khbjaTSO7mCbGtFZc0Luq3UvesFqgndErDz4TqUhbt9w==
   dependencies:
     "@devprotocol/util-ts" "3.0.0"
     bignumber.js "9.1.1"
