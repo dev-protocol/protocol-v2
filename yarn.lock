@@ -212,15 +212,15 @@
   dependencies:
     "@jridgewell/trace-mapping" "0.3.9"
 
-"@devprotocol/dev-kit@7.3.3":
-  version "7.3.3"
-  resolved "https://registry.yarnpkg.com/@devprotocol/dev-kit/-/dev-kit-7.3.3.tgz#bace6918a335570a0a14911b8ba2b6c93f82cb18"
-  integrity sha512-+kSZt9VC6D90KLv21FHONvNoaHnwkotD6zBVJ4LSk1khbjaTSO7mCbGtFZc0Luq3UvesFqgndErDz4TqUhbt9w==
+"@devprotocol/dev-kit@7.3.4":
+  version "7.3.4"
+  resolved "https://registry.yarnpkg.com/@devprotocol/dev-kit/-/dev-kit-7.3.4.tgz#f2c6fb8dc38b8bb51c8ba021ac612dec0a8e6114"
+  integrity sha512-SUdAIJIOviOsKZCMVHit3spEoIuyouQhwlMNhceK02G4Bp/iwgtVocn7z96nmJZ0J8M+RqEySgj3gyKoADjpEg==
   dependencies:
     "@devprotocol/util-ts" "3.0.0"
     bignumber.js "9.1.1"
     js-base64 "^3.7.2"
-    ramda "^0.28.0"
+    ramda "^0.29.0"
 
 "@devprotocol/util-contracts@3.3.0":
   version "3.3.0"
@@ -9237,6 +9237,11 @@ ramda@^0.28.0:
   version "0.28.0"
   resolved "https://registry.yarnpkg.com/ramda/-/ramda-0.28.0.tgz#acd785690100337e8b063cab3470019be427cc97"
   integrity sha512-9QnLuG/kPVgWvMQ4aODhsBUFKOUmnbUnsSXACv+NCQZcHbeb+v8Lodp8OVxtRULN1/xOyYLLaL6npE6dMq5QTA==
+
+ramda@^0.29.0:
+  version "0.29.0"
+  resolved "https://registry.yarnpkg.com/ramda/-/ramda-0.29.0.tgz#fbbb67a740a754c8a4cbb41e2a6e0eb8507f55fb"
+  integrity sha512-BBea6L67bYLtdbOqfp8f58fPMqEwx0doL+pAi8TZyp2YWz8R9G8z9x75CZI8W+ftqhFHCpEX2cRnUUXK130iKA==
 
 randombytes@^2.0.0, randombytes@^2.0.1, randombytes@^2.0.5, randombytes@^2.1.0:
   version "2.1.0"
