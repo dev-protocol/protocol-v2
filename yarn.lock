@@ -1010,21 +1010,21 @@
   resolved "https://registry.yarnpkg.com/@openzeppelin/contracts/-/contracts-4.3.2.tgz#ff80affd6d352dbe1bbc5b4e1833c41afd6283b6"
   integrity sha512-AybF1cesONZStg5kWf6ao9OlqTZuPqddvprc0ky7lrUVOjXeKpmQ2Y9FK+6ygxasb+4aic4O5pneFBfwVsRRRg==
 
-"@openzeppelin/truffle-upgrades@1.18.0":
-  version "1.18.0"
-  resolved "https://registry.yarnpkg.com/@openzeppelin/truffle-upgrades/-/truffle-upgrades-1.18.0.tgz#e00e032d6e1985ef88eed03624a8fc9e7cde818d"
-  integrity sha512-BgIXbDAIgxtI6xS6ZTBOdkIUphGo72cK0WvYdCkDGvoxuwseua+/OJk3L0LFmyHqytrLy3Hb1lUzx9QC1umhCA==
+"@openzeppelin/truffle-upgrades@1.18.2":
+  version "1.18.2"
+  resolved "https://registry.yarnpkg.com/@openzeppelin/truffle-upgrades/-/truffle-upgrades-1.18.2.tgz#ef2936ec29062472d104142b94ef7216c7fc2d69"
+  integrity sha512-SsUti/i+PY9rMb2XjeDh1clXpvdeU+juamd5IX1Tpjpeawkc3tfXlcgp4FYtJhU6ntP7oHpQ/IxcalEo7jc24Q==
   dependencies:
-    "@openzeppelin/upgrades-core" "^1.25.0"
+    "@openzeppelin/upgrades-core" "^1.26.2"
     "@truffle/contract" "^4.3.26"
     chalk "^4.1.0"
     debug "^4.1.1"
     solidity-ast "^0.4.15"
 
-"@openzeppelin/upgrades-core@^1.25.0":
-  version "1.25.0"
-  resolved "https://registry.yarnpkg.com/@openzeppelin/upgrades-core/-/upgrades-core-1.25.0.tgz#4f540e2043b98f8b59a4e8a988b9aeb5b5f23a35"
-  integrity sha512-vSxOSm1k+P156nNm15ydhOmSPGC37mnl092FMVOH+eGaoqLjr2Za6ULVjDMFzvMnG+sGE1UoDOqBNPfTm0ch8w==
+"@openzeppelin/upgrades-core@^1.26.2":
+  version "1.26.2"
+  resolved "https://registry.yarnpkg.com/@openzeppelin/upgrades-core/-/upgrades-core-1.26.2.tgz#6ac3d16dca21d9bd76bd55a8a34121b4a78dd2c2"
+  integrity sha512-TJORrgyun5qflPos/47P3j61gDw+7W+tEirSBOYRxfVL1WGjX1n8iaLrijPIqzyeS1MKguN1nckAMspQ4SKrxw==
   dependencies:
     cbor "^8.0.0"
     chalk "^4.1.0"
