@@ -1010,10 +1010,10 @@
   resolved "https://registry.yarnpkg.com/@openzeppelin/contracts/-/contracts-4.3.2.tgz#ff80affd6d352dbe1bbc5b4e1833c41afd6283b6"
   integrity sha512-AybF1cesONZStg5kWf6ao9OlqTZuPqddvprc0ky7lrUVOjXeKpmQ2Y9FK+6ygxasb+4aic4O5pneFBfwVsRRRg==
 
-"@openzeppelin/truffle-upgrades@1.18.2":
-  version "1.18.2"
-  resolved "https://registry.yarnpkg.com/@openzeppelin/truffle-upgrades/-/truffle-upgrades-1.18.2.tgz#ef2936ec29062472d104142b94ef7216c7fc2d69"
-  integrity sha512-SsUti/i+PY9rMb2XjeDh1clXpvdeU+juamd5IX1Tpjpeawkc3tfXlcgp4FYtJhU6ntP7oHpQ/IxcalEo7jc24Q==
+"@openzeppelin/truffle-upgrades@1.19.0":
+  version "1.19.0"
+  resolved "https://registry.yarnpkg.com/@openzeppelin/truffle-upgrades/-/truffle-upgrades-1.19.0.tgz#b0795d03790e03637c564a4b31d6c91fc5b7ea8d"
+  integrity sha512-dbYGx54l/tP3/HHy53cHYI4rxkBONSMTgDJAVNUzftpeMFu82NepSdT0WUXiHU48SrnWnmFeab116pRnLnVY2g==
   dependencies:
     "@openzeppelin/upgrades-core" "^1.26.2"
     "@truffle/contract" "^4.3.26"
