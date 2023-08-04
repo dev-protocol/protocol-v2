@@ -25,7 +25,7 @@
 	"devDependencies": {
 		"@devprotocol/dev-kit": "8.1.0",
 		"@devprotocol/util-ts": "3.0.0",
-		"@openzeppelin/truffle-upgrades": "1.19.0",
+		"@openzeppelin/truffle-upgrades": "1.20.0",
 		"@truffle/hdwallet-provider": "2.1.13",
 		"@typechain/truffle-v4": "4.1.0",
 		"@types/bent": "7.3.3",
