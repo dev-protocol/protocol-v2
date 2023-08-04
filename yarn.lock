@@ -1020,16 +1020,16 @@
   resolved "https://registry.yarnpkg.com/@openzeppelin/contracts/-/contracts-4.3.2.tgz#ff80affd6d352dbe1bbc5b4e1833c41afd6283b6"
   integrity sha512-AybF1cesONZStg5kWf6ao9OlqTZuPqddvprc0ky7lrUVOjXeKpmQ2Y9FK+6ygxasb+4aic4O5pneFBfwVsRRRg==
 
-"@openzeppelin/truffle-upgrades@1.19.0":
-  version "1.19.0"
-  resolved "https://registry.yarnpkg.com/@openzeppelin/truffle-upgrades/-/truffle-upgrades-1.19.0.tgz#b0795d03790e03637c564a4b31d6c91fc5b7ea8d"
-  integrity sha512-dbYGx54l/tP3/HHy53cHYI4rxkBONSMTgDJAVNUzftpeMFu82NepSdT0WUXiHU48SrnWnmFeab116pRnLnVY2g==
+"@openzeppelin/truffle-upgrades@1.20.0":
+  version "1.20.0"
+  resolved "https://registry.yarnpkg.com/@openzeppelin/truffle-upgrades/-/truffle-upgrades-1.20.0.tgz#4e00744d964f9aae866a330011c983754c16a470"
+  integrity sha512-1p3lspYbwHmhMlIxYuxVbEqHxVeRiGzRDdlfnu4CmL3FajfNbZNjQZVsA8Zrju0OyAzV4/TEGCd33HM7jQPTTQ==
   dependencies:
     "@openzeppelin/upgrades-core" "^1.26.2"
     "@truffle/contract" "^4.3.26"
     chalk "^4.1.0"
     debug "^4.1.1"
-    solidity-ast "^0.4.15"
+    solidity-ast "^0.4.26"
 
 "@openzeppelin/upgrades-core@^1.26.2":
   version "1.26.2"
@@ -10019,6 +10019,11 @@ solidity-ast@^0.4.15:
   version "0.4.40"
   resolved "https://registry.yarnpkg.com/solidity-ast/-/solidity-ast-0.4.40.tgz#182709271b4e55efb34e2da934dfaa96ee0cf40b"
   integrity sha512-M8uLBT2jgFB7B0iVAC5a2l71J8vim7aEm03AZkaHbDqyrl1pE+i5PriMEw6WlwGfHp3/Ym7cn9BqvVLQgRk+Yw==
+
+solidity-ast@^0.4.26:
+  version "0.4.49"
+  resolved "https://registry.yarnpkg.com/solidity-ast/-/solidity-ast-0.4.49.tgz#ecba89d10c0067845b7848c3a3e8cc61a4fc5b82"
+  integrity sha512-Pr5sCAj1SFqzwFZw1HPKSq0PehlQNdM8GwKyAVYh2DOn7/cCK8LUKD1HeHnKtTgBW7hi9h4nnnan7hpAg5RhWQ==
 
 solidity-comments-extractor@^0.0.7:
   version "0.0.7"
