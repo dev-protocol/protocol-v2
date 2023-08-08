@@ -10516,10 +10516,10 @@ trim-newlines@^4.0.2:
   resolved "https://registry.yarnpkg.com/trim-newlines/-/trim-newlines-4.0.2.tgz#d6aaaf6a0df1b4b536d183879a6b939489808c7c"
   integrity sha512-GJtWyq9InR/2HRiLZgpIKv+ufIKrVrvjQWEj7PxAXNc5dwbNJkqhAUoAGgzRmULAnoOM5EIpveYd3J2VeSAIew==
 
-truffle-plugin-verify@0.6.4:
-  version "0.6.4"
-  resolved "https://registry.yarnpkg.com/truffle-plugin-verify/-/truffle-plugin-verify-0.6.4.tgz#c8f7b8ea62d94888ea82e92c36431e519bdac6c1"
-  integrity sha512-EkgU7AudgQebGwIjge2JNAYXJwQxrwuTd2LjUZLgIDyG8OygFZp23B0KE7PiGGtH/Erm53a4z4dxHskit9uLpg==
+truffle-plugin-verify@0.6.5:
+  version "0.6.5"
+  resolved "https://registry.yarnpkg.com/truffle-plugin-verify/-/truffle-plugin-verify-0.6.5.tgz#60110d39e8bc44301cb9b2aff81da8aa8308c177"
+  integrity sha512-8vFYVKe+L/tyhjyYb2aNwT7DFkN2BfQ+VSnmywCK2IbpGA0zRF7QYjRcne8UllpxcAVv0o4i1L97+qmN06ugnA==
   dependencies:
     "@truffle/resolver" "^9.0.35"
     axios "^0.26.1"
