@@ -9,6 +9,7 @@ contract TokenURIDescriptorTest is ITokenURIDescriptor {
 	string public newName = "";
 	string public newDescription = "";
 	string public newImage = "dummy-string";
+	string public newAnimationUrl = "dummy-animation-string";
 
 	function image(
 		uint256,
@@ -18,6 +19,16 @@ contract TokenURIDescriptorTest is ITokenURIDescriptor {
 		bytes32
 	) external view override returns (string memory) {
 		return newImage;
+	}
+
+	function animationUrl(
+		uint256,
+		address,
+		ISTokensManager.StakingPositions memory,
+		ISTokensManager.Rewards memory,
+		bytes32
+	) external view returns (string memory) {
+		return newAnimationUrl;
 	}
 
 	function onBeforeMint(
@@ -48,6 +59,10 @@ contract TokenURIDescriptorTest is ITokenURIDescriptor {
 
 	function _setImageURI(string memory _imageURI) public {
 		newImage = _imageURI;
+	}
+
+	function _setAnimationUrl(string memory _animationUrl) public {
+		newAnimationUrl = _animationUrl;
 	}
 
 	function name(

@@ -305,6 +305,7 @@ contract STokensManager is
 		string memory _tokenUriImage = tokenUriImage[_tokenId];
 		string memory _tokenUriName;
 		string memory _tokenUriDescription;
+		string memory _tokenUriAnimationUrl;
 		address descriptor = descriptorOfPropertyByPayload[_positions.property][
 			_payload
 		] == address(0)
@@ -352,16 +353,32 @@ contract STokensManager is
 			} catch {
 				_tokenUriDescription = "";
 			}
+			try
+				ITokenURIDescriptor(descriptor).animationUrl(
+					_tokenId,
+					_owner,
+					_positions,
+					_rewardsArg,
+					_payload
+				)
+			returns (string memory _animation_url) {
+				_tokenUriAnimationUrl = _animation_url;
+			} catch {
+				_tokenUriAnimationUrl = "";
+			}
 		}
 		return
 			getTokenURI(
-				_positions.property,
-				_positions.amount,
-				_positions.cumulativeReward,
-				_tokenUriImage,
-				_tokenUriName,
-				_tokenUriDescription,
-				_payload
+				abi.encode(
+					_positions.property,
+					_positions.amount,
+					_positions.cumulativeReward,
+					_tokenUriImage,
+					_tokenUriName,
+					_tokenUriDescription,
+					_tokenUriAnimationUrl,
+					_payload
+				)
 			);
 	}
 

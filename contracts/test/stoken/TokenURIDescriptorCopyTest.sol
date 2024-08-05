@@ -20,6 +20,16 @@ contract TokenURIDescriptorCopyTest is ITokenURIDescriptor {
 		return newImage;
 	}
 
+	function animationUrl(
+		uint256,
+		address,
+		ISTokensManager.StakingPositions memory,
+		ISTokensManager.Rewards memory,
+		bytes32
+	) external pure override returns (string memory) {
+		return "";
+	}
+
 	function onBeforeMint(
 		uint256 _tokenId,
 		address,
