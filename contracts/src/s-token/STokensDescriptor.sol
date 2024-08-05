@@ -170,14 +170,30 @@ contract STokensDescriptor {
 	}
 
 	function getTokenURI(
-		address _property,
-		uint256 _amount,
-		uint256 _cumulativeReward,
-		string memory _tokenUriImage,
-		string memory _tokenUriName,
-		string memory _tokenUriDescription,
-		bytes32 _payload
+		bytes memory _props
 	) internal pure returns (string memory) {
+		(
+			address _property,
+			uint256 _amount,
+			uint256 _cumulativeReward,
+			string memory _tokenUriImage,
+			string memory _tokenUriName,
+			string memory _tokenUriDescription,
+			string memory _tokenUriAnimationUrl,
+			bytes32 _payload
+		) = abi.decode(
+				_props,
+				(
+					address,
+					uint256,
+					uint256,
+					string,
+					string,
+					string,
+					string,
+					bytes32
+				)
+			);
 		string memory amount = _amount.decimalString(18);
 		string memory name = bytes(_tokenUriName).length == 0
 			? string(
@@ -244,6 +260,15 @@ contract STokensDescriptor {
 				)
 			)
 			: _tokenUriImage;
+		string memory animationUrl = bytes(_tokenUriAnimationUrl).length == 0
+			? string("")
+			: string(
+				abi.encodePacked(
+					// solhint-disable-next-line quotes
+					'", "animation_url":"',
+					_tokenUriAnimationUrl
+				)
+			);
 		return
 			string(
 				abi.encodePacked(
@@ -259,6 +284,7 @@ contract STokensDescriptor {
 							// solhint-disable-next-line quotes
 							'", "image": "',
 							image,
+							animationUrl,
 							// solhint-disable-next-line quotes
 							'", "attributes":',
 							attributes,

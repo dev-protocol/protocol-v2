@@ -23,6 +23,23 @@ interface ITokenURIDescriptor {
 	) external view returns (string memory);
 
 	/*
+	 * @dev get animation_url from custom descriptor
+	 * @param _tokenId token id
+	 * @param _owner owner address
+	 * @param _positions staking position
+	 * @param _rewards rewards
+	 * @param _payload token payload
+	 * @return string image information
+	 */
+	function animationUrl(
+		uint256 _tokenId,
+		address _owner,
+		ISTokensManager.StakingPositions memory _positions,
+		ISTokensManager.Rewards memory _rewards,
+		bytes32 _payload
+	) external view returns (string memory);
+
+	/*
 	 * @dev get name from custom descriptor
 	 * @param _tokenId token id
 	 * @param _owner owner address
