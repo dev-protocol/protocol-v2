@@ -11,7 +11,7 @@
 		}
 	],
 	"editor.codeActionsOnSave": {
-		"source.fixAll.eslint": true
+		"source.fixAll.eslint": "explicit"
 	},
 	"solidity.compileUsingRemoteVersion": "v0.8.9+commit.e5eed63a"
 }
