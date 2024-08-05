@@ -9,7 +9,6 @@ contract TokenURIDescriptorCopyTest is ITokenURIDescriptor {
 	string public newName = "";
 	string public newDescription = "";
 	string public newImage = "dummy-string";
-	string public newAnimationUrl = "dummy-string";
 
 	function image(
 		uint256,
@@ -27,8 +26,8 @@ contract TokenURIDescriptorCopyTest is ITokenURIDescriptor {
 		ISTokensManager.StakingPositions memory,
 		ISTokensManager.Rewards memory,
 		bytes32
-	) external view override returns (string memory) {
-		return newAnimationUrl;
+	) external pure override returns (string memory) {
+		return "";
 	}
 
 	function onBeforeMint(

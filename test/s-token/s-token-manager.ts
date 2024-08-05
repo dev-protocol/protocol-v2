@@ -33,6 +33,7 @@ type Details = {
 	description: string
 	image: string
 	attributes: Attributes
+	animation_url?: string
 }
 
 contract('STokensManager', ([deployer, user]) => {
@@ -117,7 +118,8 @@ contract('STokensManager', ([deployer, user]) => {
 		amount: number | string,
 		cumulativeReward: number,
 		payload: string,
-		tokenUriImage = ''
+		tokenUriImage = '',
+		tokenUriAnimationUrl = ''
 	): void => {
 		const uriInfo = tokenUri.split(',')
 		expect(uriInfo.length).to.equal(2)
@@ -127,9 +129,10 @@ contract('STokensManager', ([deployer, user]) => {
 			name: string
 			description: string
 			image: string
+			animation_url: string
 			attributes: Attributes
 		}
-		const { name, description, image } = details
+		const { name, description, image, animation_url } = details
 		checkName(name, property, amount, cumulativeReward)
 		checkDescription(description, property)
 		checkAttributes(details.attributes, property, amount, payload)
@@ -137,6 +140,9 @@ contract('STokensManager', ([deployer, user]) => {
 		tokenUriImage === ''
 			? checkImage(image, property)
 			: checkTokenImageUri(image, tokenUriImage)
+		// eslint-disable-next-line @typescript-eslint/no-unused-expressions
+		tokenUriAnimationUrl !== '' &&
+			checkTokenAnimationUrl(animation_url, tokenUriAnimationUrl)
 	}
 
 	const getdetails = (tokenUri: string): Details => {
@@ -148,6 +154,7 @@ contract('STokensManager', ([deployer, user]) => {
 			name: string
 			description: string
 			image: string
+			animation_url?: string
 			attributes: Attributes
 		}
 		return details
@@ -185,6 +192,13 @@ contract('STokensManager', ([deployer, user]) => {
 
 	const checkTokenImageUri = (image: string, tokenUriImage: string): void => {
 		expect(image).to.equal(tokenUriImage)
+	}
+
+	const checkTokenAnimationUrl = (
+		animationUrl: string,
+		tokenUriAnimationUrl: string
+	): void => {
+		expect(animationUrl).to.equal(tokenUriAnimationUrl)
 	}
 
 	const checkAttributes = (
@@ -273,7 +287,7 @@ contract('STokensManager', ([deployer, user]) => {
 					'ipfs://IPFS-CID'
 				)
 			})
-			it('get descriptor token uri; with custom name & description check', async () => {
+			it('get descriptor token uri; with custom name, animation_url & description check', async () => {
 				// @ts-ignore
 				await dev.lockup.depositToProperty(
 					property.address,
@@ -294,15 +308,37 @@ contract('STokensManager', ([deployer, user]) => {
 					10000,
 					0,
 					web3.utils.keccak256('ADDITIONAL_BYTES'),
-					'dummy-string'
+					'dummy-string',
+					'dummy-animation-string'
 				)
 				// This checks for custom name & description
 				await descriptor._setName('new-name')
 				await descriptor._setDescription('new-description')
+				await descriptor._setAnimationUrl('new-animation')
 				const recheckURI = await dev.sTokensManager.tokenURI(1)
-				const { name, description } = getdetails(recheckURI)
+				const { name, description, animation_url } = getdetails(recheckURI)
 				expect(name).to.equal('new-name')
 				expect(description).to.equal('new-description')
+				expect(animation_url).to.equal('new-animation')
+			})
+			it('returns tokenURI without animation_url if it is not set', async () => {
+				// @ts-ignore
+				await dev.lockup.depositToProperty(
+					property.address,
+					'10000',
+					web3.utils.keccak256('ADDITIONAL_BYTES')
+				)
+				await dev.sTokensManager.setTokenURIDescriptor(
+					property.address,
+					descriptor.address,
+					[web3.utils.keccak256('ADDITIONAL_BYTES')],
+					{ from: user }
+				)
+				await descriptor._setAnimationUrl('')
+				const { animation_url } = getdetails(
+					await dev.sTokensManager.tokenURI(1)
+				)
+				expect(animation_url).to.equal(undefined)
 			})
 			it('get token uri for legacy descriptors; without custom name & description', async () => {
 				// @ts-ignore

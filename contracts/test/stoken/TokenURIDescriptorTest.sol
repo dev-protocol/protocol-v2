@@ -9,7 +9,7 @@ contract TokenURIDescriptorTest is ITokenURIDescriptor {
 	string public newName = "";
 	string public newDescription = "";
 	string public newImage = "dummy-string";
-	string public newAnimationUrl = "dummy-string";
+	string public newAnimationUrl = "dummy-animation-string";
 
 	function image(
 		uint256,
@@ -59,6 +59,10 @@ contract TokenURIDescriptorTest is ITokenURIDescriptor {
 
 	function _setImageURI(string memory _imageURI) public {
 		newImage = _imageURI;
+	}
+
+	function _setAnimationUrl(string memory _animationUrl) public {
+		newAnimationUrl = _animationUrl;
 	}
 
 	function name(
