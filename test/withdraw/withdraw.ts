@@ -8,9 +8,10 @@ import {
 	splitValue,
 	forwardBlockTimestamp,
 	getBlockTimestamp,
+	getBlock,
 } from '../test-lib/utils/common'
 import { getPropertyAddress } from '../test-lib/utils/log'
-import { SHARE_OF_TREASURY } from '../test-lib/const'
+import { DEFAULT_ADDRESS, SHARE_OF_TREASURY } from '../test-lib/const'
 import type { Snapshot } from '../test-lib/utils/snapshot'
 import { takeSnapshot, revertToSnapshot } from '../test-lib/utils/snapshot'
 import {
@@ -338,6 +339,258 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 			await checkAmount(dev, property1, propertyAuthor)
 			await checkAmount(dev, property2, propertyAuthor)
 			await checkAmount(dev, property3, propertyAuthor)
+		})
+	})
+	describe.only('Withdraw; TransferHistory', () => {
+		// Const [dev] = await init(deployer, user3)
+		// const propertyAddress2 = getPropertyAddress(
+		// 	await dev.propertyFactory.create('test2', 'TEST2', user1)
+		// )
+		// const propertyAddress3 = getPropertyAddress(
+		// 	await dev.propertyFactory.create('test3', 'TEST3', user1)
+		// )
+		const Alice = deployer
+		const Bob = user1
+		const Carol = user3
+		const toStruct = (
+			src: any
+		): {
+			to: string
+			from: string
+			amount: BigNumber
+			sourceOfRecipient: BigNumber
+			sourceOfSender: BigNumber
+			fill: boolean
+			blockNumber: BigNumber
+		} => {
+			const [
+				to,
+				from,
+				amount,
+				sourceOfRecipient,
+				sourceOfSender,
+				fill,
+				blockNumber,
+			] = src
+			return {
+				to,
+				from,
+				amount: toBigNumber(amount),
+				sourceOfRecipient: toBigNumber(sourceOfRecipient),
+				sourceOfSender: toBigNumber(sourceOfSender),
+				fill,
+				blockNumber: toBigNumber(blockNumber),
+			}
+		}
+
+		it('should be empty by default', async () => {
+			const data = await dev.withdraw.transferHistory(property.address, 0)
+			const res = toStruct(data)
+			expect(res.amount.toNumber()).to.be.equal(0)
+			expect(res.sourceOfSender.toNumber()).to.be.equal(0)
+			expect(res.sourceOfRecipient.toNumber()).to.be.equal(0)
+			expect(res.blockNumber.toNumber()).to.be.equal(0)
+			expect(res.to).to.be.equal(DEFAULT_ADDRESS)
+			expect(res.from).to.be.equal(DEFAULT_ADDRESS)
+			expect(res.fill).to.be.equal(false)
+		})
+		it('should create new TransferHistory each transfer', async () => {
+			const balance1 = await property.balanceOf(Alice).then(toBigNumber)
+			const balance2 = await property.balanceOf(Bob).then(toBigNumber)
+			await property.transfer(Bob, '1000000', {
+				from: Alice,
+			})
+			const block1 = await getBlock()
+			const data1 = await dev.withdraw.transferHistory(property.address, 0)
+			const balance3 = await property.balanceOf(Bob).then(toBigNumber)
+			const balance4 = await property.balanceOf(Carol).then(toBigNumber)
+			await property.transfer(Carol, '500000', {
+				from: Bob,
+			})
+			const block2 = await getBlock()
+			const data2 = await dev.withdraw.transferHistory(property.address, 1)
+
+			const res1 = toStruct(data1)
+			expect(res1.amount.toNumber()).to.be.equal(0) // Initially, it's 0
+			expect(res1.sourceOfSender.toFixed()).to.be.equal(balance1.toFixed())
+			expect(res1.sourceOfRecipient.toFixed()).to.be.equal(balance2.toFixed())
+			expect(res1.blockNumber.toNumber()).to.be.equal(block1)
+			expect(res1.to).to.be.equal(Bob)
+			expect(res1.from).to.be.equal(Alice)
+			expect(res1.fill).to.be.equal(false)
+
+			const res2 = toStruct(data2)
+			expect(res2.amount.toNumber()).to.be.equal(0) // Initially, it's 0
+			expect(res2.sourceOfSender.toFixed()).to.be.equal(balance3.toFixed())
+			expect(res2.sourceOfRecipient.toFixed()).to.be.equal(balance4.toFixed())
+			expect(res2.blockNumber.toNumber()).to.be.equal(block2)
+			expect(res2.to).to.be.equal(Carol)
+			expect(res2.from).to.be.equal(Bob)
+			expect(res2.fill).to.be.equal(false)
+		})
+		it('should update `amount` and `fill` of the last one TransferHistory', async () => {
+			await property.transfer(Bob, '1000000', {
+				from: Alice,
+			})
+			const d1 = await dev.withdraw.transferHistory(property.address, 0)
+			const r1 = toStruct(d1)
+			expect(r1.amount.toFixed()).to.be.equal('0')
+			expect(r1.fill).to.be.equal(false)
+
+			await property.transfer(Carol, '500000', {
+				from: Bob,
+			})
+			const d2 = await dev.withdraw.transferHistory(property.address, 0)
+			const r2 = toStruct(d2)
+			expect(r2.amount.toFixed()).to.be.equal('1000000')
+			expect(r2.fill).to.be.equal(true)
+		})
+		it('should increase trasnferHistoryLength each transfer', async () => {
+			expect(
+				(
+					await dev.withdraw
+						.transferHistoryLength(property.address)
+						.then(toBigNumber)
+				).toFixed()
+			).to.be.equal('0')
+
+			await property.transfer(Bob, '1000000', {
+				from: Alice,
+			})
+			expect(
+				(
+					await dev.withdraw
+						.transferHistoryLength(property.address)
+						.then(toBigNumber)
+				).toFixed()
+			).to.be.equal('1')
+
+			await property.transfer(Bob, '1000000', {
+				from: Alice,
+			})
+			expect(
+				(
+					await dev.withdraw
+						.transferHistoryLength(property.address)
+						.then(toBigNumber)
+				).toFixed()
+			).to.be.equal('2')
+		})
+		it('should increase trasnferHistorySenderLength each transfer', async () => {
+			expect(
+				(
+					await dev.withdraw
+						.transferHistorySenderLength(property.address, Alice)
+						.then(toBigNumber)
+				).toFixed()
+			).to.be.equal('0')
+
+			await property.transfer(Bob, '1000000', {
+				from: Alice,
+			})
+			expect(
+				(
+					await dev.withdraw
+						.transferHistorySenderLength(property.address, Alice)
+						.then(toBigNumber)
+				).toFixed()
+			).to.be.equal('1')
+
+			await property.transfer(Bob, '1000000', {
+				from: Alice,
+			})
+			expect(
+				(
+					await dev.withdraw
+						.transferHistorySenderLength(property.address, Alice)
+						.then(toBigNumber)
+				).toFixed()
+			).to.be.equal('2')
+		})
+		it('should increase transferHistoryRecipientLength each transfer', async () => {
+			expect(
+				(
+					await dev.withdraw
+						.transferHistoryRecipientLength(property.address, Bob)
+						.then(toBigNumber)
+				).toFixed()
+			).to.be.equal('0')
+
+			await property.transfer(Bob, '1000000', {
+				from: Alice,
+			})
+			expect(
+				(
+					await dev.withdraw
+						.transferHistoryRecipientLength(property.address, Bob)
+						.then(toBigNumber)
+				).toFixed()
+			).to.be.equal('1')
+
+			await property.transfer(Bob, '1000000', {
+				from: Alice,
+			})
+			expect(
+				(
+					await dev.withdraw
+						.transferHistoryRecipientLength(property.address, Bob)
+						.then(toBigNumber)
+				).toFixed()
+			).to.be.equal('2')
+		})
+		it('should record TransferHistory ID in transferHistorySender', async () => {
+			await property.transfer(Bob, '1000000', {
+				from: Alice,
+			})
+			const id1 = await dev.withdraw.transferHistorySender(
+				property.address,
+				Alice,
+				0
+			)
+			const r1 = await dev.withdraw
+				.transferHistory(property.address, id1)
+				.then(toStruct)
+			expect(r1.from).to.be.equal(Alice)
+
+			await property.transfer(Bob, '1000000', {
+				from: Alice,
+			})
+			const id2 = await dev.withdraw.transferHistorySender(
+				property.address,
+				Alice,
+				1
+			)
+			const r2 = await dev.withdraw
+				.transferHistory(property.address, id2)
+				.then(toStruct)
+			expect(r2.from).to.be.equal(Alice)
+		})
+		it('should record TransferHistory ID in transferHistoryRecipient', async () => {
+			await property.transfer(Bob, '1000000', {
+				from: Alice,
+			})
+			const id1 = await dev.withdraw.transferHistoryRecipient(
+				property.address,
+				Bob,
+				0
+			)
+			const r1 = await dev.withdraw
+				.transferHistory(property.address, id1)
+				.then(toStruct)
+			expect(r1.to).to.be.equal(Bob)
+
+			await property.transfer(Bob, '1000000', {
+				from: Alice,
+			})
+			const id2 = await dev.withdraw.transferHistoryRecipient(
+				property.address,
+				Bob,
+				1
+			)
+			const r2 = await dev.withdraw
+				.transferHistory(property.address, id2)
+				.then(toStruct)
+			expect(r2.to).to.be.equal(Bob)
 		})
 	})
 })
