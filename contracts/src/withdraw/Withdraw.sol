@@ -176,18 +176,19 @@ contract Withdraw is InitializableUsingRegistry, IWithdraw, ITransferHistory {
 		address _from,
 		address _to
 	) internal {
+		address prpty = address(_property);
 		uint256 balanceOfSender = _property.balanceOf(_from);
 		uint256 balanceOfRecipient = _property.balanceOf(_to);
 
-		uint256 hId = transferHistoryLength[msg.sender];
-		uint256 hSenderId = transferHistorySenderLength[msg.sender][_from];
-		uint256 hRecipientId = transferHistoryRecipientLength[msg.sender][_to];
+		uint256 hId = transferHistoryLength[prpty];
+		uint256 hSenderId = transferHistorySenderLength[prpty][_from];
+		uint256 hRecipientId = transferHistoryRecipientLength[prpty][_to];
 
-		transferHistorySenderLength[msg.sender][_from] = hSenderId + 1;
-		transferHistoryRecipientLength[msg.sender][_to] = hRecipientId + 1;
-		transferHistoryLength[msg.sender] = hId + 1;
+		transferHistorySenderLength[prpty][_from] = hSenderId + 1;
+		transferHistoryRecipientLength[prpty][_to] = hRecipientId + 1;
+		transferHistoryLength[prpty] = hId + 1;
 
-		_transferHistory[msg.sender][hId] = TransferHistory(
+		_transferHistory[prpty][hId] = TransferHistory(
 			_to,
 			_from,
 			0,
@@ -196,16 +197,19 @@ contract Withdraw is InitializableUsingRegistry, IWithdraw, ITransferHistory {
 			false,
 			block.number
 		);
-		transferHistorySender[msg.sender][_from][hSenderId] = hId;
-		transferHistoryRecipient[msg.sender][_to][hRecipientId] = hId;
+		transferHistorySender[prpty][_from][hSenderId] = hId;
+		transferHistoryRecipient[prpty][_to][hRecipientId] = hId;
 
-		TransferHistory storage lastHistory = _transferHistory[msg.sender][
-			hId - 1
-		];
-		lastHistory.amount =
-			lastHistory.sourceOfSender -
-			_property.balanceOf(lastHistory.from);
-		lastHistory.fill = true;
+		if (hId > 0) {
+			// Update last TransferHistory if exists.
+			TransferHistory storage lastHistory = _transferHistory[prpty][
+				hId - 1
+			];
+			lastHistory.amount =
+				lastHistory.sourceOfSender -
+				_property.balanceOf(lastHistory.from);
+			lastHistory.fill = true;
+		}
 	}
 
 	/**
