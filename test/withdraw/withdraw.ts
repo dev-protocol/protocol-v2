@@ -629,36 +629,75 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 			})
 
 			describe('Alice -> Bob: Prop1', () => {
+				let balanceAlice: BigNumber
+				let balanceBob: BigNumber
+				let blockNumber: number
 				before((done) => {
 					;(async () => {
+						balanceAlice = await Prop1.balanceOf(Alice).then(toBigNumber)
+						balanceBob = await Prop1.balanceOf(Bob).then(toBigNumber)
 						await Prop1.transfer(Bob, '100000', { from: Alice })
+						blockNumber = await getBlock()
 						done()
 					})()
 				})
 				it('TransferHistory for Prop1 is created 1', async () => {
-					expect(
-						(
-							await withdraw
-								.transferHistoryLength(Prop1.address)
-								.then(toBigNumber)
-						).toFixed()
-					).to.be.equal('1')
+					const [r1] = await Promise.all([
+						withdraw.transferHistoryLength(Prop1.address).then(toBigNumber),
+					])
+					expect(r1.toFixed()).to.be.equal('1')
 				})
 				it('TransferHistory for Prop2, Prop3 is not created', async () => {
-					expect(
-						(
-							await withdraw
-								.transferHistoryLength(Prop2.address)
-								.then(toBigNumber)
-						).toFixed()
-					).to.be.equal('0')
-					expect(
-						(
-							await withdraw
-								.transferHistoryLength(Prop3.address)
-								.then(toBigNumber)
-						).toFixed()
-					).to.be.equal('0')
+					const [r1, r2] = await Promise.all([
+						withdraw.transferHistoryLength(Prop2.address).then(toBigNumber),
+						withdraw.transferHistoryLength(Prop3.address).then(toBigNumber),
+					])
+					expect(r1.toFixed()).to.be.equal('0')
+					expect(r2.toFixed()).to.be.equal('0')
+				})
+				it('TransferHistorySender for Prop1:Alice is created 1', async () => {
+					const [r1] = await Promise.all([
+						withdraw
+							.transferHistorySenderLength(Prop1.address, Alice)
+							.then(toBigNumber),
+					])
+					expect(r1.toFixed()).to.be.equal('1')
+				})
+				it('TransferHistoryRecipient for Prop1:Bob is created 1', async () => {
+					const [r1] = await Promise.all([
+						withdraw
+							.transferHistoryRecipientLength(Prop1.address, Bob)
+							.then(toBigNumber),
+					])
+					expect(r1.toFixed()).to.be.equal('1')
+				})
+				it('TransferHistoryRecipient for Prop1:Alice, TransferHistorySender for Prop1:Bob are not created', async () => {
+					const [r1, r2] = await Promise.all([
+						withdraw
+							.transferHistorySenderLength(Prop1.address, Bob)
+							.then(toBigNumber),
+						withdraw
+							.transferHistoryRecipientLength(Prop1.address, Alice)
+							.then(toBigNumber),
+					])
+					expect(r1.toFixed()).to.be.equal('0')
+					expect(r2.toFixed()).to.be.equal('0')
+				})
+				it('TransferHistory for Prop1 has expected values', async () => {
+					const [r1] = await Promise.all([
+						withdraw.transferHistory(Prop1.address, 0).then(toStruct),
+					])
+					expect(r1.from).to.be.equal(Alice)
+					expect(r1.to).to.be.equal(Bob)
+					expect(r1.amount.toFixed()).to.be.equal('0')
+					expect(r1.sourceOfSender.toFixed()).to.be.equal(
+						balanceAlice.toFixed()
+					)
+					expect(r1.sourceOfRecipient.toFixed()).to.be.equal(
+						balanceBob.toFixed()
+					)
+					expect(r1.fill).to.be.equal(false)
+					expect(r1.blockNumber.toNumber()).to.be.equal(blockNumber)
 				})
 			})
 		})
