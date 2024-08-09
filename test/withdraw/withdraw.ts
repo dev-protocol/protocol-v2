@@ -1,7 +1,10 @@
 /* eslint-disable max-nested-callbacks */
 import { init } from './withdraw-common'
 import type { DevProtocolInstance } from '../test-lib/instance'
-import type { PropertyInstance } from '../../types/truffle-contracts'
+import type {
+	PropertyInstance,
+	WithdrawInstance,
+} from '../../types/truffle-contracts'
 import BigNumber from 'bignumber.js'
 import {
 	toBigNumber,
@@ -342,13 +345,6 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 		})
 	})
 	describe.only('Withdraw; TransferHistory', () => {
-		// Const [dev] = await init(deployer, user3)
-		// const propertyAddress2 = getPropertyAddress(
-		// 	await dev.propertyFactory.create('test2', 'TEST2', user1)
-		// )
-		// const propertyAddress3 = getPropertyAddress(
-		// 	await dev.propertyFactory.create('test3', 'TEST3', user1)
-		// )
 		const Alice = deployer
 		const Bob = user1
 		const Carol = user3
@@ -591,6 +587,80 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 				.transferHistory(property.address, id2)
 				.then(toStruct)
 			expect(r2.to).to.be.equal(Bob)
+		})
+		describe('Scenario', () => {
+			let Prop1: PropertyInstance
+			let Prop2: PropertyInstance
+			let Prop3: PropertyInstance
+			let withdraw: WithdrawInstance
+
+			before((done) => {
+				;(async () => {
+					const [dev] = await init(deployer, user3)
+					withdraw = dev.withdraw
+					const properties = await Promise.all([
+						artifacts
+							.require('Property')
+							.at(
+								getPropertyAddress(
+									await dev.propertyFactory.create('test1', 'TEST1', Alice)
+								)
+							),
+						artifacts
+							.require('Property')
+							.at(
+								getPropertyAddress(
+									await dev.propertyFactory.create('test2', 'TEST2', Alice)
+								)
+							),
+						artifacts
+							.require('Property')
+							.at(
+								getPropertyAddress(
+									await dev.propertyFactory.create('test3', 'TEST3', Alice)
+								)
+							),
+					])
+					Prop1 = properties[0]
+					Prop2 = properties[1]
+					Prop3 = properties[2]
+					done()
+				})()
+			})
+
+			describe('Alice -> Bob: Prop1', () => {
+				before((done) => {
+					;(async () => {
+						await Prop1.transfer(Bob, '100000', { from: Alice })
+						done()
+					})()
+				})
+				it('TransferHistory for Prop1 is created 1', async () => {
+					expect(
+						(
+							await withdraw
+								.transferHistoryLength(Prop1.address)
+								.then(toBigNumber)
+						).toFixed()
+					).to.be.equal('1')
+				})
+				it('TransferHistory for Prop2, Prop3 is not created', async () => {
+					expect(
+						(
+							await withdraw
+								.transferHistoryLength(Prop2.address)
+								.then(toBigNumber)
+						).toFixed()
+					).to.be.equal('0')
+					expect(
+						(
+							await withdraw
+								.transferHistoryLength(Prop3.address)
+								.then(toBigNumber)
+						).toFixed()
+					).to.be.equal('0')
+				})
+			})
 		})
 	})
 })
