@@ -941,6 +941,217 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 					expect(r1.blockNumber.toNumber()).to.be.equal(blockNumberProp2$1)
 				})
 			})
+			let balanceCarolProp3$1: BigNumber
+			let balanceAliceProp3$1: BigNumber
+			let blockNumberProp3$1: number
+			let transferAmountProp3$1: BigNumber
+			describe('Carol -> Alice: Prop3 with random transfer amount', () => {
+				let balanceCarol: BigNumber
+				let balanceAlice: BigNumber
+				let blockNumber: number
+				before((done) => {
+					;(async () => {
+						balanceCarol = await Prop3.balanceOf(Carol).then(toBigNumber)
+						balanceAlice = await Prop3.balanceOf(Alice).then(toBigNumber)
+						transferAmountProp3$1 = balanceCarol.times(Math.random()).dp(0)
+						console.log(
+							'transferAmountProp3$1',
+							transferAmountProp3$1.toFixed()
+						)
+						await Prop3.transfer(Alice, transferAmountProp3$1.toFixed(), {
+							from: Carol,
+						})
+						blockNumber = await getBlock()
+						balanceCarolProp3$1 = balanceCarol
+						balanceAliceProp3$1 = balanceAlice
+						blockNumberProp3$1 = blockNumber
+						done()
+					})()
+				})
+				it('transferHistory for Prop3 is created 1', async () => {
+					const [r1] = await Promise.all([
+						withdraw.transferHistoryLength(Prop3.address).then(toBigNumber),
+					])
+					expect(r1.toFixed()).to.be.equal('1')
+				})
+				it('transferHistory for Prop1, Prop2 is not increased', async () => {
+					const [r1, r2] = await Promise.all([
+						withdraw.transferHistoryLength(Prop1.address).then(toBigNumber),
+						withdraw.transferHistoryLength(Prop2.address).then(toBigNumber),
+					])
+					expect(r1.toFixed()).to.be.equal('2')
+					expect(r2.toFixed()).to.be.equal('1')
+				})
+				it('transferHistoryLengthOfSender for Prop2:Carol is created 1', async () => {
+					const [r1] = await Promise.all([
+						withdraw
+							.transferHistoryLengthOfSender(Prop3.address, Carol)
+							.then(toBigNumber),
+					])
+					expect(r1.toFixed()).to.be.equal('1')
+				})
+				it('transferHistoryOfSenderByIndex #0 for Prop3:Carol is 0', async () => {
+					const [r1] = await Promise.all([
+						withdraw
+							.transferHistoryOfSenderByIndex(Prop3.address, Carol, 0)
+							.then(toBigNumber),
+					])
+					expect(r1.toFixed()).to.be.equal('0')
+				})
+				it('transferHistoryLengthOfRecipient for Prop3:Alice is created 1', async () => {
+					const [r1] = await Promise.all([
+						withdraw
+							.transferHistoryLengthOfRecipient(Prop3.address, Alice)
+							.then(toBigNumber),
+					])
+					expect(r1.toFixed()).to.be.equal('1')
+				})
+				it('transferHistoryOfRecipientByIndex #0 for Prop3:Alice is 0', async () => {
+					const [r1] = await Promise.all([
+						withdraw
+							.transferHistoryOfRecipientByIndex(Prop3.address, Alice, 0)
+							.then(toBigNumber),
+					])
+					expect(r1.toFixed()).to.be.equal('0')
+				})
+				it('transferHistoryLengthOfRecipient for Prop3:Carol, transferHistoryLengthOfSender for Prop3:Alice are not increased', async () => {
+					const [r1, r2] = await Promise.all([
+						withdraw
+							.transferHistoryLengthOfSender(Prop3.address, Alice)
+							.then(toBigNumber),
+						withdraw
+							.transferHistoryLengthOfRecipient(Prop3.address, Carol)
+							.then(toBigNumber),
+					])
+					expect(r1.toFixed()).to.be.equal('0')
+					expect(r2.toFixed()).to.be.equal('0')
+				})
+				it('transferHistory for Prop3 #0 has expected values', async () => {
+					const [r1] = await Promise.all([
+						withdraw.transferHistory(Prop3.address, 0).then(toStruct),
+					])
+					expect(r1.from).to.be.equal(Carol)
+					expect(r1.to).to.be.equal(Alice)
+					expect(r1.amount.toFixed()).to.be.equal('0')
+					expect(r1.preBalanceOfSender.toFixed()).to.be.equal(
+						balanceCarol.toFixed()
+					)
+					expect(r1.preBalanceOfRecipient.toFixed()).to.be.equal(
+						balanceAlice.toFixed()
+					)
+					expect(r1.filled).to.be.equal(false)
+					expect(r1.blockNumber.toNumber()).to.be.equal(blockNumber)
+				})
+			})
+			describe('Alice -> Bob: Prop3 with random transfer amount', () => {
+				let balanceAlice: BigNumber
+				let balanceBob: BigNumber
+				let blockNumber: number
+				before((done) => {
+					;(async () => {
+						balanceAlice = await Prop3.balanceOf(Alice).then(toBigNumber)
+						balanceBob = await Prop3.balanceOf(Bob).then(toBigNumber)
+						await Prop3.transfer(Bob, 1, {
+							from: Alice,
+						})
+						blockNumber = await getBlock()
+						done()
+					})()
+				})
+				it('transferHistory for Prop3 is increased to 2', async () => {
+					const [r1] = await Promise.all([
+						withdraw.transferHistoryLength(Prop3.address).then(toBigNumber),
+					])
+					expect(r1.toFixed()).to.be.equal('2')
+				})
+				it('transferHistory for Prop1, Prop2 is not increased', async () => {
+					const [r1, r2] = await Promise.all([
+						withdraw.transferHistoryLength(Prop1.address).then(toBigNumber),
+						withdraw.transferHistoryLength(Prop2.address).then(toBigNumber),
+					])
+					expect(r1.toFixed()).to.be.equal('2')
+					expect(r2.toFixed()).to.be.equal('1')
+				})
+				it('transferHistoryLengthOfSender for Prop2:Alice is created 1', async () => {
+					const [r1] = await Promise.all([
+						withdraw
+							.transferHistoryLengthOfSender(Prop3.address, Alice)
+							.then(toBigNumber),
+					])
+					expect(r1.toFixed()).to.be.equal('1')
+				})
+				it('transferHistoryOfSenderByIndex #0 for Prop3:Alice is 1', async () => {
+					const [r1] = await Promise.all([
+						withdraw
+							.transferHistoryOfSenderByIndex(Prop3.address, Alice, 0)
+							.then(toBigNumber),
+					])
+					expect(r1.toFixed()).to.be.equal('1')
+				})
+				it('transferHistoryLengthOfRecipient for Prop3:Bob is created 1', async () => {
+					const [r1] = await Promise.all([
+						withdraw
+							.transferHistoryLengthOfRecipient(Prop3.address, Bob)
+							.then(toBigNumber),
+					])
+					expect(r1.toFixed()).to.be.equal('1')
+				})
+				it('transferHistoryOfRecipientByIndex #0 for Prop3:Bob is 1', async () => {
+					const [r1] = await Promise.all([
+						withdraw
+							.transferHistoryOfRecipientByIndex(Prop3.address, Bob, 0)
+							.then(toBigNumber),
+					])
+					expect(r1.toFixed()).to.be.equal('1')
+				})
+				it('transferHistoryLengthOfRecipient for Prop3:Alice, transferHistoryLengthOfSender for Prop3:Bob are not increased', async () => {
+					const [r1, r2] = await Promise.all([
+						withdraw
+							.transferHistoryLengthOfSender(Prop3.address, Bob)
+							.then(toBigNumber),
+						withdraw
+							.transferHistoryLengthOfRecipient(Prop3.address, Alice)
+							.then(toBigNumber),
+					])
+					expect(r1.toFixed()).to.be.equal('0')
+					expect(r2.toFixed()).to.be.equal('1')
+				})
+				it('transferHistory for Prop3 #1 has expected values', async () => {
+					const [r1] = await Promise.all([
+						withdraw.transferHistory(Prop3.address, 1).then(toStruct),
+					])
+					expect(r1.from).to.be.equal(Alice)
+					expect(r1.to).to.be.equal(Bob)
+					expect(r1.amount.toFixed()).to.be.equal('0')
+					expect(r1.preBalanceOfSender.toFixed()).to.be.equal(
+						balanceAlice.toFixed()
+					)
+					expect(r1.preBalanceOfRecipient.toFixed()).to.be.equal(
+						balanceBob.toFixed()
+					)
+					expect(r1.filled).to.be.equal(false)
+					expect(r1.blockNumber.toNumber()).to.be.equal(blockNumber)
+				})
+				it('transferHistory for Prop3 #0 has updated', async () => {
+					const [r1] = await Promise.all([
+						withdraw.transferHistory(Prop3.address, 0).then(toStruct),
+					])
+					expect(r1.amount.toFixed()).to.be.equal(
+						transferAmountProp3$1.toFixed()
+					)
+					expect(r1.filled).to.be.equal(true)
+
+					expect(r1.from).to.be.equal(Carol)
+					expect(r1.to).to.be.equal(Alice)
+					expect(r1.preBalanceOfSender.toFixed()).to.be.equal(
+						balanceCarolProp3$1.toFixed()
+					)
+					expect(r1.preBalanceOfRecipient.toFixed()).to.be.equal(
+						balanceAliceProp3$1.toFixed()
+					)
+					expect(r1.blockNumber.toNumber()).to.be.equal(blockNumberProp3$1)
+				})
+			})
 		})
 	})
 })
