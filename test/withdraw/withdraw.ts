@@ -354,27 +354,27 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 			to: string
 			from: string
 			amount: BigNumber
-			sourceOfRecipient: BigNumber
-			sourceOfSender: BigNumber
-			fill: boolean
+			recipientBalanceBeforeTx: BigNumber
+			senderBalanceBeforeTx: BigNumber
+			filled: boolean
 			blockNumber: BigNumber
 		} => {
 			const [
 				to,
 				from,
 				amount,
-				sourceOfRecipient,
-				sourceOfSender,
-				fill,
+				recipientBalanceBeforeTx,
+				senderBalanceBeforeTx,
+				filled,
 				blockNumber,
 			] = src
 			return {
 				to,
 				from,
 				amount: toBigNumber(amount),
-				sourceOfRecipient: toBigNumber(sourceOfRecipient),
-				sourceOfSender: toBigNumber(sourceOfSender),
-				fill,
+				recipientBalanceBeforeTx: toBigNumber(recipientBalanceBeforeTx),
+				senderBalanceBeforeTx: toBigNumber(senderBalanceBeforeTx),
+				filled,
 				blockNumber: toBigNumber(blockNumber),
 			}
 		}
@@ -383,12 +383,12 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 			const data = await dev.withdraw.transferHistory(property.address, 0)
 			const res = toStruct(data)
 			expect(res.amount.toNumber()).to.be.equal(0)
-			expect(res.sourceOfSender.toNumber()).to.be.equal(0)
-			expect(res.sourceOfRecipient.toNumber()).to.be.equal(0)
+			expect(res.senderBalanceBeforeTx.toNumber()).to.be.equal(0)
+			expect(res.recipientBalanceBeforeTx.toNumber()).to.be.equal(0)
 			expect(res.blockNumber.toNumber()).to.be.equal(0)
 			expect(res.to).to.be.equal(DEFAULT_ADDRESS)
 			expect(res.from).to.be.equal(DEFAULT_ADDRESS)
-			expect(res.fill).to.be.equal(false)
+			expect(res.filled).to.be.equal(false)
 		})
 		it('should create new TransferHistory each transfer', async () => {
 			const balance1 = await property.balanceOf(Alice).then(toBigNumber)
@@ -408,30 +408,38 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 
 			const res1 = toStruct(data1)
 			expect(res1.amount.toNumber()).to.be.equal(0) // Initially, it's 0
-			expect(res1.sourceOfSender.toFixed()).to.be.equal(balance1.toFixed())
-			expect(res1.sourceOfRecipient.toFixed()).to.be.equal(balance2.toFixed())
+			expect(res1.senderBalanceBeforeTx.toFixed()).to.be.equal(
+				balance1.toFixed()
+			)
+			expect(res1.recipientBalanceBeforeTx.toFixed()).to.be.equal(
+				balance2.toFixed()
+			)
 			expect(res1.blockNumber.toNumber()).to.be.equal(block1)
 			expect(res1.to).to.be.equal(Bob)
 			expect(res1.from).to.be.equal(Alice)
-			expect(res1.fill).to.be.equal(false)
+			expect(res1.filled).to.be.equal(false)
 
 			const res2 = toStruct(data2)
 			expect(res2.amount.toNumber()).to.be.equal(0) // Initially, it's 0
-			expect(res2.sourceOfSender.toFixed()).to.be.equal(balance3.toFixed())
-			expect(res2.sourceOfRecipient.toFixed()).to.be.equal(balance4.toFixed())
+			expect(res2.senderBalanceBeforeTx.toFixed()).to.be.equal(
+				balance3.toFixed()
+			)
+			expect(res2.recipientBalanceBeforeTx.toFixed()).to.be.equal(
+				balance4.toFixed()
+			)
 			expect(res2.blockNumber.toNumber()).to.be.equal(block2)
 			expect(res2.to).to.be.equal(Carol)
 			expect(res2.from).to.be.equal(Bob)
-			expect(res2.fill).to.be.equal(false)
+			expect(res2.filled).to.be.equal(false)
 		})
-		it('should update `amount` and `fill` of the last one TransferHistory', async () => {
+		it('should update `amount` and `filled` of the last one TransferHistory', async () => {
 			await property.transfer(Bob, '1000000', {
 				from: Alice,
 			})
 			const d1 = await dev.withdraw.transferHistory(property.address, 0)
 			const r1 = toStruct(d1)
 			expect(r1.amount.toFixed()).to.be.equal('0')
-			expect(r1.fill).to.be.equal(false)
+			expect(r1.filled).to.be.equal(false)
 
 			await property.transfer(Carol, '500000', {
 				from: Bob,
@@ -439,7 +447,7 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 			const d2 = await dev.withdraw.transferHistory(property.address, 0)
 			const r2 = toStruct(d2)
 			expect(r2.amount.toFixed()).to.be.equal('1000000')
-			expect(r2.fill).to.be.equal(true)
+			expect(r2.filled).to.be.equal(true)
 		})
 		it('should increase trasnferHistoryLength each transfer', async () => {
 			expect(
@@ -711,13 +719,13 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 					expect(r1.from).to.be.equal(Alice)
 					expect(r1.to).to.be.equal(Bob)
 					expect(r1.amount.toFixed()).to.be.equal('0')
-					expect(r1.sourceOfSender.toFixed()).to.be.equal(
+					expect(r1.senderBalanceBeforeTx.toFixed()).to.be.equal(
 						balanceAlice.toFixed()
 					)
-					expect(r1.sourceOfRecipient.toFixed()).to.be.equal(
+					expect(r1.recipientBalanceBeforeTx.toFixed()).to.be.equal(
 						balanceBob.toFixed()
 					)
-					expect(r1.fill).to.be.equal(false)
+					expect(r1.filled).to.be.equal(false)
 					expect(r1.blockNumber.toNumber()).to.be.equal(blockNumber)
 				})
 			})
@@ -805,11 +813,13 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 					expect(r1.from).to.be.equal(Bob)
 					expect(r1.to).to.be.equal(Carol)
 					expect(r1.amount.toFixed()).to.be.equal('0')
-					expect(r1.sourceOfSender.toFixed()).to.be.equal(balanceBob.toFixed())
-					expect(r1.sourceOfRecipient.toFixed()).to.be.equal(
+					expect(r1.senderBalanceBeforeTx.toFixed()).to.be.equal(
+						balanceBob.toFixed()
+					)
+					expect(r1.recipientBalanceBeforeTx.toFixed()).to.be.equal(
 						balanceCarol.toFixed()
 					)
-					expect(r1.fill).to.be.equal(false)
+					expect(r1.filled).to.be.equal(false)
 					expect(r1.blockNumber.toNumber()).to.be.equal(blockNumber)
 				})
 			})
@@ -891,11 +901,13 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 					expect(r1.from).to.be.equal(Bob)
 					expect(r1.to).to.be.equal(Carol)
 					expect(r1.amount.toFixed()).to.be.equal('0')
-					expect(r1.sourceOfSender.toFixed()).to.be.equal(balanceBob.toFixed())
-					expect(r1.sourceOfRecipient.toFixed()).to.be.equal(
+					expect(r1.senderBalanceBeforeTx.toFixed()).to.be.equal(
+						balanceBob.toFixed()
+					)
+					expect(r1.recipientBalanceBeforeTx.toFixed()).to.be.equal(
 						balanceCarol.toFixed()
 					)
-					expect(r1.fill).to.be.equal(false)
+					expect(r1.fillededed).to.be.equal(false)
 					expect(r1.blockNumber.toNumber()).to.be.equal(blockNumber)
 				})
 				it('transferHistory for Prop1 #0 has updated', async () => {
@@ -903,14 +915,14 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 						withdraw.transferHistory(Prop1.address, 0).then(toStruct),
 					])
 					expect(r1.amount.toFixed()).to.be.equal('100000')
-					expect(r1.fill).to.be.equal(true)
+					expect(r1.filled).to.be.equal(true)
 
 					expect(r1.from).to.be.equal(Alice)
 					expect(r1.to).to.be.equal(Bob)
-					expect(r1.sourceOfSender.toFixed()).to.be.equal(
+					expect(r1.senderBalanceBeforeTx.toFixed()).to.be.equal(
 						balanceAliceProp1$1.toFixed()
 					)
-					expect(r1.sourceOfRecipient.toFixed()).to.be.equal(
+					expect(r1.recipientBalanceBeforeTx.toFixed()).to.be.equal(
 						balanceBobProp1$1.toFixed()
 					)
 					expect(r1.blockNumber.toNumber()).to.be.equal(blockNumberProp1$1)
@@ -920,14 +932,14 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 						withdraw.transferHistory(Prop2.address, 0).then(toStruct),
 					])
 					expect(r1.amount.toFixed()).to.be.equal('0')
-					expect(r1.fill).to.be.equal(false)
+					expect(r1.filled).to.be.equal(false)
 
 					expect(r1.from).to.be.equal(Bob)
 					expect(r1.to).to.be.equal(Carol)
-					expect(r1.sourceOfSender.toFixed()).to.be.equal(
+					expect(r1.senderBalanceBeforeTx.toFixed()).to.be.equal(
 						balanceBobProp2$1.toFixed()
 					)
-					expect(r1.sourceOfRecipient.toFixed()).to.be.equal(
+					expect(r1.recipientBalanceBeforeTx.toFixed()).to.be.equal(
 						balanceCarolProp2$1.toFixed()
 					)
 					expect(r1.blockNumber.toNumber()).to.be.equal(blockNumberProp2$1)

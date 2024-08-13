@@ -7,9 +7,9 @@ interface ITransferHistory {
 		address to;
 		address from;
 		uint256 amount;
-		uint256 sourceOfRecipient;
-		uint256 sourceOfSender;
-		bool fill;
+		uint256 recipientBalanceBeforeTx;
+		uint256 senderBalanceBeforeTx;
+		bool filled;
 		uint256 blockNumber;
 	}
 
