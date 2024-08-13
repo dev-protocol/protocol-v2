@@ -2,6 +2,7 @@
 	"semi": false,
 	"singleQuote": true,
 	"useTabs": true,
+	"plugins": ["prettier-plugin-solidity"],
 	"overrides": [
 		{
 			"files": ["*.sol"],
