@@ -354,8 +354,8 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 			to: string
 			from: string
 			amount: BigNumber
-			recipientBalanceBeforeTx: BigNumber
-			senderBalanceBeforeTx: BigNumber
+			preBalanceOfRecipient: BigNumber
+			preBalanceOfSender: BigNumber
 			filled: boolean
 			blockNumber: BigNumber
 		} => {
@@ -363,8 +363,8 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 				to,
 				from,
 				amount,
-				recipientBalanceBeforeTx,
-				senderBalanceBeforeTx,
+				preBalanceOfRecipient,
+				preBalanceOfSender,
 				filled,
 				blockNumber,
 			] = src
@@ -372,8 +372,8 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 				to,
 				from,
 				amount: toBigNumber(amount),
-				recipientBalanceBeforeTx: toBigNumber(recipientBalanceBeforeTx),
-				senderBalanceBeforeTx: toBigNumber(senderBalanceBeforeTx),
+				preBalanceOfRecipient: toBigNumber(preBalanceOfRecipient),
+				preBalanceOfSender: toBigNumber(preBalanceOfSender),
 				filled,
 				blockNumber: toBigNumber(blockNumber),
 			}
@@ -383,8 +383,8 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 			const data = await dev.withdraw.transferHistory(property.address, 0)
 			const res = toStruct(data)
 			expect(res.amount.toNumber()).to.be.equal(0)
-			expect(res.senderBalanceBeforeTx.toNumber()).to.be.equal(0)
-			expect(res.recipientBalanceBeforeTx.toNumber()).to.be.equal(0)
+			expect(res.preBalanceOfSender.toNumber()).to.be.equal(0)
+			expect(res.preBalanceOfRecipient.toNumber()).to.be.equal(0)
 			expect(res.blockNumber.toNumber()).to.be.equal(0)
 			expect(res.to).to.be.equal(DEFAULT_ADDRESS)
 			expect(res.from).to.be.equal(DEFAULT_ADDRESS)
@@ -408,10 +408,8 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 
 			const res1 = toStruct(data1)
 			expect(res1.amount.toNumber()).to.be.equal(0) // Initially, it's 0
-			expect(res1.senderBalanceBeforeTx.toFixed()).to.be.equal(
-				balance1.toFixed()
-			)
-			expect(res1.recipientBalanceBeforeTx.toFixed()).to.be.equal(
+			expect(res1.preBalanceOfSender.toFixed()).to.be.equal(balance1.toFixed())
+			expect(res1.preBalanceOfRecipient.toFixed()).to.be.equal(
 				balance2.toFixed()
 			)
 			expect(res1.blockNumber.toNumber()).to.be.equal(block1)
@@ -421,10 +419,8 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 
 			const res2 = toStruct(data2)
 			expect(res2.amount.toNumber()).to.be.equal(0) // Initially, it's 0
-			expect(res2.senderBalanceBeforeTx.toFixed()).to.be.equal(
-				balance3.toFixed()
-			)
-			expect(res2.recipientBalanceBeforeTx.toFixed()).to.be.equal(
+			expect(res2.preBalanceOfSender.toFixed()).to.be.equal(balance3.toFixed())
+			expect(res2.preBalanceOfRecipient.toFixed()).to.be.equal(
 				balance4.toFixed()
 			)
 			expect(res2.blockNumber.toNumber()).to.be.equal(block2)
@@ -719,10 +715,10 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 					expect(r1.from).to.be.equal(Alice)
 					expect(r1.to).to.be.equal(Bob)
 					expect(r1.amount.toFixed()).to.be.equal('0')
-					expect(r1.senderBalanceBeforeTx.toFixed()).to.be.equal(
+					expect(r1.preBalanceOfSender.toFixed()).to.be.equal(
 						balanceAlice.toFixed()
 					)
-					expect(r1.recipientBalanceBeforeTx.toFixed()).to.be.equal(
+					expect(r1.preBalanceOfRecipient.toFixed()).to.be.equal(
 						balanceBob.toFixed()
 					)
 					expect(r1.filled).to.be.equal(false)
@@ -813,10 +809,10 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 					expect(r1.from).to.be.equal(Bob)
 					expect(r1.to).to.be.equal(Carol)
 					expect(r1.amount.toFixed()).to.be.equal('0')
-					expect(r1.senderBalanceBeforeTx.toFixed()).to.be.equal(
+					expect(r1.preBalanceOfSender.toFixed()).to.be.equal(
 						balanceBob.toFixed()
 					)
-					expect(r1.recipientBalanceBeforeTx.toFixed()).to.be.equal(
+					expect(r1.preBalanceOfRecipient.toFixed()).to.be.equal(
 						balanceCarol.toFixed()
 					)
 					expect(r1.filled).to.be.equal(false)
@@ -901,10 +897,10 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 					expect(r1.from).to.be.equal(Bob)
 					expect(r1.to).to.be.equal(Carol)
 					expect(r1.amount.toFixed()).to.be.equal('0')
-					expect(r1.senderBalanceBeforeTx.toFixed()).to.be.equal(
+					expect(r1.preBalanceOfSender.toFixed()).to.be.equal(
 						balanceBob.toFixed()
 					)
-					expect(r1.recipientBalanceBeforeTx.toFixed()).to.be.equal(
+					expect(r1.preBalanceOfRecipient.toFixed()).to.be.equal(
 						balanceCarol.toFixed()
 					)
 					expect(r1.filled).to.be.equal(false)
@@ -919,10 +915,10 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 
 					expect(r1.from).to.be.equal(Alice)
 					expect(r1.to).to.be.equal(Bob)
-					expect(r1.senderBalanceBeforeTx.toFixed()).to.be.equal(
+					expect(r1.preBalanceOfSender.toFixed()).to.be.equal(
 						balanceAliceProp1$1.toFixed()
 					)
-					expect(r1.recipientBalanceBeforeTx.toFixed()).to.be.equal(
+					expect(r1.preBalanceOfRecipient.toFixed()).to.be.equal(
 						balanceBobProp1$1.toFixed()
 					)
 					expect(r1.blockNumber.toNumber()).to.be.equal(blockNumberProp1$1)
@@ -936,10 +932,10 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 
 					expect(r1.from).to.be.equal(Bob)
 					expect(r1.to).to.be.equal(Carol)
-					expect(r1.senderBalanceBeforeTx.toFixed()).to.be.equal(
+					expect(r1.preBalanceOfSender.toFixed()).to.be.equal(
 						balanceBobProp2$1.toFixed()
 					)
-					expect(r1.recipientBalanceBeforeTx.toFixed()).to.be.equal(
+					expect(r1.preBalanceOfRecipient.toFixed()).to.be.equal(
 						balanceCarolProp2$1.toFixed()
 					)
 					expect(r1.blockNumber.toNumber()).to.be.equal(blockNumberProp2$1)

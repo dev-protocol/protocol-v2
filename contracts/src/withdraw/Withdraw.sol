@@ -206,7 +206,7 @@ contract Withdraw is InitializableUsingRegistry, IWithdraw, ITransferHistory {
 				hId - 1
 			];
 			lastHistory.amount =
-				lastHistory.senderBalanceBeforeTx -
+				lastHistory.preBalanceOfSender -
 				_property.balanceOf(lastHistory.from);
 			lastHistory.filled = true;
 		}
