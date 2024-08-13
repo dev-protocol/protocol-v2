@@ -31,7 +31,7 @@
 		"@types/bent": "7.3.8",
 		"@types/dotenv": "8.2.0",
 		"@types/node": "18.17.5",
-		"@types/shelljs": "0.8.12",
+		"@types/shelljs": "0.8.15",
 		"@typescript-eslint/eslint-plugin": "5.62.0",
 		"@typescript-eslint/parser": "5.62.0",
 		"arb-ethers-web3-bridge": "0.7.3",
