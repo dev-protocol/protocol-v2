@@ -28,7 +28,7 @@
 		"@openzeppelin/truffle-upgrades": "1.20.0",
 		"@truffle/hdwallet-provider": "2.1.15",
 		"@typechain/truffle-v4": "4.1.0",
-		"@types/bent": "7.3.3",
+		"@types/bent": "7.3.8",
 		"@types/dotenv": "8.2.0",
 		"@types/node": "18.17.5",
 		"@types/shelljs": "0.8.12",
