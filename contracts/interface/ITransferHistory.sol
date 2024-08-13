@@ -22,24 +22,24 @@ interface ITransferHistory {
 		address _property
 	) external view returns (uint256);
 
-	function transferHistorySender(
+	function transferHistoryOfSenderByIndex(
 		address _property,
 		address _sender,
 		uint256 _index
 	) external view returns (uint256);
 
-	function transferHistoryRecipient(
+	function transferHistoryOfRecipientByIndex(
 		address _property,
 		address _recipient,
 		uint256 _index
 	) external view returns (uint256);
 
-	function transferHistorySenderLength(
+	function transferHistoryLengthOfSender(
 		address _property,
 		address _sender
 	) external view returns (uint256);
 
-	function transferHistoryRecipientLength(
+	function transferHistoryLengthOfRecipient(
 		address _property,
 		address _recipient
 	) external view returns (uint256);

@@ -476,7 +476,7 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 			expect(
 				(
 					await dev.withdraw
-						.transferHistorySenderLength(property.address, Alice)
+						.transferHistoryLengthOfSender(property.address, Alice)
 						.then(toBigNumber)
 				).toFixed()
 			).to.be.equal('0')
@@ -487,7 +487,7 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 			expect(
 				(
 					await dev.withdraw
-						.transferHistorySenderLength(property.address, Alice)
+						.transferHistoryLengthOfSender(property.address, Alice)
 						.then(toBigNumber)
 				).toFixed()
 			).to.be.equal('1')
@@ -498,16 +498,16 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 			expect(
 				(
 					await dev.withdraw
-						.transferHistorySenderLength(property.address, Alice)
+						.transferHistoryLengthOfSender(property.address, Alice)
 						.then(toBigNumber)
 				).toFixed()
 			).to.be.equal('2')
 		})
-		it('should increase transferHistoryRecipientLength each transfer', async () => {
+		it('should increase transferHistoryLengthOfRecipient each transfer', async () => {
 			expect(
 				(
 					await dev.withdraw
-						.transferHistoryRecipientLength(property.address, Bob)
+						.transferHistoryLengthOfRecipient(property.address, Bob)
 						.then(toBigNumber)
 				).toFixed()
 			).to.be.equal('0')
@@ -518,7 +518,7 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 			expect(
 				(
 					await dev.withdraw
-						.transferHistoryRecipientLength(property.address, Bob)
+						.transferHistoryLengthOfRecipient(property.address, Bob)
 						.then(toBigNumber)
 				).toFixed()
 			).to.be.equal('1')
@@ -529,16 +529,16 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 			expect(
 				(
 					await dev.withdraw
-						.transferHistoryRecipientLength(property.address, Bob)
+						.transferHistoryLengthOfRecipient(property.address, Bob)
 						.then(toBigNumber)
 				).toFixed()
 			).to.be.equal('2')
 		})
-		it('should record TransferHistory ID in transferHistorySender', async () => {
+		it('should record TransferHistory ID in transferHistoryOfSenderByIndex', async () => {
 			await property.transfer(Bob, '1000000', {
 				from: Alice,
 			})
-			const id1 = await dev.withdraw.transferHistorySender(
+			const id1 = await dev.withdraw.transferHistoryOfSenderByIndex(
 				property.address,
 				Alice,
 				0
@@ -551,7 +551,7 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 			await property.transfer(Bob, '1000000', {
 				from: Alice,
 			})
-			const id2 = await dev.withdraw.transferHistorySender(
+			const id2 = await dev.withdraw.transferHistoryOfSenderByIndex(
 				property.address,
 				Alice,
 				1
@@ -561,11 +561,11 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 				.then(toStruct)
 			expect(r2.from).to.be.equal(Alice)
 		})
-		it('should record TransferHistory ID in transferHistoryRecipient', async () => {
+		it('should record TransferHistory ID in transferHistoryOfRecipientByIndex', async () => {
 			await property.transfer(Bob, '1000000', {
 				from: Alice,
 			})
-			const id1 = await dev.withdraw.transferHistoryRecipient(
+			const id1 = await dev.withdraw.transferHistoryOfRecipientByIndex(
 				property.address,
 				Bob,
 				0
@@ -578,7 +578,7 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 			await property.transfer(Bob, '1000000', {
 				from: Alice,
 			})
-			const id2 = await dev.withdraw.transferHistoryRecipient(
+			const id2 = await dev.withdraw.transferHistoryOfRecipientByIndex(
 				property.address,
 				Bob,
 				1
@@ -658,7 +658,7 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 				it('TransferHistorySender for Prop1:Alice is created 1', async () => {
 					const [r1] = await Promise.all([
 						withdraw
-							.transferHistorySenderLength(Prop1.address, Alice)
+							.transferHistoryLengthOfSender(Prop1.address, Alice)
 							.then(toBigNumber),
 					])
 					expect(r1.toFixed()).to.be.equal('1')
@@ -666,7 +666,7 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 				it('TransferHistoryRecipient for Prop1:Bob is created 1', async () => {
 					const [r1] = await Promise.all([
 						withdraw
-							.transferHistoryRecipientLength(Prop1.address, Bob)
+							.transferHistoryLengthOfRecipient(Prop1.address, Bob)
 							.then(toBigNumber),
 					])
 					expect(r1.toFixed()).to.be.equal('1')
@@ -674,10 +674,10 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 				it('TransferHistoryRecipient for Prop1:Alice, TransferHistorySender for Prop1:Bob are not created', async () => {
 					const [r1, r2] = await Promise.all([
 						withdraw
-							.transferHistorySenderLength(Prop1.address, Bob)
+							.transferHistoryLengthOfSender(Prop1.address, Bob)
 							.then(toBigNumber),
 						withdraw
-							.transferHistoryRecipientLength(Prop1.address, Alice)
+							.transferHistoryLengthOfRecipient(Prop1.address, Alice)
 							.then(toBigNumber),
 					])
 					expect(r1.toFixed()).to.be.equal('0')

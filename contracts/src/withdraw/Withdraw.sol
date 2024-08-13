@@ -25,13 +25,13 @@ contract Withdraw is InitializableUsingRegistry, IWithdraw, ITransferHistory {
 		internal _transferHistory;
 	mapping(address => uint256) public transferHistoryLength;
 	mapping(address => mapping(address => mapping(uint256 => uint256)))
-		public transferHistorySender;
+		public transferHistoryOfSenderByIndex;
 	mapping(address => mapping(address => mapping(uint256 => uint256)))
-		public transferHistoryRecipient;
+		public transferHistoryOfRecipientByIndex;
 	mapping(address => mapping(address => uint256))
-		public transferHistorySenderLength;
+		public transferHistoryLengthOfSender;
 	mapping(address => mapping(address => uint256))
-		public transferHistoryRecipientLength;
+		public transferHistoryLengthOfRecipient;
 
 	using Decimals for uint256;
 
@@ -181,11 +181,11 @@ contract Withdraw is InitializableUsingRegistry, IWithdraw, ITransferHistory {
 		uint256 balanceOfRecipient = _property.balanceOf(_to);
 
 		uint256 hId = transferHistoryLength[prpty];
-		uint256 hSenderId = transferHistorySenderLength[prpty][_from];
-		uint256 hRecipientId = transferHistoryRecipientLength[prpty][_to];
+		uint256 hSenderId = transferHistoryLengthOfSender[prpty][_from];
+		uint256 hRecipientId = transferHistoryLengthOfRecipient[prpty][_to];
 
-		transferHistorySenderLength[prpty][_from] = hSenderId + 1;
-		transferHistoryRecipientLength[prpty][_to] = hRecipientId + 1;
+		transferHistoryLengthOfSender[prpty][_from] = hSenderId + 1;
+		transferHistoryLengthOfRecipient[prpty][_to] = hRecipientId + 1;
 		transferHistoryLength[prpty] = hId + 1;
 
 		_transferHistory[prpty][hId] = TransferHistory(
@@ -197,8 +197,8 @@ contract Withdraw is InitializableUsingRegistry, IWithdraw, ITransferHistory {
 			false,
 			block.number
 		);
-		transferHistorySender[prpty][_from][hSenderId] = hId;
-		transferHistoryRecipient[prpty][_to][hRecipientId] = hId;
+		transferHistoryOfSenderByIndex[prpty][_from][hSenderId] = hId;
+		transferHistoryOfRecipientByIndex[prpty][_to][hRecipientId] = hId;
 
 		if (hId > 0) {
 			// Update last TransferHistory if exists.
