@@ -9,17 +9,29 @@ import "../../interface/IMetricsFactory.sol";
 import "../../interface/IPropertyFactory.sol";
 import "../common/libs/Decimals.sol";
 import "../common/registry/InitializableUsingRegistry.sol";
+import "../../interface/ITransferHistory.sol";
 
 /**
  * A contract that manages the withdrawal of holder rewards for Property holders.
  */
-contract Withdraw is InitializableUsingRegistry, IWithdraw {
+contract Withdraw is InitializableUsingRegistry, IWithdraw, ITransferHistory {
 	mapping(address => mapping(address => uint256))
 		public lastWithdrawnRewardPrice; // {Property: {User: Value}} // From [get/set]StorageLastWithdrawnReward
 	mapping(address => mapping(address => uint256))
 		public lastWithdrawnRewardCapPrice; // {Property: {User: Value}} // From [get/set]PendingWithdrawal
 	mapping(address => mapping(address => uint256)) public pendingWithdrawal; // {Property: {User: Value}}
 	mapping(address => uint256) public cumulativeWithdrawnReward; // {Property: Value} // From [get/set]RewardsAmount
+	mapping(address => mapping(uint256 => TransferHistory))
+		internal _transferHistory;
+	mapping(address => uint256) public transferHistoryLength;
+	mapping(address => mapping(address => mapping(uint256 => uint256)))
+		public transferHistoryOfSenderByIndex;
+	mapping(address => mapping(address => mapping(uint256 => uint256)))
+		public transferHistoryOfRecipientByIndex;
+	mapping(address => mapping(address => uint256))
+		public transferHistoryLengthOfSender;
+	mapping(address => mapping(address => uint256))
+		public transferHistoryLengthOfRecipient;
 
 	using Decimals for uint256;
 
@@ -52,7 +64,7 @@ contract Withdraw is InitializableUsingRegistry, IWithdraw {
 			uint256 lastPrice,
 			uint256 lastPriceCap,
 
-		) = _calculateWithdrawableAmount(_property, msg.sender);
+		) = _calculateWithdrawableAmount(IERC20(_property), msg.sender);
 
 		/**
 		 * Validates the result is not 0.
@@ -111,6 +123,8 @@ contract Withdraw is InitializableUsingRegistry, IWithdraw {
 			"this is illegal address"
 		);
 
+		IERC20 property = IERC20(msg.sender);
+
 		/**
 		 * Gets the cumulative sum of the transfer source's "before transfer" withdrawable reward amount and the cumulative sum of the maximum mint amount.
 		 */
@@ -119,7 +133,7 @@ contract Withdraw is InitializableUsingRegistry, IWithdraw {
 			uint256 priceFrom,
 			uint256 priceCapFrom,
 
-		) = _calculateAmount(msg.sender, _from);
+		) = _calculateAmount(property, _from);
 
 		/**
 		 * Gets the cumulative sum of the transfer destination's "before receive" withdrawable reward amount and the cumulative sum of the maximum mint amount.
@@ -129,7 +143,7 @@ contract Withdraw is InitializableUsingRegistry, IWithdraw {
 			uint256 priceTo,
 			uint256 priceCapTo,
 
-		) = _calculateAmount(msg.sender, _to);
+		) = _calculateAmount(property, _to);
 
 		/**
 		 * Updates the last cumulative sum of the maximum mint amount of the transfer source and destination.
@@ -150,13 +164,59 @@ contract Withdraw is InitializableUsingRegistry, IWithdraw {
 		 */
 		pendingWithdrawal[msg.sender][_from] = pendFrom + amountFrom;
 		pendingWithdrawal[msg.sender][_to] = pendTo + amountTo;
+
+		/**
+		 * Update TransferHistory
+		 */
+		updateTransferHistory(property, _from, _to);
+	}
+
+	function updateTransferHistory(
+		IERC20 _property,
+		address _from,
+		address _to
+	) internal {
+		address prpty = address(_property);
+		uint256 balanceOfSender = _property.balanceOf(_from);
+		uint256 balanceOfRecipient = _property.balanceOf(_to);
+
+		uint256 hId = transferHistoryLength[prpty];
+		uint256 hSenderId = transferHistoryLengthOfSender[prpty][_from];
+		uint256 hRecipientId = transferHistoryLengthOfRecipient[prpty][_to];
+
+		transferHistoryLengthOfSender[prpty][_from] = hSenderId + 1;
+		transferHistoryLengthOfRecipient[prpty][_to] = hRecipientId + 1;
+		transferHistoryLength[prpty] = hId + 1;
+
+		_transferHistory[prpty][hId] = TransferHistory(
+			_to,
+			_from,
+			0,
+			balanceOfRecipient,
+			balanceOfSender,
+			false,
+			block.number
+		);
+		transferHistoryOfSenderByIndex[prpty][_from][hSenderId] = hId;
+		transferHistoryOfRecipientByIndex[prpty][_to][hRecipientId] = hId;
+
+		if (hId > 0) {
+			// Update last TransferHistory if exists.
+			TransferHistory storage lastHistory = _transferHistory[prpty][
+				hId - 1
+			];
+			lastHistory.amount =
+				lastHistory.preBalanceOfSender -
+				_property.balanceOf(lastHistory.from);
+			lastHistory.filled = true;
+		}
 	}
 
 	/**
 	 * Returns the holder reward.
 	 */
 	function _calculateAmount(
-		address _property,
+		IERC20 _property,
 		address _user
 	)
 		private
@@ -172,7 +232,9 @@ contract Withdraw is InitializableUsingRegistry, IWithdraw {
 		/**
 		 * Gets the latest reward.
 		 */
-		(uint256 reward, uint256 cap) = lockup.calculateRewardAmount(_property);
+		(uint256 reward, uint256 cap) = lockup.calculateRewardAmount(
+			address(_property)
+		);
 
 		/**
 		 * Gets the cumulative sum of the holder reward price recorded the last time you withdrew.
@@ -194,17 +256,18 @@ contract Withdraw is InitializableUsingRegistry, IWithdraw {
 	 * Return the reward cap
 	 */
 	function _calculateCapped(
-		address _property,
+		IERC20 _property,
 		address _user,
 		uint256 _cap
 	) private view returns (uint256) {
 		/**
 		 * Gets the cumulative sum of the holder reward price recorded the last time you withdrew.
 		 */
-		uint256 _lastRewardCap = lastWithdrawnRewardCapPrice[_property][_user];
-		IERC20 property = IERC20(_property);
-		uint256 balance = property.balanceOf(_user);
-		uint256 totalSupply = property.totalSupply();
+		uint256 _lastRewardCap = lastWithdrawnRewardCapPrice[
+			address(_property)
+		][_user];
+		uint256 balance = _property.balanceOf(_user);
+		uint256 totalSupply = _property.totalSupply();
 		uint256 unitPriceCap = _cap >= _lastRewardCap
 			? (_cap - _lastRewardCap) / totalSupply
 			: _cap / totalSupply; // If this user has held this tokens since before this tokens got its first staking, _lastRewardCap is expected to larger than _cap. In this case, it can treat _cap as the latest range of the value.
@@ -215,17 +278,18 @@ contract Withdraw is InitializableUsingRegistry, IWithdraw {
 	 * Return the reward
 	 */
 	function _calculateAllReward(
-		address _property,
+		IERC20 _property,
 		address _user,
 		uint256 _reward
 	) private view returns (uint256) {
 		/**
 		 * Gets the cumulative sum of the holder reward price recorded the last time you withdrew.
 		 */
-		uint256 _lastReward = lastWithdrawnRewardPrice[_property][_user];
-		IERC20 property = IERC20(_property);
-		uint256 balance = property.balanceOf(_user);
-		uint256 totalSupply = property.totalSupply();
+		uint256 _lastReward = lastWithdrawnRewardPrice[address(_property)][
+			_user
+		];
+		uint256 balance = _property.balanceOf(_user);
+		uint256 totalSupply = _property.totalSupply();
 		uint256 unitPrice = ((_reward - _lastReward).mulBasis()) / totalSupply;
 		return (unitPrice * balance).divBasis().divBasis();
 	}
@@ -234,7 +298,7 @@ contract Withdraw is InitializableUsingRegistry, IWithdraw {
 	 * Returns the total rewards currently available for withdrawal. (For calling from inside the contract)
 	 */
 	function _calculateWithdrawableAmount(
-		address _property,
+		IERC20 _property,
 		address _user
 	)
 		private
@@ -261,7 +325,7 @@ contract Withdraw is InitializableUsingRegistry, IWithdraw {
 		 */
 		if (
 			IMetricsFactory(registry().registries("MetricsFactory")).hasAssets(
-				_property
+				address(_property)
 			) == false
 		) {
 			return (0, price, cap, 0);
@@ -270,7 +334,7 @@ contract Withdraw is InitializableUsingRegistry, IWithdraw {
 		/**
 		 * Gets the reward amount in saved without withdrawal and returns the sum of all values.
 		 */
-		uint256 value = _value + pendingWithdrawal[_property][_user];
+		uint256 value = _value + pendingWithdrawal[address(_property)][_user];
 		return (value, price, cap, allReward);
 	}
 
@@ -291,6 +355,19 @@ contract Withdraw is InitializableUsingRegistry, IWithdraw {
 			uint256 _allReward
 		)
 	{
-		return _calculateWithdrawableAmount(_property, _user);
+		return _calculateWithdrawableAmount(IERC20(_property), _user);
+	}
+
+	/**
+	 * @dev Returns TransferHistory.
+	 * @param _property Property token address
+	 * @param _index TransferHistory index
+	 * @return TransferHistory.
+	 */
+	function transferHistory(
+		address _property,
+		uint256 _index
+	) external view returns (TransferHistory memory) {
+		return _transferHistory[_property][_index];
 	}
 }
