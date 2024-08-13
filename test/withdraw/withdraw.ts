@@ -907,7 +907,7 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 					expect(r1.recipientBalanceBeforeTx.toFixed()).to.be.equal(
 						balanceCarol.toFixed()
 					)
-					expect(r1.fillededed).to.be.equal(false)
+					expect(r1.filled).to.be.equal(false)
 					expect(r1.blockNumber.toNumber()).to.be.equal(blockNumber)
 				})
 				it('transferHistory for Prop1 #0 has updated', async () => {
