@@ -24,7 +24,7 @@
 	"license": "MPL-2.0",
 	"devDependencies": {
 		"@devprotocol/dev-kit": "8.7.0",
-		"@devprotocol/util-ts": "3.1.0",
+		"@devprotocol/util-ts": "4.0.0",
 		"@openzeppelin/truffle-upgrades": "1.21.0",
 		"@truffle/hdwallet-provider": "2.1.15",
 		"@typechain/truffle-v4": "4.1.0",

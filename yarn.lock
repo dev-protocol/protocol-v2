@@ -234,14 +234,6 @@
   dependencies:
     "@openzeppelin/contracts" "4.3.0"
 
-"@devprotocol/util-ts@3.1.0":
-  version "3.1.0"
-  resolved "https://registry.yarnpkg.com/@devprotocol/util-ts/-/util-ts-3.1.0.tgz#8eaf8e394a80b3582e1609424cbe1b90b7e99c58"
-  integrity sha512-F2xPZ9X/Gbxior7QJjy9rb9m117C231NbuWctJ/LOBMfbqCvzyGvmKskx9G5vUTx6sOjmMNtYTJwRQ2+2WFTgw==
-  dependencies:
-    ethers "^5.7.2"
-    ramda "^0.29.0"
-
 "@devprotocol/util-ts@4.0.0":
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/@devprotocol/util-ts/-/util-ts-4.0.0.tgz#d96259c0e26eae0b98eedf2a2c6dbacc1301d9b0"
@@ -5600,7 +5592,7 @@ ethers@^4.0.32:
     uuid "2.0.1"
     xmlhttprequest "1.8.0"
 
-ethers@^5.0.13, ethers@^5.7.2:
+ethers@^5.0.13:
   version "5.7.2"
   resolved "https://registry.yarnpkg.com/ethers/-/ethers-5.7.2.tgz#3a7deeabbb8c030d4126b24f84e525466145872e"
   integrity sha512-wswUsmWo1aOK8rR7DIKiWSw9DbLWe6x98Jrn8wcTflTVvaXhAMaB5zGAXy0GYQEQp9iO1iSHWVyARQm11zUtyg==
