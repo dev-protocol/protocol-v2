@@ -2244,6 +2244,159 @@
           }
         }
       }
+    },
+    "c2d8235d6cf0b1a0ea375c4221177387bfd01cb9bdd2c55f635c40b8aaadbf1c": {
+      "address": "0x1B0d4643fd355406b37B4bef5119CF3Ba68360c3",
+      "txHash": "0xe72862b98f8053f3563c621c4fc9fd29904114698a246e6d9268598055a15e6b",
+      "layout": {
+        "solcVersion": "0.8.9",
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "_initialized",
+            "type": "t_bool",
+            "src": "../@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:21"
+          },
+          {
+            "contract": "Initializable",
+            "label": "_initializing",
+            "type": "t_bool",
+            "src": "../@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:26"
+          },
+          {
+            "contract": "InitializableUsingRegistry",
+            "label": "_registry",
+            "type": "t_address",
+            "src": "../project:/contracts/src/common/registry/InitializableUsingRegistry.sol:11"
+          },
+          {
+            "contract": "Withdraw",
+            "label": "lastWithdrawnRewardPrice",
+            "type": "t_mapping(t_address,t_mapping(t_address,t_uint256))",
+            "src": "../project:/contracts/src/withdraw/Withdraw.sol:18"
+          },
+          {
+            "contract": "Withdraw",
+            "label": "lastWithdrawnRewardCapPrice",
+            "type": "t_mapping(t_address,t_mapping(t_address,t_uint256))",
+            "src": "../project:/contracts/src/withdraw/Withdraw.sol:20"
+          },
+          {
+            "contract": "Withdraw",
+            "label": "pendingWithdrawal",
+            "type": "t_mapping(t_address,t_mapping(t_address,t_uint256))",
+            "src": "../project:/contracts/src/withdraw/Withdraw.sol:22"
+          },
+          {
+            "contract": "Withdraw",
+            "label": "cumulativeWithdrawnReward",
+            "type": "t_mapping(t_address,t_uint256)",
+            "src": "../project:/contracts/src/withdraw/Withdraw.sol:23"
+          },
+          {
+            "contract": "Withdraw",
+            "label": "_transferHistory",
+            "type": "t_mapping(t_address,t_mapping(t_uint256,t_struct(TransferHistory)8690_storage))",
+            "src": "../project:/contracts/src/withdraw/Withdraw.sol:24"
+          },
+          {
+            "contract": "Withdraw",
+            "label": "transferHistoryLength",
+            "type": "t_mapping(t_address,t_uint256)",
+            "src": "../project:/contracts/src/withdraw/Withdraw.sol:26"
+          },
+          {
+            "contract": "Withdraw",
+            "label": "transferHistoryOfSenderByIndex",
+            "type": "t_mapping(t_address,t_mapping(t_address,t_mapping(t_uint256,t_uint256)))",
+            "src": "../project:/contracts/src/withdraw/Withdraw.sol:27"
+          },
+          {
+            "contract": "Withdraw",
+            "label": "transferHistoryOfRecipientByIndex",
+            "type": "t_mapping(t_address,t_mapping(t_address,t_mapping(t_uint256,t_uint256)))",
+            "src": "../project:/contracts/src/withdraw/Withdraw.sol:29"
+          },
+          {
+            "contract": "Withdraw",
+            "label": "transferHistoryLengthOfSender",
+            "type": "t_mapping(t_address,t_mapping(t_address,t_uint256))",
+            "src": "../project:/contracts/src/withdraw/Withdraw.sol:31"
+          },
+          {
+            "contract": "Withdraw",
+            "label": "transferHistoryLengthOfRecipient",
+            "type": "t_mapping(t_address,t_mapping(t_address,t_uint256))",
+            "src": "../project:/contracts/src/withdraw/Withdraw.sol:33"
+          }
+        ],
+        "types": {
+          "t_mapping(t_address,t_mapping(t_address,t_uint256))": {
+            "label": "mapping(address => mapping(address => uint256))"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_mapping(t_address,t_uint256)": {
+            "label": "mapping(address => uint256)"
+          },
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_mapping(t_address,t_mapping(t_uint256,t_struct(TransferHistory)8690_storage))": {
+            "label": "mapping(address => mapping(uint256 => struct ITransferHistory.TransferHistory))"
+          },
+          "t_mapping(t_uint256,t_struct(TransferHistory)8690_storage)": {
+            "label": "mapping(uint256 => struct ITransferHistory.TransferHistory)"
+          },
+          "t_struct(TransferHistory)8690_storage": {
+            "label": "struct ITransferHistory.TransferHistory",
+            "members": [
+              {
+                "label": "to",
+                "type": "t_address"
+              },
+              {
+                "label": "from",
+                "type": "t_address"
+              },
+              {
+                "label": "amount",
+                "type": "t_uint256"
+              },
+              {
+                "label": "preBalanceOfRecipient",
+                "type": "t_uint256"
+              },
+              {
+                "label": "preBalanceOfSender",
+                "type": "t_uint256"
+              },
+              {
+                "label": "filled",
+                "type": "t_bool"
+              },
+              {
+                "label": "blockNumber",
+                "type": "t_uint256"
+              }
+            ]
+          },
+          "t_bool": {
+            "label": "bool"
+          },
+          "t_mapping(t_address,t_mapping(t_address,t_mapping(t_uint256,t_uint256)))": {
+            "label": "mapping(address => mapping(address => mapping(uint256 => uint256)))"
+          },
+          "t_mapping(t_address,t_mapping(t_uint256,t_uint256))": {
+            "label": "mapping(address => mapping(uint256 => uint256))"
+          },
+          "t_mapping(t_uint256,t_uint256)": {
+            "label": "mapping(uint256 => uint256)"
+          }
+        },
+        "namespaces": {}
+      }
     }
   }
 }
