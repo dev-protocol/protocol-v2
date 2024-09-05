@@ -14,28 +14,28 @@ const handler = async function (_, network) {
 	const propertyAddress = process.env.PROPERTY!
 
 	const existingAddressRegistry = await AddressRegistry.deployed().catch(() =>
-		AddressRegistry.at(proxyAddressRegistry)
+		AddressRegistry.at(proxyAddressRegistry),
 	)
 
 	await existingAddressRegistry.setRegistry('Property', propertyAddress)
 	console.log('[CONFIRMED] set the seed Property to Registry')
 
 	const existing = await PropertyFactory.deployed().catch(() =>
-		PropertyFactory.at(proxyAddress)
+		PropertyFactory.at(proxyAddress),
 	)
 
 	console.log('proxy:', existing.address)
 
 	await validateUpgrade(
 		existing.address,
-		PropertyFactory as unknown as ContractClass
+		PropertyFactory as unknown as ContractClass,
 	)
 
 	console.log('New implementation is valid')
 
 	await upgradeProxy(
 		existing.address,
-		PropertyFactory as unknown as ContractClass
+		PropertyFactory as unknown as ContractClass,
 	)
 } as Truffle.Migration
 

@@ -158,7 +158,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				const expected = toBigNumber(10)
 					.times(1e18)
 					.times(
-						toBigNumber(1000000000000).div(toBigNumber(1000000000000).times(2))
+						toBigNumber(1000000000000).div(toBigNumber(1000000000000).times(2)),
 					)
 					.times(timestamps.get('a2')! - timestamps.get('a1')!)
 					.plus(
@@ -166,20 +166,20 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 							.times(1e18)
 							.times(
 								toBigNumber(1000000000000).div(
-									toBigNumber(1000000000000).times(3)
-								)
+									toBigNumber(1000000000000).times(3),
+								),
 							)
-							.times(timestamps.get('b1')! - timestamps.get('a2')!)
+							.times(timestamps.get('b1')! - timestamps.get('a2')!),
 					)
 					.plus(
 						toBigNumber(10)
 							.times(1e18)
 							.times(
 								toBigNumber(1000000000000).div(
-									toBigNumber(1000000000000).times(4)
-								)
+									toBigNumber(1000000000000).times(4),
+								),
 							)
-							.times(timestamps.get('b2')! - timestamps.get('b1')!)
+							.times(timestamps.get('b2')! - timestamps.get('b1')!),
 					)
 					.integerValue()
 				const calculated = await calc(bobFirstTokenId)
@@ -223,19 +223,18 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				expect(result.toFixed()).to.be.equal(calculated)
 			})
 			it('Alice has a 100% of interests', async () => {
-				const alicePosition = await dev.sTokensManager.positions(
-					aliceFirstTokenId
-				)
+				const alicePosition =
+					await dev.sTokensManager.positions(aliceFirstTokenId)
 				await dev.lockup.withdrawByPosition(
 					aliceFirstTokenId,
 					alicePosition.amount.toString(),
-					{ from: alice }
+					{ from: alice },
 				)
 				const bobPosition = await dev.sTokensManager.positions(bobFirstTokenId)
 				await dev.lockup.withdrawByPosition(
 					bobFirstTokenId,
 					bobPosition.amount.toString(),
-					{ from: bob }
+					{ from: bob },
 				)
 				await dev.lockup.depositToProperty(property.address, 1000000000000, {
 					from: alice,
@@ -262,30 +261,28 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 					from: bob,
 				})
 				await forwardBlockTimestamp(2)
-				const alicePosition = await dev.sTokensManager.positions(
-					aliceSecoundTokenId
-				)
+				const alicePosition =
+					await dev.sTokensManager.positions(aliceSecoundTokenId)
 				await dev.lockup.withdrawByPosition(
 					aliceSecoundTokenId,
 					alicePosition.amount.toString(),
-					{ from: alice }
+					{ from: alice },
 				)
-				const bobPosition = await dev.sTokensManager.positions(
-					bobSecoundTokenId
-				)
+				const bobPosition =
+					await dev.sTokensManager.positions(bobSecoundTokenId)
 				await dev.lockup.withdrawByPosition(
 					bobSecoundTokenId,
 					bobPosition.amount.toString(),
-					{ from: bob }
+					{ from: bob },
 				)
 				await forwardBlockTimestamp(1)
 				const aliceAmount =
 					await dev.lockup.calculateWithdrawableInterestAmountByPosition(
-						aliceSecoundTokenId
+						aliceSecoundTokenId,
 					)
 				const bobAmount =
 					await dev.lockup.calculateWithdrawableInterestAmountByPosition(
-						bobSecoundTokenId
+						bobSecoundTokenId,
 					)
 				const aliceCalculated = await calc(aliceSecoundTokenId)
 				const bobCalculated = await calc(bobSecoundTokenId)
@@ -300,13 +297,13 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 						.require('Property')
 						.at(
 							getPropertyAddress(
-								await dev.propertyFactory.create('test', 'TEST', deployer)
-							)
+								await dev.propertyFactory.create('test', 'TEST', deployer),
+							),
 						),
 				])
 				await dev.metricsFactory.__setMetricsCountPerProperty(
 					property2.address,
-					1
+					1,
 				)
 
 				const bobBalance = toBigNumber(10000000).times(1e18)
@@ -328,7 +325,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				const expected = toBigNumber(10)
 					.times(1e18)
 					.times(
-						toBigNumber(10000000).div(toBigNumber(10000000).plus(bobBalance))
+						toBigNumber(10000000).div(toBigNumber(10000000).plus(bobBalance)),
 					)
 					.times(t2 - t1)
 				const calculated = await calc(aliceThirdTokenId)
@@ -338,11 +335,11 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 			})
 			it('Property that unauthenticated but already staked before DIP9 has no reward', async () => {
 				const propertyAddress = getPropertyAddress(
-					await dev.propertyFactory.create('test', 'TEST', deployer)
+					await dev.propertyFactory.create('test', 'TEST', deployer),
 				)
 				await dev.metricsFactory.__setMetricsCountPerProperty(
 					propertyAddress,
-					1
+					1,
 				)
 				await dev.lockup.depositToProperty(propertyAddress, 1000000000000, {
 					from: alice,
@@ -354,7 +351,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				await forwardBlockTimestamp(1)
 				await dev.metricsFactory.__setMetricsCountPerProperty(
 					propertyAddress,
-					0
+					0,
 				)
 				const result = await dev.lockup
 					.calculateWithdrawableInterestAmountByPosition(aliceFourthTokenId)
@@ -399,7 +396,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 						.then(toBigNumber)
 					const position = await dev.sTokensManager.positions(aliceFirstTokenId)
 					expect(toBigNumber(position.amount).toFixed()).to.be.equal(
-						total.toFixed()
+						total.toFixed(),
 					)
 				})
 				it(`Alice's withdrawable interest is 100% of the Property's interest`, async () => {
@@ -419,7 +416,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 					await dev.sTokensManager.safeTransferFrom(
 						alice,
 						bob,
-						aliceFirstTokenId
+						aliceFirstTokenId,
 					)
 				})
 				it(`withdrawable interest is 100% of the Property's interest`, async () => {
@@ -432,9 +429,8 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 						.times(1e18)
 						.times(t1 - lastTimestamp)
 					expect(calculateAmount.toFixed()).to.be.equal(expected.toFixed())
-					const ownerAddress = await dev.sTokensManager.ownerOf(
-						aliceFirstTokenId
-					)
+					const ownerAddress =
+						await dev.sTokensManager.ownerOf(aliceFirstTokenId)
 					expect(ownerAddress).to.be.equal(bob)
 				})
 			})
@@ -474,7 +470,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 					expect(bobAmount.toFixed()).to.be.equal('0')
 					expect(bobLockup.toFixed()).to.be.equal('0')
 					expect(afterBobBalance.toFixed()).to.be.equal(
-						bobBalance.plus(bobLocked).plus(reward).toFixed()
+						bobBalance.plus(bobLocked).plus(reward).toFixed(),
 					)
 				})
 			})
@@ -514,7 +510,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 						.then(toBigNumber)
 					const position = await dev.sTokensManager.positions(aliceFirstTokenId)
 					expect(toBigNumber(position.amount).toFixed()).to.be.equal(
-						total.toFixed()
+						total.toFixed(),
 					)
 				})
 				it(`Alice's withdrawable interest is 100% of the Property's interest`, async () => {
@@ -593,7 +589,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 					expect(aliceAmount.toFixed()).to.be.equal('0')
 					expect(aliceLockup.toFixed()).to.be.equal('0')
 					expect(afterAliceBalance.toFixed()).to.be.equal(
-						aliceBalance.plus(aliceLocked).plus(reward).toFixed()
+						aliceBalance.plus(aliceLocked).plus(reward).toFixed(),
 					)
 				})
 			})
@@ -637,20 +633,18 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 					const total = await dev.lockup
 						.totalLockedForProperty(property.address)
 						.then(toBigNumber)
-					const alicePosition = await dev.sTokensManager.positions(
-						aliceFirstTokenId
-					)
+					const alicePosition =
+						await dev.sTokensManager.positions(aliceFirstTokenId)
 					const aliceBalance = toBigNumber(alicePosition.amount)
-					const bobPosition = await dev.sTokensManager.positions(
-						bobFirstTokenId
-					)
+					const bobPosition =
+						await dev.sTokensManager.positions(bobFirstTokenId)
 					const bobBalance = toBigNumber(bobPosition.amount)
 
 					expect(aliceBalance.toFixed()).to.be.equal(
-						total.times(0.8).integerValue(BigNumber.ROUND_DOWN).toFixed()
+						total.times(0.8).integerValue(BigNumber.ROUND_DOWN).toFixed(),
 					)
 					expect(bobBalance.toFixed()).to.be.equal(
-						total.times(0.2).integerValue(BigNumber.ROUND_DOWN).toFixed()
+						total.times(0.2).integerValue(BigNumber.ROUND_DOWN).toFixed(),
 					)
 				})
 				it(`Alice's withdrawable interest is 100% of between lastBlockNumber and Bob's first deposit block interest and 80% of current interest`, async () => {
@@ -705,25 +699,23 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				it(`Bob does staking 30% of the Property's total lockups, Bob's share become ${
 					625000 / 16250
 				}%, Alice's share become ${1000000 / 16250}%`, async () => {
-					const alicePosition = await dev.sTokensManager.positions(
-						aliceFirstTokenId
-					)
+					const alicePosition =
+						await dev.sTokensManager.positions(aliceFirstTokenId)
 					const aliceBalance = toBigNumber(alicePosition.amount)
-					const bobPosition = await dev.sTokensManager.positions(
-						bobFirstTokenId
-					)
+					const bobPosition =
+						await dev.sTokensManager.positions(bobFirstTokenId)
 					const bobBalance = toBigNumber(bobPosition.amount)
 
 					expect(10000).to.be.equal(
 						new BigNumber(16250)
 							.times(new BigNumber(10000).div(16250))
-							.toNumber()
+							.toNumber(),
 					)
 					expect(aliceBalance.toFixed()).to.be.equal('10000')
 					expect(6250).to.be.equal(
 						new BigNumber(16250)
 							.times(new BigNumber(6250).div(16250))
-							.toNumber()
+							.toNumber(),
 					)
 					expect(bobBalance.toFixed()).to.be.equal('6250')
 				})
@@ -752,17 +744,15 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 			})
 			describe('after withdrawal', () => {
 				before(async () => {
-					const alicePosition = await dev.sTokensManager.positions(
-						aliceFirstTokenId
-					)
+					const alicePosition =
+						await dev.sTokensManager.positions(aliceFirstTokenId)
 					const aliceBalance = toBigNumber(alicePosition.amount)
 					await dev.lockup.withdrawByPosition(aliceFirstTokenId, aliceBalance, {
 						from: alice,
 					})
 					await forwardBlockTimestamp(3)
-					const bobPosition = await dev.sTokensManager.positions(
-						bobFirstTokenId
-					)
+					const bobPosition =
+						await dev.sTokensManager.positions(bobFirstTokenId)
 					const bobBalance = toBigNumber(bobPosition.amount)
 					await dev.lockup.withdrawByPosition(bobFirstTokenId, bobBalance, {
 						from: bob,
@@ -814,35 +804,35 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 						.require('Property')
 						.at(
 							getPropertyAddress(
-								await dev.propertyFactory.create('test2', 'TEST2', user3)
-							)
+								await dev.propertyFactory.create('test2', 'TEST2', user3),
+							),
 						),
 					artifacts
 						.require('Property')
 						.at(
 							getPropertyAddress(
-								await dev.propertyFactory.create('test3', 'TEST3', user3)
-							)
+								await dev.propertyFactory.create('test3', 'TEST3', user3),
+							),
 						),
 					artifacts
 						.require('Property')
 						.at(
 							getPropertyAddress(
-								await dev.propertyFactory.create('test4', 'TEST4', user3)
-							)
+								await dev.propertyFactory.create('test4', 'TEST4', user3),
+							),
 						),
 				])
 				await dev.metricsFactory.__setMetricsCountPerProperty(
 					property2.address,
-					1
+					1,
 				)
 				await dev.metricsFactory.__setMetricsCountPerProperty(
 					property3.address,
-					1
+					1,
 				)
 				await dev.metricsFactory.__setMetricsCountPerProperty(
 					property4.address,
-					1
+					1,
 				)
 
 				await dev.lockup.depositToProperty(property1.address, 10000, {
@@ -926,25 +916,23 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				it(`Bob does staking 30% of the all Property's total lockups, Bob's share become ${
 					625000 / 16250
 				}%, Alice's share become ${1000000 / 16250}%`, async () => {
-					const alicePosition = await dev.sTokensManager.positions(
-						aliceFirstTokenId
-					)
+					const alicePosition =
+						await dev.sTokensManager.positions(aliceFirstTokenId)
 					const aliceBalance = toBigNumber(alicePosition.amount)
-					const bobPosition = await dev.sTokensManager.positions(
-						bobFirstTokenId
-					)
+					const bobPosition =
+						await dev.sTokensManager.positions(bobFirstTokenId)
 					const bobBalance = toBigNumber(bobPosition.amount)
 
 					expect(10000).to.be.equal(
 						new BigNumber(16250)
 							.times(new BigNumber(10000).div(16250))
-							.toNumber()
+							.toNumber(),
 					)
 					expect(aliceBalance.toFixed()).to.be.equal('10000')
 					expect(6250).to.be.equal(
 						new BigNumber(16250)
 							.times(new BigNumber(6250).div(16250))
-							.toNumber()
+							.toNumber(),
 					)
 					expect(bobBalance.toFixed()).to.be.equal('6250')
 				})
@@ -981,31 +969,28 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				it(`Alice does staking 60% of the all Property's total lockups, Alice's share become ${
 					1975000 / 26000
 				}%, Bob's share become ${625000 / 26000}%`, async () => {
-					const aliceProperty1Position = await dev.sTokensManager.positions(
-						aliceFirstTokenId
-					)
+					const aliceProperty1Position =
+						await dev.sTokensManager.positions(aliceFirstTokenId)
 					const aliceProperty1Balance = toBigNumber(
-						aliceProperty1Position.amount
+						aliceProperty1Position.amount,
 					)
-					const aliceProperty3Position = await dev.sTokensManager.positions(
-						aliceSecoundTokenId
-					)
+					const aliceProperty3Position =
+						await dev.sTokensManager.positions(aliceSecoundTokenId)
 					const aliceProperty3Balance = toBigNumber(
-						aliceProperty3Position.amount
+						aliceProperty3Position.amount,
 					)
-					const bobProperty2Position = await dev.sTokensManager.positions(
-						bobFirstTokenId
-					)
+					const bobProperty2Position =
+						await dev.sTokensManager.positions(bobFirstTokenId)
 					const bobProperty2Balance = toBigNumber(bobProperty2Position.amount)
 
 					expect(19750).to.be.equal(
-						toBigNumber(26000).times(toBigNumber(19750).div(26000)).toNumber()
+						toBigNumber(26000).times(toBigNumber(19750).div(26000)).toNumber(),
 					)
 					expect(
-						aliceProperty1Balance.plus(aliceProperty3Balance).toFixed()
+						aliceProperty1Balance.plus(aliceProperty3Balance).toFixed(),
 					).to.be.equal('19750')
 					expect(6250).to.be.equal(
-						toBigNumber(26000).times(toBigNumber(6250).div(26000)).toNumber()
+						toBigNumber(26000).times(toBigNumber(6250).div(26000)).toNumber(),
 					)
 					expect(bobProperty2Balance.toFixed()).to.be.equal('6250')
 				})
@@ -1022,7 +1007,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 							.then(toBigNumber),
 						dev.lockup
 							.calculateWithdrawableInterestAmountByPosition(
-								aliceSecoundTokenId
+								aliceSecoundTokenId,
 							)
 							.then(toBigNumber),
 					])
@@ -1030,7 +1015,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 					const res2 = await calc(aliceSecoundTokenId)
 
 					expect(aliceAmount[0].plus(aliceAmount[1]).toFixed()).to.be.equal(
-						toBigNumber(res1).plus(res2).toFixed()
+						toBigNumber(res1).plus(res2).toFixed(),
 					)
 				})
 				it(`Bob's withdrawable interest is 20% of two prev interest and ${
@@ -1048,28 +1033,25 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 			})
 			describe('after withdrawal stakes', () => {
 				before(async () => {
-					const aliceProperty1Position = await dev.sTokensManager.positions(
-						aliceFirstTokenId
-					)
+					const aliceProperty1Position =
+						await dev.sTokensManager.positions(aliceFirstTokenId)
 					const aliceProperty1Balance = toBigNumber(
-						aliceProperty1Position.amount
+						aliceProperty1Position.amount,
 					)
-					const aliceProperty3Position = await dev.sTokensManager.positions(
-						aliceSecoundTokenId
-					)
+					const aliceProperty3Position =
+						await dev.sTokensManager.positions(aliceSecoundTokenId)
 					const aliceProperty3Balance = toBigNumber(
-						aliceProperty3Position.amount
+						aliceProperty3Position.amount,
 					)
-					const bobProperty2Position = await dev.sTokensManager.positions(
-						bobFirstTokenId
-					)
+					const bobProperty2Position =
+						await dev.sTokensManager.positions(bobFirstTokenId)
 					const bobProperty2Balance = toBigNumber(bobProperty2Position.amount)
 					await dev.lockup.withdrawByPosition(
 						aliceFirstTokenId,
 						aliceProperty1Balance,
 						{
 							from: alice,
-						}
+						},
 					)
 					await forwardBlockTimestamp(3)
 					await dev.lockup.withdrawByPosition(
@@ -1077,7 +1059,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 						aliceProperty3Balance,
 						{
 							from: alice,
-						}
+						},
 					)
 					await forwardBlockTimestamp(3)
 					await dev.lockup.withdrawByPosition(
@@ -1085,7 +1067,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 						bobProperty2Balance,
 						{
 							from: bob,
-						}
+						},
 					)
 					await forwardBlockTimestamp(3)
 				})
@@ -1096,7 +1078,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 							.then(toBigNumber),
 						dev.lockup
 							.calculateWithdrawableInterestAmountByPosition(
-								aliceSecoundTokenId
+								aliceSecoundTokenId,
 							)
 							.then(toBigNumber),
 					])
@@ -1104,7 +1086,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 					const res2 = await calc(aliceSecoundTokenId)
 
 					expect(aliceAmount[0].plus(aliceAmount[1]).toFixed()).to.be.equal(
-						toBigNumber(res1).plus(res2).toFixed()
+						toBigNumber(res1).plus(res2).toFixed(),
 					)
 				})
 				it(`Bob's withdrawable interest`, async () => {

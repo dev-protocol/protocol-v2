@@ -19,7 +19,7 @@ contract('DecimalsTest', ([deployer]) => {
 			})
 			const result = await decimalsTest.outOf(
 				28,
-				'700000000000000000000000000000000000000'
+				'700000000000000000000000000000000000000',
 			)
 			expect(result.toNumber()).to.be.equal(0)
 		})
@@ -49,7 +49,7 @@ contract('DecimalsTest', ([deployer]) => {
 			validateErrorMessage(
 				res,
 				'Returned error: VM Exception while processing transaction: revert',
-				false
+				false,
 			)
 		})
 	})

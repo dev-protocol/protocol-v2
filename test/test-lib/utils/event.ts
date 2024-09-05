@@ -4,15 +4,15 @@ export const watch =
 	(deployedContract: any) =>
 	(
 		name: string,
-		handler: (err: Error, values: Record<string, string>) => void
+		handler: (err: Error, values: Record<string, string>) => void,
 	): void => {
 		const { contract: deployed } = deployedContract
 		const web3WithWebsockets = new Web3(
-			new Web3.providers.WebsocketProvider(web3.eth.currentProvider.host)
+			new Web3.providers.WebsocketProvider(web3.eth.currentProvider.host),
 		)
 		const { events } = new web3WithWebsockets.eth.Contract(
 			deployed._jsonInterface,
-			deployed._address
+			deployed._address,
 		)
 
 		events.allEvents((err: Error, e: any) => {

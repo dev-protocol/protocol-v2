@@ -137,7 +137,7 @@ contract('Policy1', ([deployer]) => {
 		it('The share is 51%', async () => {
 			const result = await policy.holdersShare(1000000, 1)
 			expect(result.toString()).to.be.equal(
-				new BigNumber(1000000).times(0.51).toString()
+				new BigNumber(1000000).times(0.51).toString(),
 			)
 		})
 		it('The share is 100% when lockup is 0', async () => {
@@ -153,7 +153,7 @@ contract('Policy1', ([deployer]) => {
 		it('Returns the authentication fee when the total number of assets and the number of lockups is passed', async () => {
 			const result = await policy.authenticationFee(
 				20000,
-				new BigNumber(100000 * 1e18)
+				new BigNumber(100000 * 1e18),
 			)
 			expect(result.toString()).to.be.equal('1')
 		})
@@ -172,21 +172,21 @@ contract('Policy1', ([deployer]) => {
 		it('Returns 430 when the number of assets is 5000000, locked-ups is 7000000', async () => {
 			const result = await policy.authenticationFee(
 				5000000,
-				new BigNumber(7000000 * 1e18)
+				new BigNumber(7000000 * 1e18),
 			)
 			expect(result.toString()).to.be.equal('430')
 		})
 		it('Returns 0 when the number of assets is 5000000, locked-ups is 50000000', async () => {
 			const result = await policy.authenticationFee(
 				5000000,
-				new BigNumber(50000000 * 1e18)
+				new BigNumber(50000000 * 1e18),
 			)
 			expect(result.toString()).to.be.equal('0')
 		})
 		it('Returns 0 when the number of assets is 10000, locked-ups is 10000000', async () => {
 			const result = await policy.authenticationFee(
 				10000,
-				new BigNumber(10000000 * 1e18)
+				new BigNumber(10000000 * 1e18),
 			)
 			expect(result.toString()).to.be.equal('0')
 		})

@@ -28,7 +28,7 @@ contract('DevBridge', ([deployer, user1, lockup, withdraw, market]) => {
 
 		const [addressRegistry] = await deployProxy(
 			contract('AddressRegistry'),
-			deployer
+			deployer,
 		)
 		await addressRegistry.initialize()
 
@@ -40,7 +40,7 @@ contract('DevBridge', ([deployer, user1, lockup, withdraw, market]) => {
 
 		const [marketFactory] = await deployProxy(
 			contract('MarketFactoryTest'),
-			deployer
+			deployer,
 		)
 		await marketFactory.initialize(addressRegistry.address)
 		await marketFactory.__addMarket(market)

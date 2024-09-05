@@ -16,7 +16,7 @@ contract('Curve', () => {
 			stake: BigNumber,
 			_asset: BigNumber,
 			totalSupply: BigNumber,
-			_max: BigNumber
+			_max: BigNumber,
 		): BigNumber => {
 			// Rewards = Max*(1-StakingRate)^((12-(StakingRate*10))/2+1)
 			const stakingRate = new BigNumber(stake).div(totalSupply)
@@ -45,7 +45,7 @@ contract('Curve', () => {
 			const result = await curve.curveRewardsTest(0, 1, totalSupply, max)
 			expect(result.toString()).to.be.equal('8800000000000')
 			expect(
-				new BigNumber(result.toString()).div(new BigNumber(1e18)).toString()
+				new BigNumber(result.toString()).div(new BigNumber(1e18)).toString(),
 			).to.be.equal('0.0000088')
 		})
 		it('Depends staking rate, decrease the impact of assets', async () => {
@@ -71,13 +71,13 @@ contract('Curve', () => {
 			expect(natural(result2).toString()).to.be.equal('0.003250550847356926')
 			expect(natural(result3).toString()).to.be.equal('0.000001183918579712')
 			expect(rewards(per1010, assets, totalSupply, max).toString()).to.be.equal(
-				'7935173026534157'
+				'7935173026534157',
 			)
 			expect(rewards(per2170, assets, totalSupply, max).toString()).to.be.equal(
-				'3250550847356926'
+				'3250550847356926',
 			)
 			expect(rewards(per9560, assets, totalSupply, max).toString()).to.be.equal(
-				'1183918579712'
+				'1183918579712',
 			)
 		})
 		it('Will be correct curve', async () => {
@@ -103,13 +103,13 @@ contract('Curve', () => {
 			expect(natural(result2).toString()).to.be.equal('0.00000184549376')
 			expect(natural(result3).toString()).to.be.equal('0.000001831707186636')
 			expect(rewards(per199, one, totalSupply, max).toString()).to.be.equal(
-				'1859850117979'
+				'1859850117979',
 			)
 			expect(rewards(per200, one, totalSupply, max).toString()).to.be.equal(
-				'1845493760000'
+				'1845493760000',
 			)
 			expect(rewards(per201, one, totalSupply, max).toString()).to.be.equal(
-				'1831707186636'
+				'1831707186636',
 			)
 		})
 		it('When a number of stakes are 0', async () => {
@@ -118,7 +118,7 @@ contract('Curve', () => {
 				new BigNumber(0),
 				new BigNumber(99999),
 				totalSupply,
-				max
+				max,
 			)
 			expect(result.toString()).to.be.equal(expected.toString())
 		})
@@ -133,7 +133,7 @@ contract('Curve', () => {
 				stake,
 				99999,
 				totalSupply,
-				max
+				max,
 			)
 			expect(result.toString()).to.be.equal('0')
 		})

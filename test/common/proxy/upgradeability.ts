@@ -18,7 +18,7 @@ contract('Upgradeability ', ([deployer, address, user]) => {
 		before(async () => {
 			;[contract, admin] = await deployProxy(
 				artifacts.require('UpgradeabilityBase'),
-				deployer
+				deployer,
 			)
 		})
 		it('Store data', async () => {
@@ -31,19 +31,19 @@ contract('Upgradeability ', ([deployer, address, user]) => {
 			expect((await contract.dataUint256()).toString()).to.equal(values[0])
 			expect(await contract.dataString()).to.equal(values[1])
 			expect((await contract.dataMapping(address)).toString()).to.equal(
-				values[2]
+				values[2],
 			)
 		})
 		it('Should data be upgradable', async () => {
 			const newImpl = await artifacts.require('UpgradeabilityBase').new()
 			await admin.upgrade(contract.address, newImpl.address)
 			expect(
-				(await admin.getProxyImplementation(contract.address)).toString()
+				(await admin.getProxyImplementation(contract.address)).toString(),
 			).to.equal(newImpl.address)
 			expect((await contract.dataUint256()).toString()).to.equal(values[0])
 			expect(await contract.dataString()).to.equal(values[1])
 			expect((await contract.dataMapping(address)).toString()).to.equal(
-				values[2]
+				values[2],
 			)
 		})
 	})
@@ -56,7 +56,7 @@ contract('Upgradeability ', ([deployer, address, user]) => {
 		before(async () => {
 			;[contract, admin] = await deployProxy(
 				artifacts.require('UpgradeabilityBase'),
-				deployer
+				deployer,
 			)
 		})
 		it('Store data', async () => {
@@ -69,7 +69,7 @@ contract('Upgradeability ', ([deployer, address, user]) => {
 			expect((await contract.dataUint256()).toString()).to.equal(values[0])
 			expect(await contract.dataString()).to.equal(values[1])
 			expect((await contract.dataMapping(address)).toString()).to.equal(
-				values[2]
+				values[2],
 			)
 		})
 		it('Should data be upgradable', async () => {
@@ -78,12 +78,12 @@ contract('Upgradeability ', ([deployer, address, user]) => {
 				.new()
 			await admin.upgrade(contract.address, newImpl.address)
 			expect(
-				(await admin.getProxyImplementation(contract.address)).toString()
+				(await admin.getProxyImplementation(contract.address)).toString(),
 			).to.equal(newImpl.address)
 			expect((await contract.dataUint256()).toString()).to.equal(values[0])
 			expect(await contract.dataString()).to.equal(values[1])
 			expect((await contract.dataMapping(address)).toString()).to.equal(
-				values[2]
+				values[2],
 			)
 		})
 	})
@@ -95,7 +95,7 @@ contract('Upgradeability ', ([deployer, address, user]) => {
 		before(async () => {
 			;[contract, admin] = await deployProxy(
 				artifacts.require('UpgradeabilityBase'),
-				deployer
+				deployer,
 			)
 		})
 		it('Store data', async () => {
@@ -108,7 +108,7 @@ contract('Upgradeability ', ([deployer, address, user]) => {
 			expect((await contract.dataUint256()).toString()).to.equal(values[0])
 			expect(await contract.dataString()).to.equal(values[1])
 			expect((await contract.dataMapping(address)).toString()).to.equal(
-				values[2]
+				values[2],
 			)
 		})
 		it('Should fail to upgrade data', async () => {
@@ -117,7 +117,7 @@ contract('Upgradeability ', ([deployer, address, user]) => {
 				.new()
 			await admin.upgrade(contract.address, newImpl.address)
 			expect(
-				(await admin.getProxyImplementation(contract.address)).toString()
+				(await admin.getProxyImplementation(contract.address)).toString(),
 			).to.equal(newImpl.address)
 			expect((await contract.dataUint256()).toString()).to.equal('0')
 			expect(await contract.dataString()).to.equal('')
@@ -129,12 +129,12 @@ contract('Upgradeability ', ([deployer, address, user]) => {
 				.new()
 			await admin.upgrade(contract.address, newImpl.address)
 			expect(
-				(await admin.getProxyImplementation(contract.address)).toString()
+				(await admin.getProxyImplementation(contract.address)).toString(),
 			).to.equal(newImpl.address)
 			expect((await contract.dataUint256()).toString()).to.equal(values[0])
 			expect(await contract.dataString()).to.equal(values[1])
 			expect((await contract.dataMapping(address)).toString()).to.equal(
-				values[2]
+				values[2],
 			)
 		})
 	})
@@ -145,7 +145,7 @@ contract('Upgradeability ', ([deployer, address, user]) => {
 		before(async () => {
 			;[contract, admin] = await deployProxy(
 				artifacts.require('UpgradeabilityBase'),
-				deployer
+				deployer,
 			)
 		})
 		it('Cannot be updated by anyone other than the owner.', async () => {

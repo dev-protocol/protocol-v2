@@ -11,14 +11,14 @@ import { getEventValue } from '../test-lib/utils/event'
 
 export const init = async (
 	deployer: string,
-	user: string
+	user: string,
 ): Promise<
 	[
 		DevProtocolInstance,
 		MetricsInstance,
 		PropertyInstance,
 		IPolicyInstance,
-		MarketInstance
+		MarketInstance,
 	]
 > => {
 	const dev = new DevProtocolInstance(deployer)
@@ -47,7 +47,7 @@ export const init = async (
 		.require('PolicyTestForWithdraw')
 		.at(policyAddress)
 	const propertyAddress = getPropertyAddress(
-		await dev.propertyFactory.create('test', 'TEST', deployer)
+		await dev.propertyFactory.create('test', 'TEST', deployer),
 	)
 	const [property] = await Promise.all([
 		artifacts.require('Property').at(propertyAddress),
@@ -55,7 +55,7 @@ export const init = async (
 	await dev.metricsFactory.__setMetricsCountPerProperty(property.address, 1)
 	const marketBehavior = await dev.getMarket('MarketTest1', deployer)
 	const marketAddress = getMarketAddress(
-		await dev.marketFactory.create(marketBehavior.address)
+		await dev.marketFactory.create(marketBehavior.address),
 	)
 	const [market] = await Promise.all([
 		artifacts.require('Market').at(marketAddress),

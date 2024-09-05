@@ -53,18 +53,18 @@ contract(
 				const transaction = await dev.propertyFactory.create(
 					'sample',
 					'SAMPLE',
-					author
+					author,
 				)
 				const propertyAddress = getPropertyAddress(transaction)
 				const propertyInstance = await propertyContract.at(propertyAddress)
 				const balances = await propertyInstance.getBalances()
 				expect(balances[0].account).to.be.equal(author)
 				expect(balances[0].balance.toString()).to.be.equal(
-					'9500000000000000000000000'
+					'9500000000000000000000000',
 				)
 				expect(balances[1].account).to.be.equal(dev.treasury.address)
 				expect(balances[1].balance.toString()).to.be.equal(
-					'500000000000000000000000'
+					'500000000000000000000000',
 				)
 			})
 			it('The balance will be transferred(transfer).', async () => {
@@ -73,7 +73,7 @@ contract(
 				const transaction = await dev.propertyFactory.create(
 					'sample',
 					'SAMPLE',
-					author
+					author,
 				)
 				const propertyAddress = getPropertyAddress(transaction)
 				const propertyInstance = await propertyContract.at(propertyAddress)
@@ -83,15 +83,15 @@ contract(
 				const balances = await propertyInstance.getBalances()
 				expect(balances[0].account).to.be.equal(author)
 				expect(balances[0].balance.toString()).to.be.equal(
-					'9000000000000000000000000'
+					'9000000000000000000000000',
 				)
 				expect(balances[1].account).to.be.equal(dev.treasury.address)
 				expect(balances[1].balance.toString()).to.be.equal(
-					'500000000000000000000000'
+					'500000000000000000000000',
 				)
 				expect(balances[2].account).to.be.equal(user)
 				expect(balances[2].balance.toString()).to.be.equal(
-					'500000000000000000000000'
+					'500000000000000000000000',
 				)
 			})
 			it('The balance will be transferred(transferFrom).', async () => {
@@ -100,7 +100,7 @@ contract(
 				const transaction = await dev.propertyFactory.create(
 					'sample',
 					'SAMPLE',
-					author
+					author,
 				)
 				const propertyAddress = getPropertyAddress(transaction)
 				const propertyInstance = await propertyContract.at(propertyAddress)
@@ -110,20 +110,20 @@ contract(
 				await propertyInstance.transferFrom(
 					author,
 					user,
-					'500000000000000000000000'
+					'500000000000000000000000',
 				)
 				const balances = await propertyInstance.getBalances()
 				expect(balances[0].account).to.be.equal(author)
 				expect(balances[0].balance.toString()).to.be.equal(
-					'9000000000000000000000000'
+					'9000000000000000000000000',
 				)
 				expect(balances[1].account).to.be.equal(dev.treasury.address)
 				expect(balances[1].balance.toString()).to.be.equal(
-					'500000000000000000000000'
+					'500000000000000000000000',
 				)
 				expect(balances[2].account).to.be.equal(user)
 				expect(balances[2].balance.toString()).to.be.equal(
-					'500000000000000000000000'
+					'500000000000000000000000',
 				)
 			})
 		})
@@ -143,7 +143,7 @@ contract(
 			it('The author, decimal places, and number of issues are fixed values', async () => {
 				await dev.addressRegistry.setRegistry(
 					'PropertyFactory',
-					propertyFactory
+					propertyFactory,
 				)
 				const propertyInstance = await propertyContract.new()
 				await propertyInstance.initialize(
@@ -153,7 +153,7 @@ contract(
 					'SAMPLE',
 					{
 						from: propertyFactory,
-					}
+					},
 				)
 				const tenMillion = toBigNumber(1000).times(10000).times(1e18)
 				expect(await propertyInstance.author()).to.be.equal(author)
@@ -167,13 +167,13 @@ contract(
 				const [predictedAutherBalance, predictedTreasuryBalance] =
 					splitValue(tenMillion)
 				expect(authorBalance.toFixed()).to.be.equal(
-					predictedAutherBalance.toFixed()
+					predictedAutherBalance.toFixed(),
 				)
 				expect(treasuryBalance.toFixed()).to.be.equal(
-					predictedTreasuryBalance.toFixed()
+					predictedTreasuryBalance.toFixed(),
 				)
 				expect(
-					(await propertyInstance.totalSupply().then(toBigNumber)).toFixed()
+					(await propertyInstance.totalSupply().then(toBigNumber)).toFixed(),
 				).to.be.equal(tenMillion.toFixed())
 			})
 		})
@@ -181,7 +181,7 @@ contract(
 			it('Should fail to call when the sender is not author', async () => {
 				await dev.addressRegistry.setRegistry(
 					'PropertyFactory',
-					propertyFactory
+					propertyFactory,
 				)
 				const propertyInstance = await propertyContract.new()
 				await propertyInstance.initialize(
@@ -191,7 +191,7 @@ contract(
 					'SAMPLE',
 					{
 						from: propertyFactory,
-					}
+					},
 				)
 				const result = await propertyInstance
 					.changeName('next-name')
@@ -203,7 +203,7 @@ contract(
 				const transaction = await dev.propertyFactory.create(
 					'sample',
 					'SAMPLE',
-					author
+					author,
 				)
 				const propertyAddress = getPropertyAddress(transaction)
 				const propertyInstance = await propertyContract.at(propertyAddress)
@@ -217,7 +217,7 @@ contract(
 				await dev.generatePropertyFactory()
 				await dev.addressRegistry.setRegistry(
 					'PropertyFactory',
-					propertyFactory
+					propertyFactory,
 				)
 				const propertyInstance = await propertyContract.new()
 				await propertyInstance.initialize(
@@ -227,7 +227,7 @@ contract(
 					'SAMPLE',
 					{
 						from: propertyFactory,
-					}
+					},
 				)
 				const result = await propertyInstance.changeName('next', {
 					from: author,
@@ -242,7 +242,7 @@ contract(
 			it('Should fail to call when the sender is not author', async () => {
 				await dev.addressRegistry.setRegistry(
 					'PropertyFactory',
-					propertyFactory
+					propertyFactory,
 				)
 				const propertyInstance = await propertyContract.new()
 				await propertyInstance.initialize(
@@ -252,7 +252,7 @@ contract(
 					'SAMPLE',
 					{
 						from: propertyFactory,
-					}
+					},
 				)
 				const result = await propertyInstance
 					.changeSymbol('NEXTSYMBOL')
@@ -264,7 +264,7 @@ contract(
 				const transaction = await dev.propertyFactory.create(
 					'sample',
 					'SAMPLE',
-					author
+					author,
 				)
 				const propertyAddress = getPropertyAddress(transaction)
 				const propertyInstance = await propertyContract.at(propertyAddress)
@@ -278,7 +278,7 @@ contract(
 				await dev.generatePropertyFactory()
 				await dev.addressRegistry.setRegistry(
 					'PropertyFactory',
-					propertyFactory
+					propertyFactory,
 				)
 				const propertyInstance = await propertyContract.new()
 				await propertyInstance.initialize(
@@ -288,7 +288,7 @@ contract(
 					'SAMPLE',
 					{
 						from: propertyFactory,
-					}
+					},
 				)
 				const result = await propertyInstance.changeSymbol('NEXT', {
 					from: author,
@@ -323,7 +323,7 @@ contract(
 					author,
 					{
 						from: user,
-					}
+					},
 				)
 				propertyAddress = getPropertyAddress(result)
 			})
@@ -374,7 +374,7 @@ contract(
 					author,
 					{
 						from: user,
-					}
+					},
 				)
 				propertyAddress = getPropertyAddress(result)
 			})
@@ -424,7 +424,7 @@ contract(
 					author,
 					{
 						from: user,
-					}
+					},
 				)
 				propertyAddress = getPropertyAddress(result)
 			})
@@ -459,7 +459,7 @@ contract(
 				validateErrorMessage(
 					result,
 					'Returned error: VM Exception while processing transaction: revert',
-					false
+					false,
 				)
 			})
 			it('transfer success', async () => {
@@ -474,5 +474,5 @@ contract(
 				expect(toAddress).to.be.equal(transfer)
 			})
 		})
-	}
+	},
 )

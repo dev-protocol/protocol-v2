@@ -10,21 +10,21 @@ const handler = async function (_, network) {
 
 	const proxyAddress = process.env.S_TOKEN_MANAGER_PROXY!
 	const existing = await STokensManager.deployed().catch(() =>
-		STokensManager.at(proxyAddress)
+		STokensManager.at(proxyAddress),
 	)
 
 	console.log('proxy:', existing.address)
 
 	await validateUpgrade(
 		existing.address,
-		STokensManager as unknown as ContractClass
+		STokensManager as unknown as ContractClass,
 	)
 
 	console.log('New implementation is valid')
 
 	await upgradeProxy(
 		existing.address,
-		STokensManager as unknown as ContractClass
+		STokensManager as unknown as ContractClass,
 	)
 } as Truffle.Migration
 

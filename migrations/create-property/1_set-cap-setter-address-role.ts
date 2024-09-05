@@ -11,9 +11,8 @@ const handler = async function (deployer, network) {
 		.require('AddressRegistry')
 		.at(registryProxy)
 	console.log(`registry proxy address:${addressRegistryInstance.address}`)
-	const propertyFactoryAddress = await addressRegistryInstance.registries(
-		'PropertyFactory'
-	)
+	const propertyFactoryAddress =
+		await addressRegistryInstance.registries('PropertyFactory')
 	const propertyFactoryInstance = await artifacts
 		.require('PropertyFactory')
 		.at(propertyFactoryAddress)
@@ -22,7 +21,7 @@ const handler = async function (deployer, network) {
 	await propertyFactoryInstance.create(
 		'test',
 		'TEST',
-		'0xDaEca4F52C4bE0d6e7DE675C2FEB4C3006A96C84'
+		'0xDaEca4F52C4bE0d6e7DE675C2FEB4C3006A96C84',
 	)
 	console.log('finish')
 } as Truffle.Migration

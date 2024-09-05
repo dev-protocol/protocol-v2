@@ -9,7 +9,7 @@ export const err = (error: Error): Error => error
 
 export const init = async (
 	deployer: string,
-	user: string
+	user: string,
 ): Promise<[DevProtocolInstance, PropertyInstance]> => {
 	const dev = new DevProtocolInstance(deployer)
 	await dev.generateAddressRegistry()
@@ -32,16 +32,14 @@ export const init = async (
 	const propertyAddress = getPropertyAddress(
 		await dev.propertyFactory.create('test', 'TEST', user, {
 			from: user,
-		})
+		}),
 	)
 	const [property] = await Promise.all([
 		artifacts.require('Property').at(propertyAddress),
 	])
 
 	await dev.metricsFactory.__addMetrics(
-		(
-			await dev.createMetrics(deployer, property.address)
-		).address
+		(await dev.createMetrics(deployer, property.address)).address,
 	)
 
 	await dev.lockup.update()
@@ -51,7 +49,7 @@ export const init = async (
 
 export const init2 = async (
 	deployer: string,
-	user: string
+	user: string,
 ): Promise<[DevProtocolInstance, PropertyInstance, number]> => {
 	const [dev, property] = await init(deployer, user)
 	await dev.dev.approve(dev.lockup.address, 600)

@@ -105,7 +105,7 @@ contract('PolicyFactory', ([deployer, dummyPolicy, user1, ...accounts]) => {
 				})
 				const secoundPolicy = await dev.getPolicy(
 					'PolicyTestForPolicyFactory',
-					user1
+					user1,
 				)
 				await dev.policyFactory.create(secoundPolicy.address, {
 					from: user1,
@@ -128,7 +128,7 @@ contract('PolicyFactory', ([deployer, dummyPolicy, user1, ...accounts]) => {
 				})
 				const secoundPolicy = await dev.getPolicy(
 					'PolicyTestForPolicyFactory',
-					user1
+					user1,
 				)
 				await dev.policyFactory.create(secoundPolicy.address, {
 					from: user1,

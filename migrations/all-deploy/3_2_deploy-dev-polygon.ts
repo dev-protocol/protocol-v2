@@ -21,7 +21,7 @@ const handler = async function (deployer, network) {
 		devProxy,
 		logicInstance.address,
 		adminInstance.address,
-		web3.utils.fromUtf8('')
+		web3.utils.fromUtf8(''),
 	)
 	const proxyInstance = await devProxy.deployed()
 	console.log(`proxy address:${proxyInstance.address}`)
@@ -48,7 +48,7 @@ const handler = async function (deployer, network) {
 	// https://github.com/maticnetwork/static/blob/master/network/mainnet/v1/index.json
 	const childChainManagerProxyAddress = process.env.CHILD_CHAIN_MANAGER_PROXY!
 	console.log(
-		`child chain manager proxy address:${childChainManagerProxyAddress}`
+		`child chain manager proxy address:${childChainManagerProxyAddress}`,
 	)
 
 	// Grant depositer role to childChainManagerproxy

@@ -64,7 +64,7 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 			expect(symbol).to.be.equal('SAMPLE')
 			expect(decimals.toNumber()).to.be.equal(18)
 			expect(totalSupply.toFixed()).to.be.equal(
-				toBigNumber(1000).times(10000).times(1e18).toFixed()
+				toBigNumber(1000).times(10000).times(1e18).toFixed(),
 			)
 			expect(author).to.be.equal(user)
 		})

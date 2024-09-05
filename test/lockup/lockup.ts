@@ -12,7 +12,7 @@ import { validateErrorMessage } from '../test-lib/utils/error'
 
 contract('LockupTest', ([deployer, user1, user2]) => {
 	const init = async (
-		initialUpdate = true
+		initialUpdate = true,
 	): Promise<
 		[DevProtocolInstance, PropertyInstance, PolicyTestBaseInstance]
 	> => {
@@ -39,16 +39,14 @@ contract('LockupTest', ([deployer, user1, user2]) => {
 		const propertyAddress = getPropertyAddress(
 			await dev.propertyFactory.create('test', 'TEST', user2, {
 				from: user2,
-			})
+			}),
 		)
 		const [property] = await Promise.all([
 			artifacts.require('Property').at(propertyAddress),
 		])
 
 		await dev.metricsFactory.__addMetrics(
-			(
-				await dev.createMetrics(deployer, property.address)
-			).address
+			(await dev.createMetrics(deployer, property.address)).address,
 		)
 
 		if (initialUpdate) {
@@ -82,7 +80,7 @@ contract('LockupTest', ([deployer, user1, user2]) => {
 		const calculateCap = async (
 			dev: DevProtocolInstance,
 			property: PropertyInstance,
-			holderCap: BigNumber
+			holderCap: BigNumber,
 		): Promise<BigNumber> => {
 			const initialCap = await dev.lockup
 				.initialCumulativeHoldersRewardCap(property.address)
@@ -93,7 +91,7 @@ contract('LockupTest', ([deployer, user1, user2]) => {
 		const calculateReword = async (
 			dev: DevProtocolInstance,
 			property: PropertyInstance,
-			holders: BigNumber
+			holders: BigNumber,
 		): Promise<BigNumber> => {
 			const cHoldersReward = await dev.lockup
 				.lastCumulativeHoldersRewardAmountPerProperty(property.address)
@@ -112,7 +110,7 @@ contract('LockupTest', ([deployer, user1, user2]) => {
 
 		const calculate = async (
 			dev: DevProtocolInstance,
-			property: PropertyInstance
+			property: PropertyInstance,
 		): Promise<[BigNumber, BigNumber]> => {
 			const tmp = await dev.lockup.calculateCumulativeRewardPrices()
 			const reward = await calculateReword(dev, property, toBigNumber(tmp[1]))
@@ -124,7 +122,7 @@ contract('LockupTest', ([deployer, user1, user2]) => {
 			await dev.dev.approve(dev.lockup.address, '10000000000000000000000')
 			await dev.lockup.depositToProperty(
 				property.address,
-				'10000000000000000000000'
+				'10000000000000000000000',
 			)
 			await dev.updateCap()
 			const [reword, cap] = await calculate(dev, property)
@@ -136,7 +134,7 @@ contract('LockupTest', ([deployer, user1, user2]) => {
 	describe('Lockup; cap, updateCap', () => {
 		const calculateCap = async (
 			dev: DevProtocolInstance,
-			cap: BigNumber
+			cap: BigNumber,
 		): Promise<[BigNumber, BigNumber]> => {
 			const tmp = await dev.lockup.calculateCumulativeRewardPrices()
 			const holderPrice = toBigNumber(tmp[1])
@@ -153,7 +151,7 @@ contract('LockupTest', ([deployer, user1, user2]) => {
 			it('Can set cap.', async () => {
 				const tx = await dev.lockup.updateCap(100)
 				const eventLogs = tx.logs.filter(
-					(log: { event: string }) => log.event === 'UpdateCap'
+					(log: { event: string }) => log.event === 'UpdateCap',
 				)
 				expect(eventLogs[0].args._cap.toNumber()).to.be.equal(100)
 				const cap = await dev.lockup.cap()
@@ -161,7 +159,7 @@ contract('LockupTest', ([deployer, user1, user2]) => {
 				const [capValue, holdersPrice] = await calculateCap(
 					dev,
 
-					toBigNumber(100)
+					toBigNumber(100),
 				)
 				const holderRewardCap = await dev.lockup
 					.cumulativeHoldersRewardCap()

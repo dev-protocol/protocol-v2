@@ -22,12 +22,12 @@ const handler = async function (deployer, network) {
 
 	const hasBurnerRoll = await devPolygonInstance.hasRole(
 		bunerRole,
-		devBridgeAddress
+		devBridgeAddress,
 	)
 	console.log(`burner roll:${hasBurnerRoll}`)
 	const hasMinterRoll = await devPolygonInstance.hasRole(
 		minterRole,
-		devBridgeAddress
+		devBridgeAddress,
 	)
 	console.log(`minter roll:${hasMinterRoll}`)
 } as Truffle.Migration

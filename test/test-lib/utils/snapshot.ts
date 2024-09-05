@@ -12,7 +12,7 @@ export const takeSnapshot = async () =>
 				}
 
 				resolve(snapshotId)
-			}
+			},
 		)
 	})
 
@@ -31,7 +31,7 @@ export const revertToSnapshot = async (id: string) =>
 				}
 
 				resolve(result)
-			}
+			},
 		)
 	})
 

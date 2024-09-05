@@ -14,7 +14,7 @@ export async function mine(count: number): Promise<void> {
 					params: [],
 					id: 0,
 				},
-				resolve
+				resolve,
 			)
 		})
 	}
@@ -29,14 +29,14 @@ export const forwardBlockTimestamp = async (seconds: number): Promise<void> => {
 				params: [seconds],
 				id: 0,
 			},
-			resolve
+			resolve,
 		)
 	})
 	return mine(1)
 }
 
 export const getBlockTimestamp = async (
-	blockNumber?: number
+	blockNumber?: number,
 ): Promise<number> =>
 	web3.eth
 		.getBlock(blockNumber ? blockNumber : await getBlock())
@@ -51,7 +51,7 @@ export const collectsEth =
 		const getBalance = async (address: string): Promise<BigNumber> =>
 			web3.eth.getBalance(address).then(toBigNumber)
 		const web3Client = new Web3(
-			new Web3.providers.WebsocketProvider(web3.eth.currentProvider.host)
+			new Web3.providers.WebsocketProvider(web3.eth.currentProvider.host),
 		)
 		const minimum = toBigNumber(Web3.utils.toWei(`${min}`, 'ether'))
 		accounts.map(async (account) => {
@@ -83,7 +83,7 @@ export function keccak256(...values: string[]): string {
 
 export function splitValue(
 	_value: BigNumber,
-	percentage = SHARE_OF_TREASURY
+	percentage = SHARE_OF_TREASURY,
 ): [BigNumber, BigNumber] {
 	const tmp = _value.div(new BigNumber(100)).times(new BigNumber(percentage))
 	const tmp2 = _value.minus(tmp)
@@ -92,7 +92,7 @@ export function splitValue(
 
 export async function getAmountFromPosition(
 	dev: DevProtocolInstance,
-	tokenId: number
+	tokenId: number,
 ): Promise<BigNumber> {
 	const position = await dev.sTokensManager.positions(tokenId)
 	return toBigNumber(position.amount)

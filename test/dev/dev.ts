@@ -46,17 +46,17 @@ contract('Dev', ([deployer, user1, user2]) => {
 		})
 		it('deployer has admin role', async () => {
 			expect(
-				await dev.dev.hasRole(await dev.dev.DEFAULT_ADMIN_ROLE(), deployer)
+				await dev.dev.hasRole(await dev.dev.DEFAULT_ADMIN_ROLE(), deployer),
 			).to.equal(true)
 		})
 		it('deployer has burner role', async () => {
 			expect(
-				await dev.dev.hasRole(await dev.dev.BURNER_ROLE(), deployer)
+				await dev.dev.hasRole(await dev.dev.BURNER_ROLE(), deployer),
 			).to.equal(true)
 		})
 		it('deployer has minter role', async () => {
 			expect(
-				await dev.dev.hasRole(await dev.dev.MINTER_ROLE(), deployer)
+				await dev.dev.hasRole(await dev.dev.MINTER_ROLE(), deployer),
 			).to.equal(true)
 		})
 	})

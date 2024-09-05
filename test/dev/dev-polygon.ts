@@ -45,17 +45,17 @@ contract('DevPolygon', ([deployer, depositer, user]) => {
 		})
 		it('deployer has admin role', async () => {
 			expect(
-				await dev.devL2.hasRole(await dev.devL2.DEFAULT_ADMIN_ROLE(), deployer)
+				await dev.devL2.hasRole(await dev.devL2.DEFAULT_ADMIN_ROLE(), deployer),
 			).to.equal(true)
 		})
 		it('deployer has burner role', async () => {
 			expect(
-				await dev.devL2.hasRole(await dev.devL2.BURNER_ROLE(), deployer)
+				await dev.devL2.hasRole(await dev.devL2.BURNER_ROLE(), deployer),
 			).to.equal(true)
 		})
 		it('deployer has minter role', async () => {
 			expect(
-				await dev.devL2.hasRole(await dev.devL2.MINTER_ROLE(), deployer)
+				await dev.devL2.hasRole(await dev.devL2.MINTER_ROLE(), deployer),
 			).to.equal(true)
 		})
 	})
@@ -66,8 +66,8 @@ contract('DevPolygon', ([deployer, depositer, user]) => {
 				expect(
 					await dev.devL2.hasRole(
 						await (dev.devL2 as DevPolygonInstance).DEPOSITOR_ROLE(),
-						deployer
-					)
+						deployer,
+					),
 				).to.equal(true)
 			})
 			it('depositer can mint', async () => {

@@ -1,7 +1,7 @@
 export function validateErrorMessage(
 	result: any,
 	errorMessage: string,
-	reason = true
+	reason = true,
 ): void {
 	const message = reason ? `Reason given: ${errorMessage}` : errorMessage
 	expect(result).to.be.an.instanceOf(Error)
@@ -18,12 +18,12 @@ export function validateNotOwnerErrorMessage(result: any, reason = true): void {
 
 export function validateVmExceptionErrorMessage(
 	result: any,
-	reason = true
+	reason = true,
 ): void {
 	validateErrorMessage(
 		result,
 		'Returned error: VM Exception while processing transaction: revert',
-		reason
+		reason,
 	)
 }
 

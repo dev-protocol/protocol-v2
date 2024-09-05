@@ -10,14 +10,14 @@ const handler = async function (_, network) {
 
 	const proxyAddress = process.env.DEV_PROXY!
 	const existing = await DevArbitrum.deployed().catch(() =>
-		DevArbitrum.at(proxyAddress)
+		DevArbitrum.at(proxyAddress),
 	)
 
 	console.log('proxy:', existing.address)
 
 	await validateUpgrade(
 		existing.address,
-		DevArbitrum as unknown as ContractClass
+		DevArbitrum as unknown as ContractClass,
 	)
 
 	console.log('New implementation is valid')

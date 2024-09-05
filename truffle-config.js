@@ -49,8 +49,8 @@ module.exports = {
 				return wrapProvider(
 					new HDWalletProvider(
 						MNEMONIC,
-						'https://arbitrum-rinkeby.infura.io/v3/' + INFURA_KEY
-					)
+						'https://arbitrum-rinkeby.infura.io/v3/' + INFURA_KEY,
+					),
 				)
 			},
 		},
@@ -64,7 +64,7 @@ module.exports = {
 					MNEMONIC,
 					'https://arbitrum-mainnet.infura.io/v3/' + INFURA_KEY,
 					0,
-					1
+					1,
 				)
 			},
 		},
@@ -72,7 +72,7 @@ module.exports = {
 			provider: () =>
 				new HDWalletProvider(
 					MNEMONIC,
-					'https://polygon-mumbai.infura.io/v3/' + INFURA_KEY
+					'https://polygon-mumbai.infura.io/v3/' + INFURA_KEY,
 				),
 			network_id: 80001,
 			confirmations: 2,
@@ -83,7 +83,7 @@ module.exports = {
 			provider: () =>
 				new HDWalletProvider(
 					MNEMONIC,
-					'https://polygon-mainnet.infura.io/v3/' + INFURA_KEY
+					'https://polygon-mainnet.infura.io/v3/' + INFURA_KEY,
 				),
 			network_id: 137,
 			confirmations: 2,

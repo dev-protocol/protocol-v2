@@ -23,7 +23,7 @@ const handler = async function (deployer, network) {
 		devProxy,
 		logicInstance.address,
 		adminInstance.address,
-		web3.utils.fromUtf8('')
+		web3.utils.fromUtf8(''),
 	)
 	const proxyInstance = await devProxy.deployed()
 	console.log(`proxy address:${proxyInstance.address}`)

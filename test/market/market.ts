@@ -46,7 +46,7 @@ contract(
 				const market = await marketContract.new(
 					dev.addressRegistry.address,
 					behavuor,
-					{ from: marketFactory }
+					{ from: marketFactory },
 				)
 				expect(await market.behavior()).to.be.equal(behavuor)
 				expect(await market.enabled()).to.be.equal(false)
@@ -66,7 +66,7 @@ contract(
 					behavuor,
 					{
 						from: marketFactory,
-					}
+					},
 				)
 			})
 			it('Cannot be enabled from other than market factory', async () => {
@@ -102,7 +102,7 @@ contract(
 					behavuor,
 					{
 						from: marketFactory,
-					}
+					},
 				)
 				await market.toEnable({ from: marketFactory })
 			})
@@ -128,7 +128,7 @@ contract(
 				const market = await marketContract.new(
 					dev.addressRegistry.address,
 					behavuor.address,
-					{ from: marketFactory }
+					{ from: marketFactory },
 				)
 				expect(await market.schema()).to.be.equal('[]')
 			})
@@ -145,7 +145,7 @@ contract(
 				const market = await marketContract.new(
 					dev.addressRegistry.address,
 					behavuor.address,
-					{ from: marketFactory }
+					{ from: marketFactory },
 				)
 				expect(await market.name()).to.be.equal('MarketTest1')
 			})
@@ -164,7 +164,7 @@ contract(
 				await dev.updateCap()
 				const behavior = await dev.getMarket('MarketTest3', user)
 				const createMarketResult = await dev.marketFactory.create(
-					behavior.address
+					behavior.address,
 				)
 				const marketAddress = getMarketAddress(createMarketResult)
 				expect(await behavior.associatedMarket()).to.be.equal(marketAddress)
@@ -195,7 +195,7 @@ contract(
 				await dev.setCapSetter()
 				await dev.updateCap()
 				let createMarketResult = await dev.marketFactory.create(
-					behavior1.address
+					behavior1.address,
 				)
 				marketAddress1 = getMarketAddress(createMarketResult)
 				createMarketResult = await dev.marketFactory.create(behavior2.address)
@@ -203,12 +203,12 @@ contract(
 				const createPropertyResult = await dev.propertyFactory.create(
 					'test',
 					'TEST',
-					propertyAuther
+					propertyAuther,
 				)
 				propertyAddress = getPropertyAddress(createPropertyResult)
 				await dev.metricsFactory.__setMetricsCountPerProperty(
 					propertyAddress,
-					1
+					1,
 				)
 				await dev.dev.mint(propertyAuther, 10000000000, { from: deployer })
 				await dev.dev.approve(dev.lockup.address, 100000, {
@@ -253,10 +253,10 @@ contract(
 				const marketTest3 = artifacts.require('MarketTest3')
 
 				const marketTest3Instance = await marketTest3.at(
-					await marketInstance.behavior()
+					await marketInstance.behavior(),
 				)
 				expect(
-					await marketTest3Instance.currentAuthinticateAccount()
+					await marketTest3Instance.currentAuthinticateAccount(),
 				).to.be.equal(propertyAuther)
 			})
 			it('Should fail to run when not enabled Market.', async () => {
@@ -384,7 +384,7 @@ contract(
 				await dev.setCapSetter()
 				await dev.updateCap()
 				let createMarketResult = await dev.marketFactory.create(
-					behavior1.address
+					behavior1.address,
 				)
 				marketAddress1 = getMarketAddress(createMarketResult)
 				createMarketResult = await dev.marketFactory.create(behavior2.address)
@@ -392,17 +392,17 @@ contract(
 				const createPropertyResult = await dev.propertyFactory.create(
 					'test',
 					'TEST',
-					propertyAuther
+					propertyAuther,
 				)
 				propertyAddress = getPropertyAddress(createPropertyResult)
 				await dev.metricsFactory.__setMetricsCountPerProperty(
 					propertyAddress,
-					1
+					1,
 				)
 				await dev.dev.mint(propertyAuther, 10000000000, { from: deployer })
 				await dev.addressRegistry.setRegistry(
 					'PropertyFactory',
-					propertyFactory
+					propertyFactory,
 				)
 				await dev.dev.approve(dev.lockup.address, 100000, {
 					from: propertyAuther,
@@ -420,7 +420,7 @@ contract(
 					['id-key'],
 					{
 						from: propertyFactory,
-					}
+					},
 				)
 				const metricsAddress = await new Promise<string>((resolve) => {
 					watch(dev.metricsFactory)('Create', (_, values) => {
@@ -447,15 +447,15 @@ contract(
 					propertyAddress,
 					propertyAuther,
 					['id-key'],
-					{ from: propertyFactory }
+					{ from: propertyFactory },
 				)
 				const marketTest3 = artifacts.require('MarketTest3')
 
 				const marketTest3Instance = await marketTest3.at(
-					await marketInstance.behavior()
+					await marketInstance.behavior(),
 				)
 				expect(
-					await marketTest3Instance.currentAuthinticateAccount()
+					await marketTest3Instance.currentAuthinticateAccount(),
 				).to.be.equal(propertyAuther)
 			})
 			it('Should fail to run when not enabled Market.', async () => {
@@ -467,7 +467,7 @@ contract(
 						['id-key'],
 						{
 							from: propertyFactory,
-						}
+						},
 					)
 					.catch((err: Error) => err)
 				validateErrorMessage(result, 'market is not enabled')
@@ -517,13 +517,13 @@ contract(
 				await dev.setCapSetter()
 				await dev.updateCap()
 				const createMarketResult = await dev.marketFactory.create(
-					behavior1.address
+					behavior1.address,
 				)
 				const marketAddress1 = getMarketAddress(createMarketResult)
 				const createPropertyResult = await dev.propertyFactory.create(
 					'test',
 					'TEST',
-					propertyAuther
+					propertyAuther,
 				)
 				const propertyAddress = getPropertyAddress(createPropertyResult)
 
@@ -559,7 +559,7 @@ contract(
 				const createPropertyResult = await dev.propertyFactory.create(
 					'test2',
 					'TEST2',
-					propertyAuther
+					propertyAuther,
 				)
 				const propertyAddress2 = getPropertyAddress(createPropertyResult)
 				await marketInstance.authenticate(propertyAddress2, ['test2'], {
@@ -592,7 +592,7 @@ contract(
 				const createPropertyResult = await dev.propertyFactory.create(
 					'test2',
 					'TEST2',
-					propertyAuther
+					propertyAuther,
 				)
 				const propertyAddress2 = getPropertyAddress(createPropertyResult)
 				await marketInstance.authenticate(propertyAddress2, ['test2'], {
@@ -617,5 +617,5 @@ contract(
 				expect(propertiesNext.length).to.be.equal(0)
 			})
 		})
-	}
+	},
 )

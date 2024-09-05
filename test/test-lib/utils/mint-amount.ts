@@ -5,7 +5,7 @@ import type { PropertyInstance } from '../../../types/truffle-contracts'
 
 async function getWithdrawAmount(
 	dev: DevProtocolInstance,
-	propertyAddress: string
+	propertyAddress: string,
 ): Promise<[BigNumber, BigNumber]> {
 	const totalIssuedMetrics = await dev.metricsFactory
 		.metricsCount()
@@ -28,7 +28,7 @@ async function getWithdrawAmount(
 export async function getWithdrawHolderAmount(
 	dev: DevProtocolInstance,
 	propertyAddress: string,
-	transitionalBlock = 1
+	transitionalBlock = 1,
 ): Promise<BigNumber> {
 	const [, share] = await getWithdrawAmount(dev, propertyAddress)
 	return share.times(transitionalBlock)
@@ -38,7 +38,7 @@ export async function getWithdrawInterestAmount(
 	dev: DevProtocolInstance,
 	calculateWithdrawableAmount: BigNumber,
 	propertyAddress: string,
-	transitionalBlock = 1
+	transitionalBlock = 1,
 ): Promise<BigNumber> {
 	const [cal, share] = await getWithdrawAmount(dev, propertyAddress)
 	const tmp = cal.minus(share)
@@ -51,7 +51,7 @@ export async function getWithdrawHolderSplitAmount(
 	calculateWithdrawableAmount: BigNumber,
 	property: PropertyInstance,
 	user: string,
-	transitionalBlock = 1
+	transitionalBlock = 1,
 ): Promise<BigNumber> {
 	const [, share] = await getWithdrawAmount(dev, property.address)
 	const totalSupply = await property.totalSupply().then(toBigNumber)

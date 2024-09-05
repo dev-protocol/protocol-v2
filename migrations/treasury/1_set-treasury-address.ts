@@ -13,9 +13,8 @@ const handler = async function (deployer, network) {
 		.require('AddressRegistry')
 		.at(registryProxy)
 	console.log(`registry proxy address:${addressRegistryInstance.address}`)
-	const treasuryAddressBefore = await addressRegistryInstance.registries(
-		'Treasury'
-	)
+	const treasuryAddressBefore =
+		await addressRegistryInstance.registries('Treasury')
 	console.log(`treasury address:${treasuryAddressBefore}`)
 	await addressRegistryInstance.setRegistry('Treasury', treasury)
 	const treasuryAddress = await addressRegistryInstance.registries('Treasury')

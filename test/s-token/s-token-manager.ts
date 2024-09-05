@@ -45,7 +45,7 @@ contract('STokensManager', ([deployer, user]) => {
 			PropertyInstance,
 			TokenURIDescriptorTestInstance,
 			TokenURIDescriptorCopyTestInstance,
-			TokenURIDescriptorLegacyTestInstance
+			TokenURIDescriptorLegacyTestInstance,
 		]
 	> => {
 		const dev = new DevProtocolInstance(deployer)
@@ -70,16 +70,14 @@ contract('STokensManager', ([deployer, user]) => {
 		const propertyAddress = getPropertyAddress(
 			await dev.propertyFactory.create('test', 'TEST', user, {
 				from: user,
-			})
+			}),
 		)
 		const [property] = await Promise.all([
 			artifacts.require('Property').at(propertyAddress),
 		])
 
 		await dev.metricsFactory.__addMetrics(
-			(
-				await dev.createMetrics(deployer, property.address)
-			).address
+			(await dev.createMetrics(deployer, property.address)).address,
 		)
 
 		await dev.lockup.update()
@@ -117,7 +115,7 @@ contract('STokensManager', ([deployer, user]) => {
 		amount: number | string,
 		cumulativeReward: number,
 		payload: string,
-		tokenUriImage = ''
+		tokenUriImage = '',
 	): void => {
 		const uriInfo = tokenUri.split(',')
 		expect(uriInfo.length).to.equal(2)
@@ -157,12 +155,12 @@ contract('STokensManager', ([deployer, user]) => {
 		name: string,
 		property: string,
 		amount: number | string,
-		cumulativeReward: number
+		cumulativeReward: number,
 	): void => {
 		expect(name).to.equal(
 			`Dev Protocol sTokens - ${property} - ${toBigNumber(amount)
 				.div(1e18)
-				.toFixed()} DEV - ${cumulativeReward}`
+				.toFixed()} DEV - ${cumulativeReward}`,
 		)
 	}
 
@@ -191,7 +189,7 @@ contract('STokensManager', ([deployer, user]) => {
 		attributes: Attributes,
 		property: string,
 		amount: number | string,
-		payload: string
+		payload: string,
 	): void => {
 		expect(attributes).to.deep.equal([
 			{ trait_type: 'Destination', value: property },
@@ -214,7 +212,7 @@ contract('STokensManager', ([deployer, user]) => {
 				.catch((err: Error) => err)
 			validateErrorMessage(
 				result,
-				'Initializable: contract is already initialized'
+				'Initializable: contract is already initialized',
 			)
 		})
 	})
@@ -241,7 +239,7 @@ contract('STokensManager', ([deployer, user]) => {
 					10000,
 					0,
 					'0x0000000000000000000000000000000000000000000000000000000000000000',
-					''
+					'',
 				)
 			})
 			it('get token uri with big staked amount', async () => {
@@ -255,7 +253,7 @@ contract('STokensManager', ([deployer, user]) => {
 					property.address,
 					MAX_UINT256,
 					0,
-					'0x0000000000000000000000000000000000000000000000000000000000000000'
+					'0x0000000000000000000000000000000000000000000000000000000000000000',
 				)
 			})
 			it('get custom token uri', async () => {
@@ -270,7 +268,7 @@ contract('STokensManager', ([deployer, user]) => {
 					10000,
 					0,
 					'0x0000000000000000000000000000000000000000000000000000000000000000',
-					'ipfs://IPFS-CID'
+					'ipfs://IPFS-CID',
 				)
 			})
 			it('get descriptor token uri; with custom name & description check', async () => {
@@ -278,13 +276,13 @@ contract('STokensManager', ([deployer, user]) => {
 				await dev.lockup.depositToProperty(
 					property.address,
 					'10000',
-					web3.utils.keccak256('ADDITIONAL_BYTES')
+					web3.utils.keccak256('ADDITIONAL_BYTES'),
 				)
 				await dev.sTokensManager.setTokenURIDescriptor(
 					property.address,
 					descriptor.address,
 					[web3.utils.keccak256('ADDITIONAL_BYTES')],
-					{ from: user }
+					{ from: user },
 				)
 				const uri = await dev.sTokensManager.tokenURI(1)
 				// This checks for default name & description
@@ -294,7 +292,7 @@ contract('STokensManager', ([deployer, user]) => {
 					10000,
 					0,
 					web3.utils.keccak256('ADDITIONAL_BYTES'),
-					'dummy-string'
+					'dummy-string',
 				)
 				// This checks for custom name & description
 				await descriptor._setName('new-name')
@@ -309,13 +307,13 @@ contract('STokensManager', ([deployer, user]) => {
 				await dev.lockup.depositToProperty(
 					property.address,
 					'10000',
-					web3.utils.keccak256('ADDITIONAL_BYTES')
+					web3.utils.keccak256('ADDITIONAL_BYTES'),
 				)
 				await dev.sTokensManager.setTokenURIDescriptor(
 					property.address,
 					descriptorLegacy.address,
 					[web3.utils.keccak256('ADDITIONAL_BYTES')],
-					{ from: user }
+					{ from: user },
 				)
 				const uri = await dev.sTokensManager.tokenURI(1)
 				checkTokenUri(
@@ -324,7 +322,7 @@ contract('STokensManager', ([deployer, user]) => {
 					10000,
 					0,
 					web3.utils.keccak256('ADDITIONAL_BYTES'),
-					'dummy-string'
+					'dummy-string',
 				)
 			})
 		})
@@ -393,7 +391,7 @@ contract('STokensManager', ([deployer, user]) => {
 					property.address,
 					descriptor.address,
 					[web3.utils.keccak256('PAYLOAD')],
-					{ from: user }
+					{ from: user },
 				)
 				await (dev.sTokensManager as any).methods[
 					'setTokenURIDescriptor(address,address)'
@@ -403,20 +401,20 @@ contract('STokensManager', ([deployer, user]) => {
 				await dev.lockup.depositToProperty(
 					property.address,
 					'10000',
-					web3.utils.keccak256('PAYLOAD')
+					web3.utils.keccak256('PAYLOAD'),
 				)
 				const latestTokenId = 1
 				const position = await dev.sTokensManager.positions(latestTokenId)
 				expect(position.property).to.equal(property.address)
 				expect(toBigNumber(position.amount).toNumber()).to.equal(10000)
 				expect(
-					await dev.sTokensManager.descriptorOf(position.property)
+					await dev.sTokensManager.descriptorOf(position.property),
 				).to.equal(descriptorCopy.address)
 				expect(
 					await dev.sTokensManager.descriptorOfPropertyByPayload(
 						position.property,
-						web3.utils.keccak256('PAYLOAD')
-					)
+						web3.utils.keccak256('PAYLOAD'),
+					),
 				).to.equal(descriptor.address)
 				expect(await descriptorCopy.shouldBe()).to.equal(false)
 			})
@@ -442,7 +440,7 @@ contract('STokensManager', ([deployer, user]) => {
 				expect(toBigNumber(beforePosition.amount).toNumber()).to.equal(10000)
 				expect(toBigNumber(beforePosition.price).toNumber()).to.equal(0)
 				expect(
-					toBigNumber(beforePosition.cumulativeReward).toNumber()
+					toBigNumber(beforePosition.cumulativeReward).toNumber(),
 				).to.equal(0)
 				expect(toBigNumber(beforePosition.pendingReward).toNumber()).to.equal(0)
 				await dev.lockup.depositToPosition(latestTokenId, '10000')
@@ -453,17 +451,17 @@ contract('STokensManager', ([deployer, user]) => {
 				expect(toBigNumber(afterPosition.price).toFixed()).to.equal(
 					toBigNumber('1000000000000000000000000000000000')
 						.times(t2 - t1)
-						.toFixed()
+						.toFixed(),
 				)
 				expect(toBigNumber(afterPosition.cumulativeReward).toFixed()).to.equal(
 					toBigNumber('10000000000000000000')
 						.times(t2 - t1)
-						.toFixed()
+						.toFixed(),
 				)
 				expect(toBigNumber(afterPosition.pendingReward).toFixed()).to.equal(
 					toBigNumber('10000000000000000000')
 						.times(t2 - t1)
-						.toFixed()
+						.toFixed(),
 				)
 			})
 
@@ -487,17 +485,17 @@ contract('STokensManager', ([deployer, user]) => {
 				expect(_price).to.equal(
 					toBigNumber('1000000000000000000000000000000000')
 						.times(t2 - t1)
-						.toFixed()
+						.toFixed(),
 				)
 				expect(_cumulativeReward).to.equal(
 					toBigNumber('10000000000000000000')
 						.times(t2 - t1)
-						.toFixed()
+						.toFixed(),
 				)
 				expect(_pendingReward).to.equal(
 					toBigNumber('10000000000000000000')
 						.times(t2 - t1)
-						.toFixed()
+						.toFixed(),
 				)
 			})
 		})
@@ -525,7 +523,7 @@ contract('STokensManager', ([deployer, user]) => {
 					10000,
 					0,
 					'0x0000000000000000000000000000000000000000000000000000000000000000',
-					'ipfs://IPFS-CID'
+					'ipfs://IPFS-CID',
 				)
 			})
 			it('get overwritten data', async () => {
@@ -543,7 +541,7 @@ contract('STokensManager', ([deployer, user]) => {
 					10000,
 					0,
 					'0x0000000000000000000000000000000000000000000000000000000000000000',
-					'ipfs://IPFS-CID2'
+					'ipfs://IPFS-CID2',
 				)
 			})
 		})
@@ -665,13 +663,13 @@ contract('STokensManager', ([deployer, user]) => {
 				expect(position.entireReward.toString()).to.equal(
 					toBigNumber('10000000000000000000')
 						.times(t2 - t1)
-						.toFixed()
+						.toFixed(),
 				)
 				expect(position.cumulativeReward.toString()).to.equal('0')
 				const tmp =
 					await dev.lockup.calculateWithdrawableInterestAmountByPosition(1)
 				expect(position.withdrawableReward.toString()).to.equal(
-					toBigNumber(tmp).toFixed()
+					toBigNumber(tmp).toFixed(),
 				)
 			})
 			it('get updated reward', async () => {
@@ -685,17 +683,17 @@ contract('STokensManager', ([deployer, user]) => {
 				expect(position.entireReward.toString()).to.equal(
 					toBigNumber(position.cumulativeReward.toString())
 						.plus(position.withdrawableReward.toString())
-						.toFixed()
+						.toFixed(),
 				)
 				expect(position.cumulativeReward.toString()).to.equal(
 					toBigNumber('10000000000000000000')
 						.times(t2 - t1)
-						.toFixed()
+						.toFixed(),
 				)
 				const tmp =
 					await dev.lockup.calculateWithdrawableInterestAmountByPosition(1)
 				expect(position.withdrawableReward.toString()).to.equal(
-					toBigNumber(tmp).toFixed()
+					toBigNumber(tmp).toFixed(),
 				)
 			})
 		})
@@ -713,7 +711,7 @@ contract('STokensManager', ([deployer, user]) => {
 			it('get token id', async () => {
 				await dev.lockup.depositToProperty(property.address, '10000')
 				const tokenIds = await dev.sTokensManager.positionsOfProperty(
-					property.address
+					property.address,
 				)
 				expect(tokenIds.length).to.equal(1)
 				expect(tokenIds[0].toNumber()).to.equal(1)
@@ -723,23 +721,20 @@ contract('STokensManager', ([deployer, user]) => {
 				const propertyAddress = getPropertyAddress(
 					await dev.propertyFactory.create('test', 'TEST', user, {
 						from: user,
-					})
+					}),
 				)
 				await dev.metricsFactory.__addMetrics(
-					(
-						await dev.createMetrics(deployer, propertyAddress)
-					).address
+					(await dev.createMetrics(deployer, propertyAddress)).address,
 				)
 
 				await dev.lockup.depositToProperty(propertyAddress, '10000')
 				const tokenIds = await dev.sTokensManager.positionsOfProperty(
-					property.address
+					property.address,
 				)
 				expect(tokenIds.length).to.equal(1)
 				expect(tokenIds[0].toNumber()).to.equal(1)
-				const tokenIds2 = await dev.sTokensManager.positionsOfProperty(
-					propertyAddress
-				)
+				const tokenIds2 =
+					await dev.sTokensManager.positionsOfProperty(propertyAddress)
 				expect(tokenIds2.length).to.equal(1)
 				expect(tokenIds2[0].toNumber()).to.equal(2)
 			})
@@ -748,16 +743,15 @@ contract('STokensManager', ([deployer, user]) => {
 				await dev.lockup.depositToProperty(property.address, '10000')
 
 				const tokenIds = await dev.sTokensManager.positionsOfProperty(
-					property.address
+					property.address,
 				)
 				expect(tokenIds.length).to.equal(2)
 				expect(tokenIds[0].toNumber()).to.equal(1)
 				expect(tokenIds[1].toNumber()).to.equal(2)
 			})
 			it('return empty array', async () => {
-				const tokenIds = await dev.sTokensManager.positionsOfProperty(
-					DEFAULT_ADDRESS
-				)
+				const tokenIds =
+					await dev.sTokensManager.positionsOfProperty(DEFAULT_ADDRESS)
 				expect(tokenIds.length).to.equal(0)
 			})
 		})
@@ -793,9 +787,8 @@ contract('STokensManager', ([deployer, user]) => {
 				expect(tokenIds[1].toNumber()).to.equal(2)
 			})
 			it('return empty array', async () => {
-				const tokenIds = await dev.sTokensManager.positionsOfOwner(
-					DEFAULT_ADDRESS
-				)
+				const tokenIds =
+					await dev.sTokensManager.positionsOfOwner(DEFAULT_ADDRESS)
 				expect(tokenIds.length).to.equal(0)
 			})
 			it('transfer token(index0)', async () => {
@@ -855,21 +848,21 @@ contract('STokensManager', ([deployer, user]) => {
 					property.address,
 					descriptor.address,
 					payload1,
-					{ from: user }
+					{ from: user },
 				)
 				await dev.sTokensManager.setTokenURIDescriptor(
 					property.address,
 					descriptor.address,
 					payload2,
-					{ from: user }
+					{ from: user },
 				)
 				const tmp = await dev.sTokensManager.descriptorOfPropertyByPayload(
 					property.address,
-					payload1[0]
+					payload1[0],
 				)
 				const tmp2 = await dev.sTokensManager.descriptorOfPropertyByPayload(
 					property.address,
-					payload2[0]
+					payload2[0],
 				)
 				expect(tmp).to.equal(descriptor.address)
 				expect(tmp2).to.equal(descriptor.address)
@@ -880,13 +873,13 @@ contract('STokensManager', ([deployer, user]) => {
 					property.address,
 					descriptor.address,
 					payload,
-					{ from: user }
+					{ from: user },
 				)
 				// @ts-ignore
 				await dev.lockup.depositToProperty(
 					property.address,
 					'10000',
-					web3.utils.keccak256('ADDITIONAL_BYTES')
+					web3.utils.keccak256('ADDITIONAL_BYTES'),
 				)
 				const key = await descriptor.dataOf(1)
 				expect(key).to.equal(web3.utils.keccak256('ADDITIONAL_BYTES'))
@@ -906,7 +899,7 @@ contract('STokensManager', ([deployer, user]) => {
 					property.address,
 					descriptor.address,
 					payload,
-					{ from: user }
+					{ from: user },
 				)
 				await descriptor.__shouldBe(false)
 				// @ts-ignore
@@ -914,7 +907,7 @@ contract('STokensManager', ([deployer, user]) => {
 					.depositToProperty(
 						property.address,
 						'10000',
-						web3.utils.keccak256('ADDITIONAL_BYTES')
+						web3.utils.keccak256('ADDITIONAL_BYTES'),
 					)
 					.catch((err: Error) => err)
 				validateErrorMessage(res, 'failed to call onBeforeMint')
@@ -939,7 +932,7 @@ contract('STokensManager', ([deployer, user]) => {
 				await dev.lockup.depositToProperty(
 					property.address,
 					'10000',
-					web3.utils.keccak256('ADDITIONAL_BYTES')
+					web3.utils.keccak256('ADDITIONAL_BYTES'),
 				)
 				const key = await descriptor.dataOf(1)
 				expect(key).to.equal(web3.utils.keccak256('ADDITIONAL_BYTES'))
@@ -962,7 +955,7 @@ contract('STokensManager', ([deployer, user]) => {
 					.depositToProperty(
 						property.address,
 						'10000',
-						web3.utils.keccak256('ADDITIONAL_BYTES')
+						web3.utils.keccak256('ADDITIONAL_BYTES'),
 					)
 					.catch((err: Error) => err)
 				validateErrorMessage(res, 'failed to call onBeforeMint')
@@ -1008,14 +1001,14 @@ contract('STokensManager', ([deployer, user]) => {
 				DEFAULT_ADDRESS,
 				positions,
 				rewards,
-				'0x0000000000000000000000000000000000000000000000000000000000000000'
+				'0x0000000000000000000000000000000000000000000000000000000000000000',
 			)
 			checkTokenUri(
 				tmp,
 				positions.property,
 				positions.amount,
 				positions.cumulativeReward,
-				'0x0000000000000000000000000000000000000000000000000000000000000000'
+				'0x0000000000000000000000000000000000000000000000000000000000000000',
 			)
 		})
 		it('set token uri image', async () => {
@@ -1029,7 +1022,7 @@ contract('STokensManager', ([deployer, user]) => {
 				DEFAULT_ADDRESS,
 				positions,
 				rewards,
-				'0x0000000000000000000000000000000000000000000000000000000000000000'
+				'0x0000000000000000000000000000000000000000000000000000000000000000',
 			)
 			checkTokenUri(
 				tokenUri,
@@ -1037,7 +1030,7 @@ contract('STokensManager', ([deployer, user]) => {
 				positions.amount,
 				positions.cumulativeReward,
 				'0x0000000000000000000000000000000000000000000000000000000000000000',
-				'ipfs://IPFS-CID'
+				'ipfs://IPFS-CID',
 			)
 		})
 		it('default descriptor: with payload', async () => {
@@ -1047,14 +1040,14 @@ contract('STokensManager', ([deployer, user]) => {
 				property.address,
 				descriptor.address,
 				payload,
-				{ from: user }
+				{ from: user },
 			)
 			const tmp = await dev.sTokensManager.tokenURISim(
 				1,
 				DEFAULT_ADDRESS,
 				positions,
 				rewards,
-				web3.utils.keccak256('PAYLOAD')
+				web3.utils.keccak256('PAYLOAD'),
 			)
 			checkTokenUri(
 				tmp,
@@ -1062,7 +1055,7 @@ contract('STokensManager', ([deployer, user]) => {
 				positions.amount,
 				positions.cumulativeReward,
 				web3.utils.keccak256('PAYLOAD'),
-				'dummy-string'
+				'dummy-string',
 			)
 		})
 		it('default descriptor: without payload', async () => {
@@ -1075,7 +1068,7 @@ contract('STokensManager', ([deployer, user]) => {
 				DEFAULT_ADDRESS,
 				positions,
 				rewards,
-				'0x'
+				'0x',
 			)
 			checkTokenUri(
 				tmp,
@@ -1083,7 +1076,7 @@ contract('STokensManager', ([deployer, user]) => {
 				positions.amount,
 				positions.cumulativeReward,
 				'0x0000000000000000000000000000000000000000000000000000000000000000',
-				'dummy-string'
+				'dummy-string',
 			)
 		})
 	})
@@ -1142,7 +1135,7 @@ contract('STokensManager', ([deployer, user]) => {
 				validateErrorMessage(
 					res,
 					'ERC721Enumerable: owner index out of bounds',
-					false
+					false,
 				)
 			})
 			it('[after minted] throws the error when the passed index is over than the holding index', async () => {
@@ -1154,7 +1147,7 @@ contract('STokensManager', ([deployer, user]) => {
 				validateErrorMessage(
 					res,
 					'ERC721Enumerable: owner index out of bounds',
-					false
+					false,
 				)
 			})
 		})
@@ -1180,7 +1173,7 @@ contract('STokensManager', ([deployer, user]) => {
 				validateErrorMessage(
 					res,
 					'ERC721Enumerable: global index out of bounds',
-					false
+					false,
 				)
 			})
 			it('[after minted] throws the error when the passed index is over than the minted amount', async () => {
@@ -1193,7 +1186,7 @@ contract('STokensManager', ([deployer, user]) => {
 				validateErrorMessage(
 					res,
 					'ERC721Enumerable: global index out of bounds',
-					false
+					false,
 				)
 			})
 		})
@@ -1204,7 +1197,7 @@ contract('STokensManager', ([deployer, user]) => {
 				await dev.sTokensManager.setSTokenRoyaltyForProperty(
 					property.address,
 					'1000',
-					{ from: user }
+					{ from: user },
 				)
 				const royalty = await dev.sTokensManager.royaltyOf(property.address)
 				expect(royalty.toString()).to.equal('1000')
@@ -1234,7 +1227,7 @@ contract('STokensManager', ([deployer, user]) => {
 					await dev.sTokensManager.setSTokenRoyaltyForProperty(
 						property.address,
 						'1000',
-						{ from: user }
+						{ from: user },
 					)
 					await dev.lockup.depositToProperty(property.address, '10000')
 					const royaltyInfo = await dev.sTokensManager.royaltyInfo(1, '100')

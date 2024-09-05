@@ -66,7 +66,7 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 					'10000000000000000000000',
 					{
 						from: alis,
-					}
+					},
 				)
 				await forwardBlockTimestamp(1)
 				const prev = await dev.dev.totalSupply().then(toBigNumber)
@@ -80,7 +80,7 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 
 				expect(prev.toString()).to.be.not.equal(next.toString())
 				expect(balance.plus(gap).toString()).to.be.equal(
-					afterBalance.toString()
+					afterBalance.toString(),
 				)
 			})
 		})
@@ -94,7 +94,7 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 					'10000000000000000000000',
 					{
 						from: user3,
-					}
+					},
 				)
 				const t1 = await getBlockTimestamp()
 				await forwardBlockTimestamp(1)
@@ -108,27 +108,27 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 				await forwardBlockTimestamp(1)
 				const [deployerFirstShare] = splitValue(
 					oneBlockAmount,
-					SHARE_OF_TREASURY
+					SHARE_OF_TREASURY,
 				)
 				const [deployerSecondShare] = splitValue(
 					oneBlockAmount,
-					SHARE_OF_TREASURY + user1Share
+					SHARE_OF_TREASURY + user1Share,
 				)
 				const t3 = await getBlockTimestamp()
 				const amount1 = await dev.withdraw.calculateRewardAmount(
 					property.address,
-					deployer
+					deployer,
 				)
 				const amount2 = await dev.withdraw.calculateRewardAmount(
 					property.address,
-					user1
+					user1,
 				)
 				expect(
 					deployerFirstShare
 						.times(t2 - t1)
 						.plus(deployerSecondShare.times(t3 - t2))
 						.integerValue(BigNumber.ROUND_DOWN)
-						.toFixed()
+						.toFixed(),
 				).to.be.equal(toBigNumber(amount1[0]).toFixed())
 				expect(
 					oneBlockAmount
@@ -136,7 +136,7 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 						.times(user1Share)
 						.times(t3 - t2)
 						.integerValue(BigNumber.ROUND_DOWN)
-						.toFixed()
+						.toFixed(),
 				).to.be.equal(toBigNumber(amount2[0]).toFixed())
 			})
 			it('The withdrawal amount is always the full amount of the withdrawable amount', async () => {
@@ -148,7 +148,7 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 					'10000000000000000000000',
 					{
 						from: user3,
-					}
+					},
 				)
 				const t1 = await getBlockTimestamp()
 				await forwardBlockTimestamp(1)
@@ -185,19 +185,19 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 								.plus(
 									toBigNumber(9e19)
 										.times(0.75)
-										.times(t3 - t2)
-								)
+										.times(t3 - t2),
+								),
 						)
-						.toFixed()
+						.toFixed(),
 				).to.be.equal(nextBalance1.toFixed())
 				expect(
 					prevBalance2
 						.plus(
 							toBigNumber(9e19)
 								.times(0.2)
-								.times(t4 - t2)
+								.times(t4 - t2),
 						)
-						.toFixed()
+						.toFixed(),
 				).to.be.equal(nextBalance2.toFixed())
 			})
 			it('should fail to withdraw when the withdrawable amount is 0', async () => {
@@ -205,7 +205,7 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 
 				const amount = await dev.withdraw.calculateRewardAmount(
 					property.address,
-					user1
+					user1,
 				)
 				const res = await dev.withdraw
 					.withdraw(property.address, { from: user1 })
@@ -224,19 +224,19 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 		const prepare = async (): Promise<
 			[
 				DevProtocolInstance,
-				[PropertyInstance, PropertyInstance, PropertyInstance]
+				[PropertyInstance, PropertyInstance, PropertyInstance],
 			]
 		> => {
 			const [dev, , property, , market] = await init(deployer, user3)
 			await dev.dev.mint(alis, new BigNumber(1e18).times(10000000))
 			const propertyAddress2 = getPropertyAddress(
-				await dev.propertyFactory.create('test2', 'TEST2', propertyAuthor)
+				await dev.propertyFactory.create('test2', 'TEST2', propertyAuthor),
 			)
 			const [property2] = await Promise.all([
 				artifacts.require('Property').at(propertyAddress2),
 			])
 			const propertyAddress3 = getPropertyAddress(
-				await dev.propertyFactory.create('test2', 'TEST2', propertyAuthor)
+				await dev.propertyFactory.create('test2', 'TEST2', propertyAuthor),
 			)
 			const [property3] = await Promise.all([
 				artifacts.require('Property').at(propertyAddress3),
@@ -252,7 +252,7 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 		const calculateRewardAndCap = async (
 			dev: DevProtocolInstance,
 			property: PropertyInstance,
-			user: string
+			user: string,
 		): Promise<[BigNumber, BigNumber]> => {
 			const result = await dev.lockup.calculateRewardAmount(property.address)
 			const reward = toBigNumber(result[0])
@@ -278,21 +278,21 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 			const value = capped.isZero()
 				? allReward
 				: allReward.isLessThanOrEqualTo(capped)
-				? allReward
-				: capped
+					? allReward
+					: capped
 			return [value, capped]
 		}
 
 		const checkAmount = async (
 			dev: DevProtocolInstance,
 			property: PropertyInstance,
-			user: string
+			user: string,
 		): Promise<void> => {
 			await forwardBlockTimestamp(1)
 			const [value, capped] = await calculateRewardAndCap(dev, property, user)
 			const amount = await dev.withdraw.calculateRewardAmount(
 				property.address,
-				user
+				user,
 			)
 			const expected = value.isGreaterThan(capped) ? capped : value
 			expect(toBigNumber(amount[0]).toFixed()).to.be.equal(expected.toFixed())
@@ -305,21 +305,21 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 				toBigNumber(1000000000),
 				{
 					from: alis,
-				}
+				},
 			)
 			await dev.lockup.depositToProperty(
 				property2.address,
 				toBigNumber(2000000000),
 				{
 					from: alis,
-				}
+				},
 			)
 			await dev.lockup.depositToProperty(
 				property3.address,
 				toBigNumber(3000000000),
 				{
 					from: alis,
-				}
+				},
 			)
 
 			const cap = toBigNumber(1817120592)
@@ -349,7 +349,7 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 		const Bob = user1
 		const Carol = user3
 		const toStruct = (
-			src: any
+			src: any,
 		): {
 			to: string
 			from: string
@@ -410,7 +410,7 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 			expect(res1.amount.toNumber()).to.be.equal(0) // Initially, it's 0
 			expect(res1.preBalanceOfSender.toFixed()).to.be.equal(balance1.toFixed())
 			expect(res1.preBalanceOfRecipient.toFixed()).to.be.equal(
-				balance2.toFixed()
+				balance2.toFixed(),
 			)
 			expect(res1.blockNumber.toNumber()).to.be.equal(block1)
 			expect(res1.to).to.be.equal(Bob)
@@ -421,7 +421,7 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 			expect(res2.amount.toNumber()).to.be.equal(0) // Initially, it's 0
 			expect(res2.preBalanceOfSender.toFixed()).to.be.equal(balance3.toFixed())
 			expect(res2.preBalanceOfRecipient.toFixed()).to.be.equal(
-				balance4.toFixed()
+				balance4.toFixed(),
 			)
 			expect(res2.blockNumber.toNumber()).to.be.equal(block2)
 			expect(res2.to).to.be.equal(Carol)
@@ -451,7 +451,7 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 					await dev.withdraw
 						.transferHistoryLength(property.address)
 						.then(toBigNumber)
-				).toFixed()
+				).toFixed(),
 			).to.be.equal('0')
 
 			await property.transfer(Bob, '1000000', {
@@ -462,7 +462,7 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 					await dev.withdraw
 						.transferHistoryLength(property.address)
 						.then(toBigNumber)
-				).toFixed()
+				).toFixed(),
 			).to.be.equal('1')
 
 			await property.transfer(Bob, '1000000', {
@@ -473,7 +473,7 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 					await dev.withdraw
 						.transferHistoryLength(property.address)
 						.then(toBigNumber)
-				).toFixed()
+				).toFixed(),
 			).to.be.equal('2')
 		})
 		it('should increase transferHistoryLengthOfSender each transfer', async () => {
@@ -482,7 +482,7 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 					await dev.withdraw
 						.transferHistoryLengthOfSender(property.address, Alice)
 						.then(toBigNumber)
-				).toFixed()
+				).toFixed(),
 			).to.be.equal('0')
 
 			await property.transfer(Bob, '1000000', {
@@ -493,7 +493,7 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 					await dev.withdraw
 						.transferHistoryLengthOfSender(property.address, Alice)
 						.then(toBigNumber)
-				).toFixed()
+				).toFixed(),
 			).to.be.equal('1')
 
 			await property.transfer(Bob, '1000000', {
@@ -504,7 +504,7 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 					await dev.withdraw
 						.transferHistoryLengthOfSender(property.address, Alice)
 						.then(toBigNumber)
-				).toFixed()
+				).toFixed(),
 			).to.be.equal('2')
 		})
 		it('should increase transferHistoryLengthOfRecipient each transfer', async () => {
@@ -513,7 +513,7 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 					await dev.withdraw
 						.transferHistoryLengthOfRecipient(property.address, Bob)
 						.then(toBigNumber)
-				).toFixed()
+				).toFixed(),
 			).to.be.equal('0')
 
 			await property.transfer(Bob, '1000000', {
@@ -524,7 +524,7 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 					await dev.withdraw
 						.transferHistoryLengthOfRecipient(property.address, Bob)
 						.then(toBigNumber)
-				).toFixed()
+				).toFixed(),
 			).to.be.equal('1')
 
 			await property.transfer(Bob, '1000000', {
@@ -535,7 +535,7 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 					await dev.withdraw
 						.transferHistoryLengthOfRecipient(property.address, Bob)
 						.then(toBigNumber)
-				).toFixed()
+				).toFixed(),
 			).to.be.equal('2')
 		})
 		it('should record TransferHistory ID in transferHistoryOfSenderByIndex', async () => {
@@ -545,7 +545,7 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 			const id1 = await dev.withdraw.transferHistoryOfSenderByIndex(
 				property.address,
 				Alice,
-				0
+				0,
 			)
 			const r1 = await dev.withdraw
 				.transferHistory(property.address, id1)
@@ -558,7 +558,7 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 			const id2 = await dev.withdraw.transferHistoryOfSenderByIndex(
 				property.address,
 				Alice,
-				1
+				1,
 			)
 			const r2 = await dev.withdraw
 				.transferHistory(property.address, id2)
@@ -572,7 +572,7 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 			const id1 = await dev.withdraw.transferHistoryOfRecipientByIndex(
 				property.address,
 				Bob,
-				0
+				0,
 			)
 			const r1 = await dev.withdraw
 				.transferHistory(property.address, id1)
@@ -585,7 +585,7 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 			const id2 = await dev.withdraw.transferHistoryOfRecipientByIndex(
 				property.address,
 				Bob,
-				1
+				1,
 			)
 			const r2 = await dev.withdraw
 				.transferHistory(property.address, id2)
@@ -607,22 +607,22 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 							.require('Property')
 							.at(
 								getPropertyAddress(
-									await dev.propertyFactory.create('test1', 'TEST1', Alice)
-								)
+									await dev.propertyFactory.create('test1', 'TEST1', Alice),
+								),
 							),
 						artifacts
 							.require('Property')
 							.at(
 								getPropertyAddress(
-									await dev.propertyFactory.create('test2', 'TEST2', Bob)
-								)
+									await dev.propertyFactory.create('test2', 'TEST2', Bob),
+								),
 							),
 						artifacts
 							.require('Property')
 							.at(
 								getPropertyAddress(
-									await dev.propertyFactory.create('test3', 'TEST3', Carol)
-								)
+									await dev.propertyFactory.create('test3', 'TEST3', Carol),
+								),
 							),
 					])
 					Prop1 = properties[0]
@@ -716,10 +716,10 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 					expect(r1.to).to.be.equal(Bob)
 					expect(r1.amount.toFixed()).to.be.equal('0')
 					expect(r1.preBalanceOfSender.toFixed()).to.be.equal(
-						balanceAlice.toFixed()
+						balanceAlice.toFixed(),
 					)
 					expect(r1.preBalanceOfRecipient.toFixed()).to.be.equal(
-						balanceBob.toFixed()
+						balanceBob.toFixed(),
 					)
 					expect(r1.filled).to.be.equal(false)
 					expect(r1.blockNumber.toNumber()).to.be.equal(blockNumber)
@@ -810,10 +810,10 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 					expect(r1.to).to.be.equal(Carol)
 					expect(r1.amount.toFixed()).to.be.equal('0')
 					expect(r1.preBalanceOfSender.toFixed()).to.be.equal(
-						balanceBob.toFixed()
+						balanceBob.toFixed(),
 					)
 					expect(r1.preBalanceOfRecipient.toFixed()).to.be.equal(
-						balanceCarol.toFixed()
+						balanceCarol.toFixed(),
 					)
 					expect(r1.filled).to.be.equal(false)
 					expect(r1.blockNumber.toNumber()).to.be.equal(blockNumber)
@@ -898,10 +898,10 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 					expect(r1.to).to.be.equal(Carol)
 					expect(r1.amount.toFixed()).to.be.equal('0')
 					expect(r1.preBalanceOfSender.toFixed()).to.be.equal(
-						balanceBob.toFixed()
+						balanceBob.toFixed(),
 					)
 					expect(r1.preBalanceOfRecipient.toFixed()).to.be.equal(
-						balanceCarol.toFixed()
+						balanceCarol.toFixed(),
 					)
 					expect(r1.filled).to.be.equal(false)
 					expect(r1.blockNumber.toNumber()).to.be.equal(blockNumber)
@@ -916,10 +916,10 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 					expect(r1.from).to.be.equal(Alice)
 					expect(r1.to).to.be.equal(Bob)
 					expect(r1.preBalanceOfSender.toFixed()).to.be.equal(
-						balanceAliceProp1$1.toFixed()
+						balanceAliceProp1$1.toFixed(),
 					)
 					expect(r1.preBalanceOfRecipient.toFixed()).to.be.equal(
-						balanceBobProp1$1.toFixed()
+						balanceBobProp1$1.toFixed(),
 					)
 					expect(r1.blockNumber.toNumber()).to.be.equal(blockNumberProp1$1)
 				})
@@ -933,10 +933,10 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 					expect(r1.from).to.be.equal(Bob)
 					expect(r1.to).to.be.equal(Carol)
 					expect(r1.preBalanceOfSender.toFixed()).to.be.equal(
-						balanceBobProp2$1.toFixed()
+						balanceBobProp2$1.toFixed(),
 					)
 					expect(r1.preBalanceOfRecipient.toFixed()).to.be.equal(
-						balanceCarolProp2$1.toFixed()
+						balanceCarolProp2$1.toFixed(),
 					)
 					expect(r1.blockNumber.toNumber()).to.be.equal(blockNumberProp2$1)
 				})
@@ -956,7 +956,7 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 						transferAmountProp3$1 = balanceCarol.times(Math.random()).dp(0)
 						console.log(
 							'transferAmountProp3$1',
-							transferAmountProp3$1.toFixed()
+							transferAmountProp3$1.toFixed(),
 						)
 						await Prop3.transfer(Alice, transferAmountProp3$1.toFixed(), {
 							from: Carol,
@@ -1034,10 +1034,10 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 					expect(r1.to).to.be.equal(Alice)
 					expect(r1.amount.toFixed()).to.be.equal('0')
 					expect(r1.preBalanceOfSender.toFixed()).to.be.equal(
-						balanceCarol.toFixed()
+						balanceCarol.toFixed(),
 					)
 					expect(r1.preBalanceOfRecipient.toFixed()).to.be.equal(
-						balanceAlice.toFixed()
+						balanceAlice.toFixed(),
 					)
 					expect(r1.filled).to.be.equal(false)
 					expect(r1.blockNumber.toNumber()).to.be.equal(blockNumber)
@@ -1124,10 +1124,10 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 					expect(r1.to).to.be.equal(Bob)
 					expect(r1.amount.toFixed()).to.be.equal('0')
 					expect(r1.preBalanceOfSender.toFixed()).to.be.equal(
-						balanceAlice.toFixed()
+						balanceAlice.toFixed(),
 					)
 					expect(r1.preBalanceOfRecipient.toFixed()).to.be.equal(
-						balanceBob.toFixed()
+						balanceBob.toFixed(),
 					)
 					expect(r1.filled).to.be.equal(false)
 					expect(r1.blockNumber.toNumber()).to.be.equal(blockNumber)
@@ -1137,17 +1137,17 @@ contract('WithdrawTest', ([deployer, user1, , user3]) => {
 						withdraw.transferHistory(Prop3.address, 0).then(toStruct),
 					])
 					expect(r1.amount.toFixed()).to.be.equal(
-						transferAmountProp3$1.toFixed()
+						transferAmountProp3$1.toFixed(),
 					)
 					expect(r1.filled).to.be.equal(true)
 
 					expect(r1.from).to.be.equal(Carol)
 					expect(r1.to).to.be.equal(Alice)
 					expect(r1.preBalanceOfSender.toFixed()).to.be.equal(
-						balanceCarolProp3$1.toFixed()
+						balanceCarolProp3$1.toFixed(),
 					)
 					expect(r1.preBalanceOfRecipient.toFixed()).to.be.equal(
-						balanceAliceProp3$1.toFixed()
+						balanceAliceProp3$1.toFixed(),
 					)
 					expect(r1.blockNumber.toNumber()).to.be.equal(blockNumberProp3$1)
 				})

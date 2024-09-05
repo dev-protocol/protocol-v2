@@ -10,21 +10,21 @@ const handler = async function (_, network) {
 
 	const proxyAddress = process.env.PROPERTY_FACTORY_PROXY!
 	const existing = await PropertyFactory.deployed().catch(() =>
-		PropertyFactory.at(proxyAddress)
+		PropertyFactory.at(proxyAddress),
 	)
 
 	console.log('proxy:', existing.address)
 
 	await validateUpgrade(
 		existing.address,
-		PropertyFactory as unknown as ContractClass
+		PropertyFactory as unknown as ContractClass,
 	)
 
 	console.log('New implementation is valid')
 
 	await upgradeProxy(
 		existing.address,
-		PropertyFactory as unknown as ContractClass
+		PropertyFactory as unknown as ContractClass,
 	)
 } as Truffle.Migration
 

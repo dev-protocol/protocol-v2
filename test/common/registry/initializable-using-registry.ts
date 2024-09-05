@@ -3,7 +3,7 @@ import { validateErrorMessage } from '../../test-lib/utils/error'
 
 contract('InitializableUsingRegistry', ([deployer]) => {
 	const initializableUsingRegistryContract = artifacts.require(
-		'InitializableUsingRegistryTest'
+		'InitializableUsingRegistryTest',
 	)
 	const dev = new DevProtocolInstance(deployer)
 	before(async () => {
@@ -18,7 +18,7 @@ contract('InitializableUsingRegistry', ([deployer]) => {
 			const tokenAddress = await contract.getToken()
 
 			expect(tokenAddress).to.be.equal(
-				await dev.addressRegistry.registries('Dev')
+				await dev.addressRegistry.registries('Dev'),
 			)
 		})
 
@@ -31,7 +31,7 @@ contract('InitializableUsingRegistry', ([deployer]) => {
 
 			validateErrorMessage(
 				res,
-				'Initializable: contract is already initialized'
+				'Initializable: contract is already initialized',
 			)
 		})
 	})

@@ -242,9 +242,11 @@ contract Withdraw is InitializableUsingRegistry, IWithdraw, ITransferHistory {
 
 		uint256 allReward = _calculateAllReward(_property, _user, reward);
 		uint256 capped = _calculateCapped(_property, _user, cap);
-		uint256 value = capped == 0 ? allReward : allReward <= capped
+		uint256 value = capped == 0
 			? allReward
-			: capped;
+			: allReward <= capped
+				? allReward
+				: capped;
 
 		/**
 		 * Returns the result after adjusted decimals to 10^18, and the latest cumulative sum of the holder reward price.

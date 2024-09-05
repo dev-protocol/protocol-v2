@@ -12,12 +12,12 @@ contract('UsingRegistryTest', ([deployer]) => {
 		it('You can get the address of registry by setting it in the constructor.', async () => {
 			const usingRegistryTest = await usingRegistryContract.new(
 				dev.addressRegistry.address,
-				{ from: deployer }
+				{ from: deployer },
 			)
 			const tokenAddress = await usingRegistryTest.getToken()
 
 			expect(tokenAddress).to.be.equal(
-				await dev.addressRegistry.registries('Dev')
+				await dev.addressRegistry.registries('Dev'),
 			)
 		})
 	})
@@ -25,7 +25,7 @@ contract('UsingRegistryTest', ([deployer]) => {
 		it('You can get the address of registry.', async () => {
 			const usingRegistryTest = await usingRegistryContract.new(
 				dev.addressRegistry.address,
-				{ from: deployer }
+				{ from: deployer },
 			)
 			const registryAddress = await usingRegistryTest.registryAddress()
 

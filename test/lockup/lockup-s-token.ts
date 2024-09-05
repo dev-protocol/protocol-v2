@@ -51,7 +51,7 @@ contract('LockupTest', ([deployer, , user2, user3]) => {
 				await dev.lockup.depositToProperty(
 					property.address,
 					100,
-					web3.utils.keccak256('ADDITIONAL_BYTES')
+					web3.utils.keccak256('ADDITIONAL_BYTES'),
 				)
 				const owner = await dev.sTokensManager.ownerOf(1)
 				expect(owner).to.be.equal(deployer)
@@ -88,7 +88,7 @@ contract('LockupTest', ([deployer, , user2, user3]) => {
 				expect(toBigNumber(position.price).toFixed()).to.be.equal(
 					toBigNumber('100000000000000000000000000000000000')
 						.times(t2 - t1)
-						.toFixed()
+						.toFixed(),
 				)
 				expect(toBigNumber(position.cumulativeReward).toNumber()).to.be.equal(0)
 				expect(toBigNumber(position.pendingReward).toNumber()).to.be.equal(0)
@@ -116,12 +116,10 @@ contract('LockupTest', ([deployer, , user2, user3]) => {
 				const propertyAddress = getPropertyAddress(
 					await dev.propertyFactory.create('test2', 'TEST2', user2, {
 						from: user2,
-					})
+					}),
 				)
 				await dev.metricsFactory.__addMetrics(
-					(
-						await dev.createMetrics(deployer, propertyAddress)
-					).address
+					(await dev.createMetrics(deployer, propertyAddress)).address,
 				)
 				await dev.dev.approve(dev.lockup.address, 300)
 				await dev.lockup.depositToProperty(property.address, 100)
@@ -156,7 +154,7 @@ contract('LockupTest', ([deployer, , user2, user3]) => {
 				const allValue = await dev.lockup.totalLocked()
 				expect(allValue.toString()).to.be.equal('100')
 				const propertyValue = await dev.lockup.totalLockedForProperty(
-					property.address
+					property.address,
 				)
 				expect(propertyValue.toString()).to.be.equal('100')
 			})
@@ -172,7 +170,7 @@ contract('LockupTest', ([deployer, , user2, user3]) => {
 				const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
 				const afterPropertyBalance = await dev.dev.balanceOf(property.address)
 				expect(afterBalance.toString()).to.be.equal(
-					deployerBalance.minus(100).toString()
+					deployerBalance.minus(100).toString(),
 				)
 				expect(afterPropertyBalance.toString()).to.be.equal('100')
 			})
@@ -182,7 +180,7 @@ contract('LockupTest', ([deployer, , user2, user3]) => {
 				const propertyAddress = getPropertyAddress(
 					await dev.propertyFactory.create('test2', 'TEST2', user2, {
 						from: user2,
-					})
+					}),
 				)
 				const res = await dev.lockup
 					.depositToProperty(propertyAddress, 100)
@@ -209,10 +207,10 @@ contract('LockupTest', ([deployer, , user2, user3]) => {
 				expect(toBigNumber(beforePosition.amount).toNumber()).to.be.equal(100)
 				expect(toBigNumber(beforePosition.price).toNumber()).to.be.equal(0)
 				expect(
-					toBigNumber(beforePosition.cumulativeReward).toNumber()
+					toBigNumber(beforePosition.cumulativeReward).toNumber(),
 				).to.be.equal(0)
 				expect(
-					toBigNumber(beforePosition.pendingReward).toNumber()
+					toBigNumber(beforePosition.pendingReward).toNumber(),
 				).to.be.equal(0)
 				await forwardBlockTimestamp(2)
 				await dev.lockup.depositToPosition(tokenId, 100)
@@ -223,19 +221,19 @@ contract('LockupTest', ([deployer, , user2, user3]) => {
 				expect(toBigNumber(afterPosition.price).toFixed()).to.be.equal(
 					toBigNumber('100000000000000000000000000000000000')
 						.times(t2 - t1)
-						.toFixed()
+						.toFixed(),
 				)
 				expect(
-					toBigNumber(afterPosition.cumulativeReward).toFixed()
+					toBigNumber(afterPosition.cumulativeReward).toFixed(),
 				).to.be.equal(
 					toBigNumber('10000000000000000000')
 						.times(t2 - t1)
-						.toFixed()
+						.toFixed(),
 				)
 				expect(toBigNumber(afterPosition.pendingReward).toFixed()).to.be.equal(
 					toBigNumber('10000000000000000000')
 						.times(t2 - t1)
-						.toFixed()
+						.toFixed(),
 				)
 			})
 			it('generate event.', async () => {
@@ -256,7 +254,7 @@ contract('LockupTest', ([deployer, , user2, user3]) => {
 				const allValue = await dev.lockup.totalLocked()
 				expect(allValue.toString()).to.be.equal('400')
 				const propertyValue = await dev.lockup.totalLockedForProperty(
-					property.address
+					property.address,
 				)
 				expect(propertyValue.toString()).to.be.equal('400')
 			})
@@ -266,14 +264,14 @@ contract('LockupTest', ([deployer, , user2, user3]) => {
 					.then(toBigNumber)
 				const beforePropertyBalance = await dev.dev.balanceOf(property.address)
 				expect(beforeBalance.toString()).to.be.equal(
-					deployerBalance.minus(100).toString()
+					deployerBalance.minus(100).toString(),
 				)
 				expect(beforePropertyBalance.toString()).to.be.equal('100')
 				await dev.lockup.depositToPosition(tokenId, 300)
 				const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
 				const afterPropertyBalance = await dev.dev.balanceOf(property.address)
 				expect(afterBalance.toString()).to.be.equal(
-					deployerBalance.minus(100).minus(300).toString()
+					deployerBalance.minus(100).minus(300).toString(),
 				)
 				expect(afterPropertyBalance.toString()).to.be.equal('400')
 			})
@@ -297,12 +295,10 @@ contract('LockupTest', ([deployer, , user2, user3]) => {
 				const propertyAddress = getPropertyAddress(
 					await dev.propertyFactory.create('test2', 'TEST2', user2, {
 						from: user2,
-					})
+					}),
 				)
 				await dev.metricsFactory.__addMetrics(
-					(
-						await dev.createMetrics(deployer, propertyAddress)
-					).address
+					(await dev.createMetrics(deployer, propertyAddress)).address,
 				)
 				await dev.lockup.depositToProperty(propertyAddress, 200)
 				const info = await dev.lockup.getLockedupProperties()
@@ -346,10 +342,10 @@ contract('LockupTest', ([deployer, , user2, user3]) => {
 				expect(toBigNumber(beforePosition.amount).toNumber()).to.be.equal(100)
 				expect(toBigNumber(beforePosition.price).toNumber()).to.be.equal(0)
 				expect(
-					toBigNumber(beforePosition.cumulativeReward).toNumber()
+					toBigNumber(beforePosition.cumulativeReward).toNumber(),
 				).to.be.equal(0)
 				expect(
-					toBigNumber(beforePosition.pendingReward).toNumber()
+					toBigNumber(beforePosition.pendingReward).toNumber(),
 				).to.be.equal(0)
 				await dev.lockup.withdrawByPosition(tokenId, 100)
 				const t2 = await getBlockTimestamp()
@@ -359,17 +355,17 @@ contract('LockupTest', ([deployer, , user2, user3]) => {
 				expect(toBigNumber(afterPosition.price).toFixed()).to.be.equal(
 					toBigNumber('100000000000000000000000000000000000')
 						.times(t2 - t1)
-						.toFixed()
+						.toFixed(),
 				)
 				expect(
-					toBigNumber(afterPosition.cumulativeReward).toFixed()
+					toBigNumber(afterPosition.cumulativeReward).toFixed(),
 				).to.be.equal(
 					toBigNumber('10000000000000000000')
 						.times(t2 - t1)
-						.toFixed()
+						.toFixed(),
 				)
 				expect(
-					toBigNumber(beforePosition.pendingReward).toNumber()
+					toBigNumber(beforePosition.pendingReward).toNumber(),
 				).to.be.equal(0)
 			})
 			it('generate event.', async () => {
@@ -383,7 +379,7 @@ contract('LockupTest', ([deployer, , user2, user3]) => {
 						getEventValue(dev.lockup)('Withdrew', '_value'),
 						getEventValue(dev.lockup)('Withdrew', '_reward'),
 						getEventValue(dev.lockup)('Withdrew', '_tokenId'),
-					]
+					],
 				)
 				expect(_from).to.be.equal(deployer)
 				expect(_property).to.be.equal(property.address)
@@ -408,7 +404,7 @@ contract('LockupTest', ([deployer, , user2, user3]) => {
 				expect(reward.toString()).to.be.equal(
 					toBigNumber('10000000000000000000')
 						.times(t2 - t1)
-						.toFixed()
+						.toFixed(),
 				)
 			})
 			it('reverce staking dev token.', async () => {
@@ -424,7 +420,7 @@ contract('LockupTest', ([deployer, , user2, user3]) => {
 				const stakedDev = rewardPlusStakedDev.minus(
 					toBigNumber('10000000000000000000')
 						.times(t2 - t1)
-						.toFixed()
+						.toFixed(),
 				)
 				expect(stakedDev.toString()).to.be.equal('100')
 			})
@@ -433,7 +429,7 @@ contract('LockupTest', ([deployer, , user2, user3]) => {
 				const allValue = await dev.lockup.totalLocked()
 				expect(allValue.toString()).to.be.equal('0')
 				const propertyValue = await dev.lockup.totalLockedForProperty(
-					property.address
+					property.address,
 				)
 				expect(propertyValue.toString()).to.be.equal('0')
 			})
@@ -453,12 +449,10 @@ contract('LockupTest', ([deployer, , user2, user3]) => {
 				const propertyAddress = getPropertyAddress(
 					await dev.propertyFactory.create('test2', 'TEST2', user2, {
 						from: user2,
-					})
+					}),
 				)
 				await dev.metricsFactory.__addMetrics(
-					(
-						await dev.createMetrics(deployer, propertyAddress)
-					).address
+					(await dev.createMetrics(deployer, propertyAddress)).address,
 				)
 				await dev.lockup.depositToProperty(propertyAddress, 200)
 				await dev.lockup.withdrawByPosition(tokenId, 100)

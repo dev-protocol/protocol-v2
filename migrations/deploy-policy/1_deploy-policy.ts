@@ -16,7 +16,7 @@ const handler = async function (deployer, network) {
 		policy,
 		regProxyAddress,
 		mintPerSecondAndAsset,
-		presumptiveAssets
+		presumptiveAssets,
 	)
 	const instance = await policy.deployed()
 	console.log(`policy address:${instance.address}`)

@@ -11,7 +11,7 @@ contract('UpgradeabilityLibrary ', ([deployer]) => {
 		before(async () => {
 			;[contract, admin] = await deployProxy(
 				artifacts.require('UpgradeabilityLibraryV1'),
-				deployer
+				deployer,
 			)
 		})
 		it('Store data', async () => {
@@ -35,7 +35,7 @@ contract('UpgradeabilityLibrary ', ([deployer]) => {
 			await admin.upgrade(contract.address, newImpl.address)
 
 			expect(
-				(await admin.getProxyImplementation(contract.address)).toString()
+				(await admin.getProxyImplementation(contract.address)).toString(),
 			).to.equal(newImpl.address)
 			expect((await contract.getCounter()).toString()).to.equal('1')
 			const eSet = await contract.getEnumerableSet()

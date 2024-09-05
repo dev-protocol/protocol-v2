@@ -10,7 +10,7 @@ const handler = async function (_, network) {
 
 	const proxyAddress = process.env.WITHDRAW_PROXY!
 	const existing = await Withdraw.deployed().catch(() =>
-		Withdraw.at(proxyAddress)
+		Withdraw.at(proxyAddress),
 	)
 
 	console.log('proxy:', existing.address)
