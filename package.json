@@ -1,6 +1,6 @@
 {
 	"name": "@devprotocol/protocol-v2",
-	"version": "0.5.0",
+	"version": "0.5.1",
 	"description": "Securitize for Internet assets",
 	"scripts": {
 		"test": "truffle test --config truffle-config.js",
