@@ -9638,10 +9638,10 @@ prepend-http@^2.0.0:
   resolved "https://registry.yarnpkg.com/prepend-http/-/prepend-http-2.0.0.tgz#e92434bfa5ea8c19f41cdfd401d741a3c819d897"
   integrity sha512-ravE6m9Atw9Z/jjttRUZ+clIXogdghyZAuWJ3qEzjT+jI/dL1ifAqhZeC5VHzQp1MSt1+jxKkFNemj/iO7tVUA==
 
-prettier-plugin-solidity@1.4.0:
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/prettier-plugin-solidity/-/prettier-plugin-solidity-1.4.0.tgz#9eaa6e1d380c8d2b58e4c533ee36eda5c65870c1"
-  integrity sha512-XXEOjKaY4nC0Hjqv+DMo+A7ZNbS70jil0phl1mdMAbKf45pkxfhPXrNBMDSWsTYTldwSX+8JOwsUynO3enVc5A==
+prettier-plugin-solidity@1.4.1:
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/prettier-plugin-solidity/-/prettier-plugin-solidity-1.4.1.tgz#8060baf18853a9e34d2e09e47e87b4f19e15afe9"
+  integrity sha512-Mq8EtfacVZ/0+uDKTtHZGW3Aa7vEbX/BNx63hmVg6YTiTXSiuKP0amj0G6pGwjmLaOfymWh3QgXEZkjQbU8QRg==
   dependencies:
     "@solidity-parser/parser" "^0.18.0"
     semver "^7.5.4"
