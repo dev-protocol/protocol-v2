@@ -58,7 +58,7 @@
 		"typechain-target-truffle": "1.0.2",
 		"typescript": "5.0.4",
 		"web3": "1.10.0",
-		"web3-utils": "4.3.1"
+		"web3-utils": "4.3.2"
 	},
 	"dependencies": {
 		"@devprotocol/util-contracts": "3.3.0",
