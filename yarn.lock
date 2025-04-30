@@ -202,6 +202,11 @@
     "@babel/helper-validator-identifier" "^7.19.1"
     to-fast-properties "^2.0.0"
 
+"@bytecodealliance/preview2-shim@0.17.2":
+  version "0.17.2"
+  resolved "https://registry.yarnpkg.com/@bytecodealliance/preview2-shim/-/preview2-shim-0.17.2.tgz#8d0c732cba29169a85aa3e603c767e039378f89b"
+  integrity sha512-mNm/lblgES8UkVle8rGImXOz4TtL3eU3inHay/7TVchkKrb/lgcVvTK0+VAw8p5zQ0rgQsXm1j5dOlAAd+MeoA==
+
 "@consento/sync-randombytes@^1.0.4", "@consento/sync-randombytes@^1.0.5":
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/@consento/sync-randombytes/-/sync-randombytes-1.0.5.tgz#5be6bc58c6a6fa6e09f04cc684d037e29e6c28d5"
@@ -1060,6 +1065,13 @@
   version "0.15.1"
   resolved "https://registry.yarnpkg.com/@nomicfoundation/slang-win32-x64-msvc/-/slang-win32-x64-msvc-0.15.1.tgz#9889b0d71e353bbbd2b6d744503f9fb0eb2f431b"
   integrity sha512-cyER8M1fdBTzIfihy55d4LGGlN/eQxDqfRUTXgJf1VvNR98tRB0Q3nBfyh5PK2yP98B4lMt3RJYDqTQu+dOVDA==
+
+"@nomicfoundation/slang@1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@nomicfoundation/slang/-/slang-1.1.0.tgz#a83536e3486fe6963080d4d21240d0f218dc942e"
+  integrity sha512-g2BofMUq1qCP22L/ksOftScrCxjdHTxgg8ch5PYon2zfSSKGCMwE4TgIC64CuorMcSsvCmqNNFEWR/fwFcMeTw==
+  dependencies:
+    "@bytecodealliance/preview2-shim" "0.17.2"
 
 "@nomicfoundation/slang@^0.15.1":
   version "0.15.1"
@@ -9534,11 +9546,12 @@ prepend-http@^2.0.0:
   resolved "https://registry.yarnpkg.com/prepend-http/-/prepend-http-2.0.0.tgz#e92434bfa5ea8c19f41cdfd401d741a3c819d897"
   integrity sha512-ravE6m9Atw9Z/jjttRUZ+clIXogdghyZAuWJ3qEzjT+jI/dL1ifAqhZeC5VHzQp1MSt1+jxKkFNemj/iO7tVUA==
 
-prettier-plugin-solidity@1.4.3:
-  version "1.4.3"
-  resolved "https://registry.yarnpkg.com/prettier-plugin-solidity/-/prettier-plugin-solidity-1.4.3.tgz#73f8adeb0214fb3db1c2d59023b39e079be69019"
-  integrity sha512-Mrr/iiR9f9IaeGRMZY2ApumXcn/C5Gs3S7B7hWB3gigBFML06C0yEyW86oLp0eqiA0qg+46FaChgLPJCj/pIlg==
+prettier-plugin-solidity@2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/prettier-plugin-solidity/-/prettier-plugin-solidity-2.0.0.tgz#69b318d7f67a1ad8ca227bec5e4a4310685e95c0"
+  integrity sha512-tis3SwLSrYKDzzRFle48fjPM4GQKBtkVBUajAkt4b75/cc6zojFP7qjz6fDxKfup+34q0jKeSM3QeP9flJFXWw==
   dependencies:
+    "@nomicfoundation/slang" "1.1.0"
     "@solidity-parser/parser" "^0.20.1"
     semver "^7.7.1"
 
