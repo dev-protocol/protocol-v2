@@ -2238,6 +2238,169 @@
           }
         }
       }
+    },
+    "30dc47fdeaf9e32917f7c40b9783337f781a5dd0dfc707190f7bcd4a056b743f": {
+      "address": "0x9f34D5240a476779a4F1FbCB3D71fd45138B660C",
+      "txHash": "0xf2bd34d8500772ac335f18d2912421914478208ca80286878067cdcecc28f725",
+      "layout": {
+        "solcVersion": "0.8.9",
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "_initialized",
+            "type": "t_bool",
+            "src": "../@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:21"
+          },
+          {
+            "contract": "Initializable",
+            "label": "_initializing",
+            "type": "t_bool",
+            "src": "../@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:26"
+          },
+          {
+            "contract": "InitializableUsingRegistry",
+            "label": "_registry",
+            "type": "t_address",
+            "src": "../project:/contracts/src/common/registry/InitializableUsingRegistry.sol:11"
+          },
+          {
+            "contract": "Lockup",
+            "label": "cap",
+            "type": "t_uint256",
+            "src": "../project:/contracts/src/lockup/Lockup.sol:45"
+          },
+          {
+            "contract": "Lockup",
+            "label": "totalLocked",
+            "type": "t_uint256",
+            "src": "../project:/contracts/src/lockup/Lockup.sol:46"
+          },
+          {
+            "contract": "Lockup",
+            "label": "cumulativeHoldersRewardCap",
+            "type": "t_uint256",
+            "src": "../project:/contracts/src/lockup/Lockup.sol:47"
+          },
+          {
+            "contract": "Lockup",
+            "label": "lastCumulativeHoldersPriceCap",
+            "type": "t_uint256",
+            "src": "../project:/contracts/src/lockup/Lockup.sol:48"
+          },
+          {
+            "contract": "Lockup",
+            "label": "lastLockedChangedCumulativeReward",
+            "type": "t_uint256",
+            "src": "../project:/contracts/src/lockup/Lockup.sol:49"
+          },
+          {
+            "contract": "Lockup",
+            "label": "lastCumulativeHoldersRewardPrice",
+            "type": "t_uint256",
+            "src": "../project:/contracts/src/lockup/Lockup.sol:50"
+          },
+          {
+            "contract": "Lockup",
+            "label": "lastCumulativeRewardPrice",
+            "type": "t_uint256",
+            "src": "../project:/contracts/src/lockup/Lockup.sol:51"
+          },
+          {
+            "contract": "Lockup",
+            "label": "cumulativeGlobalReward",
+            "type": "t_uint256",
+            "src": "../project:/contracts/src/lockup/Lockup.sol:52"
+          },
+          {
+            "contract": "Lockup",
+            "label": "lastSameGlobalRewardAmount",
+            "type": "t_uint256",
+            "src": "../project:/contracts/src/lockup/Lockup.sol:53"
+          },
+          {
+            "contract": "Lockup",
+            "label": "lastSameGlobalRewardTimestamp",
+            "type": "t_uint256",
+            "src": "../project:/contracts/src/lockup/Lockup.sol:54"
+          },
+          {
+            "contract": "Lockup",
+            "label": "lockedupProperties",
+            "type": "t_struct(AddressSet)7248_storage",
+            "src": "../project:/contracts/src/lockup/Lockup.sol:55"
+          },
+          {
+            "contract": "Lockup",
+            "label": "lastCumulativeHoldersRewardPricePerProperty",
+            "type": "t_mapping(t_address,t_uint256)",
+            "src": "../project:/contracts/src/lockup/Lockup.sol:56"
+          },
+          {
+            "contract": "Lockup",
+            "label": "initialCumulativeHoldersRewardCap",
+            "type": "t_mapping(t_address,t_uint256)",
+            "src": "../project:/contracts/src/lockup/Lockup.sol:58"
+          },
+          {
+            "contract": "Lockup",
+            "label": "totalLockedForProperty",
+            "type": "t_mapping(t_address,t_uint256)",
+            "src": "../project:/contracts/src/lockup/Lockup.sol:59"
+          },
+          {
+            "contract": "Lockup",
+            "label": "lastCumulativeHoldersRewardAmountPerProperty",
+            "type": "t_mapping(t_address,t_uint256)",
+            "src": "../project:/contracts/src/lockup/Lockup.sol:60"
+          }
+        ],
+        "types": {
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_struct(AddressSet)7248_storage": {
+            "label": "struct EnumerableSet.AddressSet",
+            "members": [
+              {
+                "label": "_inner",
+                "type": "t_struct(Set)6947_storage"
+              }
+            ]
+          },
+          "t_struct(Set)6947_storage": {
+            "label": "struct EnumerableSet.Set",
+            "members": [
+              {
+                "label": "_values",
+                "type": "t_array(t_bytes32)dyn_storage"
+              },
+              {
+                "label": "_indexes",
+                "type": "t_mapping(t_bytes32,t_uint256)"
+              }
+            ]
+          },
+          "t_array(t_bytes32)dyn_storage": {
+            "label": "bytes32[]"
+          },
+          "t_mapping(t_bytes32,t_uint256)": {
+            "label": "mapping(bytes32 => uint256)"
+          },
+          "t_bytes32": {
+            "label": "bytes32"
+          },
+          "t_mapping(t_address,t_uint256)": {
+            "label": "mapping(address => uint256)"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_bool": {
+            "label": "bool"
+          }
+        },
+        "namespaces": {}
+      }
     }
   }
 }
