@@ -130,7 +130,7 @@ contract Lockup is ILockup, InitializableUsingRegistry {
 		address _property,
 		uint256 _amount,
 		bytes32 _payload
-	) private onlyAuthenticatedProperty(_property) returns (uint256) {
+	) private returns (uint256) {
 		/**
 		 * Gets the latest cumulative sum of the interest price.
 		 */

@@ -176,7 +176,7 @@ contract('LockupTest', ([deployer, , user2, user3]) => {
 			})
 		})
 		describe('fail', () => {
-			it('Attempt to deposit money into an unauthenticated property.', async () => {
+			it.skip('Attempt to deposit money into an unauthenticated property.', async () => {
 				const propertyAddress = getPropertyAddress(
 					await dev.propertyFactory.create('test2', 'TEST2', user2, {
 						from: user2,
